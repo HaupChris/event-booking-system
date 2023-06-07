@@ -1,0 +1,10 @@
+node_modules
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+
+# Editor directories and files
+.idea
+/server/db/event_booking.db
