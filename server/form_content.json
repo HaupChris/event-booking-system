@@ -1,0 +1,78 @@
+{
+  "Ticketoptions": [
+    {
+      "Title": "Donnerstag",
+      "Price": 10.0
+    },
+    {
+      "Title": "Freitag",
+      "Price": 10.0
+    }
+  ],
+  "BeverageOptions": [
+    {
+      "Title": "Ein Tag",
+      "Description": "Entspricht 5 Litern Bier",
+      "Price": 20.0
+    },
+    {
+      "Title": "Zwei Tage",
+      "Description": "Entspricht 10 Litern Bier",
+      "Price": 40.0
+    }
+  ],
+  "Workshifts": [
+    {
+      "Title": "Sauber machen",
+      "Description": "Festival aufräumen immer morgens",
+      "Zeitslots": [
+        {
+          "Title": "Donnerstag",
+          "Start": "08:00",
+          "End": "12:00:",
+          "Needed_workers": 4
+        },
+        {
+          "Title": "Freitag",
+          "Start": "08:00",
+          "End": "12:00:",
+          "Needed_workers": 5
+        },
+        {
+          "Title": "Samstag",
+          "Start": "08:00",
+          "End": "12:00:",
+          "Needed_workers": 3
+        },
+        {
+          "Title": "Sonntag",
+          "Start": "08:00",
+          "End": "12:00:",
+          "Needed_workers": 1
+        }
+      ]
+    },
+    {
+      "Title": "Aufbauen",
+      "Description": "Festival aufbauen",
+      "Zeitslots": [
+        {
+          "Title": "Donnerstag",
+          "Start": "08:00",
+          "End": "12:00:",
+          "Needed_workers": 4
+        }
+      ]
+    }
+  ],
+  "Materials": [
+    {
+      "Title": "Stühle",
+      "Needed": 100
+    },
+    {
+      "Title": "Tische",
+      "Needed": 1
+    }
+  ]
+}
