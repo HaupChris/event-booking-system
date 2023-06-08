@@ -3,6 +3,7 @@ import {BrowserRouter, BrowserRouter as Router, Navigate, Route, Routes} from 'r
 import PasswordPage from "./form/passwordPage";
 import NameAndAddressForm from "./form/nameAndAddress";
 import {AuthContext, PasswordContext} from "./AuthContext";
+import {FormContainer} from "./form/formContainer";
 
 const App = () => {
 	const [auth, setAuth] = useState(false);
@@ -19,7 +20,7 @@ const App = () => {
 			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<PasswordPage/>}/>
-					<Route path="/form" element={auth ? <NameAndAddressForm/> : <Navigate replace to="/"/>}/>
+					<Route path="/form" element={auth ? <FormContainer/> : <Navigate replace to="/"/>}/>
 					<Route path="*" element={<PasswordPage/>}/>
 				</Routes>
 			</BrowserRouter>
