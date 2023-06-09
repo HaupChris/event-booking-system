@@ -1,78 +1,80 @@
 {
-  "Ticketoptions": [
+  "ticket_options": [
     {
-      "Title": "Donnerstag",
-      "Price": 10.0
+      "title": "Donnerstag",
+      "price": 10.0,
+      "amount": 100
     },
     {
-      "Title": "Freitag",
-      "Price": 10.0
+      "title": "Freitag",
+      "price": 10.0,
+      "amount": 100
     }
   ],
-  "BeverageOptions": [
+  "beverage_options": [
     {
-      "Title": "Ein Tag",
-      "Description": "Entspricht 5 Litern Bier",
-      "Price": 20.0
+      "title": "Ein Tag",
+      "description": "Entspricht 5 Litern Bier",
+      "price": 20.0
     },
     {
-      "Title": "Zwei Tage",
-      "Description": "Entspricht 10 Litern Bier",
-      "Price": 40.0
+      "title": "Zwei Tage",
+      "description": "Entspricht 10 Litern Bier",
+      "price": 40.0
     }
   ],
-  "Workshifts": [
+  "work_shifts": [
     {
-      "Title": "Sauber machen",
-      "Description": "Festival aufräumen immer morgens",
-      "Zeitslots": [
+      "title": "Sauber machen",
+      "description": "Festival aufräumen immer morgens",
+      "time_slots": [
         {
-          "Title": "Donnerstag",
-          "Start": "08:00",
-          "End": "12:00:",
-          "Needed_workers": 4
+          "title": "Donnerstag",
+          "start_time": "08:00",
+          "end_time": "12:00:",
+          "needed_workers": 4
         },
         {
-          "Title": "Freitag",
-          "Start": "08:00",
-          "End": "12:00:",
-          "Needed_workers": 5
+          "title": "Freitag",
+          "start_time": "08:00",
+          "end_time": "12:00:",
+          "needed_workers": 5
         },
         {
-          "Title": "Samstag",
-          "Start": "08:00",
-          "End": "12:00:",
-          "Needed_workers": 3
+          "title": "Samstag",
+          "start_time": "08:00",
+          "end_time": "12:00:",
+          "needed_workers": 3
         },
         {
-          "Title": "Sonntag",
-          "Start": "08:00",
-          "End": "12:00:",
-          "Needed_workers": 1
+          "title": "Sonntag",
+          "start_time": "08:00",
+          "end_time": "12:00:",
+          "needed_workers": 1
         }
       ]
     },
     {
-      "Title": "Aufbauen",
-      "Description": "Festival aufbauen",
-      "Zeitslots": [
+      "title": "Aufbauen",
+      "description": "Festival aufbauen",
+      "time_slots": [
         {
-          "Title": "Donnerstag",
-          "Start": "08:00",
-          "End": "12:00:",
-          "Needed_workers": 4
+          "title": "Donnerstag",
+          "start_time": "08:00",
+          "end_time": "12:00:",
+          "needed_workers": 4
         }
       ]
     }
   ],
-  "Materials": [
+  "materials": [
     {
-      "Title": "Stühle",
-      "Needed": 100
+      "title": "Stühle",
+      "num_needed": 100
     },
     {
-      "Title": "Tische",
-      "Needed": 1
+      "title": "Tische",
+      "num_needed": 1
     }
   ]
 }

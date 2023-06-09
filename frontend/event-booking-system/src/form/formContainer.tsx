@@ -12,38 +12,8 @@ import NameAndAddressForm from "./nameAndAddress";
 import {NavigateBefore, NavigateNext} from "@mui/icons-material";
 
 import '../css/formContainer.css';
+import { FormContent } from "./interface";
 
-
-
-interface Address {
-	street: string;
-	city: string;
-	postcode: string;
-}
-
-interface TicketOption {
-	name: string;
-	price: number;
-}
-
-interface BeverageOption {
-	name: string;
-	price: number;
-}
-
-interface WorkshiftWithPriority {
-	workshift: string;
-	priority: number;
-}
-
-
-interface FormData {
-	name: string;
-	address: Address;
-	selectedTicket: TicketOption;
-	selectedBeverage: BeverageOption;
-	selectedWorkshiftsWithPrioritiy: WorkshiftWithPriority[];
-}
 
 enum FormSteps {
 	NameAndAddress = 0,
@@ -61,7 +31,7 @@ function LinearProgressWithLabel(props: LinearProgressProps & { currentValue: nu
 	return (
 		<Box sx={{display: 'flex', alignItems: 'center'}}>
 			<Box sx={{width: '100%', mr: 1}}>
-				<LinearProgress variant="determinate" {...props} value={(props.currentValue / props.max) * 100.0} />
+				<LinearProgress variant="determinate" {...props} value={(props.currentValue / props.max) * 100.0}/>
 			</Box>
 			<Box sx={{minWidth: 35}}>
 				<Typography variant="body2" color="text.secondary">
@@ -73,7 +43,9 @@ function LinearProgressWithLabel(props: LinearProgressProps & { currentValue: nu
 }
 
 export function FormContainer() {
+	const [formContent, setFormContent] = useState<FormContent | null>(null);
 	const [activeStep, setActiveStep] = useState(1);
+	const [userInputs, setUserInputs] = useState<any>({});
 	const maxSteps = Object.keys(FormSteps).length / 2;
 
 	return <Card className={"form-container"}>
@@ -82,15 +54,16 @@ export function FormContainer() {
 				<LinearProgressWithLabel variant="determinate" max={maxSteps} currentValue={activeStep + 1}/>
 			</Grid>
 			<Grid item xs={12} className={"navigation-buttons"}>
-				<Button variant={"outlined"} sx={{'display': activeStep < 1 ? "none" : "inline-block"}} onClick={() => setActiveStep(activeStep - 1)}>
+				<Button variant={"outlined"} sx={{'display': activeStep < 1 ? "none" : "inline-block"}}
+						onClick={() => setActiveStep(activeStep - 1)}>
 					<NavigateBefore/>
 				</Button>
-				<Button variant={"outlined"} sx={{'display': activeStep >= maxSteps -1 ? "none" : "inline-block"}}onClick={() => setActiveStep(activeStep + 1)}>
+				<Button variant={"outlined"} sx={{'display': activeStep >= maxSteps - 1 ? "none" : "inline-block"}}
+						onClick={() => setActiveStep(activeStep + 1)}>
 					<NavigateNext/>
 				</Button>
 			</Grid>
 		</Grid>
-
 		<CardContent>
 			<Typography variant={"h5"}>Schritt {activeStep + 1}</Typography>
 			{activeStep === FormSteps.NameAndAddress && <NameAndAddressForm/>}
@@ -103,9 +76,5 @@ export function FormContainer() {
 			{/*{activeStep === FormSteps.Summary && <SummaryForm/>}*/}
 			{/*{activeStep === FormSteps.Confirmation && <ConfirmationForm/>}*/}
 		</CardContent>
-
-
 	</Card>;
-
-
 }

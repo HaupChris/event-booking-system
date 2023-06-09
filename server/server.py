@@ -11,25 +11,6 @@ CORS(app)
 
 password_string = 'password'
 
-def create_connection():
-    conn = None
-    try:
-        conn = sqlite3.connect('db/event_booking.db')  # Creates a file if it doesn't exist
-        return conn
-    except Error as e:
-        print(e)
-
-    return conn
-
-
-def save_booking(name, address):
-    conn = create_connection()
-
-    with conn:
-        cur = conn.cursor()
-        cur.execute('CREATE TABLE IF NOT EXISTS bookings (name text, address text)')
-        cur.execute('INSERT INTO bookings(name, address) VALUES (?, ?)', (name, address,))
-
 
 def require_appkey(view_function):
     @wraps(view_function)
