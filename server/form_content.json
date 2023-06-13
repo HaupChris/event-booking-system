@@ -31,26 +31,26 @@
         {
           "title": "Donnerstag",
           "start_time": "08:00",
-          "end_time": "12:00:",
-          "needed_workers": 4
+          "end_time": "12:00",
+          "num_needed": 4
         },
         {
           "title": "Freitag",
           "start_time": "08:00",
-          "end_time": "12:00:",
-          "needed_workers": 5
+          "end_time": "12:00",
+          "num_needed": 5
         },
         {
           "title": "Samstag",
           "start_time": "08:00",
-          "end_time": "12:00:",
-          "needed_workers": 3
+          "end_time": "12:00",
+          "num_needed": 3
         },
         {
           "title": "Sonntag",
           "start_time": "08:00",
-          "end_time": "12:00:",
-          "needed_workers": 1
+          "end_time": "12:00",
+          "num_needed": 1
         }
       ]
     },
@@ -61,8 +61,8 @@
         {
           "title": "Donnerstag",
           "start_time": "08:00",
-          "end_time": "12:00:",
-          "needed_workers": 4
+          "end_time": "12:00",
+          "num_needed": 4
         }
       ]
     }

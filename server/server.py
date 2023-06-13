@@ -6,10 +6,14 @@ from sqlite3 import Error
 
 from flask_cors import CORS
 
+from src.booking_manager import BookingManager
+from src.views import Booking
+
 app = Flask(__name__)
 CORS(app)
 
 password_string = 'password'
+booking_manager = BookingManager(json_path='./form_content.json', db_dir='../db')
 
 
 def require_appkey(view_function):
@@ -31,12 +35,18 @@ def password():
 @app.route('/submitForm', methods=['POST'])
 @require_appkey
 def submit_form():
-    data = request.get_json()
-    name = data['name']
-    address = data['address']
-    save_booking(name, address)
+    # booking object is sent as json
+    booking = Booking(**request.json)
+    booking_manager.insert_booking(booking)
+
     return 'Form submitted successfully'
 
+@app.route('/booking', methods=['GET'])
+@require_appkey
+def get_booking():
+    form_content = booking_manager.get_form_content()
+    form_content_json = flask_cors.jsonify(form_content)
+    return form_content_json
 
 if __name__ == '__main__':
     app.run(debug=True)

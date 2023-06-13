@@ -17,12 +17,11 @@ class BookingManager:
         self.form_content = self.load_form_content()
         self.db_connection = self.connect_db()
 
-
     def connect_db(self) -> sqlite3.Connection:
         """
         This function connects to the sqlite database using sqlite3. If it does not exist, it is created using the schema {self.db_dir}/schema.sql.
         """
-        new_creation = True
+        new_creation = not os.path.exists(self.db_file_path)
 
         conn = sqlite3.connect(self.db_file_path)
 
@@ -37,30 +36,30 @@ class BookingManager:
 
     def _insert_form_content(self, connection: sqlite3.Connection) -> None:
         # Insert ticket options
-        for idx, ticket_option in enumerate(self.form_content.ticket_options):
+        for ticket_option in self.form_content.ticket_options:
             connection.execute("INSERT INTO TicketOptions (id, title, price, amount) VALUES (?, ?, ?, ?)", (
-                idx, ticket_option.title, ticket_option.price, ticket_option.amount))
+                ticket_option.id, ticket_option.title, ticket_option.price, ticket_option.amount))
 
         # Insert beverage options
-        for idx, beverage_option in enumerate(self.form_content.beverage_options):
-            connection.execute("INSERT INTO BeverageOptions (title, description, price) VALUES (?, ?, ?, ?)", (
-                idx, beverage_option.title, beverage_option.description, beverage_option.price))
+        for beverage_option in self.form_content.beverage_options:
+            connection.execute("INSERT INTO BeverageOptions (id, title, description, price) VALUES (?, ?, ?, ?)", (
+                beverage_option.id, beverage_option.title, beverage_option.description, beverage_option.price))
 
         # Insert work shifts
-        for idx, work_shift in enumerate(self.form_content.work_shifts):
+        for work_shift in self.form_content.work_shifts:
             connection.execute("INSERT INTO WorkShifts (id, title, description) VALUES (?, ?, ?)", (
-                idx, work_shift.title, work_shift.description))
-            for timeslot_idx, time_slot in work_shift.time_slots:
-                connection.execute("INSERT INTO TimeSlots (id, title, start_time, end_time, needed_workers, taken_workers, workshift_id) VALUES (?, ?, ?, ?, ?, ?, ?)", (
-                    timeslot_idx, time_slot.title, time_slot.start_time, time_slot.end_time, time_slot.needed_workers, time_slot.taken_workers, idx))
-
+                work_shift.id, work_shift.title, work_shift.description))
+            for time_slot in work_shift.time_slots:
+                connection.execute(
+                    "INSERT INTO TimeSlots (id, title, start_time, end_time, num_needed, workshift_id) VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        time_slot.id, time_slot.title, time_slot.start_time, time_slot.end_time,
+                        time_slot.num_needed, work_shift.id))
 
         # Insert materials
         for material in self.form_content.materials:
-            connection.execute("INSERT INTO Materials (title, num_needed) VALUES (?, ?)", (
-                material.title, material.num_needed))
-
-
+            connection.execute("INSERT INTO Materials (id, title, num_needed) VALUES (?, ?, ?)", (
+                material.id, material.title, material.num_needed))
 
         connection.commit()
 
@@ -74,54 +73,118 @@ class BookingManager:
 
     def get_form_content(self) -> Dict:
         """
-        This function should fetch form content based on initial configuration and bookings from the database.
-        Here you would fetch data from your database and adjust self.form_content accordingly.
-        For simplicity, it just returns the initial form content now.
+        Fetches form content based on initial configuration and bookings from the database.
+        Adjusts form_content based on the fetched data.
         """
 
-        # TODO: Fetch data from the database and adjust form_content here
+        conn = sqlite3.connect(self.db_file_path)
+        c = conn.cursor()
 
-        return asdict(self.form_content)
+        # Get count of booked tickets, beverages, and materials
+        c.execute("SELECT ticket_option_id, COUNT(*) FROM Bookings GROUP BY ticket_option_id")
+        ticket_bookings = {row[0]: row[1] for row in c.fetchall()}
+
+        c.execute("SELECT beverage_option_id, COUNT(*) FROM Bookings GROUP BY beverage_option_id")
+        beverage_bookings = {row[0]: row[1] for row in c.fetchall()}
+
+        c.execute("SELECT material_id, COUNT(*) FROM BookingMaterials GROUP BY material_id")
+        material_bookings = {row[0]: row[1] for row in c.fetchall()}
+
+        # Get count of booked timeslots
+        c.execute("""
+            SELECT first_priority_timeslot_id, COUNT(*) FROM Bookings
+            WHERE first_priority_timeslot_id IS NOT NULL
+            GROUP BY first_priority_timeslot_id
+        """)
+        timeslot_bookings_1 = {row[0]: row[1] for row in c.fetchall()}
+
+        c.execute("""
+            SELECT second_priority_timeslot_id, COUNT(*) FROM Bookings
+            WHERE second_priority_timeslot_id IS NOT NULL
+            GROUP BY second_priority_timeslot_id
+        """)
+        timeslot_bookings_2 = {row[0]: row[1] for row in c.fetchall()}
+
+        c.execute("""
+            SELECT third_priority_timeslot_id, COUNT(*) FROM Bookings
+            WHERE third_priority_timeslot_id IS NOT NULL
+            GROUP BY third_priority_timeslot_id
+        """)
+        timeslot_bookings_3 = {row[0]: row[1] for row in c.fetchall()}
+
+        conn.close()
+
+        # Adjust form_content with booking data
+        form_content_dict = asdict(self.form_content)
+
+        for ticket_option in form_content_dict['ticket_options']:
+            ticket_option['num_booked'] = ticket_bookings.get(ticket_option['id'], 0)
+
+        for beverage_option in form_content_dict['beverage_options']:
+            beverage_option['num_booked'] = beverage_bookings.get(beverage_option['id'], 0)
+
+        for material in form_content_dict['materials']:
+            material['num_booked'] = material_bookings.get(material['id'], 0)
+
+        for work_shift in form_content_dict['work_shifts']:
+            for timeslot in work_shift['time_slots']:
+                timeslot['num_booked'] = timeslot_bookings_1.get(timeslot['id'], 0) \
+                                         + timeslot_bookings_2.get(timeslot['id'], 0) \
+                                         + timeslot_bookings_3.get(timeslot['id'], 0)
+
+        return form_content_dict
 
     def insert_booking(self, booking: Booking):
-        with closing(sqlite3.connect('bookings.db')) as connection:
+        with closing(sqlite3.connect(self.db_file_path)) as connection:
             cursor = connection.cursor()
 
             # First, we'll insert the user's information into the Users table
-            cursor.execute(
-                "INSERT INTO Users (last_name, first_name, street, postal_code, city, phone_number) VALUES (?, ?, ?, ?, ?, ?)",
-                (
-                    booking.last_name, booking.first_name, booking.street, booking.postal_code, booking.city,
-                    booking.phone))
+            cursor.execute("""
+                INSERT INTO Users (last_name, first_name, street, postal_code, city, email, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (
+                booking.last_name, booking.first_name, booking.street, booking.postal_code, booking.city, booking.email,
+                booking.phone))
 
-            user_id = cursor.lastrowid
+            user_id = cursor.lastrowid  # Get the ID of the last inserted row
 
-            # Next, we'll get the IDs for the selected ticket option, beverage option, and work shifts
-            ticket_option_id = \
-                cursor.execute("SELECT id FROM TicketOptions WHERE title = ?", (booking.ticket_title,)).fetchone()[0]
-            beverage_option_id = \
-                cursor.execute('SELECT id FROM BeverageOptions WHERE title = ?', (booking.beverage_title,)).fetchone()[
-                    0]
-            work_shift_priority_1_id = \
-                cursor.execute('SELECT id FROM WorkShifts WHERE title = ?',
-                               (booking.work_shift_priority_1,)).fetchone()[0]
-            work_shift_priority_2_id = \
-                cursor.execute('SELECT id FROM WorkShifts WHERE title = ?',
-                               (booking.work_shift_priority_2,)).fetchone()[0]
-            work_shift_priority_3_id = \
-                cursor.execute('SELECT id FROM WorkShifts WHERE title = ?',
-                               (booking.work_shift_priority_3,)).fetchone()[0]
+            # Then we'll insert the booking into the Bookings table
+            cursor.execute("""
+                INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, first_priority_timeslot_id, second_priority_timeslot_id, third_priority_timeslot_id, amount_shifts, signature, total_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (user_id, booking.ticket_id, booking.beverage_id, booking.timeslot_priority_1,
+                      booking.timeslot_priority_2, booking.timeslot_priority_3, booking.amount_shifts,
+                      booking.signature, booking.total_price))
+            booking_id = cursor.lastrowid
 
-            # Then, we'll insert the booking itself into the Bookings table
-            cursor.execute('''
-                INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, first_priority_workshift_id, second_priority_workshift_id, third_priority_workshift_id, amount_shifts, signature, total_price, is_paid)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
-            ''', (user_id, ticket_option_id, beverage_option_id, work_shift_priority_1_id, work_shift_priority_2_id,
-                  work_shift_priority_3_id, booking.amount_shifts, booking.signature, booking.total_price))
+            # Then we'll insert the materials into the Materials table
+            for material_id in booking.material_ids:
+                cursor.execute("""
+                    INSERT INTO BookingMaterials (booking_id, material_id) VALUES (?, ?)
+                    """, (booking_id, material_id))
 
             connection.commit()
 
 
 if __name__ == "__main__":
     booking_manager = BookingManager(json_path='../form_content.json', db_dir='../db')
-    print(booking_manager.get_form_content())
+
+    dummy_booking = Booking(
+        last_name="Doe",
+        first_name="John",
+        street="Doe Street 1",
+        postal_code="1234",
+        city="Doe City",
+        email="j.d@web.de",
+        phone="0123456789",
+        ticket_id=1,
+        beverage_id=1,
+        timeslot_priority_1=0,
+        timeslot_priority_2=1,
+        timeslot_priority_3=2,
+        amount_shifts=2,
+        total_price=100,
+        material_ids=[1, 2, 3]
+    )
+    booking_manager.insert_booking(dummy_booking)
+    for k, v in booking_manager.get_form_content().items():
+        print(k, v)
+    # booking_manager.get_form_content()

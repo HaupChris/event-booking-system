@@ -1,43 +1,66 @@
 // Generated using py-ts-interfaces.
 // See https://github.com/cs-cordero/py-ts-interfaces
 
-interface TimeSlot {
+export interface TimeSlot {
+    id: number;
     title: string;
-    start: string;
-    end: string;
-    needed_workers: number;
-    taken_workers: number;
+    start_time: string;
+    end_time: string;
+    num_needed: number;
+    num_booked: number;
 }
 
-interface WorkShift {
+export interface WorkShift {
+    id: number;
     title: string;
     description: string;
     time_slots: Array<TimeSlot>;
 }
 
-interface Material {
+export interface Material {
+    id: number;
     title: string;
     num_needed: number;
-    num_brought: number;
+    num_booked: number;
 }
 
-interface BeverageOption {
+export interface BeverageOption {
+    id: number;
     title: string;
     description: string;
     price: number;
-    chosen: number;
+    num_booked: number;
 }
 
-interface TicketOption {
+export interface TicketOption {
+    id: number;
     title: string;
     price: number;
     amount: number;
-    taken: number;
+    num_booked: number;
 }
 
-interface FormContent {
+export interface FormContent {
     ticket_options: Array<TicketOption>;
     beverage_options: Array<BeverageOption>;
     work_shifts: Array<WorkShift>;
     materials: Array<Material>;
+}
+
+export interface Booking {
+    last_name: string;
+    first_name: string;
+    email: string;
+    phone: string;
+    street: string;
+    postal_code: string;
+    city: string;
+    ticket_id: string;
+    beverage_id: string;
+    timeslot_priority_1: number;
+    timeslot_priority_2: number;
+    timeslot_priority_3: number;
+    material_ids: Array<number>;
+    amount_shifts: number;
+    total_price: number;
 }

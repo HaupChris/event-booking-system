@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS Users  (
     street TEXT,
     postal_code TEXT,
     city TEXT,
+    email TEXT NOT NULL,
     phone_number TEXT
 );
 
@@ -33,8 +34,7 @@ CREATE TABLE IF NOT EXISTS TimeSlots  (
     title TEXT NOT NULL,
     start_time TEXT,
     end_time TEXT,
-    needed_workers INTEGER,
-    taken_workers INTEGER,
+    num_needed INTEGER,
     workshift_id INTEGER,
     FOREIGN KEY(workshift_id) REFERENCES WorkShifts(id)
 );
@@ -50,9 +50,9 @@ CREATE TABLE IF NOT EXISTS Bookings  (
     user_id INTEGER,
     ticket_option_id INTEGER,
     beverage_option_id INTEGER,
-    first_priority_workshift_id INTEGER,
-    second_priority_workshift_id INTEGER,
-    third_priority_workshift_id INTEGER,
+    first_priority_timeslot_id INTEGER,
+    second_priority_timeslot_id INTEGER,
+    third_priority_timeslot_id INTEGER,
     amount_shifts INTEGER,
     signature BLOB,
     total_price REAL,
@@ -60,9 +60,9 @@ CREATE TABLE IF NOT EXISTS Bookings  (
     FOREIGN KEY(user_id) REFERENCES Users(id),
     FOREIGN KEY(ticket_option_id) REFERENCES TicketOptions(id),
     FOREIGN KEY(beverage_option_id) REFERENCES BeverageOptions(id),
-    FOREIGN KEY(first_priority_workshift_id) REFERENCES WorkShifts(id),
-    FOREIGN KEY(second_priority_workshift_id) REFERENCES WorkShifts(id),
-    FOREIGN KEY(third_priority_workshift_id) REFERENCES WorkShifts(id)
+    FOREIGN KEY(first_priority_timeslot_id) REFERENCES WorkShifts(id),
+    FOREIGN KEY(second_priority_timeslot_id) REFERENCES WorkShifts(id),
+    FOREIGN KEY(third_priority_timeslot_id) REFERENCES WorkShifts(id)
 );
 
 CREATE TABLE IF NOT EXISTS BookingMaterials  (
