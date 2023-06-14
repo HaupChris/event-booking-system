@@ -9,7 +9,7 @@ interface TicketFormProps extends FormProps {
 
 function TicketForm(props: TicketFormProps) {
 	const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		props.updateBooking('ticket_id', (event.target as HTMLInputElement).value);
+		props.updateBooking('ticket_id', Number((event.target as HTMLInputElement).value));
 	};
 
 	return (
@@ -28,7 +28,6 @@ function TicketForm(props: TicketFormProps) {
 					/>
 				))}
 			</RadioGroup>
-			{props.formValidation.ticket_id && <FormHelperText>{props.formValidation.ticket_id}</FormHelperText>}
 		</FormControl>
 	);
 }

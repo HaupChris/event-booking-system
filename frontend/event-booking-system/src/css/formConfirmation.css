@@ -1,0 +1,12 @@
+@keyframes scale-up {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.icon-container {
+  animation: scale-up 0.3s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+}

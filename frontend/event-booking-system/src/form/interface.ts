@@ -52,15 +52,14 @@ export interface Booking {
     first_name: string;
     email: string;
     phone: string;
-    street: string;
-    postal_code: string;
-    city: string;
-    ticket_id: string;
-    beverage_id: string;
+    ticket_id: number;
+    beverage_id: number;
     timeslot_priority_1: number;
     timeslot_priority_2: number;
     timeslot_priority_3: number;
+    signature: string;
     material_ids: Array<number>;
     amount_shifts: number;
+    supporter_buddy: string;
     total_price: number;
 }

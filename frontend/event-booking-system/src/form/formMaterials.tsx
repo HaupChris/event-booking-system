@@ -2,6 +2,7 @@ import {Booking, FormContent, Material} from "./interface";
 import React from "react";
 import {Checkbox, List, ListItem, ListItemAvatar, ListItemButton, ListItemText} from "@mui/material";
 import {CircularProgressWithLabel} from "./components/circularProgressWithLabel";
+import "../css/formMaterials.css";
 
 
 export interface MaterialFormProps {
@@ -22,7 +23,7 @@ function MaterialsForm(props: MaterialFormProps) {
 
 	}
 
-	return  <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+	return  <List dense sx={{}} className={'material-list'}>
       {props.formContent.materials.map((material: Material) => {
         const labelId = `checkbox-list-secondary-label-${material.id}`;
         return (

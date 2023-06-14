@@ -1,0 +1,10 @@
+.timeslot-list {
+    column-count: 1;
+    column-gap: 2em;
+}
+
+@media screen and (min-width: 600px) {
+    .timeslot-list {
+        column-count: 2;
+    }
+}

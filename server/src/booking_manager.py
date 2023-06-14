@@ -1,3 +1,4 @@
+import base64
 import sqlite3
 from contextlib import closing
 from typing import Dict
@@ -140,9 +141,9 @@ class BookingManager:
 
             # First, we'll insert the user's information into the Users table
             cursor.execute("""
-                INSERT INTO Users (last_name, first_name, street, postal_code, city, email, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO Users (last_name, first_name, email, phone_number) VALUES (?, ?, ?, ?)
                 """, (
-                booking.last_name, booking.first_name, booking.street, booking.postal_code, booking.city, booking.email,
+                booking.last_name, booking.first_name, booking.email,
                 booking.phone))
 
             user_id = cursor.lastrowid  # Get the ID of the last inserted row
@@ -162,6 +163,19 @@ class BookingManager:
                     """, (booking_id, material_id))
 
             connection.commit()
+
+            self.save_signature_image(booking)
+
+    def save_signature_image(self, booking: Booking):
+        # remove header if exists
+        signature = booking.signature.split(',')[1] if ',' in booking.signature else booking.signature
+
+        # decode base64 string
+        img_data = base64.b64decode(signature)
+        file_path = os.path.join(self.db_dir, 'signatures', f'{booking.last_name}_{booking.first_name}_{booking.email}.png')
+        # write to a file
+        with open(file_path, 'wb') as file:
+            file.write(img_data)
 
 
 if __name__ == "__main__":

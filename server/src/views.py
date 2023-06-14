@@ -87,18 +87,16 @@ class Booking(Interface):
     first_name: str
     email: str
     phone: str
-    street: str
-    postal_code: str
-    city: str
-    ticket_id: str
-    beverage_id: str
+    ticket_id: int
+    beverage_id: int
     timeslot_priority_1: int
     timeslot_priority_2: int
     timeslot_priority_3: int
     material_ids: List[int]
     amount_shifts: int
+    supporter_buddy: str
     total_price: float
-    # signature: bytes
+    signature: str
 
 
 

@@ -5,7 +5,7 @@ import {FormControl, FormControlLabel, Radio, RadioGroup} from "@mui/material";
 
 function BeverageForm(props: FormProps) {
 	const handleBeverageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		props.updateBooking('beverage_id', (event.target as HTMLInputElement).value);
+		props.updateBooking('beverage_id', Number((event.target as HTMLInputElement).value));
 	};
 
 	return (

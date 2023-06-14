@@ -1,7 +1,8 @@
 import {Booking, WorkShift as WorkShiftType} from '../interface';
-import {Divider, List, ListItem, Typography} from '@mui/material';
-import React from 'react';
+import {Box, Divider, List, ListItem, Typography} from '@mui/material';
+import React, {useEffect, useState} from 'react';
 import TimeSlot from './timeSlot';
+import '../../css/workShift.css';
 
 interface WorkShiftProps {
 	workShift: WorkShiftType;
@@ -11,20 +12,33 @@ interface WorkShiftProps {
 }
 
 function WorkShift({workShift, currentBooking, updateBooking, availablePriorities}: WorkShiftProps) {
+	const [sortedTimeSlots, setSortedTimeSlots] = useState(workShift.time_slots);
+
+	useEffect(() => {
+	  const sorted = [...workShift.time_slots].sort((a, b) => {
+		if (a.num_booked >= a.num_needed && b.num_booked < b.num_needed) {
+		  return 1;
+		} else if (b.num_booked >= b.num_needed && a.num_booked < a.num_needed) {
+		  return -1;
+		}
+		return 0;
+	  });
+
+	  setSortedTimeSlots(sorted);
+	}, [workShift]);
+
 	return (
-		<div>
-			<Typography variant="h6">{workShift.title}</Typography>
+		<Box sx={{display: 'flex', 'flex-direction': 'column', 'align-items': 'center', 'justify-content': 'center', }}>
+			<Typography variant="h5">{workShift.title}</Typography>
 			<Typography variant="body2">{workShift.description}</Typography>
 			<ListItem>
-				<List>
-					{workShift.time_slots.map((timeSlot) => {
+				<List className={'timeslot-list'}>
+					{sortedTimeSlots.map((timeSlot) => {
 						const selectedPriority = currentBooking.timeslot_priority_1 === timeSlot.id
 							? "Höchste" : currentBooking.timeslot_priority_2 === timeSlot.id
 								? "Mittlere" : currentBooking.timeslot_priority_3 === timeSlot.id
 									? "Notnagel" : "";
-
 						return <>
-
 							<TimeSlot
 								key={timeSlot.id}
 								timeSlot={timeSlot}
@@ -32,14 +46,11 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
 								selectedPriority={selectedPriority}
 								updateBooking={updateBooking}
 							/>
-
-
 						</>
 					})}
 				</List>
-
 			</ListItem>
-		</div>
+		</Box>
 	);
 }
 

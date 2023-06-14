@@ -1,37 +1,59 @@
-import React, {useEffect, useRef, useState} from "react";
-import SignatureCanvas from "react-signature-canvas";
-// import axios from "axios";
-import ReactSignatureCanvas from "react-signature-canvas";
-import '../../css/signature.css'
+import React, {useRef, useEffect, useState} from 'react';
+import {Box, Button, Typography} from '@mui/material';
+import SignatureCanvas from 'react-signature-canvas';
+import {Booking} from "../interface";
+import '../../css/signature.css';
 
-export function SignaturePad() {
-	const sigRef = useRef();
-	const [signature, setSignature] = useState(null);
-	const handleSignatureEnd = () => {
-		// @ts-ignore
-		setSignature(sigRef.current.toDataURL());
-	}
-	const clearSignature = () => {
-		// @ts-ignore
-		sigRef.current.clear();
-		setSignature(null);
-	}
+interface IProps {
+	updateBooking: (key: keyof Booking, value: any) => void;
+	booking: Booking;
+}
 
-	useEffect(() => {
-		console.log(signature);
-	}, [signature]);
+export function SignaturePad(props: IProps) {
+    const sigRef = useRef<SignatureCanvas | null>(null);
+    const [signature, setSignature] = useState<string | null>(null);
 
-	return <div>
-		<SignatureCanvas
-			penColor="black"
-			canvasProps={{className: 'signature-canvas'}}
-				// @ts-ignore
-			ref={sigRef}
-			onEnd={handleSignatureEnd}
-		/>
-		<button onClick={clearSignature}>Clear</button>
-	</div>
+    // Draw existing signature when the component mounts
+    useEffect(() => {
+        if (!props.booking.signature) return;
+        const canvas = sigRef.current?.getCanvas();
+        const ctx = canvas?.getContext('2d');
+        if (!ctx) return;
+        const img = new Image();
+        img.onload = () => {
+			const width = canvas ? canvas.width : 0;
+			const height = canvas ? canvas.height : 0;
+            ctx.clearRect(0, 0, width, height);  // Clear the canvas
+            ctx.drawImage(img, 0, 0);  // Draw the image
+        };
+        img.src = props.booking.signature;
+    }, [props.booking.signature]);
 
+    const handleSignatureEnd = () => {
+        if (!sigRef.current) return;
+        const signatureDataURL = sigRef.current.toDataURL();
+        props.updateBooking("signature", signatureDataURL);
+        setSignature(signatureDataURL);
+    };
+
+    const clearSignature = () => {
+        if (!sigRef.current) return;
+        sigRef.current.clear();
+        props.updateBooking("signature", "");
+        setSignature(null);
+    };
+
+    return (
+        <Box sx={{display: 'flex', 'flex-direction': 'column', 'align-items': 'center', 'justify-content': 'center', }}>
+            <SignatureCanvas
+                penColor="black"
+                canvasProps={{className: 'signature-canvas'}}
+                ref={sigRef}
+                onEnd={handleSignatureEnd}
+            />
+            <Button onClick={clearSignature}>Löschen</Button>
+        </Box>
+    );
 }
 
 export default SignaturePad;

@@ -49,7 +49,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 	}
 
 
-	return <ListItem sx={{border: selectedPriorityBorder}}>
+	return <ListItem sx={{border: selectedPriorityBorder, opacity: isFull ? '50%' : '100%'}}>
 		<ListItemAvatar>
 			<CircularProgressWithLabel valueCurrent={timeSlot.num_booked} valueMax={timeSlot.num_needed}/>
 		</ListItemAvatar>

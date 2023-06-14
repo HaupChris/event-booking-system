@@ -1,4 +1,5 @@
 import {
+	Alert,
 	Box,
 	Button,
 	Card,
@@ -7,19 +8,23 @@ import {
 	LinearProgressProps,
 	Typography
 } from "@mui/material";
-import React, {useState} from "react";
-import NameAndAddressForm from "./nameAndAddress";
-import {NavigateBefore, NavigateNext} from "@mui/icons-material";
-
 import '../css/formContainer.css';
+import {NavigateBefore, NavigateNext} from "@mui/icons-material";
+import axios from 'axios';
+import React, {useContext, useEffect, useState} from "react";
+
 import {Booking, FormContent} from "./interface";
-import SignaturePad from "signature_pad";
+
+import NameAndAddressForm from "./nameAndAddress";
 import {FormSignature} from "./formSignature";
 import TicketForm from "./formTicketSelection";
 import BeverageForm from "./formBeverageSelection";
-import WorkShiftForm from "./formWorkshifts";
 import WorkshiftForm from "./formWorkshifts";
 import MaterialsForm from "./formMaterials";
+import FormAwarnessCode from "./formAwarenessCode";
+import FormSummary from "./formSummary";
+import FormConfirmation from "./formConfirmation";
+import {AuthContext, TokenContext} from "../AuthContext";
 
 
 enum FormSteps {
@@ -34,15 +39,16 @@ enum FormSteps {
 	Confirmation = 8,
 }
 
-function LinearProgressWithLabel(props: LinearProgressProps & { currentValue: number, max: number }) {
+
+function LinearProgressWithLabel(props: LinearProgressProps & { currentvalue: number, max: number }) {
 	return (
 		<Box sx={{display: 'flex', alignItems: 'center'}}>
 			<Box sx={{width: '100%', mr: 1}}>
-				<LinearProgress variant="determinate" {...props} value={(props.currentValue / props.max) * 100.0}/>
+				<LinearProgress variant="determinate" {...props} value={(props.currentvalue / props.max) * 100.0}/>
 			</Box>
-			<Box sx={{minWidth: 35}}>
-				<Typography variant="body2" color="text.secondary">
-					{props.currentValue} von {props.max}
+			<Box sx={{minWidth: 70}}>
+				<Typography variant="body2" color="text.primary">
+					{props.currentvalue} von {props.max}
 				</Typography>
 			</Box>
 		</Box>
@@ -55,18 +61,16 @@ function getEmptyBooking(): Booking {
 		first_name: "",
 		email: "",
 		phone: "",
-		street: "",
-		postal_code: "",
-		city: "",
-		ticket_id: "",
-		beverage_id: "",
+		ticket_id: -1,
+		beverage_id: -1,
 		timeslot_priority_1: -1,
 		timeslot_priority_2: -1,
 		timeslot_priority_3: -1,
 		material_ids: [],
-		amount_shifts: -1,
-		total_price: -1,
-
+		amount_shifts: 1,
+		supporter_buddy: "",
+		total_price: -1.0,
+		signature: "",
 	}
 }
 
@@ -116,7 +120,7 @@ function getDummyFormContent(): FormContent {
 						start_time: '08:00',
 						end_time: '12:00',
 						num_needed: 5,
-						num_booked: 2,
+						num_booked: 7,
 					},
 					{
 						id: 2,
@@ -181,63 +185,122 @@ export function FormContainer() {
 	const [formContent, setFormContent] = useState<FormContent>(getDummyFormContent);
 	const [formValidation, setFormValidation] = useState<{ [key in keyof Booking]?: string }>({});
 	const [booking, setBooking] = useState<Booking>(getEmptyBooking());
-	const [activeStep, setActiveStep] = useState(FormSteps.Workshift);
+	const [activeStep, setActiveStep] = useState(FormSteps.NameAndAddress);
 	const maxSteps = Object.keys(FormSteps).length / 2;
+	const [currentError, setCurrentError] = useState<string>("");
+	const [bookingIsSubmitted, setBookingIsSubmitted] = useState<boolean>(false);
+	const {token, setToken} = useContext(TokenContext);
+	const {auth, setAuth} = useContext(AuthContext);
+	const stepTitles = ["Persönliche Infos",
+		"Ich komme an folgenden Tagen",
+		"Bierflatrate wählen (1 Tag = 5 Liter)",
+		"Festival Support",
+		"Ich kann folgende Materialien mitbringen",
+		"Damit wir alle eine entspannte Zeit haben",
+		"",
+		"Zusammenfassung",
+		"Fast geschafft!"
+	]
+
+	const requiredFields: { [key: number]: (keyof Booking)[] } = {
+		[FormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone'],
+		[FormSteps.Ticket]: ['ticket_id'],
+		[FormSteps.Beverage]: [],
+		[FormSteps.Workshift]: ['timeslot_priority_1', 'amount_shifts'],
+		[FormSteps.Material]: [],
+		[FormSteps.Signature]: ['signature'],
+		[FormSteps.AwarenessCode]: [],
+		[FormSteps.Summary]: [],
+		[FormSteps.Confirmation]: [],
+
+	};
+
+	useEffect(() => {
+		console.log("token: ", token);
+		axios.get('/api/formcontent', {
+			headers: {Authorization: `Bearer ${token}`}
+		})
+			.then((response) => {
+					setFormContent(response.data);
+				}
+			);
+
+	}, []);
+
+	useEffect(() => {
+		updateCurrentError();
+	}, [formValidation]);
+
+	useEffect(() => {
+		updateTotalPrice();
+	}, [booking.ticket_id, booking.beverage_id]);
+
+	function updateTotalPrice() {
+		let totalPrice = 0;
+		if (booking.ticket_id !== -1) {
+			const ticket = formContent.ticket_options.find((ticket) => ticket.id === booking.ticket_id);
+			if (ticket) {
+				totalPrice += ticket.price;
+			}
+		}
+		if (booking.beverage_id !== -1) {
+			const beverage = formContent.beverage_options.find((beverage) => beverage.id === booking.beverage_id);
+			if (beverage) {
+				totalPrice += beverage.price;
+			}
+		}
+		setBooking({...booking, total_price: totalPrice});
+	}
 
 	function validateField(key: keyof Booking, value: any) {
-    let errorMessage = '';
-    switch (key) {
-        case 'last_name':
-        case 'first_name':
-        case 'email':
-        case 'phone':
-        case 'street':
-        case 'postal_code':
-        case 'city':
-            errorMessage = value === '' ? 'This field is required.' : '';
-            break;
-        case 'timeslot_priority_1':
-        case 'timeslot_priority_2':
-        case 'timeslot_priority_3':
-            errorMessage = value === '' ? 'You need to select a priority for at least one timeslot.' : '';
-            break;
-        // Add cases for other fields as needed
-    }
-    setFormValidation(prev => ({...prev, [key]: errorMessage}));
-}
-
+		let errorMessage = '';
+		switch (key) {
+			case 'last_name':
+				errorMessage = value === '' ? 'Bitte gib einen Nachnamen ein' : '';
+				break;
+			case 'first_name':
+				errorMessage = value === '' ? 'Bitte gib einen Vornamen ein' : '';
+				break;
+			case 'email':
+				errorMessage = value === '' ? 'Bitte gib eine Email ein' : '';
+				break;
+			case 'phone':
+				errorMessage = value === '' ? 'Bitte gib eine Telefonnummer ein' : '';
+				break;
+			case 'ticket_id':
+				errorMessage = value === -1 ? 'Bitte wähle ein Ticket aus.' : '';
+				break;
+			case 'timeslot_priority_1':
+				errorMessage = value === -1 ? 'Bitte wähle eine Schicht mit höchster Priorität aus.' : '';
+				break;
+			case 'signature':
+				errorMessage = value === '' ? 'Wir würden uns freuen, wenn du das Formular unterschreibst' : '';
+		}
+		setFormValidation(prev => ({...prev, [key]: errorMessage}));
+	}
 
 	function isStepValid() {
-		const requiredFields: { [key: number]: (keyof Booking)[] } = {
-			[FormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone', 'street', 'postal_code', 'city'],
-			[FormSteps.Ticket]: ['ticket_id'],
-			[FormSteps.Beverage]: ['beverage_id'],
-			[FormSteps.Workshift]: ['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3', 'amount_shifts'],
-			[FormSteps.Material]: ['material_ids'],
-			[FormSteps.Summary]: [],
-
-			// Add required fields for other steps as needed
-		};
-
 		const currentStepFields = requiredFields[activeStep];
 
 		if (!currentStepFields) {
-			return true;
+			return false;
 		}
 
 		let isValid = true;
-		if (activeStep !== FormSteps.Workshift) {
-			return isValid;
-		}
-
 		for (let field of currentStepFields) {
-			if (!booking[field]) {
+			if (booking[field] === undefined || booking[field] === "" || booking[field] === -1) {
 				isValid = false;
 			}
 			validateField(field, booking[field]);
 		}
 
 		return isValid;
+	}
+
+	function updateCurrentError() {
+		const errorMessages = requiredFields[activeStep].map(field => formValidation[field]).filter(message => message !== '');
+		const errorMessage = errorMessages !== undefined && errorMessages.length > 0 && errorMessages[0] !== undefined ? errorMessages[0] : '';
+		setCurrentError(() => errorMessage);
 	}
 
 
@@ -250,15 +313,34 @@ export function FormContainer() {
 		setBooking({...booking, material_ids: material_ids});
 	}
 
+	function submitBooking() {
+		setBookingIsSubmitted(true);
+
+		axios.post('/api/submitForm', booking, {
+			headers: {Authorization: `Bearer ${token}`}
+		})
+			.then(function (response: any) {
+				console.log(response);
+				// handle success
+			})
+			.catch(function (error: any) {
+				console.log(error);
+				// handle error
+			});
+	}
+
 
 	return <Card className={"form-container"}>
 		<Grid container className={"navigation"}>
-			<Grid item xs={12} className={"navigation-progress"}>
-				<LinearProgressWithLabel variant="determinate" max={maxSteps} currentValue={activeStep + 1}/>
+			<Grid item xs={11} className={"navigation-progress"}>
+				<LinearProgressWithLabel variant="determinate" max={maxSteps} currentvalue={activeStep + 1}/>
 			</Grid>
-			<Grid item xs={12} className={"navigation-buttons"}>
+			<Grid item xs={12} className={"navigation-buttons"} sx={{display: bookingIsSubmitted ? "None" : ""}}>
 				<Button variant={"outlined"} sx={{'display': activeStep < 1 ? "none" : "inline-block"}}
-						onClick={() => setActiveStep(activeStep - 1)}>
+						onClick={() => {
+							setActiveStep(activeStep - 1);
+							setCurrentError("");
+						}}>
 					<NavigateBefore/>
 				</Button>
 				<Button
@@ -266,57 +348,66 @@ export function FormContainer() {
 					sx={{'display': activeStep >= maxSteps - 1 ? "none" : "inline-block"}}
 					onClick={() => {
 						if (isStepValid()) {
-							setActiveStep(activeStep + 1)
+							setActiveStep(activeStep + 1);
+							setCurrentError("");
+						} else {
+							updateCurrentError();
 						}
 					}}>
 					<NavigateNext/>
 				</Button>
-
 			</Grid>
 		</Grid>
 		<CardContent>
-			<Typography variant={"h5"}>Schritt {activeStep + 1}</Typography>
-			{activeStep === FormSteps.NameAndAddress &&
-                <NameAndAddressForm updateBooking={updateBooking}
-									currentBooking={booking}
-                                    formValidation={formValidation}
-									formContent={formContent}
-				/>}
-			{activeStep === FormSteps.Ticket &&
-                <TicketForm updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}/>}
+			<Box sx={{display: 'flex', 'flex-direction': 'column', 'align-items': 'center', 'justify-content': 'center'}}>
+				<Typography variant={"h5"}>{stepTitles[activeStep]}</Typography>
+				<Alert variant={"outlined"}  sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>
+					{currentError}
+				</Alert>
+				{activeStep === FormSteps.NameAndAddress &&
+                    <NameAndAddressForm updateBooking={updateBooking}
+                                        currentBooking={booking}
+                                        formValidation={formValidation}
+                                        formContent={formContent}
+                    />}
+				{activeStep === FormSteps.Ticket &&
+                    <TicketForm updateBooking={updateBooking}
+                                currentBooking={booking}
+                                formValidation={formValidation}
+                                formContent={formContent}/>}
 
-			{activeStep === FormSteps.Beverage &&
-                <BeverageForm updateBooking={updateBooking}
-                              currentBooking={booking}
-                              formValidation={formValidation}
-                              formContent={formContent}/>}
+				{activeStep === FormSteps.Beverage &&
+                    <BeverageForm updateBooking={updateBooking}
+                                  currentBooking={booking}
+                                  formValidation={formValidation}
+                                  formContent={formContent}/>}
 
-			{activeStep === FormSteps.Workshift &&
-				<WorkshiftForm currentBooking={booking}
-							   updateBooking={updateBooking}
-							   formValidation={formValidation}
-							   formContent={formContent}
-				/>}
-			{activeStep === FormSteps.Material &&
-				<MaterialsForm
-				updateMaterialIds={updateMaterialIds}
-				currentBooking={booking}
-				formValidation={formValidation}
-				formContent={formContent}
-				/>}
-			{/*{activeStep === FormSteps.AwarenessCode && <AwarenessCodeForm/>}*/}
-			{activeStep === FormSteps.Signature &&
-                <FormSignature updateBooking={updateBooking}
-							   currentBooking={booking}
-							   formValidation={formValidation}
-							   formContent={formContent}
-				/>}
-			{/*{activeStep === FormSteps.Signature && <SignatureForm/>}*/}
-			{/*{activeStep === FormSteps.Summary && <SummaryForm/>}*/}
-			{/*{activeStep === FormSteps.Confirmation && <ConfirmationForm/>}*/}
+				{activeStep === FormSteps.Workshift &&
+                    <WorkshiftForm currentBooking={booking}
+                                   updateBooking={updateBooking}
+                                   formValidation={formValidation}
+                                   formContent={formContent}
+                    />}
+				{activeStep === FormSteps.Material &&
+                    <MaterialsForm
+                        updateMaterialIds={updateMaterialIds}
+                        currentBooking={booking}
+                        formValidation={formValidation}
+                        formContent={formContent}
+                    />}
+				{activeStep === FormSteps.AwarenessCode && <FormAwarnessCode/>}
+				{activeStep === FormSteps.Signature &&
+                    <FormSignature updateBooking={updateBooking}
+                                   currentBooking={booking}
+                                   formValidation={formValidation}
+                                   formContent={formContent}
+                    />}
+				{activeStep === FormSteps.Summary && <FormSummary booking={booking} formContent={formContent}/>}
+				{activeStep === FormSteps.Confirmation &&
+                    <FormConfirmation bookingIsSubmitted={bookingIsSubmitted} formContent={formContent}
+                                      booking={booking}
+                                      submitBooking={submitBooking}/>}
+			</Box>
 		</CardContent>
 	</Card>;
 }

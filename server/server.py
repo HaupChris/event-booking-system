@@ -1,39 +1,41 @@
-from flask import Flask, request, abort
+from flask import Flask, request, jsonify
 import flask_cors
-from functools import wraps
-import sqlite3
-from sqlite3 import Error
-
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from src.booking_manager import BookingManager
 from src.views import Booking
 
 app = Flask(__name__)
+
+app.config["JWT_SECRET_KEY"] = "your-secret-key"  # This should be a complex random string.
+jwt = JWTManager(app)
 CORS(app)
 
-password_string = 'password'
-booking_manager = BookingManager(json_path='./form_content.json', db_dir='../db')
+## allow CORS for all domains on all routes
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 
-def require_appkey(view_function):
-    @wraps(view_function)
-    def decorated_function(*args, **kwargs):
-        if request.args.get('key') and request.args.get('key') == password_string:
-            return view_function(*args, **kwargs)
-        else:
-            abort(401)
-
-    return decorated_function
+hashed_password = generate_password_hash("password", method="pbkdf2:sha256", salt_length=8)
 
 
-@app.route('/password', methods=['GET'])
-def password():
-    return password_string
+@app.route("/api/auth", methods=["POST"])
+def authenticate():
+    password = request.json.get("password", None)
+    if not password:
+        return jsonify({"msg": "Missing password"}), 400
+    if not check_password_hash(hashed_password, password):
+        return jsonify({"msg": "Bad password"}), 401
+    access_token = create_access_token(identity="user")
+    return jsonify(access_token=access_token), 200
 
 
-@app.route('/submitForm', methods=['POST'])
-@require_appkey
+booking_manager = BookingManager(json_path='./form_content.json', db_dir='./db')
+
+
+@app.route('/api/submitForm', methods=['POST'])
+@jwt_required()
 def submit_form():
     # booking object is sent as json
     booking = Booking(**request.json)
@@ -41,12 +43,14 @@ def submit_form():
 
     return 'Form submitted successfully'
 
-@app.route('/booking', methods=['GET'])
-@require_appkey
-def get_booking():
+
+@app.route('/api/formcontent', methods=['GET'])
+@jwt_required()
+def get_formcontent():
     form_content = booking_manager.get_form_content()
-    form_content_json = flask_cors.jsonify(form_content)
+    form_content_json = jsonify(form_content)
     return form_content_json
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -2,9 +2,6 @@ CREATE TABLE IF NOT EXISTS Users  (
     id INTEGER PRIMARY KEY NOT NULL,
     last_name TEXT NOT NULL,
     first_name TEXT,
-    street TEXT,
-    postal_code TEXT,
-    city TEXT,
     email TEXT NOT NULL,
     phone_number TEXT
 );
@@ -54,6 +51,7 @@ CREATE TABLE IF NOT EXISTS Bookings  (
     second_priority_timeslot_id INTEGER,
     third_priority_timeslot_id INTEGER,
     amount_shifts INTEGER,
+    supporter_buddy TEXT,
     signature BLOB,
     total_price REAL,
     is_paid INTEGER,

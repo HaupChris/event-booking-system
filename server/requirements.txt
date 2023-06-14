@@ -1,3 +1,4 @@
 Flask==2.3.2
 Flask-Cors==3.0.10
 py-ts-interfaces==0.5.0
+flask-praetorian==1.4.0

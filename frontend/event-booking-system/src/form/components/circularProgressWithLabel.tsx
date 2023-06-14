@@ -6,9 +6,10 @@ interface IProps {
 	valueMax: number
 }
 export function CircularProgressWithLabel(props: IProps) {
+	const frac = ( props.valueCurrent / props.valueMax) > 1.0 ? 1.0 : (props.valueCurrent / props.valueMax);
 	return (
 		<Box sx={{position: 'relative', display: 'inline-flex'}}>
-			<CircularProgress variant="determinate" value={(props.valueCurrent / props.valueMax) * 100} />
+			<CircularProgress variant="determinate" value={frac * 100} />
 			<Box
 				sx={{
 					top: 0,
