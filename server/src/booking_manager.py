@@ -5,7 +5,7 @@ from typing import Dict, List
 import json
 import os
 from dataclasses import asdict
-from views import FormContent, Booking
+from .views import FormContent, Booking
 
 
 # define your table schema here
