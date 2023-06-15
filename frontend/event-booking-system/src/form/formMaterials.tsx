@@ -24,7 +24,10 @@ function MaterialsForm(props: MaterialFormProps) {
 	}
 
 	return  <List dense sx={{}} className={'material-list'}>
-      {props.formContent.materials.map((material: Material) => {
+      {props.formContent.materials
+		  .filter((material) => material.num_needed > material.num_booked || props.currentBooking.material_ids.includes(material.id))
+		  .sort((a, b) => (b.num_needed -b.num_booked) - (a.num_needed - a.num_booked) )
+		  .map((material: Material) => {
         const labelId = `checkbox-list-secondary-label-${material.id}`;
         return (
           <ListItem

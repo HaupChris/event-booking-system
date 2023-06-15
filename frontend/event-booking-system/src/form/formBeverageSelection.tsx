@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormProps } from './formContainer';
-import {FormControl, FormControlLabel, Radio, RadioGroup} from "@mui/material";
+import {FormControl, FormControlLabel, Radio, RadioGroup, Typography} from "@mui/material";
 
 
 function BeverageForm(props: FormProps) {
@@ -10,6 +10,9 @@ function BeverageForm(props: FormProps) {
 
 	return (
 		<FormControl component="fieldset">
+			<Typography variant="body1" component="div" sx={{mb: 2, mt:2}}>
+				Auf dem Festival steht eine frei zugängliche Zapfanlage, an der du dich für den gebuchten Tag so oft du willst bedienen kannst.
+			</Typography>
 			<RadioGroup aria-label="beverage" name="beverage_id" value={props.currentBooking.beverage_id} onChange={handleBeverageChange}>
 				{props.formContent.beverage_options.map(option => (
 					<FormControlLabel

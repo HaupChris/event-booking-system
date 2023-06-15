@@ -8,9 +8,19 @@ interface IProps {
 }
 
 function CustomToolbar() {
+
+	// create a timestamp for the export, so the filename is always different. Format is YYYYMMDD-HHMMSS
+	const timestamp = new Date().toISOString().replace(/[-:.]/g, '').replace('T', '-').split('.')[0];
+
+
 	return (
 		<GridToolbarContainer>
-			<GridToolbarExport/>
+			<GridToolbarExport
+				csvOptions={{
+					allColumns: true,
+					fileName: 'booking_' + timestamp,
+				}}
+			/>
 		</GridToolbarContainer>
 	);
 }
@@ -73,13 +83,13 @@ function BookingTable(props: IProps) {
 				initialState={{
 					pagination: {
 						paginationModel: {
-							pageSize: 5,
+							pageSize: 100,
 						},
 					},
 				}}
-				pageSizeOptions={[5]}
+				pageSizeOptions={[100]}
 				slots={{
-					toolbar: GridToolbarExport,
+					toolbar: CustomToolbar,
 				}}
 			/>
 		</Box>

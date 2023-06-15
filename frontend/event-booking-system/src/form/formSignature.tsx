@@ -7,7 +7,7 @@ export function FormSignature(props: FormProps) {
 		<Box sx={{display: 'flex', 'flex-direction': 'column', 'align-items': 'center', 'justify-content': 'center', }}>
 			<Typography>
 				Hiermit bestätige ich, dass ich auf eigene Gefahr am "Weiher Wald und Wiesenwahn 2023" vom 24.08.2023 bis zum 27.08.2023 teilnehme.
-				Der Veranstalter haftet bei Personen-, Sach- und nicht für leichte Fahrlässigkeit. Dies gilt sowohl für eigene Handlungen, als auch für Handlungen
+				Der Veranstalter haftet bei Personen-, Sach- und Vermögensschäden nicht für leichte Fahrlässigkeit. Dies gilt sowohl für eigene Handlungen, als auch für Handlungen
 				seiner Vertreter, Erfüllungsgehilfen oder Dritter, derer sich der Veranstalter im Zusammenhang mit der Durchführung der Veranstaltung bedient.
 			</Typography>
 

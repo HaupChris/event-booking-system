@@ -257,7 +257,7 @@ export function FormContainer() {
 	}
 
 	function validateName(value: string, nameString: string): string {
-		const pattern = /^[A-Za-z\s]+$/;
+		const pattern = /^[A-Za-zÄÖÜööüß\s]+$/;
 		if (value === '') return 'Bitte gib einen ' + nameString + ' an';
 		if (!pattern.test(value)) return 'Bitte verwende nur Buchstaben für deinen ' + nameString;
 		return '';
@@ -268,9 +268,7 @@ export function FormContainer() {
 	}, [booking]);
 
 	function validateEmail(value: any): string {
-		const pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 		if (value === '') return 'Bitte gib eine Email ein';
-		if (!pattern.test(value)) return 'Bitte gib eine gültige E-Mail Adresse ein';
 		return '';
 	}
 
@@ -350,13 +348,19 @@ export function FormContainer() {
 	}
 
 	function submitBooking() {
-		setBookingIsSubmitted(true);
 
 		axios.post('/api/submitForm', booking, {
 			headers: {Authorization: `Bearer ${token}`}
 		})
 			.then(function (response: any) {
 				// handle success
+				setBookingIsSubmitted(true);
+				// set an interval after which the user is logged out
+				setTimeout(() => {
+					setToken("");
+					setAuth(false);
+				}, 1000 * 60 * 60);
+
 			})
 			.catch(function (error: any) {
 				// handle error

@@ -1,4 +1,5 @@
 import dataclasses
+import os
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -10,7 +11,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from src.booking_manager import BookingManager
 from src.views import Booking
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend/event-booking-system/build')
 
 app.config["JWT_SECRET_KEY"] = "your-secret-key"  # This should be a complex random string.
 jwt = JWTManager(app)
@@ -55,6 +56,14 @@ def authenticate():
 
 booking_manager = BookingManager(json_path='./form_content.json', db_dir='./db')
 
+
+@app.route("/", defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/api/submitForm', methods=['POST'])
 @limiter.limit("20/minute")

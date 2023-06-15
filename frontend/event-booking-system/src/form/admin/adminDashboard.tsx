@@ -10,6 +10,7 @@ import WorkShiftTable from "./workShiftTable";
 import {getDummyFormContent} from "../formContainer";
 import BeverageOptionTable from "./beverageOptionTable";
 import '../../css/admin.css';
+import MaterialTable from "./materialTable";
 
 
 function TabPanel(props: { [x: string]: any; children: any; value: any; index: any; }) {
@@ -83,9 +84,9 @@ function AdminDashboard() {
       <TabPanel value={value} index={3}>
         <WorkShiftTable workShifts={formContent.work_shifts}/>
       </TabPanel>
-      {/*<TabPanel value={value} index={4}>*/}
-      {/*  <MaterialTable materials={formContent.materials}/>*/}
-      {/*</TabPanel>*/}
+      <TabPanel value={value} index={4}>
+        <MaterialTable materials={formContent.materials}/>
+      </TabPanel>
     </Box>
   );
 }

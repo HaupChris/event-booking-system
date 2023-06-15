@@ -100,35 +100,4 @@ function FormConfirmation(props: FinalBookingProps) {
 	);
 }
 
-// interface IProps {
-// 	booking: Booking;
-// 	ticket: TicketOption | undefined;
-// 	beverage: BeverageOption | undefined;
-// }
-//
-// function CopyField(props: IProps) {
-//
-// 	const [value, setValue] = useState(`Betreff: ${props.booking.last_name}, ${props.booking.first_name} - ${props.ticket?.title}, ${props.beverage?.title}`);
-//
-//
-//
-// 	return (
-// 		<TextField
-// 			fullWidth
-// 			value={value}
-// 			InputProps={{
-// 				readOnly: true,
-// 				endAdornment: (
-// 					<InputAdornment position="end">
-// 						<IconButton onClick={handleCopy}>
-// 							<FileCopyIcon/>
-// 						</IconButton>
-// 					</InputAdornment>
-// 				)
-// 			}}
-// 		/>
-// 	);
-// }
-
-
 export default FormConfirmation;

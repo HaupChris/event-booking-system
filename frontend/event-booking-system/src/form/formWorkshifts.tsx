@@ -2,19 +2,16 @@ import {FormProps} from "./formContainer";
 import React, {useEffect, useState} from "react";
 import WorkShift from "./components/workShift";
 import {
-	Alert,
 	Box,
 	Divider,
 	FormControl,
-	IconButton,
-	Input,
 	InputLabel,
 	List,
 	MenuItem,
 	Select,
 	TextField, Typography
 } from "@mui/material";
-import {Close} from "@mui/icons-material";
+import {TimeSlot} from "./interface";
 
 function WorkShiftForm(props: FormProps) {
 	const [availablePriorities, setAvailabelPriorities] = useState<string[]>(["Höchste", "Mittlere", "Notnagel", ""]);
@@ -42,16 +39,30 @@ function WorkShiftForm(props: FormProps) {
 	}
 
 
-	return <Box sx={{display: 'flex', 'flex-direction': 'column', 'align-items': 'center', 'justify-content': 'center' }}>
+	return <Box
+		sx={{display: 'flex', 'flex-direction': 'column', 'align-items': 'center', 'justify-content': 'center'}}>
 		<Typography variant="body2">
 			Wir freuen uns, wenn du uns bei einer Supportschicht unterstützen könntest!
 			Wähle bitte bis zu drei Prioritäten aus.
 			Die Zahlen in den Kreisen zeigen, wie viele Helfer:innen schon dabei sind und wie viele wir noch brauchen.
-			Möchtest du mit einer bestimmten Person zusammenarbeiten oder bist du bereit, mehr als eine Schicht zu übernehmen?
+			Möchtest du mit einer bestimmten Person zusammenarbeiten oder bist du bereit, mehr als eine Schicht zu
+			übernehmen?
 			Lass es uns unten wissen - wir berücksichtigen dies gerne bei unserer Planung.
 		</Typography>
-			<List>
-				{props.formContent.work_shifts.map(workShift => (
+		<List>
+			{props.formContent.work_shifts
+				.sort((shift_a, shift_b) => {
+					const shift_a_workers = shift_a.time_slots.reduce((sum: number, timeslot: TimeSlot) => (sum + timeslot.num_needed - timeslot.num_booked), 0);
+					const shift_b_workers = shift_b.time_slots.reduce((sum: number, timeslot: TimeSlot) => (sum + timeslot.num_needed - timeslot.num_booked), 0);
+					if (shift_a_workers > shift_b_workers) {
+						return -1;
+					}
+					if (shift_a_workers < shift_b_workers) {
+						return 1;
+					}
+					return 0;
+				})
+				.map(workShift => (
 					<>
 						<WorkShift
 							key={workShift.id}
@@ -63,35 +74,34 @@ function WorkShiftForm(props: FormProps) {
 						<Divider/>
 					</>
 				))}
-			</List>
+		</List>
 
-			<FormControl sx={{mt: 2, width: 400}}>
-				<InputLabel id="shift-select-label">Wie viele Schichten willst du arbeiten?</InputLabel>
-				<Select
-					variant={"standard"}
+		<FormControl sx={{mt: 2, width: '280px'}}>
+			<InputLabel id="shift-select-label">Deine Anzahl Schichten:</InputLabel>
+			<Select
+				variant={"standard"}
 
-					labelId="shift-select-label"
-					id="shift-select"
-					value={props.currentBooking.amount_shifts}
-					onChange={e => props.updateBooking('amount_shifts', e.target.value)}>
-					<MenuItem value={1}>1</MenuItem>
-					<MenuItem value={2}>2</MenuItem>
-					<MenuItem value={3}>3</MenuItem>
-				</Select>
+				labelId="shift-select-label"
+				id="shift-select"
+				value={props.currentBooking.amount_shifts}
+				onChange={e => props.updateBooking('amount_shifts', e.target.value)}>
+				<MenuItem value={1}>1</MenuItem>
+				<MenuItem value={2}>2</MenuItem>
+				<MenuItem value={3}>3</MenuItem>
+			</Select>
 
-				<TextField
-					error={!!props.formValidation.supporter_buddy}
-					variant="outlined"
-					margin="normal"
-					id="supporter-buddy"
-					label="Mit wem möchtest du arbeiten?"
-					name="name"
-					value={props.currentBooking.supporter_buddy}
-					onChange={e => props.updateBooking("supporter_buddy", e.target.value)}
-					autoFocus
-				/>
-			</FormControl>
-		</Box>;
+			<TextField
+				error={!!props.formValidation.supporter_buddy}
+				variant="outlined"
+				margin="normal"
+				id="supporter-buddy"
+				label="Mit wem möchtest du arbeiten?"
+				name="name"
+				value={props.currentBooking.supporter_buddy}
+				onChange={e => props.updateBooking("supporter_buddy", e.target.value)}
+			/>
+		</FormControl>
+	</Box>;
 }
 
 export default WorkShiftForm;

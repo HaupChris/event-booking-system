@@ -1,9 +1,27 @@
-import {DataGrid} from '@mui/x-data-grid';
+import {DataGrid, GridToolbarContainer, GridToolbarExport} from '@mui/x-data-grid';
 import {TicketOption} from "../interface";
 import React from "react";
 
 interface IProps {
 	ticketOptions: TicketOption[]
+}
+
+function CustomToolbar() {
+
+	// create a timestamp for the export, so the filename is always different. Format is YYYYMMDD-HHMMSS
+	const timestamp = new Date().toISOString().replace(/[-:.]/g, '').replace('T', '-').split('.')[0];
+
+
+	return (
+		<GridToolbarContainer>
+			<GridToolbarExport
+				csvOptions={{
+					allColumns: true,
+					fileName: 'tickets' + timestamp,
+				}}
+			/>
+		</GridToolbarContainer>
+	);
 }
 
 function TicketOptionTable(props: IProps) {
@@ -22,10 +40,15 @@ function TicketOptionTable(props: IProps) {
 					  initialState={{
 						  pagination: {
 							  paginationModel: {
-								  pageSize: 5,
+								  pageSize: 100,
 							  },
 						  },
-					  }} checkboxSelection/>
+					  }}
+					  pageSizeOptions={[100]}
+					  slots={{
+						  toolbar: CustomToolbar,
+					  }}
+					  checkboxSelection/>
 		</div>
 	);
 }

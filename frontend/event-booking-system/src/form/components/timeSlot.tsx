@@ -80,7 +80,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 		</ListItemText>
 
 		<ListItemText>
-			<FormControl variant="standard" sx={{minWidth: "200px"}}>
+			<FormControl variant="standard" sx={{minWidth: "100px"}}>
 				<InputLabel id="demo-simple-select-standard-label"> Priorität </InputLabel>
 				<Select
 					labelId="demo-simple-select-standard-label"

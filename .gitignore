@@ -8,3 +8,6 @@ Thumbs.db
 # Editor directories and files
 .idea
 /server/db/event_booking.db
+
+server/db/*
+

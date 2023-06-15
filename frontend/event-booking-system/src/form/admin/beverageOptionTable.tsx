@@ -1,9 +1,28 @@
-import {DataGrid} from '@mui/x-data-grid';
+import {DataGrid, GridToolbarContainer, GridToolbarExport} from '@mui/x-data-grid';
 import {BeverageOption} from "../interface";
 
 
 interface IProps {
 	beverageOptions: BeverageOption[]
+}
+
+
+function CustomToolbar() {
+
+	// create a timestamp for the export, so the filename is always different. Format is YYYYMMDD-HHMMSS
+	const timestamp = new Date().toISOString().replace(/[-:.]/g, '').replace('T', '-').split('.')[0];
+
+
+	return (
+		<GridToolbarContainer>
+			<GridToolbarExport
+				csvOptions={{
+					allColumns: true,
+					fileName: 'beverages' + timestamp,
+				}}
+			/>
+		</GridToolbarContainer>
+	);
 }
 
 function BeverageOptionTable(props: IProps) {
@@ -18,13 +37,18 @@ function BeverageOptionTable(props: IProps) {
 	return (
 		<div style={{height: 400, width: '100%'}}>
 			<DataGrid rows={props.beverageOptions}
-					  columns={columns} initialState={{
-				pagination: {
-					paginationModel: {
-						pageSize: 5,
-					},
-				},
-			}} checkboxSelection/>
+					  columns={columns}
+					  initialState={{
+						  pagination: {
+							  paginationModel: {
+								  pageSize: 100,
+							  },
+						  },
+					  }}
+					  slots={{
+						  toolbar: CustomToolbar,
+					  }}
+					  pageSizeOptions={[100]} checkboxSelection/>
 		</div>
 	);
 };

@@ -1,80 +1,309 @@
 {
   "ticket_options": [
     {
+      "title": "Donnerstag bis Sonntag",
+      "price": 40.0,
+      "amount": 80
+    },
+    {
+      "title": "Freitag, Samstag",
+      "price": 30.0,
+      "amount": 30
+    },
+    {
+      "title": "Donnerstag, Freitag",
+      "price": 30.0,
+      "amount": 30
+    },
+    {
+      "title": "Donnerstag, Samstag",
+      "price": 30.0,
+      "amount": 20
+    },
+
+    {
       "title": "Donnerstag",
-      "price": 10.0,
-      "amount": 100
+      "price": 20.0,
+      "amount": 20
     },
     {
       "title": "Freitag",
       "price": 10.0,
-      "amount": 100
+      "amount": 20
+    },
+    {
+      "title": "Samstag",
+      "price": 10.0,
+      "amount": 20
     }
   ],
   "beverage_options": [
     {
       "title": "Ein Tag",
       "description": "Entspricht 5 Litern Bier",
-      "price": 20.0
+      "price": 10.0
     },
     {
       "title": "Zwei Tage",
       "description": "Entspricht 10 Litern Bier",
-      "price": 40.0
+      "price": 19.0
+    },
+    {
+      "title": "Drei Tage",
+      "description": "Entspricht 15 Litern Bier",
+      "price": 28.0
     }
   ],
   "work_shifts": [
     {
-      "title": "Sauber machen",
-      "description": "Festival aufräumen immer morgens",
+      "title": "Schaffe schaffe Festival baue",
+      "description": "Aufbau von Zelten und Bühne",
+      "time_slots": [
+        {
+          "title": "vorm Festival",
+          "start_time": "Samstag",
+          "end_time": "Sonntag ",
+          "num_needed": 15
+        }
+      ]
+    },
+    {
+      "title": "Wer A sagt muss auch Abbau sagen",
+      "description": "Am Sonntag packen wir alles zusammen und überlassen die Wiese wieder der Natur.",
+      "time_slots": [
+        {
+          "title": "Sonntag",
+          "start_time": "10:00",
+          "end_time": "19:00",
+          "num_needed": 30
+        }
+      ]
+    },
+    {
+      "title": "Cu Later, Generator",
+      "description": "2er Teams. Überwachung der Generatoren. Kontrolle ca. jede Stunde + nächster Schicht bescheid geben.",
       "time_slots": [
         {
           "title": "Donnerstag",
-          "start_time": "08:00",
+          "start_time": "19:00",
+          "end_time": "23:30",
+          "num_needed": 2
+        },
+        {
+          "title": "Donnerstag",
+          "start_time": "23:30",
+          "end_time": "04:00",
+          "num_needed": 2
+        },
+        {
+          "title": "Freitag",
+          "start_time": "19:00",
+          "end_time": "23:30",
+          "num_needed": 2
+        },
+        {
+          "title": "Freitag",
+          "start_time": "23:30",
+          "end_time": "04:00",
+          "num_needed": 2
+        },
+        {
+          "title": "Samstag",
+          "start_time": "19:00",
+          "end_time": "23:30",
+          "num_needed": 2
+        },
+        {
+          "title": "Samstag",
+          "start_time": "23:30",
+          "end_time": "04:00",
+          "num_needed": 2
+        }
+      ]
+    },
+    {
+      "title": "Supersauberwahn",
+      "description": "Jeden Morgen soll etwas Ordnung gemacht werden, d.h. Müllsäcke austauschen, Tische abräumen, Zapfanlage abwischen, Müll vom Boden aufheben, etc. ",
+      "time_slots": [
+        {
+          "title": "Freitag",
+          "start_time": "10:00",
           "end_time": "12:00",
           "num_needed": 4
         },
         {
-          "title": "Freitag",
-          "start_time": "08:00",
+          "title": "Samstsag",
+          "start_time": "10:00",
           "end_time": "12:00",
-          "num_needed": 5
+          "num_needed": 4
+        }
+      ]
+    },
+    {
+      "title": "Volltanken bidde",
+      "description": "Kontrolle der Spritbestände und einkaufen von neuem Sprit. Bist du nicht fahrtaugliche, kümmere dich bitte um Ersatz.",
+      "time_slots": [
+        {
+          "title": "Freitag",
+          "start_time": "14:00",
+          "end_time": "18:00",
+          "num_needed": 2
         },
         {
           "title": "Samstag",
-          "start_time": "08:00",
-          "end_time": "12:00",
-          "num_needed": 3
+          "start_time": "14:00",
+          "end_time": "18:00",
+          "num_needed": 2
+        }
+      ]
+    },
+    {
+      "title": "Mr. and Ms. Poopybutthole",
+      "description": "1x Morgens und 1x Abends vorm Feiern müssen Toiletten und Duschen gecheckt, Klopapier/Sägespähne evtl nachgefüllt und abgeschätzt werden, ob die Klos für die Nacht noch reichen.",
+      "time_slots": [
+        {
+          "title": "Freitag",
+          "start_time": "10:00",
+          "end_time": "19:00",
+          "num_needed": 2
         },
         {
-          "title": "Sonntag",
-          "start_time": "08:00",
+          "title": "Samstag",
+          "start_time": "10:00",
+          "end_time": "19:00",
+          "num_needed": 2
+        }
+      ]
+    },
+    {
+      "title": "Bunde hunde",
+      "description": "Bitte nur ankreuzen, wenn du Mitglied im Deko-Team bist. ",
+      "time_slots": [
+        {
+          "title": "Deko Team",
+          "start_time": "",
+          "end_time": "",
+          "num_needed": 15
+        }
+      ]
+    },
+    {
+      "title": "Hier spielt die Musik",
+      "description": "Bitte nur ankreuzen, wenn du als DJ oder Bandmitglied kommst.",
+      "time_slots": [
+        {
+          "title": "Wiesnmusik",
+          "start_time": "",
+          "end_time": "",
+          "num_needed": 20
+        }
+      ]
+    },
+    {
+      "title": "Brummi fahren",
+      "description": "Wassertanks müssen befüllt und Bier nachgeholt werden. Bitte hier nur melden, wenn du einen LKW Führerschein hast und große Maschinen fahren kannst.",
+      "time_slots": [
+        {
+          "title": "Freitag",
+          "start_time": "10:00",
+          "end_time": "12:00",
+          "num_needed": 1
+        },
+        {
+          "title": "Samstag",
+          "start_time": "10:00",
           "end_time": "12:00",
           "num_needed": 1
         }
       ]
-    },
-    {
-      "title": "Aufbauen",
-      "description": "Festival aufbauen",
-      "time_slots": [
-        {
-          "title": "Donnerstag",
-          "start_time": "08:00",
-          "end_time": "12:00",
-          "num_needed": 4
-        }
-      ]
     }
+
   ],
   "materials": [
     {
-      "title": "Stühle",
-      "num_needed": 100
+        "title": "Lichterketten (kein Glas)",
+        "num_needed": 8
     },
     {
-      "title": "Tische",
-      "num_needed": 1
+        "title": "Mehrfachstecker",
+        "num_needed": 8
+    },
+    {
+        "title": "Kabeltrommel",
+        "num_needed": 4
+    },
+    {
+        "title": "Verlängerungskabel",
+        "num_needed": 6
+    },
+    {
+        "title": "Feuerlöscher",
+        "num_needed": 4
+    },
+    {
+        "title": "Bunte Tücher / Goa Tücher",
+        "num_needed": 8
+    },
+    {
+        "title": "Seile (dick oder dünnn)",
+        "num_needed": 4
+    },
+    {
+        "title": "Pavillon mit Seitenwänden",
+        "num_needed": 1
+    },
+    {
+        "title": "Pavillon ohne Seitenwände",
+        "num_needed": 3
+    },
+    {
+        "title": "Werkzeugkoffer",
+        "num_needed": 2
+    },
+    {
+        "title": "Schwarzlicht",
+        "num_needed": 4
+    },
+    {
+        "title": "alte Regenschirme/Gestelle",
+        "num_needed": 4
+    },
+    {
+        "title": "Solarlichter",
+        "num_needed": 5
+    },
+    {
+        "title": "Hängematte",
+        "num_needed": 3
+    },
+    {
+        "title": "Benzin und Diesel Kanister",
+        "num_needed": 5
+    },
+    {
+        "title": "Scheren",
+        "num_needed": 3
+    },
+    {
+        "title": "alte Kissen",
+        "num_needed": 4
+    },
+    {
+        "title": "alter Teppich",
+        "num_needed": 3
+    },
+    {
+        "title": "Biertrichter",
+        "num_needed": 2
+    },
+    {
+        "title": "Volleyballfeld",
+        "num_needed": 1
+    },
+    {
+        "title": "Wäscheständer",
+        "num_needed": 2
     }
-  ]
+]
+
 }
