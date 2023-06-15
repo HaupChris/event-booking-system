@@ -26,6 +26,8 @@ limiter = Limiter(
     default_limits=["300 per day", "60 per hour"]
 )
 
+script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
+
 hashed_password = generate_password_hash("password", method="pbkdf2:sha256", salt_length=8)
 admin_hashed_password = generate_password_hash("admin-password", method="pbkdf2:sha256", salt_length=8)
 
@@ -54,7 +56,8 @@ def authenticate():
     return jsonify(access_token=access_token), 200
 
 
-booking_manager = BookingManager(json_path='./form_content.json', db_dir='./db')
+booking_manager = BookingManager(json_path=os.path.join(script_dir, 'form_content.json'),
+                                 db_dir=os.path.join(script_dir, 'db'))
 
 
 @app.route("/", defaults={'path': ''})
