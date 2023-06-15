@@ -10,7 +10,7 @@
     column-gap: 2em;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 901px) {
     .material-list {
         column-count: 2;
     }

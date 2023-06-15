@@ -40,6 +40,7 @@ function NameAndAddressForm(props: FormProps) {
                 />
                 <TextField
                     error={!! props.formValidation.email}
+                    type={"email"}
                     variant="outlined"
                     margin="normal"
                     required
@@ -52,6 +53,7 @@ function NameAndAddressForm(props: FormProps) {
                 />
                 <TextField
                     error={!! props.formValidation.phone}
+                    type={"tel"}
                     variant="outlined"
                     margin="normal"
                     required

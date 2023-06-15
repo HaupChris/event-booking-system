@@ -46,7 +46,7 @@ export function SignaturePad(props: IProps) {
     return (
         <Box sx={{display: 'flex', 'flex-direction': 'column', 'align-items': 'center', 'justify-content': 'center', }}>
             <SignatureCanvas
-                penColor="black"
+                penColor="#eac764"
                 canvasProps={{className: 'signature-canvas'}}
                 ref={sigRef}
                 onEnd={handleSignatureEnd}

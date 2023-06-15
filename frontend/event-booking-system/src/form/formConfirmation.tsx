@@ -80,12 +80,9 @@ function FormConfirmation(props: FinalBookingProps) {
 				<br/>
 
 			</Typography>
-			<Typography variant={"subtitle2"}>
-				Solltest du kein Paypal haben, schreibe dir deinen Beitrag auf und kontaktiere <u>Christian
-				Hauptmann</u>.
-			</Typography>
 
-			{props.bookingIsSubmitted && false ? (
+
+			{props.bookingIsSubmitted ? (
 				<div className="icon-container">
 					<CheckCircleOutline color="primary" style={{fontSize: 60}}/>
 					<Typography variant="h6">Buchung erfolgreich</Typography>
@@ -95,6 +92,10 @@ function FormConfirmation(props: FinalBookingProps) {
 					Buchung absenden
 				</Button>
 			)}
+			<Typography sx={{"pt": 2}} variant={"subtitle2"}>
+				Solltest du kein Paypal haben, schreibe dir deinen Beitrag auf und kontaktiere <u>Christian
+				Hauptmann</u>.
+			</Typography>
 		</Box>
 	);
 }

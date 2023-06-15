@@ -3,13 +3,10 @@ import {useNavigate} from 'react-router-dom';
 import {AuthContext, TokenContext} from "../AuthContext";
 
 const SHA256 = require("crypto-js/sha256");
-
 import axios from "axios";
-import {Box, Button, TextField} from "@mui/material";
+import {Alert, Box, Button, Snackbar, TextField} from "@mui/material";
 
-function hashPassword(password: string) {
-	return SHA256(password).toString();
-}
+import "../css/formContainer.css"
 
 function PasswordPage() {
 	const [password, setPassword] = useState('');
@@ -17,6 +14,7 @@ function PasswordPage() {
 	const {auth, setAuth} = useContext(AuthContext);
 	const {token, setToken} = useContext(TokenContext);
 	const navigate = useNavigate();
+	const [passwordIsWrong, setPasswordIsWrong] = useState(false);
 
 	const handleSubmit = () => {
 
@@ -28,9 +26,15 @@ function PasswordPage() {
 				navigate('/form');
 			})
 			.catch(error => {
-				console.error('There was an error!', error);
-				alert('Incorrect password');
+				setPasswordIsWrong(true);
 			});
+	};
+
+	const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+		if (reason === 'clickaway') {
+			return;
+		}
+		setPasswordIsWrong(false);
 	};
 
 	return <Box sx={{
@@ -40,26 +44,42 @@ function PasswordPage() {
 		'justify-content': 'center',
 		height: "100vh"
 	}}>
-		{! display && (
-		<div>
-			<p>Kommst du mit uns in den Kanienchenbau?</p>
+		{!display && (
+			<div>
+				<p>Kommst du mit uns in den Kanienchenbau?</p>
 
-			<Button variant="contained" style={{backgroundColor: 'red', 'marginRight': '3em'}} onClick={() => {}}>Red Pill</Button>
-			<Button variant="contained" style={{backgroundColor: 'blue'}} onClick={() => setDisplay(true)}>Blue Pill</Button>
-		</div>)}
+				<Button variant="contained" style={{backgroundColor: 'red', 'marginRight': '3em'}} onClick={() => {
+				}}>Red Pill</Button>
+				<Button variant="contained" style={{backgroundColor: 'blue'}} onClick={() => setDisplay(true)}>Blue
+					Pill</Button>
+			</div>)}
 
 		{display && (
-			<>
+			<div className={"div-password-input"}>
 				<TextField
-					id="outlined-password-input"
+					sx={{marginBottom: '1em'}}
 					label="Password"
 					type="password"
-					autoComplete="current-password"
 					value={password}
 					onChange={e => setPassword(e.target.value)}
+					onKeyDown={e => {
+						if (e.key === 'Enter') {
+							handleSubmit();
+						}
+					}}
 				/>
-				<Button variant="contained" onClick={() => handleSubmit()}>Einloggen</Button>
-			</>
+				<Button variant={"contained"} onClick={() => handleSubmit()}>Einloggen</Button>
+				<Snackbar
+					anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+					open={passwordIsWrong}
+					autoHideDuration={4000}
+					onClose={handleClose}
+				>
+					<Alert onClose={handleClose} severity="error" sx={{width: '100%'}}>
+						Falsches Passwort!
+					</Alert>
+				</Snackbar>
+			</div>
 		)}
 	</Box>;
 }

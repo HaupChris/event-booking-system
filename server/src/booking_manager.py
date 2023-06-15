@@ -1,7 +1,7 @@
 import base64
 import sqlite3
 from contextlib import closing
-from typing import Dict
+from typing import Dict, List
 import json
 import os
 from dataclasses import asdict
@@ -150,9 +150,9 @@ class BookingManager:
 
             # Then we'll insert the booking into the Bookings table
             cursor.execute("""
-                INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, first_priority_timeslot_id, second_priority_timeslot_id, third_priority_timeslot_id, amount_shifts, signature, total_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, first_priority_timeslot_id, second_priority_timeslot_id, third_priority_timeslot_id, amount_shifts, supporter_buddy, signature, total_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (user_id, booking.ticket_id, booking.beverage_id, booking.timeslot_priority_1,
-                      booking.timeslot_priority_2, booking.timeslot_priority_3, booking.amount_shifts,
+                      booking.timeslot_priority_2, booking.timeslot_priority_3, booking.amount_shifts, booking.supporter_buddy,
                       booking.signature, booking.total_price))
             booking_id = cursor.lastrowid
 
@@ -176,6 +176,63 @@ class BookingManager:
         # write to a file
         with open(file_path, 'wb') as file:
             file.write(img_data)
+
+    def get_all_bookings(self) -> List[Booking]:
+        with closing(sqlite3.connect(self.db_file_path)) as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""
+                SELECT 
+                    b.id as booking_id,
+                    u.last_name, 
+                    u.first_name, 
+                    u.email, 
+                    u.phone_number, 
+                    b.ticket_option_id, 
+                    b.beverage_option_id, 
+                    b.first_priority_timeslot_id, 
+                    b.second_priority_timeslot_id, 
+                    b.third_priority_timeslot_id, 
+                    b.amount_shifts, 
+                    b.supporter_buddy,
+                    b.total_price, 
+                    b.signature                    
+                FROM Users u
+                JOIN Bookings b ON u.id = b.user_id
+            """)
+
+            rows = cursor.fetchall()
+
+            bookings = []
+            for row in rows:
+                # For each row, fetch the material_ids
+                cursor.execute("""
+                    SELECT material_id 
+                    FROM BookingMaterials 
+                    WHERE booking_id = ?
+                """, (row[0],))
+
+                material_ids = [item[0] for item in cursor.fetchall()]
+
+                booking = Booking(
+                    last_name=row[1],
+                    first_name=row[2],
+                    email=row[3],
+                    phone=row[4],
+                    ticket_id=row[5],
+                    beverage_id=row[6],
+                    timeslot_priority_1=row[7],
+                    timeslot_priority_2=row[8],
+                    timeslot_priority_3=row[9],
+                    material_ids=material_ids,
+                    amount_shifts=row[10],
+                    supporter_buddy=row[11],
+                    total_price=row[12],
+                    signature=row[13] if row[13] else ''
+                )
+                bookings.append(booking)
+
+            return bookings
 
 
 if __name__ == "__main__":

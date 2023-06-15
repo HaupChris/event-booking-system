@@ -19,6 +19,12 @@ function BeverageForm(props: FormProps) {
 						label={option.title + ' - ' + option.price + ' €'}
 					/>
 				))}
+				<FormControlLabel
+						key={-1}
+						value={"-1"}
+						control={<Radio />}
+						label={'Kein Bier für mich'}
+					/>
 			</RadioGroup>
 		</FormControl>
 	);

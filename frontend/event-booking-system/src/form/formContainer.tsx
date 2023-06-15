@@ -74,7 +74,7 @@ function getEmptyBooking(): Booking {
 	}
 }
 
-function getDummyFormContent(): FormContent {
+export function getDummyFormContent(): FormContent {
 	return {
 		ticket_options: [
 			{
@@ -216,7 +216,6 @@ export function FormContainer() {
 	};
 
 	useEffect(() => {
-		console.log("token: ", token);
 		axios.get('/api/formcontent', {
 			headers: {Authorization: `Bearer ${token}`}
 		})
@@ -226,6 +225,11 @@ export function FormContainer() {
 			);
 
 	}, []);
+
+	// useEffect(() => {
+	// 	isStepValid();
+	// }, [booking]);
+
 
 	useEffect(() => {
 		updateCurrentError();
@@ -252,20 +256,48 @@ export function FormContainer() {
 		setBooking({...booking, total_price: totalPrice});
 	}
 
+	function validateName(value: string, nameString: string): string {
+		const pattern = /^[A-Za-z\s]+$/;
+		if (value === '') return 'Bitte gib einen ' + nameString + ' an';
+		if (!pattern.test(value)) return 'Bitte verwende nur Buchstaben für deinen ' + nameString;
+		return '';
+	}
+
+	useEffect(() => {
+		setCurrentError("");
+	}, [booking]);
+
+	function validateEmail(value: any): string {
+		const pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+		if (value === '') return 'Bitte gib eine Email ein';
+		if (!pattern.test(value)) return 'Bitte gib eine gültige E-Mail Adresse ein';
+		return '';
+	}
+
+	function validatePhone(value: any): string {
+		const pattern = /^\d{10,15}$/;
+		if (value === '') return 'Bitte gib eine Telefonnummer ein';
+		if (!pattern.test(value)) return 'Bitte gib eine gültige Telefonnummer ein';
+		return '';
+	}
+
 	function validateField(key: keyof Booking, value: any) {
 		let errorMessage = '';
 		switch (key) {
 			case 'last_name':
-				errorMessage = value === '' ? 'Bitte gib einen Nachnamen ein' : '';
-				break;
+				errorMessage = validateName(value, "Nachnamen");
+				break
 			case 'first_name':
-				errorMessage = value === '' ? 'Bitte gib einen Vornamen ein' : '';
+				errorMessage = validateName(value, "Vornamen");
+				break
+			case 'supporter_buddy':
+				errorMessage = validateName(value, "Support Buddy");
 				break;
 			case 'email':
-				errorMessage = value === '' ? 'Bitte gib eine Email ein' : '';
+				errorMessage = validateEmail(value);
 				break;
 			case 'phone':
-				errorMessage = value === '' ? 'Bitte gib eine Telefonnummer ein' : '';
+				errorMessage = validatePhone(value);
 				break;
 			case 'ticket_id':
 				errorMessage = value === -1 ? 'Bitte wähle ein Ticket aus.' : '';
@@ -275,9 +307,13 @@ export function FormContainer() {
 				break;
 			case 'signature':
 				errorMessage = value === '' ? 'Wir würden uns freuen, wenn du das Formular unterschreibst' : '';
+				break;
+
 		}
 		setFormValidation(prev => ({...prev, [key]: errorMessage}));
+		return errorMessage;
 	}
+
 
 	function isStepValid() {
 		const currentStepFields = requiredFields[activeStep];
@@ -287,13 +323,14 @@ export function FormContainer() {
 		}
 
 		let isValid = true;
+		let errorMessage = '';
 		for (let field of currentStepFields) {
-			if (booking[field] === undefined || booking[field] === "" || booking[field] === -1) {
+			errorMessage = validateField(field, booking[field]);
+			if (errorMessage !== '') {
 				isValid = false;
+				break;
 			}
-			validateField(field, booking[field]);
 		}
-
 		return isValid;
 	}
 
@@ -306,7 +343,6 @@ export function FormContainer() {
 
 	function updateBooking(key: keyof Booking, value: any) {
 		setBooking({...booking, [key]: value});
-		validateField(key, value);
 	}
 
 	function updateMaterialIds(material_ids: Array<number>) {
@@ -320,11 +356,9 @@ export function FormContainer() {
 			headers: {Authorization: `Bearer ${token}`}
 		})
 			.then(function (response: any) {
-				console.log(response);
 				// handle success
 			})
 			.catch(function (error: any) {
-				console.log(error);
 				// handle error
 			});
 	}
@@ -359,9 +393,14 @@ export function FormContainer() {
 			</Grid>
 		</Grid>
 		<CardContent>
-			<Box sx={{display: 'flex', 'flex-direction': 'column', 'align-items': 'center', 'justify-content': 'center'}}>
+			<Box sx={{
+				display: 'flex',
+				'flex-direction': 'column',
+				'align-items': 'center',
+				'justify-content': 'center'
+			}}>
 				<Typography variant={"h5"}>{stepTitles[activeStep]}</Typography>
-				<Alert variant={"outlined"}  sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>
+				<Alert variant={"outlined"} sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>
 					{currentError}
 				</Alert>
 				{activeStep === FormSteps.NameAndAddress &&
