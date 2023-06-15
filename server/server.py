@@ -1,7 +1,7 @@
 import dataclasses
 import os
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from flask_limiter import Limiter
@@ -64,6 +64,7 @@ def serve(path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, 'index.html')
+
 
 @app.route('/api/submitForm', methods=['POST'])
 @limiter.limit("20/minute")
