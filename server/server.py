@@ -1,5 +1,7 @@
 import dataclasses
+import logging
 import os
+import sys
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -12,6 +14,31 @@ from src.booking_manager import BookingManager
 from src.views import Booking
 
 app = Flask(__name__, static_folder='../frontend/event-booking-system/build')
+
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+
+    logging.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+
+if not app.debug:
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    file_handler = logging.FileHandler('logs/flask_app.log')
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Flask app startup')
+
+    logging.basicConfig(filename='error.log', level=logging.ERROR)
+
+    sys.excepthook = handle_exception
+
 
 app.config["JWT_SECRET_KEY"] = "your-secret-key"  # This should be a complex random string.
 jwt = JWTManager(app)
