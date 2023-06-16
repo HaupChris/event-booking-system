@@ -89,7 +89,7 @@ function FormConfirmation(props: FinalBookingProps) {
 
 									</Typography>
 									<Button variant={"outlined"} sx={{mb: '1em'}} onClick={handleCopy}>
-										Betreff kopieren
+										Betreff kopieren k<FileCopy/>
 									</Button>
 									<a
 										href="https://paypal.me/ChristianHauptmanny" target="_blank"

@@ -27,11 +27,12 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
 	  setSortedTimeSlots(sorted);
 	}, [workShift]);
 
+
 	return (
 		<Box sx={{display: 'flex', 'flexDirection': 'column', 'alignItems': 'center', 'justifyContent': 'center', maxWidth: '90vw'}}>
 			<Typography variant="h5">{workShift.title}</Typography>
 			<Typography variant="body2">{workShift.description}</Typography>
-			<ListItem sx={{paddingLeft: 0, paddingRight: 0, display: 'flex', justifyContent: 'center'}}>
+			<ListItem key={workShift.title + "-" + workShift.id} sx={{paddingLeft: 0, paddingRight: 0, display: 'flex', justifyContent: 'center'}}>
 				<List className={'timeslot-list'} >
 					{sortedTimeSlots.map((timeSlot) => {
 						const selectedPriority = currentBooking.timeslot_priority_1 === timeSlot.id
@@ -39,7 +40,6 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
 								? "Mittlere" : currentBooking.timeslot_priority_3 === timeSlot.id
 									? "Notnagel" : "";
 						return <TimeSlot
-								key={timeSlot.id}
 								timeSlot={timeSlot}
 								availablePriorities={availablePriorities}
 								selectedPriority={selectedPriority}

@@ -39,9 +39,9 @@ function PasswordPage() {
 
 	return <Box sx={{
 		display: 'flex',
-		'flex-direction': 'column',
-		'align-items': 'center',
-		'justify-content': 'center',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
 		height: "100vh"
 	}}>
 		{!display && (

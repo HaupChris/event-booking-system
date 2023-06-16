@@ -29,27 +29,33 @@ export function SignaturePad(props: IProps) {
         img.src = props.booking.signature;
     }, [props.booking.signature]);
 
-    const handleSignatureEnd = () => {
+    const preventScroll = (event: { preventDefault: () => void; }) => {
+        event.preventDefault();
+    };
+
+    const handleSignatureEnd = (event: MouseEvent) => {
+        // preventScroll(event);
         if (!sigRef.current) return;
         const signatureDataURL = sigRef.current.toDataURL();
         props.updateBooking("signature", signatureDataURL);
-        setSignature(signatureDataURL);
     };
 
     const clearSignature = () => {
         if (!sigRef.current) return;
         sigRef.current.clear();
         props.updateBooking("signature", "");
-        setSignature(null);
     };
 
     return (
-        <Box sx={{display: 'flex', 'flex-direction': 'column', 'align-items': 'center', 'justify-content': 'center', }}>
+        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', }}>
             <SignatureCanvas
                 penColor="#eac764"
                 canvasProps={{className: 'signature-canvas'}}
                 ref={sigRef}
-                onEnd={handleSignatureEnd}
+                onEnd={(event) => handleSignatureEnd(event)}
+                clearOnResize={false}
+                // onBegin={preventScroll}
+
             />
             <Button onClick={clearSignature}>Löschen</Button>
         </Box>

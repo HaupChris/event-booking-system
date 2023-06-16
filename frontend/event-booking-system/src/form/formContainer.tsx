@@ -437,9 +437,9 @@ export function FormContainer() {
 		<CardContent>
 			<Box sx={{
 				display: 'flex',
-				'flex-direction': 'column',
-				'align-items': 'center',
-				'justify-content': 'center'
+				flexDirection: 'column',
+				alignItems: 'center',
+				justifyContent: 'center'
 			}}>
 				<Typography variant={"h5"}>{stepTitles[activeStep]}</Typography>
 				<Alert variant={"outlined"} sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>

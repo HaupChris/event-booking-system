@@ -40,7 +40,7 @@ function WorkShiftForm(props: FormProps) {
 
 
 	return <Box
-		sx={{display: 'flex', 'flex-direction': 'column', 'align-items': 'center', 'justify-content': 'center', maxWidth: '90vw'}}>
+		sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', maxWidth: '90vw'}}>
 		<Typography variant="body2">
 			Wir freuen uns, wenn du uns bei einer Supportschicht unterstützen könntest!
 			Wähle bitte bis zu drei Prioritäten aus.

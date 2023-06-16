@@ -49,7 +49,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 	}
 
 
-	return <ListItem className={"tetwartasdfsjohnsons"} sx={{border: selectedPriorityBorder, opacity: isFull ? '40%' : '100%', marginLeft: 0, paddingLeft: 0}}>
+	return <ListItem key={timeSlot.title + '-' + timeSlot.id} className={"tetwartasdfsjohnsons"} sx={{border: selectedPriorityBorder, opacity: isFull ? '40%' : '100%', marginLeft: 0, paddingLeft: 0}}>
 		<ListItemAvatar>
 			<CircularProgressWithLabel valueCurrent={timeSlot.num_booked} valueMax={timeSlot.num_needed}/>
 		</ListItemAvatar>
