@@ -170,6 +170,9 @@ class BookingManager:
         # remove header if exists
         signature = booking.signature.split(',')[1] if ',' in booking.signature else booking.signature
 
+        if not os.path.exists(os.path.join(self.db_dir, 'signatures')):
+            os.makedirs(os.path.join(self.db_dir, 'signatures'))
+
         # decode base64 string
         img_data = base64.b64decode(signature)
         file_path = os.path.join(self.db_dir, 'signatures', f'{booking.last_name}_{booking.first_name}_{booking.email}.png')
