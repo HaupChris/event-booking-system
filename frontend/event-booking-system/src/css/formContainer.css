@@ -107,11 +107,12 @@ body {
 
     .form-container {
         height: 98%;
-        width: 97%;
+        height: var(--doc-height);
+        width: 98%;
         margin: 0;
         position: absolute;
         top: 50%;
-        left: 1%;
+        left: 1px;
         -ms-transform: translateY(-50%);
         transform: translateY(-50%);
         /*background-color: rgba(255, 255, 255, 0) !important;*/

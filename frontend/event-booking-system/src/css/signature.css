@@ -1,4 +1,13 @@
 .signature-canvas{
     border: 1px solid;
     border-radius: 20px;
+    width: 30vw;
+    height: 30vh;
+}
+
+@media only screen and (max-width: 600px) {
+    .signature-canvas{
+        width: 90vw;
+        height: 30vh;
+    }
 }

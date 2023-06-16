@@ -6,5 +6,6 @@
 @media screen and (min-width: 901px) {
     .timeslot-list {
         column-count: 2;
+        justify-content: center;
     }
 }

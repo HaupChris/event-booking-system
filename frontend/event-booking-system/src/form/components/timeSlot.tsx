@@ -49,7 +49,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 	}
 
 
-	return <ListItem sx={{border: selectedPriorityBorder, opacity: isFull ? '50%' : '100%'}}>
+	return <ListItem className={"tetwartasdfsjohnsons"} sx={{border: selectedPriorityBorder, opacity: isFull ? '40%' : '100%', marginLeft: 0, paddingLeft: 0}}>
 		<ListItemAvatar>
 			<CircularProgressWithLabel valueCurrent={timeSlot.num_booked} valueMax={timeSlot.num_needed}/>
 		</ListItemAvatar>
@@ -99,8 +99,6 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 				</Select>
 			</FormControl>
 		</ListItemText>
-
-
 	</ListItem>
 }
 

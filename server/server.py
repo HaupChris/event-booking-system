@@ -23,7 +23,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["300 per day", "60 per hour"]
+    default_limits=["20000 per day", "5000 per hour"]
 )
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
@@ -33,7 +33,7 @@ admin_hashed_password = generate_password_hash("admin-password", method="pbkdf2:
 
 
 @app.route("/api/auth/admin", methods=["POST"])
-@limiter.limit("10/minute")
+@limiter.limit("40/minute")
 def authenticate_admin():
     password = request.json.get("password", None)
     if not password:
@@ -45,7 +45,7 @@ def authenticate_admin():
 
 
 @app.route("/api/auth", methods=["POST"])
-@limiter.limit("20/minute")
+@limiter.limit("100/minute")
 def authenticate():
     password = request.json.get("password", None)
     if not password:
@@ -70,7 +70,7 @@ def serve(path):
 
 
 @app.route('/api/submitForm', methods=['POST'])
-@limiter.limit("20/minute")
+@limiter.limit("90/minute")
 @jwt_required()
 def submit_form():
     # booking object is sent as json
@@ -88,7 +88,7 @@ def get_bookings():
 
 
 @app.route('/api/formcontent', methods=['GET'])
-@limiter.limit("20/minute")
+@limiter.limit("200/minute")
 @jwt_required()
 def get_formcontent():
     form_content = booking_manager.get_form_content()

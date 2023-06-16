@@ -9,15 +9,16 @@ import {
 } from '@mui/material';
 import {Booking, FormContent} from "./interface";
 import React, {useState} from "react";
-import {CheckCircleOutline, FileCopy} from "@mui/icons-material";
+import {CheckCircleOutline, ErrorOutline, FileCopy} from "@mui/icons-material";
 
 import '../css/formConfirmation.css';
+import {BookingState} from "./formContainer";
 
 interface FinalBookingProps {
 	booking: Booking;
 	submitBooking: () => void;
 	formContent: FormContent;
-	bookingIsSubmitted: boolean;
+	bookingState: BookingState;
 }
 
 function findItemById<T extends { id: number }>(array: T[], id: number): T | undefined {
@@ -42,6 +43,9 @@ function FormConfirmation(props: FinalBookingProps) {
 
 		setCopied(false);
 	};
+
+	console.log('formConfirmation.tsx: props.bookingState.isSubmitted: ', props.bookingState.isSubmitted);
+	console.log('formConfirmation.tsx: props.bookingState.isSuccessful: ', props.bookingState.isSuccessful);
 
 	return (
 		<Box sx={{mt: 3, p: 2, borderRadius: '5px'}}>
@@ -81,12 +85,15 @@ function FormConfirmation(props: FinalBookingProps) {
 
 			</Typography>
 
-
-			{props.bookingIsSubmitted ? (
+			{props.bookingState.isSubmitted ? ( props.bookingState.isSuccessful ? (
 				<div className="icon-container">
 					<CheckCircleOutline color="primary" style={{fontSize: 60}}/>
 					<Typography variant="h6">Buchung erfolgreich</Typography>
-				</div>
+				</div> ) : (
+				<div className="icon-container">
+					<ErrorOutline color="error" style={{fontSize: 60}}/>
+					<Typography variant="h6">Buchung fehlgeschlagen, bitte Christian Hauptmann kontaktieren.</Typography>
+				</div> )
 			) : (
 				<Button variant="contained" color="primary" onClick={props.submitBooking}>
 					Buchung absenden

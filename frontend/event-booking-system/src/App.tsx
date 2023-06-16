@@ -53,7 +53,10 @@ export const themeOptions: ThemeOptions = {
 	},
 };
 const theme = createTheme(themeOptions);
-
+const documentHeight = () => {
+	const doc = document.documentElement
+	doc.style.setProperty('--doc-height', `${window.innerHeight - 8}px`)
+}
 
 const App = () => {
 	const [auth, setAuth] = useState(false);
@@ -67,6 +70,9 @@ const App = () => {
 			setToken(storedToken);
 			setAuth(true);
 		}
+
+		window.addEventListener('resize', documentHeight);
+		documentHeight()
 	}, []);
 
 	// Save token to local storage whenever it changes
@@ -95,8 +101,10 @@ const App = () => {
 						<Routes>
 							<Route path="/" element={auth ? <Navigate replace to="/form"/> : <PasswordPage/>}/>
 							<Route path="/form" element={auth ? <FormContainer/> : <Navigate replace to="/"/>}/>
-						  	<Route path="/admin" element={isAdmin ? <Navigate replace to="/admin/dashboard" /> : <AdminLogin/>} />
-							<Route path="/admin/dashboard" element={isAdmin ? <AdminDashboard/> : <Navigate replace to={"/admin"}/> }/>
+							<Route path="/admin"
+								   element={isAdmin ? <Navigate replace to="/admin/dashboard"/> : <AdminLogin/>}/>
+							<Route path="/admin/dashboard"
+								   element={isAdmin ? <AdminDashboard/> : <Navigate replace to={"/admin"}/>}/>
 						</Routes>
 					</BrowserRouter>
 				</TokenContext.Provider>

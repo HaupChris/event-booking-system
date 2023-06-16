@@ -181,6 +181,12 @@ export interface FormProps {
 	formContent: FormContent;
 }
 
+export interface BookingState {
+	isSubmitted: boolean;
+	isSuccessful: boolean;
+}
+
+
 export function FormContainer() {
 	const [formContent, setFormContent] = useState<FormContent>(getDummyFormContent);
 	const [formValidation, setFormValidation] = useState<{ [key in keyof Booking]?: string }>({});
@@ -188,7 +194,9 @@ export function FormContainer() {
 	const [activeStep, setActiveStep] = useState(FormSteps.NameAndAddress);
 	const maxSteps = Object.keys(FormSteps).length / 2;
 	const [currentError, setCurrentError] = useState<string>("");
-	const [bookingIsSubmitted, setBookingIsSubmitted] = useState<boolean>(false);
+	const [bookingState, setBookingState] = useState<BookingState>({isSubmitted: false, isSuccessful: false});
+
+
 	const {token, setToken} = useContext(TokenContext);
 	const {auth, setAuth} = useContext(AuthContext);
 	const stepTitles = ["Persönliche Infos",
@@ -216,13 +224,22 @@ export function FormContainer() {
 	};
 
 	useEffect(() => {
+
+
 		axios.get('/api/formcontent', {
 			headers: {Authorization: `Bearer ${token}`}
 		})
 			.then((response) => {
 					setFormContent(response.data);
 				}
-			);
+			)
+			.catch((error) => {
+			// 	catch 401 and redirect to login
+				if (error.response.status === 401 || error.response.status === 403 || error.response.status === 500) {
+					setAuth(false);
+					setToken("");
+				}
+			});
 
 	}, []);
 
@@ -354,7 +371,13 @@ export function FormContainer() {
 		})
 			.then(function (response: any) {
 				// handle success
-				setBookingIsSubmitted(true);
+				console.log("booking  successful");
+				setBookingState( () => {
+					return {
+						isSuccessful: true,
+						isSubmitted: true
+					}
+				})
 				// set an interval after which the user is logged out
 				setTimeout(() => {
 					setToken("");
@@ -364,7 +387,20 @@ export function FormContainer() {
 			})
 			.catch(function (error: any) {
 				// handle error
+				console.log("booking failed");
+				setBookingState(() => {
+					return {
+						isSuccessful: false,
+						isSubmitted: true
+					};
+				})
+
+				setTimeout(() => {
+					setToken("");
+					setAuth(false);
+				}, 1000 * 10);
 			});
+
 	}
 
 
@@ -373,7 +409,7 @@ export function FormContainer() {
 			<Grid item xs={11} className={"navigation-progress"}>
 				<LinearProgressWithLabel variant="determinate" max={maxSteps} currentvalue={activeStep + 1}/>
 			</Grid>
-			<Grid item xs={12} className={"navigation-buttons"} sx={{display: bookingIsSubmitted ? "None" : ""}}>
+			<Grid item xs={12} className={"navigation-buttons"} sx={{display: bookingState.isSubmitted ? "None" : ""}}>
 				<Button variant={"outlined"} sx={{'display': activeStep < 1 ? "none" : "inline-block"}}
 						onClick={() => {
 							setActiveStep(activeStep - 1);
@@ -447,7 +483,8 @@ export function FormContainer() {
                     />}
 				{activeStep === FormSteps.Summary && <FormSummary booking={booking} formContent={formContent}/>}
 				{activeStep === FormSteps.Confirmation &&
-                    <FormConfirmation bookingIsSubmitted={bookingIsSubmitted} formContent={formContent}
+                    <FormConfirmation bookingState={bookingState}
+                                      formContent={formContent}
                                       booking={booking}
                                       submitBooking={submitBooking}/>}
 			</Box>
