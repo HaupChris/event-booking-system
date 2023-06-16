@@ -25,6 +25,7 @@ import FormAwarnessCode from "./formAwarenessCode";
 import FormSummary from "./formSummary";
 import FormConfirmation from "./formConfirmation";
 import {AuthContext, TokenContext} from "../AuthContext";
+import {jsPDF} from "jspdf";
 
 
 enum FormSteps {
@@ -195,6 +196,7 @@ export function FormContainer() {
 	const maxSteps = Object.keys(FormSteps).length / 2;
 	const [currentError, setCurrentError] = useState<string>("");
 	const [bookingState, setBookingState] = useState<BookingState>({isSubmitted: false, isSuccessful: false});
+	const [pdfSummary, setPdfSummary] = useState<jsPDF>(new jsPDF());
 
 
 	const {token, setToken} = useContext(TokenContext);
@@ -481,12 +483,17 @@ export function FormContainer() {
                                    formValidation={formValidation}
                                    formContent={formContent}
                     />}
-				{activeStep === FormSteps.Summary && <FormSummary booking={booking} formContent={formContent}/>}
+				{activeStep === FormSteps.Summary && <FormSummary booking={booking} formContent={formContent} setPdfSummary={setPdfSummary} pdfSummary={pdfSummary}/>}
 				{activeStep === FormSteps.Confirmation &&
                     <FormConfirmation bookingState={bookingState}
                                       formContent={formContent}
                                       booking={booking}
-                                      submitBooking={submitBooking}/>}
+                                      submitBooking={submitBooking}
+									  pdfSummary={pdfSummary}
+
+					/>
+
+				}
 			</Box>
 		</CardContent>
 	</Card>;

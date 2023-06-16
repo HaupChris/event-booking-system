@@ -9,4 +9,23 @@
 
 .icon-container {
   animation: scale-up 0.3s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2em;
+}
+
+.checkout {
+    border: #eac764 solid 2px;
+    border-radius: 5px;
+    padding: 2em;
+    margin-bottom: 2em;
+}
+
+a {
+  color: #EB7942 !important;
+}
+
+a:active, a:hover {
+    color: #31f605 !important;
 }

@@ -29,6 +29,7 @@ export const themeOptions: ThemeOptions = {
 			primary: '#a29c0d',
 			secondary: '#817c0e',
 		},
+
 	},
 	typography: {
 		fontFamily: 'Permanent Marker',

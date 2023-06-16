@@ -3,6 +3,7 @@ import {Booking, FormContent, TimeSlot, WorkShift} from './interface';
 import {jsPDF} from "jspdf";
 import {Download} from "@mui/icons-material";
 import "../css/formSummary.css";
+import {useEffect} from "react";
 
 function findItemById<T extends { id: number }>(array: T[], id: number): T | undefined {
 	return array.find(item => item.id === id);
@@ -17,6 +18,8 @@ function getShiftAndTimeslot(work_shifts: WorkShift[], timeslot_id: number) {
 interface IProps {
 	booking: Booking;
 	formContent: FormContent;
+	setPdfSummary: (doc: jsPDF) => void;
+	pdfSummary: jsPDF;
 }
 
 function FormSummary(props: IProps) {
@@ -36,6 +39,10 @@ function FormSummary(props: IProps) {
 	const materials = material_ids.map(id => findItemById(props.formContent.materials, id));
 	const personalInfoKeys = ['first_name', 'last_name', 'email', 'phone'];
 	const personalInfoValues = ['Vorname', 'Nachname', 'E-Mail', 'Telefon'];
+
+	useEffect(() => {
+		generatePDF();
+	}, [])
 
 	const generatePDF = () => {
 		const doc = new jsPDF();
@@ -88,13 +95,18 @@ function FormSummary(props: IProps) {
 
 		const betreff = `WWWW: ${props.booking.last_name}, ${props.booking.first_name} - ${ticket?.title}, ${beverage?.title}`;
 		doc.text("Betreff: " + betreff, 10, yPos);
+		props.setPdfSummary(doc);
 
-		doc.save('booking-summary.pdf');
+		// doc.save('booking-summary.pdf');
+	}
+
+	const saveSummary = () => {
+		props.pdfSummary.save('booking-summary.pdf');
 	}
 
 	return (
 		<Box sx={{mt: 3, p: 2, borderRadius: '5px'}}>
-			<Button onClick={generatePDF} variant="contained" color="primary">
+			<Button onClick={saveSummary} variant="contained" color="primary">
 				Zusammenfassung als PDF herunterladen <Download/>
 			</Button>
 			<Typography variant="h6" component="div" sx={{mb: 1}}>
