@@ -11,3 +11,6 @@ Thumbs.db
 
 server/db/*
 
+server/error.log
+server/logs/*
+
