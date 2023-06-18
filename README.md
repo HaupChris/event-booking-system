@@ -12,7 +12,9 @@ kill -9 <pid>
 4. activate venv and then start the gunicorn service
 ```
 cd project_folder/server
-gunicorn --bind 0.0.0.0:5000 wsgi:app
+```
+```
+gunicorn --bind 0.0.0.0:5000 wsgi:app --daemon
 ```
 5. check the service status
 ``` 
@@ -20,7 +22,7 @@ ps aux | grep gunicorn
 ```
 6. restart the nginx service
 ```
-sudo service nginx restart
+sudo systemctl restart nginx
 ```
 7. check the nginx service status
 ```

@@ -3,17 +3,12 @@ import {Box, Button, Typography} from '@mui/material';
 import SignatureCanvas from 'react-signature-canvas';
 import {Booking} from "../interface";
 import '../../css/signature.css';
+import CustomSignaturePad from "./customSignaturePad";
 
 interface IProps {
 	updateBooking: (key: keyof Booking, value: any) => void;
 	booking: Booking;
 }
-
-
-
-
-
-
 
 export function SignaturePad(props: IProps) {
     const sigRef = useRef<SignatureCanvas | null>(null);
@@ -57,30 +52,39 @@ export function SignaturePad(props: IProps) {
         event.preventDefault();
     };
 
-    const handleSignatureEnd = (event: MouseEvent) => {
-        // preventScroll(event);
-        if (!sigRef.current) return;
-        const signatureDataURL = sigRef.current.toDataURL();
-        props.updateBooking("signature", signatureDataURL);
-    };
+    // const handleSignatureEnd = (event: MouseEvent) => {
+    //     // preventScroll(event);
+    //     if (!sigRef.current) return;
+    //     const signatureDataURL = sigRef.current.toDataURL();
+    //     props.updateBooking("signature", signatureDataURL);
+    // };
+
+    const handleSignatureEnd = (signatureURL: string) => {
+        props.updateBooking("signature", signatureURL);
+    }
 
     const clearSignature = () => {
-        if (!sigRef.current) return;
-        sigRef.current.clear();
         props.updateBooking("signature", "");
     };
 
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', }}>
-            <SignatureCanvas
+            {/*<SignatureCanvas*/}
+            {/*    penColor="#eac764"*/}
+            {/*    canvasProps={{className: 'signature-canvas'}}*/}
+            {/*    ref={sigRef}*/}
+            {/*    onEnd={(event) => handleSignatureEnd(event)}*/}
+            {/*    on*/}
+            {/*    clearOnResize={false}*/}
+
+            {/*    // onBegin={preventScroll}*/}
+
+            {/*/>*/}
+            <CustomSignaturePad
                 penColor="#eac764"
-                canvasProps={{className: 'signature-canvas'}}
-                ref={sigRef}
-                onEnd={(event) => handleSignatureEnd(event)}
+                existingSignature={props.booking.signature}
+                onEnd={(signatureURL) => handleSignatureEnd(signatureURL)}
                 clearOnResize={false}
-
-                // onBegin={preventScroll}
-
             />
             <Button onClick={clearSignature}>Löschen</Button>
         </Box>
