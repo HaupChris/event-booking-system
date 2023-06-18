@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS Materials  (
 
 CREATE TABLE IF NOT EXISTS Bookings  (
     id INTEGER PRIMARY KEY NOT NULL,
+    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     user_id INTEGER,
     ticket_option_id INTEGER,
     beverage_option_id INTEGER,

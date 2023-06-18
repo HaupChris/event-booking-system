@@ -1,6 +1,7 @@
 import base64
 import sqlite3
 from contextlib import closing
+from datetime import datetime
 from typing import Dict, List
 import json
 import os
@@ -129,13 +130,13 @@ class BookingManager:
 
         for work_shift in form_content_dict['work_shifts']:
             for timeslot in work_shift['time_slots']:
-                timeslot['num_booked'] = timeslot_bookings_1.get(timeslot['id'], 0) \
-                                         + timeslot_bookings_2.get(timeslot['id'], 0) \
-                                         + timeslot_bookings_3.get(timeslot['id'], 0)
+                timeslot['num_booked'] = timeslot_bookings_1.get(timeslot['id'], 0)
 
         return form_content_dict
 
     def insert_booking(self, booking: Booking):
+        booking_timestamp = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+
         with closing(sqlite3.connect(self.db_file_path)) as connection:
             cursor = connection.cursor()
 
@@ -166,6 +167,13 @@ class BookingManager:
 
             self.save_signature_image(booking)
 
+    def check_email_exists(self, email: str) -> bool:
+        with closing(sqlite3.connect(self.db_file_path)) as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("SELECT * FROM Users WHERE email=?", (email,))
+            return cursor.fetchone() is not None
+
     def save_signature_image(self, booking: Booking):
         # remove header if exists
         signature = booking.signature.split(',')[1] if ',' in booking.signature else booking.signature
@@ -175,7 +183,7 @@ class BookingManager:
 
         # decode base64 string
         img_data = base64.b64decode(signature)
-        file_path = os.path.join(self.db_dir, 'signatures', f'{booking.last_name}_{booking.first_name}_{booking.email}.png')
+        file_path = os.path.join(self.db_dir, 'signatures', f'{booking.last_name}_{booking.first_name}.png')
         # write to a file
         with open(file_path, 'wb') as file:
             file.write(img_data)

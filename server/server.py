@@ -107,6 +107,19 @@ def submit_form():
     return 'Form submitted successfully'
 
 
+
+@app.route('/api/booking/mail-exists', methods=['POST'])
+@limiter.limit("90/minute")
+@jwt_required()
+def mail_exists():
+    mail = request.json.get('mail', None)
+    if not mail:
+        return jsonify({"msg": "Missing mail"}), 400
+    mail_is_existing = booking_manager.check_email_exists(mail)
+    return jsonify(mail_exists=mail_is_existing), 200
+
+
+
 @app.route("/api/data", methods=["GET"])
 @jwt_required()
 def get_bookings():

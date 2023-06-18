@@ -89,7 +89,7 @@ function FormConfirmation(props: FinalBookingProps) {
 
 									</Typography>
 									<Button variant={"outlined"} sx={{mb: '1em'}} onClick={handleCopy}>
-										Betreff kopieren k<FileCopy/>
+										Betreff kopieren <FileCopy/>
 									</Button>
 									<a
 										href="https://paypal.me/ChristianHauptmanny" target="_blank"
@@ -118,9 +118,9 @@ function FormConfirmation(props: FinalBookingProps) {
 							<Typography variant="h6">Buchung fehlgeschlagen, bitte Christian Hauptmann
 								kontaktieren.</Typography>
 						</div>)
-			) : (<>
+			) : (<Box sx={{display: 'flex', 'flexDirection': 'column', 'alignItems': 'center', 'justifyContent': 'center'}}>
 					<Typography variant="body1" component="div" sx={{mb: 2}}>
-						Wir freuen uns, dass du dabei bist und mit uns zusammen feierst!s
+						Wir freuen uns, dass du dabei bist und mit uns zusammen feierst!
 						<br/>
 
 					</Typography>
@@ -128,7 +128,7 @@ function FormConfirmation(props: FinalBookingProps) {
 					<Button variant="contained" color="primary" onClick={props.submitBooking}>
 						<Check/> Buchung absenden
 					</Button>
-				</>
+				</Box>
 			)}
 
 		</Box>

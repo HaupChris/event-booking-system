@@ -287,7 +287,10 @@ export function FormContainer() {
 	}, [booking]);
 
 	function validateEmail(value: any): string {
+		const pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 		if (value === '') return 'Bitte gib eine Email ein';
+		if (!pattern.test(value)) return 'Bitte gib eine gültige Email ein.';
+
 		return '';
 	}
 

@@ -9,6 +9,12 @@ interface IProps {
 	booking: Booking;
 }
 
+
+
+
+
+
+
 export function SignaturePad(props: IProps) {
     const sigRef = useRef<SignatureCanvas | null>(null);
     const [signature, setSignature] = useState<string | null>(null);
@@ -28,6 +34,24 @@ export function SignaturePad(props: IProps) {
         };
         img.src = props.booking.signature;
     }, [props.booking.signature]);
+
+    useEffect(() => {
+        const canvas = sigRef.current?.getCanvas();
+        if (!canvas) return;
+
+        const preventScroll = (event: TouchEvent) => {
+            event.preventDefault();
+        };
+
+        canvas.addEventListener('touchstart', preventScroll);
+        canvas.addEventListener('touchmove', preventScroll);
+
+        // Clean up the event listeners when the component unmounts
+        return () => {
+            canvas.removeEventListener('touchstart', preventScroll);
+            canvas.removeEventListener('touchmove', preventScroll);
+        };
+    }, [sigRef]);
 
     const preventScroll = (event: { preventDefault: () => void; }) => {
         event.preventDefault();
@@ -54,6 +78,7 @@ export function SignaturePad(props: IProps) {
                 ref={sigRef}
                 onEnd={(event) => handleSignatureEnd(event)}
                 clearOnResize={false}
+
                 // onBegin={preventScroll}
 
             />
