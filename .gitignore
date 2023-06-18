@@ -11,6 +11,7 @@ Thumbs.db
 
 server/db/*
 
-server/error.log
-server/logs/flask_app.log
+**/logs
+
+server/*.log
 

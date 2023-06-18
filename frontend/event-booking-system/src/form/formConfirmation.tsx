@@ -63,7 +63,7 @@ function FormConfirmation(props: FinalBookingProps) {
 									Du bist dabei!
 								</Typography>
 							</div>
-							<Button onClick={saveSummary} sx={{mb: '1em'}} variant="outlined" color="primary">
+							<Button fullWidth onClick={saveSummary} sx={{mb: '1em'}} variant="outlined" color="primary">
 								Zusammenfassung der Buchung herunterladen <Download/>
 							</Button>
 
@@ -73,7 +73,7 @@ function FormConfirmation(props: FinalBookingProps) {
 										Dein Beitrag: <strong>{props.booking.total_price}€</strong>
 									</Typography>
 
-									<Typography variant="body2" sx={{mb: '1em'}} component="div">
+									<Typography variant="body2" sx={{mb:'1em'}} component="div">
 										<TextField
 											sx={{width: {xs: '100%', md: '70%'}}}
 											variant={"standard"}
@@ -85,16 +85,17 @@ function FormConfirmation(props: FinalBookingProps) {
 											autoHideDuration={4000}
 											onClose={handleClose}
 											message="Betreff kopiert"
+											anchorOrigin={{vertical: 'top', horizontal: 'center'}}
 										/>
 
 									</Typography>
-									<Button variant={"outlined"} sx={{mb: '1em'}} onClick={handleCopy}>
+									<Button variant={"outlined"} fullWidth sx={{mb: {xs: '1em'}}} onClick={handleCopy}>
 										Betreff kopieren <FileCopy/>
 									</Button>
 									<a
 										href="https://paypal.me/ChristianHauptmanny" target="_blank"
 										rel="noreferrer">
-										<Button variant={"contained"}>
+										<Button fullWidth variant={"contained"}>
 											Zu unserem Paypal <OpenInNew/>
 										</Button>
 									</a>

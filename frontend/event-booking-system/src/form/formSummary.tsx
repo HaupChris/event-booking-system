@@ -22,30 +22,17 @@ interface IProps {
 	pdfSummary: jsPDF;
 }
 
-function FormSummary(props: IProps) {
-	const {
-		ticket_id,
-		beverage_id,
-		timeslot_priority_1,
-		timeslot_priority_2,
-		timeslot_priority_3,
-		material_ids
-	} = props.booking;
-	const ticket = findItemById(props.formContent.ticket_options, ticket_id);
-	const beverage = findItemById(props.formContent.beverage_options, beverage_id);
-	const shift_slot_1 = getShiftAndTimeslot(props.formContent.work_shifts, timeslot_priority_1);
-	const shift_slot_2 = getShiftAndTimeslot(props.formContent.work_shifts, timeslot_priority_2);
-	const shift_slot_3 = getShiftAndTimeslot(props.formContent.work_shifts, timeslot_priority_3);
-	const materials = material_ids.map(id => findItemById(props.formContent.materials, id));
+export function generateSummaryPDF(booking: Booking, formContent: FormContent): jsPDF {
+	const ticket = findItemById(formContent.ticket_options, booking.ticket_id);
+	const beverage = findItemById(formContent.beverage_options, booking.beverage_id);
+	const shift_slot_1 = getShiftAndTimeslot(formContent.work_shifts, booking.timeslot_priority_1);
+	const shift_slot_2 = getShiftAndTimeslot(formContent.work_shifts, booking.timeslot_priority_2);
+	const shift_slot_3 = getShiftAndTimeslot(formContent.work_shifts, booking.timeslot_priority_3);
+	const materials = booking.material_ids.map(id => findItemById(formContent.materials, id));
 	const personalInfoKeys = ['first_name', 'last_name', 'email', 'phone'];
 	const personalInfoValues = ['Vorname', 'Nachname', 'E-Mail', 'Telefon'];
 
-	useEffect(() => {
-		generatePDF();
-	}, [])
-
-	const generatePDF = () => {
-		const doc = new jsPDF();
+	const doc = new jsPDF();
 		let yPos = 10;
 
 		doc.setFontSize(16);
@@ -54,7 +41,7 @@ function FormSummary(props: IProps) {
 
 		personalInfoKeys.forEach((key, index) => {
 			doc.setFontSize(14);
-			doc.text(`${personalInfoValues[index]}: ${props.booking[key as keyof Booking]}`, 10, yPos);
+			doc.text(`${personalInfoValues[index]}: ${booking[key as keyof Booking]}`, 10, yPos);
 			yPos += 10;
 		});
 
@@ -84,21 +71,44 @@ function FormSummary(props: IProps) {
 			yPos += 10;
 		}
 
-		doc.text("Supporter buddy: " + props.booking.supporter_buddy, 10, yPos);
+		doc.text("Supporter buddy: " + booking.supporter_buddy, 10, yPos);
 		yPos += 10;
 
-		doc.text("Dein Beitrag: " + props.booking.total_price + "€", 10, yPos);
+		doc.text("Dein Beitrag: " + booking.total_price + "€", 10, yPos);
 		yPos += 10;
 
 		doc.text("Zahlungsmethode: https://paypal.me/ChristianHauptmanny", 10, yPos);
 		yPos += 10;
 
-		const betreff = `WWWW: ${props.booking.last_name}, ${props.booking.first_name} - ${ticket?.title}, ${beverage?.title}`;
+		const betreff = `WWWW: ${booking.last_name}, ${booking.first_name} - ${ticket?.title}, ${beverage?.title}`;
 		doc.text("Betreff: " + betreff, 10, yPos);
-		props.setPdfSummary(doc);
 
-		// doc.save('booking-summary.pdf');
-	}
+		return doc;
+}
+
+function FormSummary(props: IProps) {
+	const {
+		ticket_id,
+		beverage_id,
+		timeslot_priority_1,
+		timeslot_priority_2,
+		timeslot_priority_3,
+		material_ids
+	} = props.booking;
+	const ticket = findItemById(props.formContent.ticket_options, ticket_id);
+	const beverage = findItemById(props.formContent.beverage_options, beverage_id);
+	const shift_slot_1 = getShiftAndTimeslot(props.formContent.work_shifts, timeslot_priority_1);
+	const shift_slot_2 = getShiftAndTimeslot(props.formContent.work_shifts, timeslot_priority_2);
+	const shift_slot_3 = getShiftAndTimeslot(props.formContent.work_shifts, timeslot_priority_3);
+	const materials = material_ids.map(id => findItemById(props.formContent.materials, id));
+	const personalInfoKeys = ['first_name', 'last_name', 'email', 'phone'];
+	const personalInfoValues = ['Vorname', 'Nachname', 'E-Mail', 'Telefon'];
+
+	useEffect(() => {
+		props.setPdfSummary(generateSummaryPDF(props.booking, props.formContent));
+	}, [])
+
+
 
 	const saveSummary = () => {
 		props.pdfSummary.save('booking-summary.pdf');

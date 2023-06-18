@@ -1,7 +1,7 @@
 {
   "ticket_options": [
     {
-      "title": "Donnerstag bis Sonntag",
+      "title": "Donnerstag, Freitag, Samstag",
       "price": 40.0,
       "amount": 80
     },
@@ -23,7 +23,7 @@
 
     {
       "title": "Donnerstag",
-      "price": 20.0,
+      "price": 10.0,
       "amount": 20
     },
     {
@@ -68,7 +68,7 @@
       ]
     },
     {
-      "title": "Wer A sagt muss auch Abbau sagen",
+      "title": "Licht aus, Tür zu",
       "description": "Am Sonntag packen wir alles zusammen und überlassen die Wiese wieder der Natur.",
       "time_slots": [
         {
@@ -176,8 +176,8 @@
       ]
     },
     {
-      "title": "Bunde hunde",
-      "description": "Bitte nur ankreuzen, wenn du Mitglied im Deko-Team bist. ",
+      "title": "Bunde Hunde",
+      "description": "Bitte nur ankreuzen, wenn du Mitglied im Deko-Team bist. Falls du noch dazu willst, melde dich bei gerne bei uns.",
       "time_slots": [
         {
           "title": "Deko Team",
@@ -216,6 +216,24 @@
           "num_needed": 1
         }
       ]
+    },
+    {
+      "title": "Fünf Sterne Deluxe Küche",
+        "description": "Wir werden mit Backofenpizza versorgt und brauchen hier noch helfende Hände.",
+        "time_slots": [
+          {
+            "title": "Freitag",
+            "start_time": "15:00",
+            "end_time": "20:00",
+            "num_needed": 3
+          },
+          {
+            "title": "Samstag",
+            "start_time": "15:00",
+            "end_time": "20:00",
+            "num_needed": 3
+          }
+        ]
     }
 
   ],
