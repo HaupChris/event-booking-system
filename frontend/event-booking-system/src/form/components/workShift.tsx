@@ -30,8 +30,8 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
 
 	return (
 		<Box sx={{display: 'flex', 'flexDirection': 'column', 'alignItems': 'center', 'justifyContent': 'center', maxWidth: '90vw'}}>
-			<Typography variant="h5">{workShift.title}</Typography>
-			<Typography variant="body2">{workShift.description}</Typography>
+			<Typography align={"center"} variant="h5">{workShift.title}</Typography>
+			<Typography align={"justify"} variant="body2">{workShift.description}</Typography>
 			<ListItem key={workShift.title + "-" + workShift.id} sx={{paddingLeft: 0, paddingRight: 0, display: 'flex', justifyContent: 'center'}}>
 				<List className={'timeslot-list'} >
 					{sortedTimeSlots.map((timeSlot) => {

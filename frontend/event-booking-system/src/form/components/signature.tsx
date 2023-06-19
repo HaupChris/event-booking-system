@@ -48,17 +48,7 @@ export function SignaturePad(props: IProps) {
         };
     }, [sigRef]);
 
-    const preventScroll = (event: { preventDefault: () => void; }) => {
-        event.preventDefault();
-    };
-
-    // const handleSignatureEnd = (event: MouseEvent) => {
-    //     // preventScroll(event);
-    //     if (!sigRef.current) return;
-    //     const signatureDataURL = sigRef.current.toDataURL();
-    //     props.updateBooking("signature", signatureDataURL);
-    // };
-
+    
     const handleSignatureEnd = (signatureURL: string) => {
         props.updateBooking("signature", signatureURL);
     }
@@ -69,17 +59,6 @@ export function SignaturePad(props: IProps) {
 
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', }}>
-            {/*<SignatureCanvas*/}
-            {/*    penColor="#eac764"*/}
-            {/*    canvasProps={{className: 'signature-canvas'}}*/}
-            {/*    ref={sigRef}*/}
-            {/*    onEnd={(event) => handleSignatureEnd(event)}*/}
-            {/*    on*/}
-            {/*    clearOnResize={false}*/}
-
-            {/*    // onBegin={preventScroll}*/}
-
-            {/*/>*/}
             <CustomSignaturePad
                 penColor="#eac764"
                 existingSignature={props.booking.signature}

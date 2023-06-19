@@ -62,8 +62,8 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 				color="text.primary"
 			>
 				{`${timeSlot.title}`}
-				<br/>
-				{`${timeSlot.start_time} - ${timeSlot.end_time}`}
+
+				{timeSlot.start_time.length !== 0 && timeSlot.end_time.length !== 0 ? <><br/> {`${timeSlot.start_time} - ${timeSlot.end_time}`}</> : ""}
 			</Typography>
 		</ListItemText>
 

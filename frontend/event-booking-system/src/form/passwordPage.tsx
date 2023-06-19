@@ -42,17 +42,19 @@ function PasswordPage() {
 		flexDirection: 'column',
 		alignItems: 'center',
 		justifyContent: 'center',
-		height: "100vh"
+		height: "100vh",
 	}}>
 		{!display && (
-			<div>
+			<Box sx={{position: "absolut", top: "10%"}}>
 				<p>Kommst du mit uns in den Kanienchenbau?</p>
+				<Box sx={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+					<Button variant="contained" style={{backgroundColor: 'red', 'marginRight': '1em'}} onClick={() => {
+					}}>Red Pill</Button>
+					<Button variant="contained" style={{backgroundColor: 'blue'}} onClick={() => setDisplay(true)}>Blue
+						Pill</Button>
+				</Box>
 
-				<Button variant="contained" style={{backgroundColor: 'red', 'marginRight': '3em'}} onClick={() => {
-				}}>Red Pill</Button>
-				<Button variant="contained" style={{backgroundColor: 'blue'}} onClick={() => setDisplay(true)}>Blue
-					Pill</Button>
-			</div>)}
+			</Box>)}
 
 		{display && (
 			<div className={"div-password-input"}>
