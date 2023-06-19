@@ -43,19 +43,19 @@ function MaterialTable(props: IProps) {
 
 
 	return (
-		<div style={{height: 400, width: '100%'}}>
-			<DataGrid rows={rows} columns={columns}
+		<div >
+			<DataGrid rows={rows} columns={columns} style={{maxHeight: '90vh',width: '100%'}}
 					  initialState={{
 						  pagination: {
 							  paginationModel: {
-								  pageSize: 100,
+								  pageSize: 10,
 							  },
 						  },
 					  }}
 					  slots={{
 						  toolbar: CustomToolbar,
 					  }}
-					  pageSizeOptions={[100]}
+					  pageSizeOptions={[10]}
 					  checkboxSelection/>
 		</div>
 	);

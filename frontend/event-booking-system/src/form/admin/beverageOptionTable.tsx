@@ -35,7 +35,7 @@ function BeverageOptionTable(props: IProps) {
 	];
 
 	return (
-		<div style={{height: 400, width: '100%'}}>
+		<div style={{height: '90vh', width: '100%'}}>
 			<DataGrid rows={props.beverageOptions}
 					  columns={columns}
 					  initialState={{
