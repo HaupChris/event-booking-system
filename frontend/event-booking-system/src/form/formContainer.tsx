@@ -261,10 +261,11 @@ export function FormContainer() {
 			)
 			.catch((error) => {
 				// 	catch 401 and redirect to login
-				if (error.response.status === 401 || error.response.status === 403 || error.response.status === 500) {
-					setAuth(false);
-					setToken("");
-				}
+
+				console.log(error);
+				setAuth(false);
+				setToken("");
+
 			});
 	}, []);
 
@@ -390,160 +391,167 @@ export function FormContainer() {
 			let total_price = 0;
 			let newBooking = {...prevBooking};
 
-			if (key === 'ticket_id' || key === 'beverage_id') {
+			if (key === 'ticket_id') {
 				ticketOption = formContent.ticket_options.find((ticket) => ticket.id === value);
-				beverageOption = formContent.beverage_options.find((beverage) => beverage.id === prevBooking.beverage_id);
-				total_price += ticketOption ? ticketOption.price : 0;
-				total_price += beverageOption ? beverageOption.price : 0;
-				newBooking = {...prevBooking, [key]: value, total_price: total_price};
 			} else {
-				newBooking = {...prevBooking, [key]: value};
+				ticketOption = formContent.ticket_options.find((ticket) => ticket.id === prevBooking.ticket_id);
 			}
+
+			if (key === 'beverage_id') {
+				beverageOption = formContent.beverage_options.find((beverage) => beverage.id === value);
+			} else {
+				beverageOption = formContent.beverage_options.find((beverage) => beverage.id === prevBooking.beverage_id);
+			}
+
+			total_price += ticketOption ? ticketOption.price : 0;
+			total_price += beverageOption ? beverageOption.price : 0;
+
+			newBooking = {...prevBooking, [key]: value, total_price: total_price};
 
 			return newBooking;
 		});
 	}
 
 
-function updateMaterialIds(material_ids: Array<number>) {
-	setBooking((prevBooking) => {
-		const newBooking = {...booking, material_ids: material_ids};
-		return newBooking;
+	function updateMaterialIds(material_ids: Array<number>) {
+		setBooking((prevBooking) => {
+			const newBooking = {...booking, material_ids: material_ids};
+			return newBooking;
 
-	});
-}
-
-function submitBooking() {
-
-	axios.post('/api/submitForm', booking, {
-		headers: {Authorization: `Bearer ${token}`}
-	})
-		.then(function (response: any) {
-			// handle success
-			console.log("booking  successful");
-			setBookingState(() => {
-				return {
-					isSuccessful: true,
-					isSubmitted: true
-				}
-			})
-			// set an interval after which the user is logged out
-			setTimeout(() => {
-				setToken("");
-				setAuth(false);
-			}, 1000 * 60 * 60);
-
-		})
-		.catch(function (error: any) {
-			// handle error
-			console.log("booking failed");
-			setBookingState(() => {
-				return {
-					isSuccessful: false,
-					isSubmitted: true
-				};
-			})
-
-			setTimeout(() => {
-				setToken("");
-				setAuth(false);
-			}, 1000 * 10);
 		});
+	}
 
-}
+	function submitBooking() {
 
-
-return <Card className={"form-container"}>
-	<Grid container className={"navigation"}>
-		<Grid item xs={11} className={"navigation-progress"}>
-			<LinearProgressWithLabel variant="determinate" max={maxSteps} currentvalue={activeStep + 1}/>
-		</Grid>
-		<Grid item xs={12} className={"navigation-buttons"} sx={{display: bookingState.isSubmitted ? "None" : ""}}>
-			<Button variant={"outlined"} sx={{'display': activeStep < 1 ? "none" : "inline-block"}}
-					onClick={() => {
-						setActiveStep(activeStep - 1);
-						setCurrentError("");
-					}}>
-				<NavigateBefore/>
-			</Button>
-			<Button
-				variant={"outlined"}
-				sx={{'display': activeStep >= maxSteps - 1 ? "none" : "inline-block"}}
-				onClick={() => {
-					if (isStepValid()) {
-						setActiveStep(activeStep + 1);
-						setCurrentError("");
-					} else {
-						updateCurrentError();
+		axios.post('/api/submitForm', booking, {
+			headers: {Authorization: `Bearer ${token}`}
+		})
+			.then(function (response: any) {
+				// handle success
+				console.log("booking  successful");
+				setBookingState(() => {
+					return {
+						isSuccessful: true,
+						isSubmitted: true
 					}
-				}}>
-				<NavigateNext/>
-			</Button>
+				})
+				// set an interval after which the user is logged out
+				setTimeout(() => {
+					setToken("");
+					setAuth(false);
+				}, 1000 * 60 * 60);
+
+			})
+			.catch(function (error: any) {
+				// handle error
+				console.log("booking failed");
+				setBookingState(() => {
+					return {
+						isSuccessful: false,
+						isSubmitted: true
+					};
+				})
+
+				setTimeout(() => {
+					setToken("");
+					setAuth(false);
+				}, 1000 * 10);
+			});
+
+	}
+
+
+	return <Card className={"form-container"}>
+		<Grid container className={"navigation"}>
+			<Grid item xs={11} className={"navigation-progress"}>
+				<LinearProgressWithLabel variant="determinate" max={maxSteps} currentvalue={activeStep + 1}/>
+			</Grid>
+			<Grid item xs={12} className={"navigation-buttons"} sx={{display: bookingState.isSubmitted ? "None" : ""}}>
+				<Button variant={"outlined"} sx={{'display': activeStep < 1 ? "none" : "inline-block"}}
+						onClick={() => {
+							setActiveStep(activeStep - 1);
+							setCurrentError("");
+						}}>
+					<NavigateBefore/>
+				</Button>
+				<Button
+					variant={"outlined"}
+					sx={{'display': activeStep >= maxSteps - 1 ? "none" : "inline-block"}}
+					onClick={() => {
+						if (isStepValid()) {
+							setActiveStep(activeStep + 1);
+							setCurrentError("");
+						} else {
+							updateCurrentError();
+						}
+					}}>
+					<NavigateNext/>
+				</Button>
+			</Grid>
 		</Grid>
-	</Grid>
-	<CardContent>
-		<Box sx={{
-			display: 'flex',
-			flexDirection: 'column',
-			alignItems: 'center',
-			justifyContent: 'center'
-		}}>
-			<Typography variant={"h5"}>{stepTitles[activeStep]}</Typography>
-			<Alert variant={"outlined"} sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>
-				{currentError}
-			</Alert>
-			{activeStep === FormSteps.NameAndAddress &&
-                <NameAndAddressForm updateBooking={updateBooking}
-                                    currentBooking={booking}
-                                    formValidation={formValidation}
-                                    formContent={formContent}
-                />}
-			{activeStep === FormSteps.Ticket &&
-                <TicketForm updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}/>}
+		<CardContent>
+			<Box sx={{
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				justifyContent: 'center'
+			}}>
+				<Typography variant={"h5"}>{stepTitles[activeStep]}</Typography>
+				<Alert variant={"outlined"} sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>
+					{currentError}
+				</Alert>
+				{activeStep === FormSteps.NameAndAddress &&
+                    <NameAndAddressForm updateBooking={updateBooking}
+                                        currentBooking={booking}
+                                        formValidation={formValidation}
+                                        formContent={formContent}
+                    />}
+				{activeStep === FormSteps.Ticket &&
+                    <TicketForm updateBooking={updateBooking}
+                                currentBooking={booking}
+                                formValidation={formValidation}
+                                formContent={formContent}/>}
 
-			{activeStep === FormSteps.Beverage &&
-                <BeverageForm updateBooking={updateBooking}
-                              currentBooking={booking}
-                              formValidation={formValidation}
-                              formContent={formContent}/>}
+				{activeStep === FormSteps.Beverage &&
+                    <BeverageForm updateBooking={updateBooking}
+                                  currentBooking={booking}
+                                  formValidation={formValidation}
+                                  formContent={formContent}/>}
 
-			{activeStep === FormSteps.Workshift &&
-                <WorkshiftForm currentBooking={booking}
-                               updateBooking={updateBooking}
-                               formValidation={formValidation}
-                               formContent={formContent}
-                />}
-			{activeStep === FormSteps.Material &&
-                <MaterialsForm
-                    updateMaterialIds={updateMaterialIds}
-                    currentBooking={booking}
-                    formValidation={formValidation}
-                    formContent={formContent}
-                />}
-			{activeStep === FormSteps.AwarenessCode && <FormAwarnessCode/>}
-			{activeStep === FormSteps.Signature &&
-                <FormSignature updateBooking={updateBooking}
-                               currentBooking={booking}
-                               formValidation={formValidation}
-                               formContent={formContent}
-                />}
-			{activeStep === FormSteps.Summary &&
-                <FormSummary booking={booking} formContent={formContent} setPdfSummary={setPdfSummary}
-                             pdfSummary={pdfSummary}/>}
-			{activeStep === FormSteps.Confirmation &&
-                <FormConfirmation bookingState={bookingState}
-                                  formContent={formContent}
-                                  booking={booking}
-                                  submitBooking={submitBooking}
-                                  pdfSummary={pdfSummary}
+				{activeStep === FormSteps.Workshift &&
+                    <WorkshiftForm currentBooking={booking}
+                                   updateBooking={updateBooking}
+                                   formValidation={formValidation}
+                                   formContent={formContent}
+                    />}
+				{activeStep === FormSteps.Material &&
+                    <MaterialsForm
+                        updateMaterialIds={updateMaterialIds}
+                        currentBooking={booking}
+                        formValidation={formValidation}
+                        formContent={formContent}
+                    />}
+				{activeStep === FormSteps.AwarenessCode && <FormAwarnessCode/>}
+				{activeStep === FormSteps.Signature &&
+                    <FormSignature updateBooking={updateBooking}
+                                   currentBooking={booking}
+                                   formValidation={formValidation}
+                                   formContent={formContent}
+                    />}
+				{activeStep === FormSteps.Summary &&
+                    <FormSummary booking={booking} formContent={formContent} setPdfSummary={setPdfSummary}
+                                 pdfSummary={pdfSummary}/>}
+				{activeStep === FormSteps.Confirmation &&
+                    <FormConfirmation bookingState={bookingState}
+                                      formContent={formContent}
+                                      booking={booking}
+                                      submitBooking={submitBooking}
+                                      pdfSummary={pdfSummary}
 
-                />
+                    />
 
-			}
-		</Box>
-	</CardContent>
-</Card>;
+				}
+			</Box>
+		</CardContent>
+	</Card>;
 }
