@@ -9,11 +9,14 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
 
 from src.booking_manager import BookingManager
 from src.views import Booking
 
 app = Flask(__name__, static_folder='../frontend/event-booking-system/build')
+
+load_dotenv()
 
 
 def handle_exception(exc_type, exc_value, exc_traceback):
@@ -21,7 +24,8 @@ def handle_exception(exc_type, exc_value, exc_traceback):
         sys.__excepthook__(exc_type, exc_value, exc_traceback)
         return
 
-    logging.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+    app.logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+
 
 if not app.debug:
     if not os.path.exists('logs'):
@@ -29,18 +33,15 @@ if not app.debug:
     file_handler = logging.FileHandler('logs/flask_app.log')
     file_handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-    file_handler.setLevel(logging.INFO)
+    file_handler.setLevel(logging.DEBUG)
     app.logger.addHandler(file_handler)
 
-    app.logger.setLevel(logging.INFO)
+    app.logger.setLevel(logging.DEBUG)
     app.logger.info('Flask app startup')
-
-    logging.basicConfig(filename='error.log', level=logging.ERROR)
 
     sys.excepthook = handle_exception
 
-
-app.config["JWT_SECRET_KEY"] = "your-secret-key"  # This should be a complex random string.
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")  # This should be a complex random string.
 jwt = JWTManager(app)
 CORS(app)
 
@@ -55,8 +56,10 @@ limiter = Limiter(
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
 
-hashed_password = generate_password_hash("password", method="pbkdf2:sha256", salt_length=8)
-admin_hashed_password = generate_password_hash("admin-password", method="pbkdf2:sha256", salt_length=8)
+hashed_password = generate_password_hash(os.environ.get("PASSWORD"), method="pbkdf2:sha256", salt_length=8)
+admin_hashed_password = generate_password_hash(os.environ.get("ADMIN_PASSWORD"), method="pbkdf2:sha256", salt_length=8)
+
+app.logger.info('Passwords hashed')
 
 
 @app.route("/api/auth/admin", methods=["POST"])
@@ -68,6 +71,7 @@ def authenticate_admin():
     if not check_password_hash(admin_hashed_password, password):
         return jsonify({"msg": "Bad password"}), 401
     access_token = create_access_token(identity="admin")
+    app.logger.info('Admin authentication successful')
     return jsonify(access_token=access_token), 200
 
 
@@ -80,11 +84,14 @@ def authenticate():
     if not check_password_hash(hashed_password, password):
         return jsonify({"msg": "Bad password"}), 401
     access_token = create_access_token(identity="user")
+    app.logger.info('User authentication successful')
     return jsonify(access_token=access_token), 200
 
 
 booking_manager = BookingManager(json_path=os.path.join(script_dir, 'form_content.json'),
                                  db_dir=os.path.join(script_dir, 'db'))
+
+app.logger.info('BookingManager initialized')
 
 
 @app.route("/", defaults={'path': ''})
@@ -103,27 +110,15 @@ def submit_form():
     # booking object is sent as json
     booking = Booking(**request.json)
     booking_manager.insert_booking(booking)
-
+    app.logger.info('Form submitted successfully')
     return 'Form submitted successfully'
-
-
-
-@app.route('/api/booking/mail-exists', methods=['POST'])
-@limiter.limit("90/minute")
-@jwt_required()
-def mail_exists():
-    mail = request.json.get('mail', None)
-    if not mail:
-        return jsonify({"msg": "Missing mail"}), 400
-    mail_is_existing = booking_manager.check_email_exists(mail)
-    return jsonify(mail_exists=mail_is_existing), 200
-
 
 
 @app.route("/api/data", methods=["GET"])
 @jwt_required()
 def get_bookings():
     bookings = booking_manager.get_all_bookings()  # replace db with your database instance
+    app.logger.info('Bookings fetched successfully')
     return jsonify([dataclasses.asdict(booking) for booking in bookings]), 200
 
 
@@ -133,8 +128,9 @@ def get_bookings():
 def get_formcontent():
     form_content = booking_manager.get_form_content()
     form_content_json = jsonify(form_content)
+    app.logger.info('Form content fetched successfully')
     return form_content_json
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
