@@ -23,17 +23,17 @@
 
     {
       "title": "Donnerstag",
-      "price": 10.0,
+      "price": 20.0,
       "amount": 20
     },
     {
       "title": "Freitag",
-      "price": 10.0,
+      "price": 20.0,
       "amount": 20
     },
     {
       "title": "Samstag",
-      "price": 10.0,
+      "price": 20.0,
       "amount": 20
     }
   ],
