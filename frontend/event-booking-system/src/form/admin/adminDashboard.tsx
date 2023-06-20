@@ -1,4 +1,4 @@
-import React, {SetStateAction, useContext, useState} from "react";
+import React, {useContext, useState} from "react";
 import axios from "axios";
 import {useEffect} from "react";
 import {Booking, FormContent} from "../interface";
@@ -8,7 +8,6 @@ import {
 	AppBar,
 	Box,
 	Drawer,
-	Hidden,
 	IconButton,
 	List,
 	ListItem,
@@ -118,7 +117,7 @@ function AdminDashboard() {
 			>
 				<List>
 					{labels.map((label, index) => (
-						<ListItem button key={label} onClick={(event) => handleChange(event, index)}>
+						<ListItem key={label} onClick={(event) => handleChange(event, index)}>
 							<ListItemText primary={label}/>
 						</ListItem>
 					))}
