@@ -57,7 +57,7 @@
   "work_shifts": [
     {
       "title": "Schaffe schaffe Festival baue",
-      "description": "Aufbau von Zelten und Bühne",
+      "description": "Aufbau der Bierzelte und des Bühnengestells vor Festivalbeginn. Findet wahrscheinlich am Wochenende VOR dem Festival statt. Genauer Termin wird abgestimmt.",
       "time_slots": [
         {
           "title": "vorm Festival",
@@ -99,7 +99,7 @@
     },
     {
       "title": "Cu Later, Generator",
-      "description": "2er Teams. Überwachung der Generatoren. Kontrolle ca. jede Stunde + nächster Schicht bescheid geben.",
+      "description": "Überwachen und Auftanken der Generatoren während des Festivals.",
       "time_slots": [
         {
           "title": "Donnerstag",
@@ -141,7 +141,7 @@
     },
     {
       "title": "Supersauberwahn",
-      "description": "Jeden Morgen soll etwas Ordnung gemacht werden, d.h. Müllsäcke austauschen, Tische abräumen, Zapfanlage abwischen, Müll vom Boden aufheben, etc. ",
+      "description": "Müllsammeln am Morgen vertreibt Kummer und Sorgen, darum soll jeden Morgen etwas Ordnung gemacht und das Gelände etwas aufgehübscht werden.",
       "time_slots": [
         {
           "title": "Freitag",
@@ -159,7 +159,7 @@
     },
     {
       "title": "Volltanken bidde",
-      "description": "Kontrolle der Spritbestände und einkaufen von neuem Sprit. Bist du nicht fahrtaugliche, kümmere dich bitte um Ersatz.",
+      "description": "Kontrolle der Spritbestände und Einkauf von neuem Sprit. Wichtig: Nüchternheit, Führerschein und Autonutzung.",
       "time_slots": [
         {
           "title": "Freitag",
@@ -177,7 +177,7 @@
     },
     {
       "title": "Mr. and Ms. Poopybutthole",
-      "description": "1x Morgens und 1x Abends vorm Feiern müssen Toiletten und Duschen gecheckt, evlt. geputzt, Klopapier nachgefüllt und abgeschätzt werden, ob die Klos für die Nacht noch reichen.",
+      "description": "Klokontrolle auf Klopapier, Seife und Sauberkeit. Reinigung der Toilette wenn nötig. ",
       "time_slots": [
         {
           "title": "Freitag",
