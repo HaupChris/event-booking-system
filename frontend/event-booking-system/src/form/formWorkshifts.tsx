@@ -53,8 +53,9 @@ function WorkShiftForm(props: FormProps) {
 		<Typography variant="body2">
 			Supporterbuddy und deine Schichtenanzahl
 		</Typography>
-		<FormControl sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '90%', marginTop: '16px', marginBottom: '8px'}}>
+		<FormControl sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '95%', marginTop: '16px', marginBottom: '8px'}}>
 			<TextField
+				sx={{mt: '8px'}}
 				error={!!props.formValidation.supporter_buddy}
 				variant="outlined"
 				margin="normal"
@@ -65,7 +66,7 @@ function WorkShiftForm(props: FormProps) {
 				onChange={e => props.updateBooking("supporter_buddy", e.target.value)}
 			/>
 			<Select
-				sx={{ml: 2}}
+				sx={{ml: 1}}
 				variant={"outlined"}
 				labelId="shift-select-label"
 				id="shift-select"
