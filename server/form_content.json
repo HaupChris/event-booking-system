@@ -69,13 +69,31 @@
     },
     {
       "title": "Licht aus, Tür zu",
-      "description": "Am Sonntag packen wir alles zusammen und überlassen die Wiese wieder der Natur.",
+      "description": "Am Sonntag packen wir alles zusammen. Bitte stellt sicher, dass ihr und eure Mitfahrgelegenheit Zeit bis zum Ende (19:00 Uhr) habt.",
       "time_slots": [
         {
           "title": "Sonntag",
-          "start_time": "10:00",
+          "start_time": "11:00",
           "end_time": "19:00",
           "num_needed": 30
+        }
+      ]
+    },
+    {
+      "title": "After Hour",
+      "description": "Verstauen der übrigen Sachen nach dem Festival und Wegfahren des Mülls.",
+      "time_slots": [
+        {
+          "title": "Montag",
+          "start_time": "12:00",
+          "end_time": "17:00",
+          "num_needed": 3
+        },
+        {
+          "title": "Dienstag",
+          "start_time": "12:00",
+          "end_time": "17:00",
+          "num_needed": 3
         }
       ]
     },
@@ -159,7 +177,7 @@
     },
     {
       "title": "Mr. and Ms. Poopybutthole",
-      "description": "1x Morgens und 1x Abends vorm Feiern müssen Toiletten und Duschen gecheckt, Klopapier/Sägespähne evtl nachgefüllt und abgeschätzt werden, ob die Klos für die Nacht noch reichen.",
+      "description": "1x Morgens und 1x Abends vorm Feiern müssen Toiletten und Duschen gecheckt, evlt. geputzt, Klopapier nachgefüllt und abgeschätzt werden, ob die Klos für die Nacht noch reichen.",
       "time_slots": [
         {
           "title": "Freitag",
@@ -177,13 +195,13 @@
     },
     {
       "title": "Bunde Hunde",
-      "description": "Bitte nur ankreuzen, wenn du Mitglied im Deko-Team bist. Falls du noch dazu willst, melde dich bei gerne bei uns.",
+      "description": "Bitte nur ankreuzen, wenn du Mitglied im Deko-Team bist.",
       "time_slots": [
         {
           "title": "Deko Team",
           "start_time": "",
           "end_time": "",
-          "num_needed": 15
+          "num_needed": 5
         }
       ]
     },
@@ -195,7 +213,7 @@
           "title": "Wiesnmusik",
           "start_time": "",
           "end_time": "",
-          "num_needed": 20
+          "num_needed": 15
         }
       ]
     },
@@ -222,16 +240,28 @@
         "description": "Wir werden mit Backofenpizza versorgt und brauchen hier noch helfende Hände.",
         "time_slots": [
           {
-            "title": "Freitag",
+            "title": "Freitag, Vorbereitung",
             "start_time": "15:00",
-            "end_time": "20:00",
-            "num_needed": 3
+            "end_time": "17:30",
+            "num_needed": 2
           },
           {
-            "title": "Samstag",
-            "start_time": "15:00",
+            "title": "Freitag, Backen, Ausgabe",
+            "start_time": "17:30",
             "end_time": "20:00",
-            "num_needed": 3
+            "num_needed": 2
+          },
+          {
+            "title": "Samstag, Vorbereitung",
+            "start_time": "15:00",
+            "end_time": "17:30",
+            "num_needed": 2
+          },
+          {
+            "title": "Samstag, Backen, Ausgabe",
+            "start_time": "17:30",
+            "end_time": "20:00",
+            "num_needed": 2
           }
         ]
     }

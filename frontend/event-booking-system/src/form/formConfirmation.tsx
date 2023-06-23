@@ -14,6 +14,7 @@ import {Check, CheckCircleOutline, Download, ErrorOutline, FileCopy, OpenInNew} 
 import '../css/formConfirmation.css';
 import {BookingState} from "./formContainer";
 import {jsPDF} from "jspdf";
+import UnlockSlider from "./components/unlockSlider";
 
 interface FinalBookingProps {
 	booking: Booking;
@@ -129,6 +130,7 @@ function FormConfirmation(props: FinalBookingProps) {
 					<Button variant="contained" color="primary" onClick={props.submitBooking}>
 						<Check/> Buchung absenden
 					</Button>
+					{/*<UnlockSlider/>*/}
 				</Box>
 			)}
 

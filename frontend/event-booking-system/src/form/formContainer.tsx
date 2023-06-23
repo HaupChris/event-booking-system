@@ -217,7 +217,7 @@ export function FormContainer() {
 
 	const stepTitles = {
 		[FormSteps.NameAndAddress]: " Herzlich Willkommen beim Weiher Wald und Wiesenwahn!",
-		[FormSteps.Ticket]: "Ich komme an folgenden Tagen",
+		[FormSteps.Ticket]: "Ich komme an folgenden Tagen (Sonntag ist Abbau)",
 		[FormSteps.Beverage]: "Bierflatrate wählen (1 Tag = 5 Liter)",
 		[FormSteps.Workshift]: "Festival Support",
 		[FormSteps.Material]: "Ich kann folgende Materialien mitbringen",
@@ -232,7 +232,7 @@ export function FormContainer() {
 		[FormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone'],
 		[FormSteps.Ticket]: ['ticket_id'],
 		[FormSteps.Beverage]: [],
-		[FormSteps.Workshift]: ['timeslot_priority_1', 'amount_shifts'],
+		[FormSteps.Workshift]: ['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3', 'amount_shifts'],
 		[FormSteps.Material]: [],
 		[FormSteps.Signature]: ['signature'],
 		[FormSteps.AwarenessCode]: [],
@@ -273,30 +273,6 @@ export function FormContainer() {
 		setPdfSummary(generateSummaryPDF(booking, formContent));
 	}, [booking, formContent]);
 
-
-	const calculateTotalPrice = (bookingData: Booking) => {
-		let totalPrice = 0;
-
-		if (bookingData.ticket_id !== -1) {
-			const ticket = formContent.ticket_options.find((ticket) => ticket.id === bookingData.ticket_id);
-			console.log(ticket);
-			if (ticket) {
-				totalPrice += ticket.price;
-			}
-		}
-
-		if (bookingData.beverage_id !== -1) {
-			const beverage = formContent.beverage_options.find((beverage) => beverage.id === bookingData.beverage_id);
-			console.log(beverage);
-			if (beverage) {
-				totalPrice += beverage.price;
-			}
-		}
-		console.log(booking, totalPrice);
-		console.log("----");
-
-		return totalPrice;
-	}
 
 	function validateName(value: string, nameString: string): string {
 		const pattern = /^[A-Za-zÄÖÜöüß\s]+$/;
@@ -346,7 +322,13 @@ export function FormContainer() {
 				errorMessage = value === -1 ? 'Bitte wähle ein Ticket aus.' : '';
 				break;
 			case 'timeslot_priority_1':
-				errorMessage = value === -1 ? 'Bitte wähle eine Schicht mit höchster Priorität aus.' : '';
+				errorMessage = value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
+				break;
+			case 'timeslot_priority_2':
+				errorMessage = value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
+				break;
+			case 'timeslot_priority_3':
+				errorMessage = value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
 				break;
 			case 'signature':
 				errorMessage = value === '' ? 'Wir würden uns freuen, wenn du das Formular unterschreibst' : '';

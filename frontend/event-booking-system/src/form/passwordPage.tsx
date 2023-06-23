@@ -48,10 +48,9 @@ function PasswordPage() {
 			<Box sx={{position: "absolut", top: "10%"}}>
 				<p>Kommst du mit uns in den Kanienchenbau?</p>
 				<Box sx={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-					<Button variant="contained" style={{backgroundColor: 'red', 'marginRight': '1em'}} onClick={() => {
-					}}>Red Pill</Button>
-					<Button variant="contained" style={{backgroundColor: 'blue'}} onClick={() => setDisplay(true)}>Blue
-						Pill</Button>
+					<Button variant="contained" style={{backgroundColor: 'blue', 'marginRight': '1em'}} onClick={() => {
+					}}>Blue Pill</Button>
+					<Button variant="contained" style={{backgroundColor: 'red'}} onClick={() => setDisplay(true)}>Red Pill</Button>
 				</Box>
 
 			</Box>)}

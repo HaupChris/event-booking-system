@@ -43,12 +43,41 @@ function WorkShiftForm(props: FormProps) {
 		sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', maxWidth: '90vw'}}>
 		<Typography variant="body2">
 			Wir freuen uns, wenn du uns bei einer Supportschicht unterstützen könntest!
-			Wähle bitte bis zu drei Prioritäten aus.
-			Die Zahlen in den Kreisen zeigen, wie viele Helfer:innen schon dabei sind und wie viele wir noch brauchen.
+			Wähle bitte <strong>drei</strong> Prioritäten aus.
+			Die Zahlen zeigen, wie viele Helfer:innen schon dabei sind und wie viele wir noch brauchen.
 			Möchtest du mit einer bestimmten Person zusammenarbeiten oder bist du bereit, mehr als eine Schicht zu
 			übernehmen?
-			Lass es uns unten wissen - wir berücksichtigen dies gerne bei unserer Planung.
+			Lass es uns wissen - wir berücksichtigen dies gerne bei unserer Planung.
 		</Typography>
+		<Divider sx={{width: '100%', margin: '1em'}}/>
+		<Typography variant="body2">
+			Supporterbuddy und deine Schichtenanzahl
+		</Typography>
+		<FormControl sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '90%', marginTop: '16px', marginBottom: '8px'}}>
+			<TextField
+				error={!!props.formValidation.supporter_buddy}
+				variant="outlined"
+				margin="normal"
+				id="supporter-buddy"
+				label="Dein Buddy..."
+				name="name"
+				value={props.currentBooking.supporter_buddy}
+				onChange={e => props.updateBooking("supporter_buddy", e.target.value)}
+			/>
+			<Select
+				sx={{ml: 2}}
+				variant={"outlined"}
+				labelId="shift-select-label"
+				id="shift-select"
+				value={props.currentBooking.amount_shifts}
+				onChange={e => props.updateBooking('amount_shifts', e.target.value)}>
+				<MenuItem value={1}>1</MenuItem>
+				<MenuItem value={2}>2</MenuItem>
+				<MenuItem value={3}>3</MenuItem>
+			</Select>
+
+		</FormControl>
+		<Divider sx={{width: '100%', margin: '1em'}}/>
 		<List>
 			{props.formContent.work_shifts
 				.sort((shift_a, shift_b) => {
@@ -76,31 +105,7 @@ function WorkShiftForm(props: FormProps) {
 				))}
 		</List>
 
-		<FormControl sx={{mt: 2, width: '280px'}}>
-			<InputLabel id="shift-select-label">Deine Anzahl Schichten:</InputLabel>
-			<Select
-				variant={"standard"}
 
-				labelId="shift-select-label"
-				id="shift-select"
-				value={props.currentBooking.amount_shifts}
-				onChange={e => props.updateBooking('amount_shifts', e.target.value)}>
-				<MenuItem value={1}>1</MenuItem>
-				<MenuItem value={2}>2</MenuItem>
-				<MenuItem value={3}>3</MenuItem>
-			</Select>
-
-			<TextField
-				error={!!props.formValidation.supporter_buddy}
-				variant="outlined"
-				margin="normal"
-				id="supporter-buddy"
-				label="Mit wem möchtest du arbeiten?"
-				name="name"
-				value={props.currentBooking.supporter_buddy}
-				onChange={e => props.updateBooking("supporter_buddy", e.target.value)}
-			/>
-		</FormControl>
 	</Box>;
 }
 

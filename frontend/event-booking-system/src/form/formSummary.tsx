@@ -74,6 +74,9 @@ export function generateSummaryPDF(booking: Booking, formContent: FormContent): 
 		doc.text("Supporter buddy: " + booking.supporter_buddy, 10, yPos);
 		yPos += 10;
 
+		doc.text("Deine gewählte Anzahl Schichten: " + booking.amount_shifts, 10, yPos);
+		yPos += 10;
+
 		doc.text("Dein Beitrag: " + booking.total_price + "€", 10, yPos);
 		yPos += 10;
 
@@ -93,7 +96,11 @@ function FormSummary(props: IProps) {
 		timeslot_priority_1,
 		timeslot_priority_2,
 		timeslot_priority_3,
-		material_ids
+		material_ids,
+		supporter_buddy,
+		amount_shifts,
+		total_price,
+
 	} = props.booking;
 	const ticket = findItemById(props.formContent.ticket_options, ticket_id);
 	const beverage = findItemById(props.formContent.beverage_options, beverage_id);
@@ -181,6 +188,11 @@ function FormSummary(props: IProps) {
 					/>
 				</ListItem>
 				<ListItem>
+					<Typography>Supporter Buddy: {supporter_buddy}
+					<br/>
+					Deine Anzahl Schichten: {amount_shifts}</Typography>
+				</ListItem>
+				<ListItem>
 					<ListItemText
 						primary={<Typography variant="subtitle1"
 											 component="div"><strong>Ich bringe mit:</strong></Typography>}
@@ -195,7 +207,7 @@ function FormSummary(props: IProps) {
 				<ListItem>
 					<ListItemText
 						primary={<Typography variant="h6" component="div" color="primary">
-							<strong>Dein Beitrag: {props.booking.total_price}€</strong>
+							<strong>Dein Beitrag: {total_price}€</strong>
 						</Typography>}
 					/>
 				</ListItem>
