@@ -51,9 +51,6 @@ function FormConfirmation(props: FinalBookingProps) {
 		props.pdfSummary.save('booking-summary.pdf');
 	}
 
-	console.log('formConfirmation.tsx: props.bookingState.isSubmitted: ', props.bookingState.isSubmitted);
-	console.log('formConfirmation.tsx: props.bookingState.isSuccessful: ', props.bookingState.isSuccessful);
-
 	return (
 		<Box sx={{mt: 3, p: 2, borderRadius: '5px'}}>
 			{props.bookingState.isSubmitted ? (props.bookingState.isSuccessful ? (

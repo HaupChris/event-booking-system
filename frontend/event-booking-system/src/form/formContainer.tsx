@@ -273,7 +273,6 @@ export function FormContainer() {
 		setPdfSummary(generateSummaryPDF(booking, formContent));
 	}, [booking, formContent]);
 
-
 	function validateName(value: string, nameString: string): string {
 		const pattern = /^[A-Za-zÄÖÜöüß\s]+$/;
 		if (value === '') return 'Bitte gib einen ' + nameString + ' an';
@@ -339,7 +338,6 @@ export function FormContainer() {
 		return errorMessage;
 	}
 
-
 	function isStepValid() {
 		const currentStepFields = requiredFields[activeStep];
 
@@ -364,7 +362,6 @@ export function FormContainer() {
 		const errorMessage = errorMessages !== undefined && errorMessages.length > 0 && errorMessages[0] !== undefined ? errorMessages[0] : '';
 		setCurrentError(() => errorMessage);
 	}
-
 
 	function updateBooking(key: keyof Booking, value: any) {
 		setBooking((prevBooking) => {
@@ -394,7 +391,6 @@ export function FormContainer() {
 		});
 	}
 
-
 	function updateMaterialIds(material_ids: Array<number>) {
 		setBooking((prevBooking) => {
 			const newBooking = {...booking, material_ids: material_ids};
@@ -410,7 +406,6 @@ export function FormContainer() {
 		})
 			.then(function (response: any) {
 				// handle success
-				console.log("booking  successful");
 				setBookingState(() => {
 					return {
 						isSuccessful: true,
@@ -425,8 +420,13 @@ export function FormContainer() {
 
 			})
 			.catch(function (error: any) {
-				// handle error
-				console.log("booking failed");
+				console.log(error);
+
+				if (error.status === 401) {
+					setToken("");
+					setAuth(false);
+				} else {
+					// handle error
 				setBookingState(() => {
 					return {
 						isSuccessful: false,
@@ -438,6 +438,9 @@ export function FormContainer() {
 					setToken("");
 					setAuth(false);
 				}, 1000 * 10);
+				}
+
+
 			});
 
 	}

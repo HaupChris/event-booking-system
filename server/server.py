@@ -2,6 +2,7 @@ import dataclasses
 import logging
 import os
 import sys
+from datetime import timedelta
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -42,6 +43,7 @@ if not app.debug:
     sys.excepthook = handle_exception
 
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")  # This should be a complex random string.
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
 jwt = JWTManager(app)
 CORS(app)
 
