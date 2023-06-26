@@ -3,18 +3,23 @@ import {
 	Box,
 	Typography,
 	TextField,
-	InputAdornment,
-	IconButton,
-	Snackbar,
+	Snackbar, Alert, CircularProgress,
 } from '@mui/material';
 import {Booking, FormContent} from "./interface";
-import React, {useState} from "react";
-import {Check, CheckCircleOutline, Download, ErrorOutline, FileCopy, OpenInNew} from "@mui/icons-material";
+import React, {useEffect, useState} from "react";
+import {
+	Check,
+	CheckCircleOutline,
+	Download,
+	ErrorOutline,
+	FileCopy,
+	OpenInNew,
+	SignalCellularNodata
+} from "@mui/icons-material";
 
 import '../css/formConfirmation.css';
 import {BookingState} from "./formContainer";
 import {jsPDF} from "jspdf";
-import UnlockSlider from "./components/unlockSlider";
 
 interface FinalBookingProps {
 	booking: Booking;
@@ -34,6 +39,23 @@ function FormConfirmation(props: FinalBookingProps) {
 	const beverage = beverage_or_undefined ? beverage_or_undefined : {title: "Keine Bierflat"};
 	const betreff = `WWWW: ${props.booking.last_name}, ${props.booking.first_name} - ${ticket?.title}, ${beverage?.title}`;
 	const [copied, setCopied] = useState(false);
+	const [open, setOpen] = useState(false);
+	const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+	useEffect(() => {
+		function updateOnlineStatus() {
+			setIsOnline(navigator.onLine);
+		}
+
+		window.addEventListener('online', updateOnlineStatus);
+		window.addEventListener('offline', updateOnlineStatus);
+		return () => {
+			window.removeEventListener('online', updateOnlineStatus);
+			window.removeEventListener('offline', updateOnlineStatus);
+		}
+
+	}, [])
+
 	const handleCopy = () => {
 		navigator.clipboard.writeText(betreff);
 		setCopied(true);
@@ -47,9 +69,26 @@ function FormConfirmation(props: FinalBookingProps) {
 		setCopied(false);
 	};
 
+	// Function to handle Snackbar close
+	const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+		if (reason === 'clickaway') {
+			return;
+		}
+		setOpen(false);
+	};
+
 	const saveSummary = () => {
 		props.pdfSummary.save('booking-summary.pdf');
 	}
+
+	const submitBooking = () => {
+		if (navigator.onLine) {
+			props.submitBooking();
+		} else {
+			setOpen(true);
+		}
+	}
+
 
 	return (
 		<Box sx={{mt: 3, p: 2, borderRadius: '5px'}}>
@@ -67,11 +106,11 @@ function FormConfirmation(props: FinalBookingProps) {
 
 							<div>
 								<div className={"checkout"}>
-									<Typography variant="h5"  component="div" sx={{mb: '1em'}}>
+									<Typography variant="h5" component="div" sx={{mb: '1em'}}>
 										Dein Beitrag: <strong>{props.booking.total_price}€</strong>
 									</Typography>
 
-									<Typography variant="body2" sx={{mb:'1em'}} component="div">
+									<Typography variant="body2" sx={{mb: '1em'}} component="div">
 										<TextField
 											sx={{width: {xs: '100%', md: '70%'}}}
 											variant={"standard"}
@@ -117,17 +156,40 @@ function FormConfirmation(props: FinalBookingProps) {
 							<Typography variant="h6">Buchung fehlgeschlagen, bitte Christian Hauptmann
 								kontaktieren.</Typography>
 						</div>)
-			) : (<Box sx={{display: 'flex', 'flexDirection': 'column', 'alignItems': 'center', 'justifyContent': 'center'}}>
+			) : (<Box sx={{
+					display: 'flex',
+					'flexDirection': 'column',
+					'alignItems': 'center',
+					'justifyContent': 'center'
+				}}>
 					<Typography variant="body1" component="div" sx={{mb: 2}}>
 						Wir freuen uns, dass du dabei bist und mit uns zusammen feierst!
 						<br/>
 
 					</Typography>
 
-					<Button variant="contained" color="primary" onClick={props.submitBooking}>
-						<Check/> Buchung absenden
+					<Button disabled={!isOnline} variant="contained" color="primary" onClick={submitBooking}>
+						{
+							isOnline ?
+								<><Check/> Buchung absenden</>
+							:
+							<><CircularProgress sx={{mr: 1}}/> Keine Internetverbindung</>
+
+						}
 					</Button>
-					{/*<UnlockSlider/>*/}
+					<Snackbar
+						open={open}
+						autoHideDuration={6000}
+						onClose={handleSnackbarClose}
+						anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+					>
+						<Alert onClose={handleSnackbarClose} severity="error" sx={{width: '100%'}}
+							   icon={<SignalCellularNodata/>}>
+							Du bist gerade offline. Bitte stelle sicher, dass du mit dem Internet verbunden bist und
+							versuche es erneut.
+							Sollte das Problem weiterhin bestehen, kontaktiere Christian Hauptmann
+						</Alert>
+					</Snackbar>
 				</Box>
 			)}
 
