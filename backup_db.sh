@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the paths
-DB_PATH="/var/www/event-booking-sytem/server/db/bookings.db"
+DB_PATH="/var/www/event-booking-system/server/db/bookings.db"
 BACKUP_DIR="/var/db_backups"
 
 # Generate the timestamp
