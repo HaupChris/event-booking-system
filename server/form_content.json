@@ -3,38 +3,38 @@
     {
       "title": "Donnerstag, Freitag, Samstag",
       "price": 40.0,
-      "amount": 80
+      "amount": 90
     },
     {
       "title": "Freitag, Samstag",
       "price": 30.0,
-      "amount": 30
+      "amount": 10
     },
     {
       "title": "Donnerstag, Freitag",
       "price": 30.0,
-      "amount": 30
+      "amount": 10
     },
     {
       "title": "Donnerstag, Samstag",
       "price": 30.0,
-      "amount": 20
+      "amount": 10
     },
 
     {
       "title": "Donnerstag",
       "price": 20.0,
-      "amount": 20
+      "amount": 10
     },
     {
       "title": "Freitag",
       "price": 20.0,
-      "amount": 20
+      "amount": 10
     },
     {
       "title": "Samstag",
       "price": 20.0,
-      "amount": 20
+      "amount": 10
     }
   ],
   "beverage_options": [
