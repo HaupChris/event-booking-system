@@ -8,7 +8,7 @@
 }
 
 .icon-container {
-  animation: scale-up 0.3s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+    animation: scale-up 1.0s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
     display: flex;
     justify-content: center;
     align-items: center;

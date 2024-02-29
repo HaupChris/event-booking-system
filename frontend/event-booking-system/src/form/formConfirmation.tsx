@@ -10,7 +10,6 @@ import React, {useEffect, useState} from "react";
 import {
 	Check,
 	CheckCircleOutline,
-	Download,
 	ErrorOutline,
 	FileCopy,
 	OpenInNew,
@@ -20,6 +19,7 @@ import {
 import '../css/formConfirmation.css';
 import {BookingState} from "./formContainer";
 import {jsPDF} from "jspdf";
+import jellyfishImage from '../img/jellyfish.png';
 
 interface FinalBookingProps {
 	booking: Booking;
@@ -65,7 +65,6 @@ function FormConfirmation(props: FinalBookingProps) {
 		if (reason === 'clickaway') {
 			return;
 		}
-
 		setCopied(false);
 	};
 
@@ -77,10 +76,6 @@ function FormConfirmation(props: FinalBookingProps) {
 		setOpen(false);
 	};
 
-	const saveSummary = () => {
-		props.pdfSummary.save('booking-summary.pdf');
-	}
-
 	const submitBooking = () => {
 		if (navigator.onLine) {
 			props.submitBooking();
@@ -89,21 +84,22 @@ function FormConfirmation(props: FinalBookingProps) {
 		}
 	}
 
-
 	return (
-		<Box sx={{mt: 3, p: 2, borderRadius: '5px'}}>
+		<Box sx={{p: 2, borderRadius: '5px'}}>
 			{props.bookingState.isSubmitted ? (props.bookingState.isSuccessful ? (
 						<div>
 							<div className="icon-container">
-								<CheckCircleOutline color="primary" style={{fontSize: 60}}/>
-								<Typography variant="h6">
-									Du bist dabei!
-								</Typography>
+								{/*<CheckCircleOutline color="primary" style={{fontSize: 60}}/>*/}
+								{/*Insert the image jellyfish.png*/}
+								<img src={jellyfishImage} alt="jellyfish" style={{width: '115px', height: '115px', marginRight: '1em'}}/>
+								{/*<Typography variant="h6">*/}
+								{/*	Du bist dabei!*/}
+								{/*</Typography>*/}
 							</div>
-							<Button fullWidth onClick={saveSummary} sx={{mb: '1em'}} variant="outlined" color="primary">
-								Zusammenfassung der Buchung herunterladen <Download/>
-							</Button>
-
+							<Typography variant="body2" component="div" sx={{mb: 2}}>
+								Deine Buchung war erfolgreich. Du erhältst in Kürze eine Bestätigungsmail (bitte auch im
+								Spam-Ordner nachsehen).
+							</Typography>
 							<div>
 								<div className={"checkout"}>
 									<Typography variant="h5" component="div" sx={{mb: '1em'}}>
@@ -144,7 +140,6 @@ function FormConfirmation(props: FinalBookingProps) {
 									Solltest du kein Paypal haben, schreibe dir deinen Beitrag auf und kontaktiere <u>Christian
 									Hauptmann</u>.
 								</Typography>
-
 							</div>
 						</div>)
 
