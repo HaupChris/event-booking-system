@@ -1,0 +1,12 @@
+.avatar-container {
+  position: relative;
+  padding: 2em 1em;
+}
+
+.porthole-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1; /* Ensure it's on top */
+  width: 90%; /* Adjust sizing as needed */
+}
