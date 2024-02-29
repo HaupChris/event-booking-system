@@ -12,8 +12,9 @@ from flask_limiter.util import get_remote_address
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 
+from src.mail import send_confirmation_mail
 from src.booking_manager import BookingManager
-from src.views import Booking
+from src.views import Booking, FormContent
 
 app = Flask(__name__, static_folder='../frontend/event-booking-system/build')
 
@@ -113,7 +114,10 @@ def submit_form():
     booking = Booking(**request.json)
     booking_manager.insert_booking(booking)
     app.logger.info('Form submitted successfully')
-    return 'Form submitted successfully'
+    form_content_dict = booking_manager.get_up_to_date_form_content()
+    send_confirmation_mail(booking, form_content_dict)
+    app.logger.info('Confirmation mail sent successfully')
+    return 'Form submitted successfully', 200
 
 
 @app.route("/api/data", methods=["GET"])
@@ -127,8 +131,8 @@ def get_bookings():
 @app.route('/api/formcontent', methods=['GET'])
 @limiter.limit("200/minute")
 @jwt_required()
-def get_formcontent():
-    form_content = booking_manager.get_form_content()
+def get_form_content():
+    form_content = booking_manager.get_up_to_date_form_content()
     form_content_json = jsonify(form_content)
     app.logger.info('Form content fetched successfully')
     return form_content_json
