@@ -73,10 +73,10 @@ class BookingManager:
         form_content = FormContent.from_dict(data)
         return form_content
 
-    def get_form_content(self) -> Dict:
+    def get_up_to_date_form_content(self) -> Dict:
         """
-        Fetches form content based on initial configuration and bookings from the database.
-        Adjusts form_content based on the fetched data.
+        Fetches form content based on initial configuration, updated with the bookings from the database.
+        Depending on the already happened bookings, form content can be different form the initial state.
         """
 
         conn = sqlite3.connect(self.db_file_path)
@@ -267,6 +267,6 @@ if __name__ == "__main__":
         material_ids=[1, 2, 3]
     )
     booking_manager.insert_booking(dummy_booking)
-    for k, v in booking_manager.get_form_content().items():
+    for k, v in booking_manager.get_up_to_date_form_content().items():
         print(k, v)
     # booking_manager.get_form_content()
