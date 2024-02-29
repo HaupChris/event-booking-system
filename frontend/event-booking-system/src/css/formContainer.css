@@ -7,6 +7,12 @@ body {
     padding: 0;
 }
 
+.navigation-progress {
+    text-align: center;
+    width: 100%;
+    padding: 1em 2em;
+}
+
 
 /*desktop screen*/
 @media only screen and (min-width: 901px) {
@@ -18,7 +24,6 @@ body {
 
     .navigation-progress {
         text-align: center;
-        width: 90%;
     }
 
     .navigation-buttons {
@@ -36,7 +41,7 @@ body {
         left: 20%;
         -ms-transform: translateY(-50%);
         transform: translateY(-50%);
-        border: 3px solid #eac764;
+        /*border: 3px solid #eac764;*/
         border-radius: 40px !important;
         overflow: scroll !important;
     }
@@ -52,10 +57,6 @@ body {
         width: 100%;
     }
 
-    .navigation-progress {
-        text-align: center;
-        width: 100%;
-    }
 
     .navigation-buttons {
         display: flex;
@@ -75,9 +76,12 @@ body {
         -ms-transform: translateY(-50%);
         transform: translateY(-50%);
         /*background-color: rgba(255, 255, 255, 0) !important;*/
-        border: 3px solid #eac764;
-        border-radius: 10px !important;
+        /*border: 3px solid #eac764;*/
+        /*border-radius: 10px !important;*/
         overflow: scroll !important;
+        /*    make the form background transparent*/
+        background-color: rgba(255, 255, 255, 0) !important;
+
     }
 }
 
@@ -105,6 +109,7 @@ body {
         padding-right: 2em;
     }
 
+
     .form-container {
         height: 98%;
         height: var(--doc-height);
@@ -112,12 +117,12 @@ body {
         margin: 0;
         position: absolute;
         top: 50%;
-        left: 1px;
+        left: 2px;
         -ms-transform: translateY(-50%);
         transform: translateY(-50%);
         /*background-color: rgba(255, 255, 255, 0) !important;*/
-        border: 3px solid #eac764;
-        border-radius: 10px !important;
+        /*border: 3px solid #eac764;*/
+        border-radius: 20px !important;
         overflow: scroll !important;
     }
 }

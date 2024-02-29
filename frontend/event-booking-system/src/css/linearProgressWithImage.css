@@ -1,0 +1,35 @@
+.progress-container {
+    position: relative;
+}
+
+.progress-fish {
+    position: absolute;
+    left: 0%; /* Start at the beginning */
+    top: 50%;
+    transform: translateY(-50%); /* Vertical centering */
+    width: 30px; /* Adjust the size of your fish */
+    transition: left 1.5s ease-in-out, transform 1.5s ease-in-out; /* Add transform transition */
+    animation: swimming 2s infinite alternate; /* Adjust time (2s) if needed */
+}
+
+@keyframes swimming {
+    0% {
+        transform: translateY(-50%) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-52%) rotate(10deg);
+    }
+    /* Nose up, slightly higher */
+    50% {
+        transform: translateY(-50%) rotate(0deg);
+    }
+    75% {
+        transform: translateY(-48%) rotate(-10deg);
+    }
+    /* Nose down, slightly lower */
+    100% {
+        transform: translateY(-50%) rotate(0deg);
+    }
+}
+
+

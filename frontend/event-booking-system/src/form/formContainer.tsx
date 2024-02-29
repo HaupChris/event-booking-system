@@ -1,12 +1,10 @@
 import {
-	Alert,
-	Box,
-	Button,
-	Card,
-	CardContent, Grid,
-	LinearProgress,
-	LinearProgressProps,
-	Typography
+    Alert,
+    Box,
+    Button,
+    Card,
+    CardContent, Grid,
+    Typography
 } from "@mui/material";
 import '../css/formContainer.css';
 import {NavigateBefore, NavigateNext} from "@mui/icons-material";
@@ -26,507 +24,493 @@ import FormSummary, {generateSummaryPDF} from "./formSummary";
 import FormConfirmation from "./formConfirmation";
 import {AuthContext, TokenContext} from "../AuthContext";
 import {jsPDF} from "jspdf";
+import fishImage from "../img/fish.png";
+import LinearProgressWithImage from "./components/linearProgressWithImage";
 
 
 enum FormSteps {
-	NameAndAddress = 0,
-	Ticket = 1,
-	Beverage = 2,
-	Workshift = 3,
-	Material = 4,
-	AwarenessCode = 5,
-	Signature = 6,
-	Summary = 7,
-	Confirmation = 8,
+    NameAndAddress = 0,
+    Ticket = 1,
+    Beverage = 2,
+    Workshift = 3,
+    Material = 4,
+    AwarenessCode = 5,
+    Signature = 6,
+    Summary = 7,
+    Confirmation = 8,
 }
 
-
-function LinearProgressWithLabel(props: LinearProgressProps & { currentvalue: number, max: number }) {
-	return (
-		<Box sx={{display: 'flex', alignItems: 'center'}}>
-			<Box sx={{width: '100%', mr: 1}}>
-				<LinearProgress variant="determinate" {...props} value={(props.currentvalue / props.max) * 100.0}/>
-			</Box>
-			<Box sx={{minWidth: 70}}>
-				<Typography variant="body2" color="text.primary">
-					{props.currentvalue} von {props.max}
-				</Typography>
-			</Box>
-		</Box>
-	);
-}
 
 function getEmptyBooking(): Booking {
-	return {
-		last_name: "",
-		first_name: "",
-		email: "",
-		phone: "",
-		ticket_id: -1,
-		beverage_id: -1,
-		timeslot_priority_1: -1,
-		timeslot_priority_2: -1,
-		timeslot_priority_3: -1,
-		material_ids: [],
-		amount_shifts: 1,
-		supporter_buddy: "",
-		total_price: -1.0,
-		signature: "",
-	}
+    return {
+        last_name: "",
+        first_name: "",
+        email: "",
+        phone: "",
+        ticket_id: -1,
+        beverage_id: -1,
+        timeslot_priority_1: -1,
+        timeslot_priority_2: -1,
+        timeslot_priority_3: -1,
+        material_ids: [],
+        amount_shifts: 1,
+        supporter_buddy: "",
+        total_price: -1.0,
+        signature: "",
+    }
 }
 
 export function getDummyFormContent(): FormContent {
-	return {
-		ticket_options: [
-			{
-				id: 1,
-				title: 'Option 1',
-				price: 100,
-				amount: 10,
-				num_booked: 5,
-			},
-			{
-				id: 2,
-				title: 'Option 2',
-				price: 200,
-				amount: 5,
-				num_booked: 2,
-			},
-		],
-		beverage_options: [
-			{
-				id: 1,
-				title: 'Beverage 1',
-				description: 'Delicious beverage 1',
-				price: 10,
-				num_booked: 5,
-			},
-			{
-				id: 2,
-				title: 'Beverage 2',
-				description: 'Delicious beverage 2',
-				price: 15,
-				num_booked: 2,
-			},
-		],
-		work_shifts: [
-			{
-				id: 1,
-				title: 'Essen kochen',
-				description: 'wir benötigen Menschen, die beim zubereiten der Pizzas helfen',
-				time_slots: [
-					{
-						id: 1,
-						title: 'erste Schicht',
-						start_time: '08:00',
-						end_time: '12:00',
-						num_needed: 5,
-						num_booked: 7,
-					},
-					{
-						id: 2,
-						title: 'zweite Schicht',
-						start_time: '12:00',
-						end_time: '16:00',
-						num_needed: 3,
-						num_booked: 1,
-					},
-				],
-			},
-			{
-				id: 2,
-				title: 'Shift 2',
-				description: 'Afternoon shift',
-				time_slots: [
-					{
-						id: 3,
-						title: 'Slot 3',
-						start_time: '14:00',
-						end_time: '18:00',
-						num_needed: 4,
-						num_booked: 2,
-					},
-					{
-						id: 4,
-						title: 'Slot 4',
-						start_time: '18:00',
-						end_time: '22:00',
-						num_needed: 3,
-						num_booked: 1,
-					},
-				],
-			},
-		],
-		materials: [
-			{
-				id: 1,
-				title: 'Material 1',
-				num_needed: 10,
-				num_booked: 5,
-			},
-			{
-				id: 2,
-				title: 'Material 2',
-				num_needed: 15,
-				num_booked: 10,
-			},
-		],
-	};
+    return {
+        ticket_options: [
+            {
+                id: 1,
+                title: 'Option 1',
+                price: 100,
+                amount: 10,
+                num_booked: 5,
+            },
+            {
+                id: 2,
+                title: 'Option 2',
+                price: 200,
+                amount: 5,
+                num_booked: 2,
+            },
+        ],
+        beverage_options: [
+            {
+                id: 1,
+                title: 'Beverage 1',
+                description: 'Delicious beverage 1',
+                price: 10,
+                num_booked: 5,
+            },
+            {
+                id: 2,
+                title: 'Beverage 2',
+                description: 'Delicious beverage 2',
+                price: 15,
+                num_booked: 2,
+            },
+        ],
+        work_shifts: [
+            {
+                id: 1,
+                title: 'Essen kochen',
+                description: 'wir benötigen Menschen, die beim zubereiten der Pizzas helfen',
+                time_slots: [
+                    {
+                        id: 1,
+                        title: 'erste Schicht',
+                        start_time: '08:00',
+                        end_time: '12:00',
+                        num_needed: 5,
+                        num_booked: 7,
+                    },
+                    {
+                        id: 2,
+                        title: 'zweite Schicht',
+                        start_time: '12:00',
+                        end_time: '16:00',
+                        num_needed: 3,
+                        num_booked: 1,
+                    },
+                ],
+            },
+            {
+                id: 2,
+                title: 'Shift 2',
+                description: 'Afternoon shift',
+                time_slots: [
+                    {
+                        id: 3,
+                        title: 'Slot 3',
+                        start_time: '14:00',
+                        end_time: '18:00',
+                        num_needed: 4,
+                        num_booked: 2,
+                    },
+                    {
+                        id: 4,
+                        title: 'Slot 4',
+                        start_time: '18:00',
+                        end_time: '22:00',
+                        num_needed: 3,
+                        num_booked: 1,
+                    },
+                ],
+            },
+        ],
+        materials: [
+            {
+                id: 1,
+                title: 'Material 1',
+                num_needed: 10,
+                num_booked: 5,
+            },
+            {
+                id: 2,
+                title: 'Material 2',
+                num_needed: 15,
+                num_booked: 10,
+            },
+        ],
+    };
 }
 
 
 export interface FormProps {
-	updateBooking: (key: keyof Booking, value: any) => void;
-	currentBooking: Booking;
-	formValidation: { [key in keyof Booking]?: string };
-	formContent: FormContent;
+    updateBooking: (key: keyof Booking, value: any) => void;
+    currentBooking: Booking;
+    formValidation: { [key in keyof Booking]?: string };
+    formContent: FormContent;
 }
 
 export interface BookingState {
-	isSubmitted: boolean;
-	isSuccessful: boolean;
+    isSubmitted: boolean;
+    isSuccessful: boolean;
 }
 
 
 function safelyParseJSON<T>(json: string | null, fallback: T): T {
-	try {
-		if (json === null) {
-			return fallback;
-		}
-		return JSON.parse(json);
-	} catch (e) {
-		return fallback;
-	}
+    try {
+        if (json === null) {
+            return fallback;
+        }
+        return JSON.parse(json);
+    } catch (e) {
+        return fallback;
+    }
 }
 
 export function FormContainer() {
-	const [formContent, setFormContent] = useState<FormContent>(getDummyFormContent);
-	const [formValidation, setFormValidation] = useState<{ [key in keyof Booking]?: string }>(safelyParseJSON(localStorage.getItem('formValidation'), {}));
-	const [booking, setBooking] = useState<Booking>(safelyParseJSON(localStorage.getItem('booking'), getEmptyBooking()));
-	const [activeStep, setActiveStep] = useState<FormSteps>(safelyParseJSON(localStorage.getItem('activeStep'), FormSteps.NameAndAddress));
-	const [bookingState, setBookingState] = useState<BookingState>(safelyParseJSON(localStorage.getItem('bookingState'), {
-		isSubmitted: false,
-		isSuccessful: false
-	}));
-	const [currentError, setCurrentError] = useState<string>(safelyParseJSON(localStorage.getItem('currentError'), ""));
-	const [pdfSummary, setPdfSummary] = useState<jsPDF>(safelyParseJSON(localStorage.getItem('pdfSummary'), new jsPDF()));
+    const [formContent, setFormContent] = useState<FormContent>(getDummyFormContent);
+    const [formValidation, setFormValidation] = useState<{ [key in keyof Booking]?: string }>(safelyParseJSON(localStorage.getItem('formValidation'), {}));
+    const [booking, setBooking] = useState<Booking>(safelyParseJSON(localStorage.getItem('booking'), getEmptyBooking()));
+    const [activeStep, setActiveStep] = useState<FormSteps>(safelyParseJSON(localStorage.getItem('activeStep'), FormSteps.NameAndAddress));
+    const [bookingState, setBookingState] = useState<BookingState>(safelyParseJSON(localStorage.getItem('bookingState'), {
+        isSubmitted: false,
+        isSuccessful: false
+    }));
+    const [currentError, setCurrentError] = useState<string>(safelyParseJSON(localStorage.getItem('currentError'), ""));
+    const [pdfSummary, setPdfSummary] = useState<jsPDF>(safelyParseJSON(localStorage.getItem('pdfSummary'), new jsPDF()));
 
-	const {token, setToken} = useContext(TokenContext);
-	const maxSteps = Object.keys(FormSteps).length / 2;
-	const {auth, setAuth} = useContext(AuthContext);
+    const {token, setToken} = useContext(TokenContext);
+    const maxSteps = Object.keys(FormSteps).length / 2;
+    const {auth, setAuth} = useContext(AuthContext);
 
-	const stepTitles = {
-		[FormSteps.NameAndAddress]: " Herzlich Willkommen beim Weiher Wald und Wiesenwahn!",
-		[FormSteps.Ticket]: "Ich komme an folgenden Tagen (Sonntag ist Abbau)",
-		[FormSteps.Beverage]: "Bierflatrate wählen (1 Tag = 5 Liter)",
-		[FormSteps.Workshift]: "Festival Support",
-		[FormSteps.Material]: "Ich kann folgende Materialien mitbringen",
-		[FormSteps.AwarenessCode]: "Damit wir alle eine entspannte Zeit haben",
-		[FormSteps.Signature]: "",
-		[FormSteps.Summary]: "Zusammenfassung",
-		[FormSteps.Confirmation]: "Fast geschafft!"
-	}
+    const stepTitles = {
+        [FormSteps.NameAndAddress]: " Herzlich Willkommen beim Weiher Wald und Wiesenwahn!",
+        [FormSteps.Ticket]: "Ich komme an folgenden Tagen (Sonntag ist Abbau)",
+        [FormSteps.Beverage]: "Bierflatrate wählen",
+        [FormSteps.Workshift]: "Festival Support",
+        [FormSteps.Material]: "Ich kann folgende Materialien mitbringen",
+        [FormSteps.AwarenessCode]: "Damit wir alle eine entspannte Zeit haben",
+        [FormSteps.Signature]: "",
+        [FormSteps.Summary]: "Zusammenfassung",
+        [FormSteps.Confirmation]: "Fast geschafft!"
+    }
+    const requiredFields: { [key: number]: (keyof Booking)[] } = {
+        [FormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone'],
+        [FormSteps.Ticket]: ['ticket_id'],
+        [FormSteps.Beverage]: [],
+        [FormSteps.Workshift]: ['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3', 'amount_shifts'],
+        [FormSteps.Material]: [],
+        [FormSteps.Signature]: ['signature'],
+        [FormSteps.AwarenessCode]: [],
+        [FormSteps.Summary]: [],
+        [FormSteps.Confirmation]: [],
 
-
-	const requiredFields: { [key: number]: (keyof Booking)[] } = {
-		[FormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone'],
-		[FormSteps.Ticket]: ['ticket_id'],
-		[FormSteps.Beverage]: [],
-		[FormSteps.Workshift]: ['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3', 'amount_shifts'],
-		[FormSteps.Material]: [],
-		[FormSteps.Signature]: ['signature'],
-		[FormSteps.AwarenessCode]: [],
-		[FormSteps.Summary]: [],
-		[FormSteps.Confirmation]: [],
-
-	};
-
-	useEffect(() => {
-		localStorage.setItem('formValidation', JSON.stringify(formValidation));
-		localStorage.setItem('activeStep', JSON.stringify(activeStep));
-		localStorage.setItem('bookingState', JSON.stringify(bookingState));
-		localStorage.setItem('currentError', JSON.stringify(currentError));
-		localStorage.setItem('pdfSummary', JSON.stringify(pdfSummary));
-		localStorage.setItem('booking', JSON.stringify(booking));
-	}, [formValidation, activeStep, bookingState, currentError, pdfSummary, booking]);
+    };
 
 
-	useEffect(() => {
-		axios.get('/api/formcontent', {
-			headers: {Authorization: `Bearer ${token}`}
-		})
-			.then((response) => {
-					setFormContent(response.data);
-				}
-			)
-			.catch((error) => {
-				// 	catch 401 and redirect to login
+    useEffect(() => {
+        localStorage.setItem('formValidation', JSON.stringify(formValidation));
+        localStorage.setItem('activeStep', JSON.stringify(activeStep));
+        localStorage.setItem('bookingState', JSON.stringify(bookingState));
+        localStorage.setItem('currentError', JSON.stringify(currentError));
+        localStorage.setItem('pdfSummary', JSON.stringify(pdfSummary));
+        localStorage.setItem('booking', JSON.stringify(booking));
+    }, [formValidation, activeStep, bookingState, currentError, pdfSummary, booking]);
 
-				console.log(error);
-				setAuth(false);
-				setToken("");
+    useEffect(() => {
+        axios.get('/api/formcontent', {
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            .then((response) => {
+                    setFormContent(response.data);
+                }
+            )
+            .catch((error) => {
+                // 	catch 401 and redirect to login
 
-			});
-	}, []);
+                console.log(error);
+                setAuth(false);
+                setToken("");
 
-	useEffect(() => {
-		setPdfSummary(generateSummaryPDF(booking, formContent));
-	}, [booking, formContent]);
+            });
+    }, []);
 
-	function validateName(value: string, nameString: string): string {
-		const pattern = /^[A-Za-zÄÖÜöüß\s]+$/;
-		if (value === '') return 'Bitte gib einen ' + nameString + ' an';
-		if (!pattern.test(value)) return 'Bitte verwende nur Buchstaben für deinen ' + nameString;
-		return '';
-	}
+    useEffect(() => {
+        setPdfSummary(generateSummaryPDF(booking, formContent));
+    }, [booking, formContent]);
 
-	useEffect(() => {
-		setCurrentError("");
-	}, [booking]);
+    function validateName(value: string, nameString: string): string {
+        const pattern = /^[A-Za-zÄÖÜöüß\s]+$/;
+        if (value === '') return 'Bitte gib einen ' + nameString + ' an';
+        if (!pattern.test(value)) return 'Bitte verwende nur Buchstaben für deinen ' + nameString;
+        return '';
+    }
 
-	function validateEmail(value: any): string {
-		const pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-		if (value === '') return 'Bitte gib eine Email ein';
-		if (!pattern.test(value)) return 'Bitte gib eine gültige Email ein.';
+    useEffect(() => {
+        setCurrentError("");
+    }, [booking]);
 
-		return '';
-	}
+    function validateEmail(value: any): string {
+        const pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+        if (value === '') return 'Bitte gib eine Email ein';
+        if (!pattern.test(value)) return 'Bitte gib eine gültige Email ein.';
 
-	function validatePhone(value: any): string {
-		const pattern = /^\d{10,15}$/;
-		if (value === '') return 'Bitte gib eine Telefonnummer ein';
-		if (!pattern.test(value)) return 'Bitte gib eine gültige Telefonnummer ein';
-		return '';
-	}
+        return '';
+    }
 
-	function validateField(key: keyof Booking, value: any) {
-		let errorMessage = '';
-		switch (key) {
-			case 'last_name':
-				errorMessage = validateName(value, "Nachnamen");
-				break
-			case 'first_name':
-				errorMessage = validateName(value, "Vornamen");
-				break
-			case 'supporter_buddy':
-				errorMessage = validateName(value, "Support Buddy");
-				break;
-			case 'email':
-				errorMessage = validateEmail(value);
-				break;
-			case 'phone':
-				errorMessage = validatePhone(value);
-				break;
-			case 'ticket_id':
-				errorMessage = value === -1 ? 'Bitte wähle ein Ticket aus.' : '';
-				break;
-			case 'timeslot_priority_1':
-				errorMessage = value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
-				break;
-			case 'timeslot_priority_2':
-				errorMessage = value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
-				break;
-			case 'timeslot_priority_3':
-				errorMessage = value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
-				break;
-			case 'signature':
-				errorMessage = value === '' ? 'Wir würden uns freuen, wenn du das Formular unterschreibst' : '';
-				break;
+    function validatePhone(value: any): string {
+        const pattern = /^\d{10,15}$/;
+        if (value === '') return 'Bitte gib eine Telefonnummer ein';
+        if (!pattern.test(value)) return 'Bitte gib eine gültige Telefonnummer ein';
+        return '';
+    }
 
-		}
-		setFormValidation(prev => ({...prev, [key]: errorMessage}));
-		return errorMessage;
-	}
+    function validateField(key: keyof Booking, value: any) {
+        let errorMessage = '';
+        switch (key) {
+            case 'last_name':
+                errorMessage = validateName(value, "Nachnamen");
+                break
+            case 'first_name':
+                errorMessage = validateName(value, "Vornamen");
+                break
+            case 'supporter_buddy':
+                errorMessage = validateName(value, "Support Buddy");
+                break;
+            case 'email':
+                errorMessage = validateEmail(value);
+                break;
+            case 'phone':
+                errorMessage = validatePhone(value);
+                break;
+            case 'ticket_id':
+                errorMessage = value === -1 ? 'Bitte wähle ein Ticket aus.' : '';
+                break;
+            case 'timeslot_priority_1':
+                errorMessage = value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
+                break;
+            case 'timeslot_priority_2':
+                errorMessage = value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
+                break;
+            case 'timeslot_priority_3':
+                errorMessage = value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
+                break;
+            case 'signature':
+                errorMessage = value === '' ? 'Wir würden uns freuen, wenn du das Formular unterschreibst' : '';
+                break;
 
-	function isStepValid() {
-		const currentStepFields = requiredFields[activeStep];
+        }
+        setFormValidation(prev => ({...prev, [key]: errorMessage}));
+        return errorMessage;
+    }
 
-		if (!currentStepFields) {
-			return false;
-		}
+    function isStepValid() {
+        const currentStepFields = requiredFields[activeStep];
 
-		let isValid = true;
-		let errorMessage = '';
-		for (let field of currentStepFields) {
-			errorMessage = validateField(field, booking[field]);
-			if (errorMessage !== '') {
-				isValid = false;
-				break;
-			}
-		}
-		return isValid;
-	}
+        if (!currentStepFields) {
+            return false;
+        }
 
-	function updateCurrentError() {
-		const errorMessages = requiredFields[activeStep].map(field => formValidation[field]).filter(message => message !== '');
-		const errorMessage = errorMessages !== undefined && errorMessages.length > 0 && errorMessages[0] !== undefined ? errorMessages[0] : '';
-		setCurrentError(() => errorMessage);
-	}
+        let isValid = true;
+        let errorMessage = '';
+        for (let field of currentStepFields) {
+            errorMessage = validateField(field, booking[field]);
+            if (errorMessage !== '') {
+                isValid = false;
+                break;
+            }
+        }
+        return isValid;
+    }
 
-	function updateBooking(key: keyof Booking, value: any) {
-		setBooking((prevBooking) => {
-			let ticketOption = undefined;
-			let beverageOption = undefined;
-			let total_price = 0;
-			let newBooking = {...prevBooking};
+    function updateCurrentError() {
+        const errorMessages = requiredFields[activeStep].map(field => formValidation[field]).filter(message => message !== '');
+        const errorMessage = errorMessages !== undefined && errorMessages.length > 0 && errorMessages[0] !== undefined ? errorMessages[0] : '';
+        setCurrentError(() => errorMessage);
+    }
 
-			if (key === 'ticket_id') {
-				ticketOption = formContent.ticket_options.find((ticket) => ticket.id === value);
-			} else {
-				ticketOption = formContent.ticket_options.find((ticket) => ticket.id === prevBooking.ticket_id);
-			}
+    function updateBooking(key: keyof Booking, value: any) {
+        setBooking((prevBooking) => {
+            let ticketOption = undefined;
+            let beverageOption = undefined;
+            let total_price = 0;
+            let newBooking = {...prevBooking};
 
-			if (key === 'beverage_id') {
-				beverageOption = formContent.beverage_options.find((beverage) => beverage.id === value);
-			} else {
-				beverageOption = formContent.beverage_options.find((beverage) => beverage.id === prevBooking.beverage_id);
-			}
+            if (key === 'ticket_id') {
+                ticketOption = formContent.ticket_options.find((ticket) => ticket.id === value);
+            } else {
+                ticketOption = formContent.ticket_options.find((ticket) => ticket.id === prevBooking.ticket_id);
+            }
 
-			total_price += ticketOption ? ticketOption.price : 0;
-			total_price += beverageOption ? beverageOption.price : 0;
+            if (key === 'beverage_id') {
+                beverageOption = formContent.beverage_options.find((beverage) => beverage.id === value);
+            } else {
+                beverageOption = formContent.beverage_options.find((beverage) => beverage.id === prevBooking.beverage_id);
+            }
 
-			newBooking = {...prevBooking, [key]: value, total_price: total_price};
+            total_price += ticketOption ? ticketOption.price : 0;
+            total_price += beverageOption ? beverageOption.price : 0;
 
-			return newBooking;
-		});
-	}
+            newBooking = {...prevBooking, [key]: value, total_price: total_price};
 
-	function updateMaterialIds(material_ids: Array<number>) {
-		setBooking((prevBooking) => {
-			const newBooking = {...booking, material_ids: material_ids};
-			return newBooking;
+            return newBooking;
+        });
+    }
 
-		});
-	}
+    function updateMaterialIds(material_ids: Array<number>) {
+        setBooking((prevBooking) => {
+            const newBooking = {...booking, material_ids: material_ids};
+            return newBooking;
 
-	function submitBooking() {
+        });
+    }
 
-		axios.post('/api/submitForm', booking, {
-			headers: {Authorization: `Bearer ${token}`}
-		})
-			.then(function (response: any) {
-				// handle success
-				setBookingState(() => {
-					return {
-						isSuccessful: true,
-						isSubmitted: true
-					}
-				})
-				// set an interval after which the user is logged out
-				setTimeout(() => {
-					setToken("");
-					setAuth(false);
-				}, 1000 * 60 * 60);
+    function submitBooking() {
 
-			})
-			.catch(function (error: any) {
-				console.log(error);
+        axios.post('/api/submitForm', booking, {
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            .then(function (response: any) {
+                // handle success
+                setBookingState(() => {
+                    return {
+                        isSuccessful: true,
+                        isSubmitted: true
+                    }
+                })
+                // set an interval after which the user is logged out
+                setTimeout(() => {
+                    setToken("");
+                    setAuth(false);
+                }, 1000 * 60 * 60);
 
-				if (error.status === 401) {
-					setToken("");
-					setAuth(false);
-				} else {
-					// handle error
-				setBookingState(() => {
-					return {
-						isSuccessful: false,
-						isSubmitted: true
-					};
-				})
+            })
+            .catch(function (error: any) {
+                console.log(error);
 
-				setTimeout(() => {
-					setToken("");
-					setAuth(false);
-				}, 1000 * 10);
-				}
+                if (error.status === 401) {
+                    setToken("");
+                    setAuth(false);
+                } else {
+                    // handle error
+                    setBookingState(() => {
+                        return {
+                            isSuccessful: false,
+                            isSubmitted: true
+                        };
+                    })
 
-
-			});
-
-	}
+                    setTimeout(() => {
+                        setToken("");
+                        setAuth(false);
+                    }, 1000 * 10);
+                }
 
 
-	return <Card className={"form-container"}>
-		<Grid container className={"navigation"}>
-			<Grid item xs={11} className={"navigation-progress"}>
-				<LinearProgressWithLabel variant="determinate" max={maxSteps} currentvalue={activeStep + 1}/>
-			</Grid>
-			<Grid item xs={12} className={"navigation-buttons"} sx={{display: bookingState.isSubmitted ? "None" : ""}}>
-				<Button variant={"outlined"} sx={{'display': activeStep < 1 ? "none" : "inline-block"}}
-						onClick={() => {
-							setActiveStep(activeStep - 1);
-							setCurrentError("");
-						}}>
-					<NavigateBefore/>
-				</Button>
-				<Button
-					variant={"outlined"}
-					sx={{'display': activeStep >= maxSteps - 1 ? "none" : "inline-block"}}
-					onClick={() => {
-						if (isStepValid()) {
-							setActiveStep(activeStep + 1);
-							setCurrentError("");
-						} else {
-							updateCurrentError();
-						}
-					}}>
-					<NavigateNext/>
-				</Button>
-			</Grid>
-		</Grid>
-		<CardContent>
-			<Box sx={{
-				display: 'flex',
-				flexDirection: 'column',
-				alignItems: 'center',
-				justifyContent: 'center'
-			}}>
-				<Typography variant={"h5"}>{stepTitles[activeStep]}</Typography>
-				<Alert variant={"outlined"} sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>
-					{currentError}
-				</Alert>
-				{activeStep === FormSteps.NameAndAddress &&
+            });
+
+    }
+
+
+    return <Card className={"form-container"}>
+        <Grid container className={"navigation"}>
+            <Grid item xs={12} className={"navigation-progress"}>
+                <LinearProgressWithImage activeStep={activeStep} maxSteps={maxSteps} variant={"determinate"} image={fishImage}/>
+            </Grid>
+            <Grid item xs={12} className={"navigation-buttons"}
+                  sx={{display: bookingState.isSubmitted ? "None" : ""}}>
+                <Button variant={"outlined"} sx={{'display': activeStep < 1 ? "none" : "inline-block"}}
+                        onClick={() => {
+                            setActiveStep(activeStep - 1);
+                            setCurrentError("");
+                        }}>
+                    <NavigateBefore/>
+                </Button>
+                <Button
+                    variant={"outlined"}
+                    sx={{'display': activeStep >= maxSteps - 1 ? "none" : "inline-block"}}
+                    onClick={() => {
+                        if (isStepValid()) {
+                            setActiveStep(activeStep + 1);
+                            setCurrentError("");
+                        } else {
+                            updateCurrentError();
+                        }
+                    }}>
+                    <NavigateNext/>
+                </Button>
+            </Grid>
+        </Grid>
+        <CardContent>
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <Typography variant={"h5"}>{stepTitles[activeStep]}</Typography>
+                <Alert variant={"outlined"} sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>
+                    {currentError}
+                </Alert>
+                {activeStep === FormSteps.NameAndAddress &&
                     <NameAndAddressForm updateBooking={updateBooking}
                                         currentBooking={booking}
                                         formValidation={formValidation}
                                         formContent={formContent}
                     />}
-				{activeStep === FormSteps.Ticket &&
+                {activeStep === FormSteps.Ticket &&
                     <TicketForm updateBooking={updateBooking}
                                 currentBooking={booking}
                                 formValidation={formValidation}
                                 formContent={formContent}/>}
 
-				{activeStep === FormSteps.Beverage &&
+                {activeStep === FormSteps.Beverage &&
                     <BeverageForm updateBooking={updateBooking}
                                   currentBooking={booking}
                                   formValidation={formValidation}
                                   formContent={formContent}/>}
 
-				{activeStep === FormSteps.Workshift &&
+                {activeStep === FormSteps.Workshift &&
                     <WorkshiftForm currentBooking={booking}
                                    updateBooking={updateBooking}
                                    formValidation={formValidation}
                                    formContent={formContent}
                     />}
-				{activeStep === FormSteps.Material &&
+                {activeStep === FormSteps.Material &&
                     <MaterialsForm
                         updateMaterialIds={updateMaterialIds}
                         currentBooking={booking}
                         formValidation={formValidation}
                         formContent={formContent}
                     />}
-				{activeStep === FormSteps.AwarenessCode && <FormAwarnessCode/>}
-				{activeStep === FormSteps.Signature &&
+                {activeStep === FormSteps.AwarenessCode && <FormAwarnessCode/>}
+                {activeStep === FormSteps.Signature &&
                     <FormSignature updateBooking={updateBooking}
                                    currentBooking={booking}
                                    formValidation={formValidation}
                                    formContent={formContent}
                     />}
-				{activeStep === FormSteps.Summary &&
+                {activeStep === FormSteps.Summary &&
                     <FormSummary booking={booking} formContent={formContent} setPdfSummary={setPdfSummary}
                                  pdfSummary={pdfSummary}/>}
-				{activeStep === FormSteps.Confirmation &&
+                {activeStep === FormSteps.Confirmation &&
                     <FormConfirmation bookingState={bookingState}
                                       formContent={formContent}
                                       booking={booking}
@@ -535,8 +519,8 @@ export function FormContainer() {
 
                     />
 
-				}
-			</Box>
-		</CardContent>
-	</Card>;
+                }
+            </Box>
+        </CardContent>
+    </Card>;
 }
