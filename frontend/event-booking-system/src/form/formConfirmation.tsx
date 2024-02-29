@@ -87,22 +87,25 @@ function FormConfirmation(props: FinalBookingProps) {
 	return (
 		<Box sx={{p: 2, borderRadius: '5px'}}>
 			{props.bookingState.isSubmitted ? (props.bookingState.isSuccessful ? (
-						<div>
-							<div className="icon-container">
-								{/*<CheckCircleOutline color="primary" style={{fontSize: 60}}/>*/}
-								{/*Insert the image jellyfish.png*/}
-								<img src={jellyfishImage} alt="jellyfish" style={{width: '115px', height: '115px', marginRight: '1em'}}/>
-								{/*<Typography variant="h6">*/}
-								{/*	Du bist dabei!*/}
-								{/*</Typography>*/}
-							</div>
-							<Typography variant="body2" component="div" sx={{mb: 2}}>
-								Deine Buchung war erfolgreich. Du erhältst in Kürze eine Bestätigungsmail (bitte auch im
-								Spam-Ordner nachsehen).
-							</Typography>
-							<div>
-								<div className={"checkout"}>
-									<Typography variant="h5" component="div" sx={{mb: '1em'}}>
+					<div>
+						<div className="icon-container">
+							{/*<CheckCircleOutline color="primary" style={{fontSize: 60}}/>*/}
+							{/*Insert the image jellyfish.png*/}
+
+							<img src={jellyfishImage} alt="jellyfish"
+								 style={{width: '115px', height: '115px', marginRight: '1em'}}/>
+							{/*<Typography variant="h6">*/}
+							{/*	Du bist dabei!*/}
+							{/*</Typography>*/}
+						</div>
+						<Typography variant="body2" component="div" sx={{mb: 2}}>
+							Deine Buchung war erfolgreich. Du erhältst in Kürze eine Bestätigungsmail (bitte auch im
+							Spam-Ordner nachsehen).
+
+					</Typography>
+				<div>
+					<div className={"checkout"}>
+					<Typography variant="h5" component="div" sx={{mb: '1em'}}>
 										Dein Beitrag: <strong>{props.booking.total_price}€</strong>
 									</Typography>
 
