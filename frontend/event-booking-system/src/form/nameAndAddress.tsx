@@ -14,7 +14,7 @@ function NameAndAddressForm(props: FormProps) {
         <Container component="main" maxWidth="xs">
             <Typography variant="body2">
 
-                <u>Do, 24.08. - So, 27.08.2023</u>
+                <u>Do, 29.08. - So, 01.09.2024</u>
                 <br/>
                 <br/>
                 Wir freuen uns, dass du dabei bist! Bitte fülle das Formular aus, um dich anzumelden.
@@ -53,7 +53,7 @@ function NameAndAddressForm(props: FormProps) {
                     required
                     fullWidth
                     name="email"
-                    label="E-Mail"
+                    label="E-Mail (für deine Ticketbestätigung)"
                     id="email"
                     value={props.currentBooking.email}
                     onChange={e => props.updateBooking("email", e.target.value)}

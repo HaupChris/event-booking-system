@@ -123,9 +123,6 @@ function FormSummary(props: IProps) {
 
 	return (
 		<Box sx={{mt: 3, p: 2, borderRadius: '5px'}}>
-			<Button onClick={saveSummary} variant="contained" color="primary">
-				Zusammenfassung als PDF herunterladen <Download/>
-			</Button>
 			<Typography variant="h6" component="div" sx={{mb: 1}}>
 				Persönliche Informationen
 			</Typography>
@@ -154,8 +151,8 @@ function FormSummary(props: IProps) {
 
 				<ListItem>
 					<ListItemText
-						primary={<Typography variant="subtitle1" component="div"><strong>Teilnahmeoption:</strong></Typography>}
-						secondary={<Typography variant="body1"
+						primary={<Typography color={"primary"} variant="subtitle1" component="div"><strong>Teilnahmeoption:</strong></Typography>}
+						secondary={<Typography variant="body1" color={"secondary"}
 											   component="div">{ticket?.title} - {ticket?.price}€</Typography>}
 					/>
 				</ListItem>
@@ -163,7 +160,7 @@ function FormSummary(props: IProps) {
 					<ListItemText
 						primary={<Typography variant="subtitle1"
 											 component="div"><strong>Bierflatrate:</strong></Typography>}
-						secondary={<Typography variant="body1"
+						secondary={<Typography variant="body1" color={"secondary"}
 											   component="div">{beverage !== undefined ? beverage.title + " - " + beverage.price + "€" : "Keine"}</Typography>}
 					/>
 				</ListItem>
@@ -172,7 +169,7 @@ function FormSummary(props: IProps) {
 						primary={<Typography variant="subtitle1" component="div"><strong>Support
 							Prioritäten:</strong></Typography>}
 						secondary={
-							<Typography variant="body1" component="div">
+							<Typography variant="body1" component="div" color={"secondary"}>
 								{(shift_slot_1 !== undefined && shift_slot_1.shift !== undefined && shift_slot_1.timeslot !== undefined) ?
 									("Höchste: " + shift_slot_1.shift.title + ", " + shift_slot_1.timeslot.title + " " + shift_slot_1.timeslot.start_time + " - " + shift_slot_1.timeslot.end_time)
 									: ""}
@@ -188,16 +185,16 @@ function FormSummary(props: IProps) {
 					/>
 				</ListItem>
 				<ListItem>
-					<Typography>Supporter Buddy: {supporter_buddy}
+					<Typography>Supporter Buddy: <Typography color={"secondary"}>{supporter_buddy}</Typography>
 					<br/>
-					Deine Anzahl Schichten: {amount_shifts}</Typography>
+					Deine Anzahl Schichten: <Typography variant="h6" component="span" color={"secondary"}>{amount_shifts}</Typography></Typography>
 				</ListItem>
 				<ListItem>
 					<ListItemText
 						primary={<Typography variant="subtitle1"
 											 component="div"><strong>Ich bringe mit:</strong></Typography>}
 						secondary={
-							<Typography variant="body1" component="div">
+							<Typography variant="body1" component="div" color={"secondary"}>
 								{materials.map(material => material?.title).join(', ')}
 							</Typography>}
 					/>
@@ -207,7 +204,7 @@ function FormSummary(props: IProps) {
 				<ListItem>
 					<ListItemText
 						primary={<Typography variant="h6" component="div" color="primary">
-							<strong>Dein Beitrag: {total_price}€</strong>
+							<strong>Dein Beitrag: <Typography variant="h6" color={"secondary"}>{total_price}€</Typography></strong>
 						</Typography>}
 					/>
 				</ListItem>

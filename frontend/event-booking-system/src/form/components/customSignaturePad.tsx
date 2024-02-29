@@ -13,20 +13,20 @@ function CustomSignaturePad(props: SignaturePadProps) {
 
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	let ctx: CanvasRenderingContext2D | undefined | null = undefined;
-	let drawing = false;
+	const drawing = useRef(false);
 
 	const handleStart = (clientX: number, clientY: number) => {
 		if (!canvasRef.current) return;
 		const rect = canvasRef.current.getBoundingClientRect();
 		const x = (clientX - rect.left) * (canvasRef.current.width / rect.width);
 		const y = (clientY - rect.top) * (canvasRef.current.height / rect.height);
-		drawing = true;
+		drawing.current = true;
 		// onBegin?.();
 		ctx?.moveTo(x, y);
 	};
 
 	const handleMove = (clientX: number, clientY: number) => {
-		if (!drawing) return;
+		if (!drawing.current) return;
 		if (!canvasRef.current) return;
 		const rect = canvasRef.current.getBoundingClientRect();
 		const x = (clientX - rect.left) * (canvasRef.current.width / rect.width);
@@ -38,7 +38,7 @@ function CustomSignaturePad(props: SignaturePadProps) {
 
 	const handleEnd = () => {
 		console.log("handleEnd");
-		drawing = false;
+		drawing.current = false;
 		if (!ctx || !canvasRef.current || typeof props.onEnd !== 'function') return;
 		const dataURL = canvasRef.current.toDataURL();
 		console.log(dataURL);
@@ -82,10 +82,12 @@ function CustomSignaturePad(props: SignaturePadProps) {
 
 		// Handle normal mouse events
 		const handleMouseDown = (event: MouseEvent) => {
+			drawing.current = true;
 			handleStart(event.clientX, event.clientY);
 		};
 
 		const handleMouseMove = (event: MouseEvent) => {
+			if (!drawing.current) return;
 			handleMove(event.clientX, event.clientY);
 		};
 
