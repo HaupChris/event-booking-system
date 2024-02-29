@@ -15,3 +15,5 @@ server/db/*
 
 server/*.log
 
+.env
+
