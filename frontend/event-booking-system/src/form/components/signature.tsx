@@ -58,14 +58,14 @@ export function SignaturePad(props: IProps) {
     };
 
     return (
-        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', }}>
+        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
             <CustomSignaturePad
-                penColor="#eac764"
+                penColor="secondary"
                 existingSignature={props.booking.signature}
                 onEnd={(signatureURL) => handleSignatureEnd(signatureURL)}
                 clearOnResize={false}
             />
-            <Button onClick={clearSignature}>Löschen</Button>
+            <Button color={"secondary"} onClick={clearSignature}>Löschen</Button>
         </Box>
     );
 }

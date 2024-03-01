@@ -15,26 +15,78 @@ import AdminLogin from './form/adminLogin';
 import './css/global.css';
 
 
+// export const themeOptions: ThemeOptions = {
+//   palette: {
+//     mode: 'light', // Switching to light mode for a friendlier vibe
+//     primary: {
+//       main: 'rgb(2,79,152)', // Keeping white for legibility
+//     },
+//     secondary: {
+//       main: 'rgba(0,0,0,0.9)', // A brighter yellow for vibrancy
+//     },
+//     background: {
+//       default: 'rgba(255, 255, 255, 0.3)', // Light translucent background for form
+//       paper: 'rgba(255, 255, 255, 0.7)', // Lighter for paper elements with less transparency
+//     },
+//     divider: 'rgba(30, 144, 255, 0.5)', // Using a sky blue for a friendlier divider color
+//     text: {
+//       primary: 'rgb(2,79,152)', // Dark text for contrast and readability
+//       secondary: 'rgba(0, 0, 0, 0.7)', // Slightly dimmed for secondary text
+//     },
+//   },
+//   typography: {
+//     fontFamily: [
+//       'Kavoon',
+//       'Roboto',
+//       '"Helvetica Neue"',
+//       'Arial',
+//       'sans-serif',
+//     ].join(','),
+//     body1: {
+//       fontFamily: 'Kavoon',
+//     },
+//     h1: {
+//       fontFamily: 'Kavoon',
+//     },
+//     button: {
+//       fontFamily: 'Kavoon',
+//     },
+//   },
+//   components: {
+//     MuiCard: {
+//       styleOverrides: {
+//         root: {
+//           fontFamily: 'Kavoon',
+//           backgroundColor: 'rgba(255, 255, 255, 0.1)', // Very light background for card elements
+//           backdropFilter: 'blur(5px)', // Optional: Apply a blur effect to the background
+//         },
+//       },
+//     },
+//     // If you use other components that need to be styled, add them here
+//   },
+// };
+
 export const themeOptions: ThemeOptions = {
   palette: {
-    mode: 'light', // Switching to light mode for a friendlier vibe
+    mode: 'light',
     primary: {
-      main: 'rgb(2,79,152)', // Keeping white for legibility
+      main: '#00AEFF', // Ocean blue
     },
     secondary: {
-      main: 'rgba(0,0,0,0.9)', // A brighter yellow for vibrancy
+      main: '#F7D100', // A vibrant yellow
     },
     background: {
-      default: 'rgba(255, 255, 255, 0.3)', // Light translucent background for form
-      paper: 'rgba(255, 255, 255, 0.7)', // Lighter for paper elements with less transparency
+      default: 'rgba(255, 255, 255, 0.2)', // Slightly more transparent
+      paper: 'rgba(255, 255, 255, 0.5)',
     },
-    divider: 'rgba(30, 144, 255, 0.5)', // Using a sky blue for a friendlier divider color
+    divider: 'rgba(0, 174, 255, 0.8)', // Brighter ocean blue
     text: {
-      primary: 'rgb(2,79,152)', // Dark text for contrast and readability
-      secondary: 'rgba(0, 0, 0, 0.7)', // Slightly dimmed for secondary text
+      primary: '#024F98', // A darker blue for better contrast
+      secondary: 'rgba(0, 0, 0, 0.8)',
     },
   },
   typography: {
+    // Keep your friendly font family
     fontFamily: [
       'Kavoon',
       'Roboto',
@@ -57,14 +109,14 @@ export const themeOptions: ThemeOptions = {
       styleOverrides: {
         root: {
           fontFamily: 'Kavoon',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)', // Very light background for card elements
-          backdropFilter: 'blur(5px)', // Optional: Apply a blur effect to the background
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(5px)',
         },
       },
     },
-    // If you use other components that need to be styled, add them here
   },
 };
+
 
 const theme = createTheme(themeOptions);
 const documentHeight = () => {

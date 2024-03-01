@@ -32,6 +32,15 @@ function BeverageForm(props: FormProps) {
             </Typography>
 
             <List dense sx={{width: '100%'}}>
+                <ListItem disablePadding sx={{
+                    border: props.currentBooking.beverage_id === -1 ? '4px solid' : '',
+                    borderRadius: '8px',
+                    mb: 1
+                }}>
+                    <ListItemButton onClick={handleBeverageSelect(-1)}>
+                        <ListItemText primary="Kein Bier für mich"/>
+                    </ListItemButton>
+                </ListItem>
                 {props.formContent.beverage_options.map((option) => {
                     return (
                         <ListItem
@@ -49,7 +58,7 @@ function BeverageForm(props: FormProps) {
                                     <div className="avatar-container"> {/* New container */}
                                         <Avatar alt={option.title}
                                                 src={option.id === 1 ? beverages_1 : option.id === 2 ? beverages_2 : beverages_0}
-                                                sx={{width: '6em', height: '6em', marginRight: '1.5em'}}
+                                                sx={{width: '4em', height: '4em', marginRight: '1.5em'}}
                                         />
                                         <img src={portholeImage} className="porthole-image"/> {/* Porthole */}
                                     </div>
@@ -66,15 +75,6 @@ function BeverageForm(props: FormProps) {
                         </ListItem>
                     );
                 })}
-                <ListItem disablePadding sx={{
-                    border: props.currentBooking.beverage_id === -1 ? '4px solid' : '',
-                    borderRadius: '8px',
-                    mb: 1
-                }}>
-                    <ListItemButton onClick={handleBeverageSelect(-1)}>
-                        <ListItemText primary="Kein Bier für mich"/>
-                    </ListItemButton>
-                </ListItem>
             </List>
         </div>
     );

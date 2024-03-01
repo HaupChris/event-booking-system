@@ -5,8 +5,8 @@
 
 .porthole-image {
   position: absolute;
-  top: 0;
+  top: 13px;
   left: 0;
   z-index: 1; /* Ensure it's on top */
-  width: 90%; /* Adjust sizing as needed */
+  width: 80%; /* Adjust sizing as needed */
 }

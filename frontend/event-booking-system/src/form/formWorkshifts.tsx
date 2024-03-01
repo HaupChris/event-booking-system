@@ -5,6 +5,7 @@ import {
 	Box,
 	Divider,
 	FormControl,
+	FormHelperText,
 	InputLabel,
 	List,
 	MenuItem,
@@ -45,17 +46,15 @@ function WorkShiftForm(props: FormProps) {
 			Wir freuen uns, wenn du uns bei einer Supportschicht unterstützen könntest!
 			Wähle bitte <strong>drei</strong> Prioritäten aus.
 			Die Zahlen zeigen, wie viele Helfer:innen schon dabei sind und wie viele wir noch brauchen.
-			Möchtest du mit einer bestimmten Person zusammenarbeiten oder bist du bereit, mehr als eine Schicht zu
-			übernehmen?
-			Lass es uns wissen - wir berücksichtigen dies gerne bei unserer Planung.
+
 		</Typography>
 		<Divider sx={{width: '100%', margin: '1em'}}/>
 		<Typography variant="body2">
-			Supporterbuddy und deine Schichtenanzahl
+			Mit wem möchtest du zusammen arbeiten?
 		</Typography>
 		<FormControl sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '95%', marginTop: '16px', marginBottom: '8px'}}>
 			<TextField
-				sx={{mt: '8px'}}
+				sx={{mt: '8px', width: '90%'}}
 				error={!!props.formValidation.supporter_buddy}
 				variant="outlined"
 				margin="normal"
@@ -65,9 +64,16 @@ function WorkShiftForm(props: FormProps) {
 				value={props.currentBooking.supporter_buddy}
 				onChange={e => props.updateBooking("supporter_buddy", e.target.value)}
 			/>
+		</FormControl>
+		<Divider sx={{width: '100%', margin: '1em'}}/>
+		<Typography variant="body2" align={"center"}>
+			Wie viele Schichten möchtest du übernehmen?
+		</Typography>
+		<FormControl sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '95%', marginTop: '16px', marginBottom: '8px'}}>
 			<Select
-				sx={{ml: 1}}
-				variant={"outlined"}
+				sx={{ml: 1, minWidth: '90%'}}
+				variant={"filled"}
+				label="Anzahl Schichten"
 				labelId="shift-select-label"
 				id="shift-select"
 				value={props.currentBooking.amount_shifts}
@@ -76,8 +82,9 @@ function WorkShiftForm(props: FormProps) {
 				<MenuItem value={2}>2</MenuItem>
 				<MenuItem value={3}>3</MenuItem>
 			</Select>
-
 		</FormControl>
+
+
 		<Divider sx={{width: '100%', margin: '1em'}}/>
 		<List>
 			{props.formContent.work_shifts

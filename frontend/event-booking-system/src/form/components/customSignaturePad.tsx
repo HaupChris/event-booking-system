@@ -147,7 +147,7 @@ function CustomSignaturePad(props: SignaturePadProps) {
 				touchAction: "none",
 				width: '300px',
 				height: '200px',
-				border: '1px solid #eac764',
+				border: '2px solid #eac764',
 				borderRadius: '10px'
 			}} // To ensure that page scrolling is not triggered by touch events on the canvas
 			width={300}

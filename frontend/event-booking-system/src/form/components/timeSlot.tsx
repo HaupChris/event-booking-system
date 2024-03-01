@@ -36,7 +36,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 
 
 	const priorityColor = selectedPriority === "Höchste" ? 'green' : selectedPriority === "Mittlere" ? 'lightgreen' : selectedPriority === "Notnagel" ? 'lightgrey' : 'transparent';
-	const selectedPriorityBorder = selectedPriority === "Höchste" ? '1px solid green' : selectedPriority === "Mittlere" ? '1px solid lightgreen' : selectedPriority === "Notnagel" ? '1px solid lightgrey' : '1px solid transparent';
+	const selectedPriorityBorder = selectedPriority === "Höchste" ? '3px solid green' : selectedPriority === "Mittlere" ? '3px solid lightgreen' : selectedPriority === "Notnagel" ? '3px solid lightgrey' : '1px solid transparent';
 
 	const handleReset = () => {
 		if (selectedPriority === "Höchste") {
@@ -49,7 +49,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 	}
 
 
-	return <ListItem key={timeSlot.title + '-' + timeSlot.id} className={"tetwartasdfsjohnsons"} sx={{border: selectedPriorityBorder, opacity: isFull ? '40%' : '100%', marginLeft: 0, paddingLeft: 0}}>
+	return <ListItem key={timeSlot.title + '-' + timeSlot.id} className={"tetwartasdfsjohnsons"} sx={{border: selectedPriorityBorder, opacity: isFull ? '40%' : '100%', marginLeft: 0, paddingLeft: 0, borderRadius: "10px"}}>
 		<ListItemAvatar>
 			<CircularProgressWithLabel valueCurrent={timeSlot.num_booked} valueMax={timeSlot.num_needed}/>
 		</ListItemAvatar>

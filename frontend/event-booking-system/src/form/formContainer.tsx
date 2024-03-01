@@ -20,10 +20,9 @@ import BeverageForm from "./formBeverageSelection";
 import WorkshiftForm from "./formWorkshifts";
 import MaterialsForm from "./formMaterials";
 import FormAwarnessCode from "./formAwarenessCode";
-import FormSummary, {generateSummaryPDF} from "./formSummary";
+import FormSummary from "./formSummary";
 import FormConfirmation from "./formConfirmation";
 import {AuthContext, TokenContext} from "../AuthContext";
-import {jsPDF} from "jspdf";
 import fishImage from "../img/fish.png";
 import LinearProgressWithImage from "./components/linearProgressWithImage";
 
@@ -194,7 +193,6 @@ export function FormContainer() {
         isSuccessful: false
     }));
     const [currentError, setCurrentError] = useState<string>(safelyParseJSON(localStorage.getItem('currentError'), ""));
-    const [pdfSummary, setPdfSummary] = useState<jsPDF>(safelyParseJSON(localStorage.getItem('pdfSummary'), new jsPDF()));
 
     const {token, setToken} = useContext(TokenContext);
     const maxSteps = Object.keys(FormSteps).length / 2;
@@ -230,9 +228,8 @@ export function FormContainer() {
         localStorage.setItem('activeStep', JSON.stringify(activeStep));
         localStorage.setItem('bookingState', JSON.stringify(bookingState));
         localStorage.setItem('currentError', JSON.stringify(currentError));
-        localStorage.setItem('pdfSummary', JSON.stringify(pdfSummary));
         localStorage.setItem('booking', JSON.stringify(booking));
-    }, [formValidation, activeStep, bookingState, currentError, pdfSummary, booking]);
+    }, [formValidation, activeStep, bookingState, currentError, booking]);
 
     useEffect(() => {
         axios.get('/api/formcontent', {
@@ -251,10 +248,6 @@ export function FormContainer() {
 
             });
     }, []);
-
-    useEffect(() => {
-        setPdfSummary(generateSummaryPDF(booking, formContent));
-    }, [booking, formContent]);
 
     function validateName(value: string, nameString: string): string {
         const pattern = /^[A-Za-zÄÖÜöüß\s]+$/;
@@ -508,14 +501,12 @@ export function FormContainer() {
                                    formContent={formContent}
                     />}
                 {activeStep === FormSteps.Summary &&
-                    <FormSummary booking={booking} formContent={formContent} setPdfSummary={setPdfSummary}
-                                 pdfSummary={pdfSummary}/>}
+                    <FormSummary booking={booking} formContent={formContent}/>}
                 {activeStep === FormSteps.Confirmation &&
                     <FormConfirmation bookingState={bookingState}
                                       formContent={formContent}
                                       booking={booking}
                                       submitBooking={submitBooking}
-                                      pdfSummary={pdfSummary}
 
                     />
 

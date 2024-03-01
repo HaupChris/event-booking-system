@@ -9,7 +9,6 @@ import {Booking, FormContent} from "./interface";
 import React, {useEffect, useState} from "react";
 import {
 	Check,
-	CheckCircleOutline,
 	ErrorOutline,
 	FileCopy,
 	OpenInNew,
@@ -18,7 +17,6 @@ import {
 
 import '../css/formConfirmation.css';
 import {BookingState} from "./formContainer";
-import {jsPDF} from "jspdf";
 import jellyfishImage from '../img/jellyfish.png';
 
 interface FinalBookingProps {
@@ -26,7 +24,6 @@ interface FinalBookingProps {
 	submitBooking: () => void;
 	formContent: FormContent;
 	bookingState: BookingState;
-	pdfSummary: jsPDF;
 }
 
 function findItemById<T extends { id: number }>(array: T[], id: number): T | undefined {
@@ -125,7 +122,7 @@ function FormConfirmation(props: FinalBookingProps) {
 										/>
 
 									</Typography>
-									<Button variant={"outlined"} fullWidth sx={{mb: {xs: '1em'}}} onClick={handleCopy}>
+									<Button variant={"outlined"} color={"secondary"} fullWidth sx={{mb: {xs: '1em'}}} onClick={handleCopy}>
 										Betreff kopieren <FileCopy/>
 									</Button>
 									<a
