@@ -4,7 +4,7 @@ import {AuthContext, TokenContext} from "../AuthContext";
 
 const SHA256 = require("crypto-js/sha256");
 import axios from "axios";
-import {Alert, Box, Button, Snackbar, TextField} from "@mui/material";
+import {Alert, Box, Button, Snackbar, TextField, Typography} from "@mui/material";
 
 import "../css/formContainer.css"
 
@@ -46,11 +46,11 @@ function PasswordPage() {
 	}}>
 		{!display && (
 			<Box sx={{position: "absolut", top: "10%"}}>
-				<p>Kommst du mit uns in den Kanienchenbau?</p>
-				<Box sx={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-					<Button variant="contained" style={{backgroundColor: 'blue', 'marginRight': '1em'}} onClick={() => {
-					}}>Blue Pill</Button>
-					<Button variant="contained" style={{backgroundColor: 'red'}} onClick={() => setDisplay(true)}>Red Pill</Button>
+				<Typography variant={"h6"} align={"center"} sx={{marginBottom:"1em", backdropFilter: 'blur(5px)'}}>Wer hat mehr Arme, eine Qualle oder ein Tausendfüßler?</Typography>
+				<Box sx={{display: "flex", width:{xs: '90%', sm: '100%'}, justifyContent: "center"}}>
+					<Button variant="contained" color={"primary"} sx={{marginRight: "2em"}} onClick={() => {
+					}}>Ein Tausendfüßler</Button>
+					<Button variant="contained" color={"secondary"} onClick={() => setDisplay(true)}>Eine Qualle</Button>
 				</Box>
 
 			</Box>)}
