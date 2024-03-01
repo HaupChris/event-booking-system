@@ -1,14 +1,9 @@
-import base64
 import os
 import smtplib
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-
 from typing import Dict
-
 from dotenv import load_dotenv
 
 from .views import Booking, FormContent
