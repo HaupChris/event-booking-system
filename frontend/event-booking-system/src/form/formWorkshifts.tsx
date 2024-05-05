@@ -67,7 +67,7 @@ function WorkShiftForm(props: FormProps) {
 		</FormControl>
 		<Divider sx={{width: '100%', margin: '1em'}}/>
 		<Typography variant="body2" align={"center"}>
-			Wie viele Schichten möchtest du übernehmen?
+			Wie viele Schichten möchtest du maximal übernehmen?
 		</Typography>
 		<FormControl sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '95%', marginTop: '16px', marginBottom: '8px'}}>
 			<Select

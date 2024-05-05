@@ -185,14 +185,14 @@ function safelyParseJSON<T>(json: string | null, fallback: T): T {
 
 export function FormContainer() {
     const [formContent, setFormContent] = useState<FormContent>(getDummyFormContent);
-    const [formValidation, setFormValidation] = useState<{ [key in keyof Booking]?: string }>(safelyParseJSON(localStorage.getItem('formValidation'), {}));
+    const [formValidation, setFormValidation] = useState<{ [key in keyof Booking]?: string }>({});
     const [booking, setBooking] = useState<Booking>(safelyParseJSON(localStorage.getItem('booking'), getEmptyBooking()));
     const [activeStep, setActiveStep] = useState<FormSteps>(safelyParseJSON(localStorage.getItem('activeStep'), FormSteps.NameAndAddress));
     const [bookingState, setBookingState] = useState<BookingState>(safelyParseJSON(localStorage.getItem('bookingState'), {
         isSubmitted: false,
         isSuccessful: false
     }));
-    const [currentError, setCurrentError] = useState<string>(safelyParseJSON(localStorage.getItem('currentError'), ""));
+    const [currentError, setCurrentError] = useState<string>("");
 
     const {token, setToken} = useContext(TokenContext);
     const maxSteps = Object.keys(FormSteps).length / 2;
@@ -222,14 +222,58 @@ export function FormContainer() {
 
     };
 
+// Define the current version number of the form
+    const VERSION_NUMBER = '1.1';
+
+// Function to check and clear outdated data from local storage
+    const clearOutdatedData = () => {
+        const storedVersion = localStorage.getItem('formVersion');
+        if (storedVersion !== VERSION_NUMBER) {
+            // Clear outdated data
+            localStorage.removeItem('formVersion');
+            localStorage.removeItem('formValidation');
+            localStorage.removeItem('activeStep');
+            localStorage.removeItem('bookingState');
+            localStorage.removeItem('currentError');
+            localStorage.removeItem('booking');
+        }
+    };
+
+// Function to load default values from local storage
+    const loadDefaultValues = () => {
+        // Load default values from localStorage
+        const storedFormValidation = safelyParseJSON(localStorage.getItem('formValidation'), {});
+        const storedBooking = safelyParseJSON(localStorage.getItem('booking'), getEmptyBooking());
+        const storedActiveStep = safelyParseJSON(localStorage.getItem('activeStep'), FormSteps.NameAndAddress);
+        const storedBookingState = safelyParseJSON(localStorage.getItem('bookingState'), {
+            isSubmitted: false,
+            isSuccessful: false
+        });
+        const storedCurrentError = safelyParseJSON(localStorage.getItem('currentError'), "");
+
+        // Set state with loaded default values
+        setFormValidation(storedFormValidation);
+        setBooking(storedBooking);
+        setActiveStep(storedActiveStep);
+        setBookingState(storedBookingState);
+        setCurrentError(storedCurrentError);
+    };
+
+// Call loadDefaultValues function when the component mounts
+    useEffect(() => {
+        clearOutdatedData();
+        loadDefaultValues();
+    }, []);
 
     useEffect(() => {
         localStorage.setItem('formValidation', JSON.stringify(formValidation));
+        localStorage.setItem('booking', JSON.stringify(booking));
         localStorage.setItem('activeStep', JSON.stringify(activeStep));
         localStorage.setItem('bookingState', JSON.stringify(bookingState));
         localStorage.setItem('currentError', JSON.stringify(currentError));
-        localStorage.setItem('booking', JSON.stringify(booking));
-    }, [formValidation, activeStep, bookingState, currentError, booking]);
+        localStorage.setItem('formVersion', VERSION_NUMBER);
+
+    }, [formValidation, booking, activeStep, bookingState, currentError]);
 
     useEffect(() => {
         axios.get('/api/formcontent', {
@@ -255,6 +299,10 @@ export function FormContainer() {
         if (!pattern.test(value)) return 'Bitte verwende nur Buchstaben für deinen ' + nameString;
         return '';
     }
+
+    useEffect(() => {
+        updateCurrentError();
+    }, [formValidation]);
 
     useEffect(() => {
         setCurrentError("");
@@ -371,12 +419,10 @@ export function FormContainer() {
         setBooking((prevBooking) => {
             const newBooking = {...booking, material_ids: material_ids};
             return newBooking;
-
         });
     }
 
     function submitBooking() {
-
         axios.post('/api/submitForm', booking, {
                 headers: {Authorization: `Bearer ${token}`}
             })
@@ -425,7 +471,8 @@ export function FormContainer() {
     return <Card className={"form-container"}>
         <Grid container className={"navigation"}>
             <Grid item xs={12} className={"navigation-progress"}>
-                <LinearProgressWithImage activeStep={activeStep} maxSteps={maxSteps} variant={"determinate"} image={fishImage}/>
+                <LinearProgressWithImage activeStep={activeStep} maxSteps={maxSteps} variant={"determinate"}
+                                         image={fishImage}/>
             </Grid>
             <Grid item xs={12} className={"navigation-buttons"}
                   sx={{display: bookingState.isSubmitted ? "None" : ""}}>
@@ -443,8 +490,6 @@ export function FormContainer() {
                         if (isStepValid()) {
                             setActiveStep(activeStep + 1);
                             setCurrentError("");
-                        } else {
-                            updateCurrentError();
                         }
                     }}>
                     <NavigateNext/>

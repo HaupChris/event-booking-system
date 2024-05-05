@@ -7,9 +7,10 @@ interface IProps {
 }
 export function CircularProgressWithLabel(props: IProps) {
 	const frac = ( props.valueCurrent / props.valueMax) > 1.0 ? 1.0 : (props.valueCurrent / props.valueMax);
+	const progressIsFull = frac >= 1.0;
 	return (
 		<Box sx={{position: 'relative', display: 'inline-flex'}}>
-			<CircularProgress variant="determinate" value={frac * 100} />
+			<CircularProgress variant="determinate" color={progressIsFull ? "error" : "secondary"} value={frac * 100} thickness={6}/>
 			<Box
 				sx={{
 					top: 0,
