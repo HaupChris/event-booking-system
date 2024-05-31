@@ -89,6 +89,9 @@ class BookingManager:
         c.execute("SELECT beverage_option_id, COUNT(*) FROM Bookings GROUP BY beverage_option_id")
         beverage_bookings = {row[0]: row[1] for row in c.fetchall()}
 
+        c.execute("SELECT food_option_id, COUNT(*) FROM Bookings GROUP BY food_option_id")
+        food_bookings = {row[0]: row[1] for row in c.fetchall()}
+
         c.execute("SELECT material_id, COUNT(*) FROM BookingMaterials GROUP BY material_id")
         material_bookings = {row[0]: row[1] for row in c.fetchall()}
 
@@ -125,6 +128,9 @@ class BookingManager:
         for beverage_option in form_content_dict['beverage_options']:
             beverage_option['num_booked'] = beverage_bookings.get(beverage_option['id'], 0)
 
+        for food_option in form_content_dict['food_options']:
+            food_option['num_booked'] = food_bookings.get(food_option['id'], 0)
+
         for material in form_content_dict['materials']:
             material['num_booked'] = material_bookings.get(material['id'], 0)
 
@@ -151,8 +157,8 @@ class BookingManager:
 
             # Then we'll insert the booking into the Bookings table
             cursor.execute("""
-                INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, first_priority_timeslot_id, second_priority_timeslot_id, third_priority_timeslot_id, amount_shifts, supporter_buddy, signature, total_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (user_id, booking.ticket_id, booking.beverage_id, booking.timeslot_priority_1,
+                INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, food_option_id, first_priority_timeslot_id, second_priority_timeslot_id, third_priority_timeslot_id, amount_shifts, supporter_buddy, signature, total_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (user_id, booking.ticket_id, booking.beverage_id, booking.food_id, booking.timeslot_priority_1,
                       booking.timeslot_priority_2, booking.timeslot_priority_3, booking.amount_shifts, booking.supporter_buddy,
                       booking.signature, booking.total_price))
             booking_id = cursor.lastrowid
@@ -201,6 +207,7 @@ class BookingManager:
                     u.phone_number, 
                     b.ticket_option_id, 
                     b.beverage_option_id, 
+                    b.food_option_id,
                     b.first_priority_timeslot_id, 
                     b.second_priority_timeslot_id, 
                     b.third_priority_timeslot_id, 
@@ -232,14 +239,15 @@ class BookingManager:
                     phone=row[4],
                     ticket_id=row[5],
                     beverage_id=row[6],
-                    timeslot_priority_1=row[7],
-                    timeslot_priority_2=row[8],
-                    timeslot_priority_3=row[9],
+                    food_id=row[7],
+                    timeslot_priority_1=row[8],
+                    timeslot_priority_2=row[9],
+                    timeslot_priority_3=row[10],
                     material_ids=material_ids,
-                    amount_shifts=row[10],
-                    supporter_buddy=row[11],
-                    total_price=row[12],
-                    signature=row[13] if row[13] else ''
+                    amount_shifts=row[11],
+                    supporter_buddy=row[12],
+                    total_price=row[13],
+                    signature=row[14] if row[14] else ''
                 )
                 bookings.append(booking)
 

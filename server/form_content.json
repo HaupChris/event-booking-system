@@ -8,7 +8,7 @@
     {
       "title": "Freitag, Samstag",
       "price": 30.0,
-      "amount": 10
+      "amount": 20
     },
     {
       "title": "Donnerstag, Freitag",
@@ -20,7 +20,6 @@
       "price": 30.0,
       "amount": 10
     },
-
     {
       "title": "Donnerstag",
       "price": 20.0,
@@ -54,6 +53,23 @@
       "price": 28.0
     }
   ],
+  "food_options": [
+    {
+      "title": "Freitag",
+      "description": "Am Freitag gibts Pishausser Schoaßfleckerl, direkt aus Hintertupfingen vom Metzgermeister.",
+      "price": 10.0
+    },
+    {
+      "title": "Samstag",
+      "description": "Pizzabaguttes und dazu a kloans Bier.",
+      "price": 10.0
+    },
+    {
+      "title": "Beide Tage",
+      "description": "Für dich beide Tage was feines zum Essen.",
+      "price": 20.0
+    }
+  ],
   "work_shifts": [
     {
       "title": "Schaffe schaffe Festival baue",
@@ -63,19 +79,25 @@
           "title": "vorm Festival",
           "start_time": "Samstag",
           "end_time": "Sonntag ",
-          "num_needed": 15
+          "num_needed": 12
         }
       ]
     },
     {
       "title": "Licht aus, Tür zu",
-      "description": "Am Sonntag packen wir alles zusammen. Bitte stellt sicher, dass ihr und eure Mitfahrgelegenheit Zeit bis zum Ende (19:00 Uhr) habt.",
+      "description": "Am Sonntag packen wir alles zusammen. Bitte stellt sicher, dass ihr und eure Mitfahrgelegenheit Zeit bis zum Ende habt.",
       "time_slots": [
         {
-          "title": "Sonntag",
+          "title": "Sonntag früh",
           "start_time": "11:00",
+          "end_time": "15:00",
+          "num_needed": 20
+        },
+        {
+          "title": "Sonntag spät",
+          "start_time": "15:00",
           "end_time": "19:00",
-          "num_needed": 30
+          "num_needed": 15
         }
       ]
     },
@@ -85,13 +107,13 @@
       "time_slots": [
         {
           "title": "Montag",
-          "start_time": "12:00",
+          "start_time": "13:00",
           "end_time": "17:00",
           "num_needed": 3
         },
         {
           "title": "Dienstag",
-          "start_time": "12:00",
+          "start_time": "13:00",
           "end_time": "17:00",
           "num_needed": 3
         }
@@ -159,7 +181,7 @@
     },
     {
       "title": "Volltanken bidde",
-      "description": "Kontrolle der Spritbestände und Einkauf von neuem Sprit. Wichtig: Nüchternheit, Führerschein und Autonutzung.",
+      "description": "Kontrolle der Spritbestände und Einkauf von neuem Sprit. Wichtig: Führerschein, ein Auto und Nüchternheit (Kranplätze müssen verdichtet sein - Du nicht!)",
       "time_slots": [
         {
           "title": "Freitag",
@@ -177,7 +199,7 @@
     },
     {
       "title": "Mr. and Ms. Poopybutthole",
-      "description": "Klokontrolle auf Klopapier, Seife und Sauberkeit. Reinigung der Toilette wenn nötig. ",
+      "description": "Klokontrolle auf Klopapier, Seife und Sauberkeit. Reinigung der Toilette wenn nötig.",
       "time_slots": [
         {
           "title": "Freitag",
@@ -195,13 +217,43 @@
     },
     {
       "title": "Bunde Hunde",
-      "description": "Bitte nur ankreuzen, wenn du Mitglied im Deko-Team bist.",
+      "description": "Wir basteln die Deko und gestalten das Festivalgelände. Wichtig: Die Arbeit findet hauptsächlich vor dem Festival statt & wir haben einen extra Aufbautag. Außerdem trifft sich das Deko-Team in Würzburg, das sollte also nicht zu weit weg von dir sein!",
       "time_slots": [
         {
           "title": "Deko Team",
           "start_time": "",
           "end_time": "",
-          "num_needed": 5
+          "num_needed": 10
+        }
+      ]
+    },
+    {
+      "title": "Verkehrsgroßraum Poppenwind",
+      "description": "Musikanlage und Generator müssen transportiert werden. Bitte nur melden, wenn du ein Auto mit Anhänger fahren kannst und darfst oder einen kleinen Transporter hast.",
+      "time_slots": [
+        {
+          "title": "Generator Anlieferung",
+          "start_time": "Mittwoch oder Donnerstag",
+          "end_time": "",
+          "num_needed": 2
+        },
+        {
+          "title": "Musikanlage Anlieferung",
+          "start_time": "Mittwoch oder Donnerstag",
+          "end_time": "",
+          "num_needed": 2
+        },
+        {
+          "title": "Generator Rücktransport",
+          "start_time": "Sonntag Abend",
+          "end_time": "",
+          "num_needed": 2
+        },
+        {
+          "title": "Musikanlage Rücktransport",
+          "start_time": "Sonntag Abend oder Montag",
+          "end_time": "",
+          "num_needed": 2
         }
       ]
     },
@@ -219,7 +271,7 @@
     },
     {
       "title": "Brummi fahren",
-      "description": "Wassertanks müssen befüllt und Bier nachgeholt werden. Bitte hier nur melden, wenn du einen LKW Führerschein hast und große Maschinen fahren kannst.",
+      "description": "Wassertanks müssen befüllt und Bier nachgeholt werden. Bitte hier nur melden, wenn du einen einen Traktor mit einem Anhänger fahren kannst.",
       "time_slots": [
         {
           "title": "Freitag",
@@ -237,121 +289,119 @@
     },
     {
       "title": "Fünf Sterne Deluxe Küche",
-        "description": "Wir werden mit Backofenpizza versorgt und brauchen hier noch helfende Hände.",
-        "time_slots": [
-          {
-            "title": "Freitag, Vorbereitung",
-            "start_time": "15:00",
-            "end_time": "17:30",
-            "num_needed": 2
-          },
-          {
-            "title": "Freitag, Backen, Ausgabe",
-            "start_time": "17:30",
-            "end_time": "20:00",
-            "num_needed": 2
-          },
-          {
-            "title": "Samstag, Vorbereitung",
-            "start_time": "15:00",
-            "end_time": "17:30",
-            "num_needed": 2
-          },
-          {
-            "title": "Samstag, Backen, Ausgabe",
-            "start_time": "17:30",
-            "end_time": "20:00",
-            "num_needed": 2
-          }
-        ]
+      "description": "Koch- und Verkaufsdienst für unseren Essenswagen. ",
+      "time_slots": [
+        {
+          "title": "Freitag, Vorbereitung",
+          "start_time": "14:00",
+          "end_time": "17:30",
+          "num_needed": 2
+        },
+        {
+          "title": "Freitag, Backen, Ausgabe",
+          "start_time": "17:30",
+          "end_time": "20:00",
+          "num_needed": 2
+        },
+        {
+          "title": "Samstag, Vorbereitung",
+          "start_time": "15:00",
+          "end_time": "17:30",
+          "num_needed": 2
+        },
+        {
+          "title": "Samstag, Backen, Ausgabe",
+          "start_time": "17:30",
+          "end_time": "20:00",
+          "num_needed": 2
+        }
+      ]
     }
-
   ],
   "materials": [
     {
-        "title": "Lichterketten (kein Glas)",
-        "num_needed": 8
+      "title": "Lichterketten (kein Glas)",
+      "num_needed": 8
     },
     {
-        "title": "Mehrfachstecker",
-        "num_needed": 8
+      "title": "Mehrfachstecker",
+      "num_needed": 8
     },
     {
-        "title": "Kabeltrommel",
-        "num_needed": 4
+      "title": "Kabeltrommel",
+      "num_needed": 4
     },
     {
-        "title": "Verlängerungskabel",
-        "num_needed": 6
+      "title": "Verlängerungskabel",
+      "num_needed": 6
     },
     {
-        "title": "Feuerlöscher",
-        "num_needed": 4
+      "title": "Feuerlöscher",
+      "num_needed": 4
     },
     {
-        "title": "Bunte Tücher / Goa Tücher",
-        "num_needed": 8
+      "title": "Bunte Tücher / Goa Tücher",
+      "num_needed": 8
     },
     {
-        "title": "Seile (dick oder dünnn)",
-        "num_needed": 4
+      "title": "Seile (dick oder dünnn)",
+      "num_needed": 4
     },
     {
-        "title": "Pavillon mit Seitenwänden",
-        "num_needed": 1
+      "title": "Pavillon mit Seitenwänden",
+      "num_needed": 1
     },
     {
-        "title": "Pavillon ohne Seitenwände",
-        "num_needed": 3
+      "title": "Pavillon ohne Seitenwände",
+      "num_needed": 3
     },
     {
-        "title": "Werkzeugkoffer",
-        "num_needed": 2
+      "title": "Werkzeugkoffer",
+      "num_needed": 2
     },
     {
-        "title": "Schwarzlicht",
-        "num_needed": 4
+      "title": "Schwarzlicht",
+      "num_needed": 4
     },
     {
-        "title": "alte Regenschirme/Gestelle",
-        "num_needed": 4
+      "title": "alte Regenschirme/Gestelle",
+      "num_needed": 4
     },
     {
-        "title": "Solarlichter",
-        "num_needed": 5
+      "title": "Solarlichter",
+      "num_needed": 5
     },
     {
-        "title": "Hängematte",
-        "num_needed": 3
+      "title": "Hängematte",
+      "num_needed": 3
     },
     {
-        "title": "Benzin und Diesel Kanister",
-        "num_needed": 5
+      "title": "Benzin und Diesel Kanister",
+      "num_needed": 5
     },
     {
-        "title": "Scheren",
-        "num_needed": 3
+      "title": "Scheren",
+      "num_needed": 3
     },
     {
-        "title": "alte Kissen",
-        "num_needed": 4
+      "title": "alte Kissen",
+      "num_needed": 4
     },
     {
-        "title": "alter Teppich",
-        "num_needed": 3
+      "title": "alter Teppich",
+      "num_needed": 3
     },
     {
-        "title": "Biertrichter",
-        "num_needed": 2
+      "title": "Biertrichter",
+      "num_needed": 2
     },
     {
-        "title": "Volleyballfeld",
-        "num_needed": 1
+      "title": "Volleyballfeld",
+      "num_needed": 1
     },
     {
-        "title": "Wäscheständer",
-        "num_needed": 2
+      "title": "Wäscheständer",
+      "num_needed": 2
     }
-]
-
+  ]
 }

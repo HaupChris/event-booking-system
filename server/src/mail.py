@@ -106,7 +106,7 @@ def send_confirmation_mail(booking: Booking, form_content: Dict) -> None:
         Liebe/r <strong>{booking.first_name} {booking.last_name}</strong>,<br><br>
         Wir freuen uns, dass du bei unserem 5 jährigen Jubiläum dabei bist! Hier sind die Details deiner Buchung:<br><br>
         {booking_details_html}<br><br>
-        Falls noch nicht geschehen, sende bitte deinen Beitrag an unser Paypal: <a href="https://paypal.me/ChristianHauptmanny">https://paypal.me/ChristianHauptmanny</a> 
+        Falls noch nicht geschehen, sende bitte deinen Beitrag an unser Paypal: <a href="https://www.paypal.me/StephanHau">https://www.paypal.me/StephanHau</a> 
         <br>
         Betreff: <u>WW24 - {booking.first_name}, {booking.last_name} - {booking_ticket_title} - {beverage_option_title}</u>
         <br><br>      

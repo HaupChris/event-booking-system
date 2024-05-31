@@ -46,6 +46,14 @@ class BeverageOption(Interface):
     price: float
     num_booked: int = 0
 
+@dataclass
+class FoodOption(Interface):
+    id: int
+    title: str
+    description: str
+    price: float
+    num_booked: int = 0
+
 
 @dataclass
 class TicketOption(Interface):
@@ -60,6 +68,7 @@ class TicketOption(Interface):
 class FormContent(Interface):
     ticket_options: List[TicketOption]
     beverage_options: List[BeverageOption]
+    food_options: List[FoodOption]
     work_shifts: List[WorkShift]
     materials: List[Material]
 
@@ -76,6 +85,7 @@ class FormContent(Interface):
         return FormContent(
             ticket_options=[TicketOption(idx, **ticket_option) for idx, ticket_option in enumerate(data['ticket_options'])],
             beverage_options=[BeverageOption(idx, **beverage_option) for idx, beverage_option in enumerate(data['beverage_options'])],
+            food_options=[FoodOption(idx, **food_option) for idx, food_option in enumerate(data['food_options'])],
             work_shifts=work_shifts,
             materials=[Material(idx, **material) for idx, material in enumerate(data['materials'])]
         )
@@ -89,6 +99,7 @@ class Booking(Interface):
     phone: str
     ticket_id: int
     beverage_id: int
+    food_id: int
     timeslot_priority_1: int
     timeslot_priority_2: int
     timeslot_priority_3: int

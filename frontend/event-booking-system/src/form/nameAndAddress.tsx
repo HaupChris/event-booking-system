@@ -12,12 +12,8 @@ function NameAndAddressForm(props: FormProps) {
 
     return auth ? (
         <Container component="main" maxWidth="xs">
-            <Typography variant="body2">
-
-                <u>Do, 29.08. - So, 01.09.2024</u>
-                <br/>
-                <br/>
-                Wir freuen uns, dass du dabei bist! Bitte fülle das Formular aus, um dich anzumelden.
+            <Typography variant="body1">
+                Do, 29.08. - So, 01.09.2024
             </Typography>
             <form>
                 <TextField

@@ -1,11 +1,4 @@
-import {
-    Alert,
-    Box,
-    Button,
-    Card,
-    CardContent, Grid,
-    Typography
-} from "@mui/material";
+import {Alert, Box, Button, Card, CardContent, Grid, Typography} from "@mui/material";
 import '../css/formContainer.css';
 import {NavigateBefore, NavigateNext} from "@mui/icons-material";
 import axios from 'axios';
@@ -25,18 +18,20 @@ import FormConfirmation from "./formConfirmation";
 import {AuthContext, TokenContext} from "../AuthContext";
 import fishImage from "../img/fish.png";
 import LinearProgressWithImage from "./components/linearProgressWithImage";
+import FoodForm from "./FoodForm";
 
 
 enum FormSteps {
     NameAndAddress = 0,
     Ticket = 1,
     Beverage = 2,
-    Workshift = 3,
-    Material = 4,
-    AwarenessCode = 5,
-    Signature = 6,
-    Summary = 7,
-    Confirmation = 8,
+    Food = 3,
+    Workshift = 4,
+    Material = 5,
+    AwarenessCode = 6,
+    Signature = 7,
+    Summary = 8,
+    Confirmation = 9,
 }
 
 
@@ -48,6 +43,7 @@ function getEmptyBooking(): Booking {
         phone: "",
         ticket_id: -1,
         beverage_id: -1,
+        food_id: -1,
         timeslot_priority_1: -1,
         timeslot_priority_2: -1,
         timeslot_priority_3: -1,
@@ -89,6 +85,22 @@ export function getDummyFormContent(): FormContent {
                 id: 2,
                 title: 'Beverage 2',
                 description: 'Delicious beverage 2',
+                price: 15,
+                num_booked: 2,
+            },
+        ],
+        food_options: [
+            {
+                id: 1,
+                title: 'Food 1',
+                description: 'Delicious food 1',
+                price: 10,
+                num_booked: 5,
+            },
+            {
+                id: 2,
+                title: 'Food 2',
+                description: 'Delicious food 2',
                 price: 15,
                 num_booked: 2,
             },
@@ -199,13 +211,14 @@ export function FormContainer() {
     const {auth, setAuth} = useContext(AuthContext);
 
     const stepTitles = {
-        [FormSteps.NameAndAddress]: " Herzlich Willkommen beim Weiher Wald und Wiesenwahn!",
+        [FormSteps.NameAndAddress]: " Herzlich Willkommen zum Weiher Wald und Wiesenwahn!",
         [FormSteps.Ticket]: "Ich komme an folgenden Tagen (Sonntag ist Abbau)",
-        [FormSteps.Beverage]: "Bierflatrate wählen",
+        [FormSteps.Beverage]: "Was wollen wir trinken?",
+        [FormSteps.Food]: "Hunger?",
         [FormSteps.Workshift]: "Festival Support",
         [FormSteps.Material]: "Ich kann folgende Materialien mitbringen",
         [FormSteps.AwarenessCode]: "Damit wir alle eine entspannte Zeit haben",
-        [FormSteps.Signature]: "",
+        [FormSteps.Signature]: "Please sign here",
         [FormSteps.Summary]: "Zusammenfassung",
         [FormSteps.Confirmation]: "Fast geschafft!"
     }
@@ -213,6 +226,7 @@ export function FormContainer() {
         [FormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone'],
         [FormSteps.Ticket]: ['ticket_id'],
         [FormSteps.Beverage]: [],
+        [FormSteps.Food]: [],
         [FormSteps.Workshift]: ['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3', 'amount_shifts'],
         [FormSteps.Material]: [],
         [FormSteps.Signature]: ['signature'],
@@ -285,8 +299,6 @@ export function FormContainer() {
             )
             .catch((error) => {
                 // 	catch 401 and redirect to login
-
-                console.log(error);
                 setAuth(false);
                 setToken("");
 
@@ -344,6 +356,9 @@ export function FormContainer() {
             case 'ticket_id':
                 errorMessage = value === -1 ? 'Bitte wähle ein Ticket aus.' : '';
                 break;
+            case 'food_id':
+                errorMessage = value === -1 ? 'Bitte wähle deine Essensoption aus.' : '';
+                break;
             case 'timeslot_priority_1':
                 errorMessage = value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
                 break;
@@ -391,6 +406,7 @@ export function FormContainer() {
         setBooking((prevBooking) => {
             let ticketOption = undefined;
             let beverageOption = undefined;
+            let foodOption = undefined;
             let total_price = 0;
             let newBooking = {...prevBooking};
 
@@ -406,8 +422,15 @@ export function FormContainer() {
                 beverageOption = formContent.beverage_options.find((beverage) => beverage.id === prevBooking.beverage_id);
             }
 
+            if (key === 'food_id') {
+                foodOption = formContent.food_options.find((food) => food.id === value);
+            } else {
+                foodOption = formContent.food_options.find((food) => food.id === prevBooking.food_id);
+            }
+
             total_price += ticketOption ? ticketOption.price : 0;
             total_price += beverageOption ? beverageOption.price : 0;
+            total_price += foodOption ? foodOption.price : 0;
 
             newBooking = {...prevBooking, [key]: value, total_price: total_price};
 
@@ -416,9 +439,8 @@ export function FormContainer() {
     }
 
     function updateMaterialIds(material_ids: Array<number>) {
-        setBooking((prevBooking) => {
-            const newBooking = {...booking, material_ids: material_ids};
-            return newBooking;
+        setBooking(() => {
+            return {...booking, material_ids: material_ids};
         });
     }
 
@@ -524,6 +546,11 @@ export function FormContainer() {
                                   currentBooking={booking}
                                   formValidation={formValidation}
                                   formContent={formContent}/>}
+                {activeStep === FormSteps.Food &&
+                    <FoodForm updateBooking={updateBooking}
+                              currentBooking={booking}
+                              formValidation={formValidation}
+                              formContent={formContent}/>}
 
                 {activeStep === FormSteps.Workshift &&
                     <WorkshiftForm currentBooking={booking}

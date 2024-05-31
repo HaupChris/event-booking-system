@@ -126,7 +126,7 @@ function FormConfirmation(props: FinalBookingProps) {
 										Betreff kopieren <FileCopy/>
 									</Button>
 									<a
-										href="https://paypal.me/ChristianHauptmanny" target="_blank"
+										href="https://www.paypal.me/StephanHau" target="_blank"
 										rel="noreferrer">
 										<Button fullWidth variant={"contained"}>
 											Zu unserem Paypal <OpenInNew/>
@@ -137,7 +137,7 @@ function FormConfirmation(props: FinalBookingProps) {
 
 
 								<Typography sx={{"pt": 2}} variant={"subtitle2"}>
-									Solltest du kein Paypal haben, schreibe dir deinen Beitrag auf und kontaktiere <u>Christian
+									Solltest du kein Paypal haben, schreibe dir deinen Beitrag auf und kontaktiere <u>Stephan
 									Hauptmann</u>.
 								</Typography>
 							</div>

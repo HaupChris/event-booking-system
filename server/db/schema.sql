@@ -20,6 +20,13 @@ CREATE TABLE IF NOT EXISTS BeverageOptions  (
     price REAL NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS FOODOptions  (
+    id INTEGER PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    price REAL NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS WorkShifts  (
     id INTEGER PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
@@ -33,7 +40,7 @@ CREATE TABLE IF NOT EXISTS TimeSlots  (
     end_time TEXT,
     num_needed INTEGER,
     workshift_id INTEGER,
-    FOREIGN KEY(workshift_id) REFERENCES WorkShifts(id)
+    FOREIGN KEY(workshift_id) REFERENCES WorkShifts(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Materials  (
@@ -48,6 +55,7 @@ CREATE TABLE IF NOT EXISTS Bookings  (
     user_id INTEGER,
     ticket_option_id INTEGER,
     beverage_option_id INTEGER,
+    food_option_id INTEGER,
     first_priority_timeslot_id INTEGER,
     second_priority_timeslot_id INTEGER,
     third_priority_timeslot_id INTEGER,
@@ -56,18 +64,19 @@ CREATE TABLE IF NOT EXISTS Bookings  (
     signature BLOB,
     total_price REAL,
     is_paid INTEGER,
-    FOREIGN KEY(user_id) REFERENCES Users(id),
-    FOREIGN KEY(ticket_option_id) REFERENCES TicketOptions(id),
-    FOREIGN KEY(beverage_option_id) REFERENCES BeverageOptions(id),
-    FOREIGN KEY(first_priority_timeslot_id) REFERENCES WorkShifts(id),
-    FOREIGN KEY(second_priority_timeslot_id) REFERENCES WorkShifts(id),
-    FOREIGN KEY(third_priority_timeslot_id) REFERENCES WorkShifts(id)
+    FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE,
+    FOREIGN KEY(ticket_option_id) REFERENCES TicketOptions(id) ON DELETE SET NULL,
+    FOREIGN KEY(beverage_option_id) REFERENCES BeverageOptions(id) ON DELETE SET NULL,
+    FOREIGN KEY(food_option_id) REFERENCES FOODOptions(id) ON DELETE SET NULL,
+    FOREIGN KEY(first_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL,
+    FOREIGN KEY(second_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL,
+    FOREIGN KEY(third_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS BookingMaterials  (
     id INTEGER PRIMARY KEY NOT NULL,
     booking_id INTEGER,
     material_id INTEGER,
-    FOREIGN KEY(booking_id) REFERENCES Bookings(id),
-    FOREIGN KEY(material_id) REFERENCES Materials(id)
+    FOREIGN KEY(booking_id) REFERENCES Bookings(id) ON DELETE CASCADE,
+    FOREIGN KEY(material_id) REFERENCES Materials(id) ON DELETE CASCADE
 );

@@ -32,6 +32,14 @@ export interface BeverageOption {
     num_booked: number;
 }
 
+export interface FoodOption {
+    id: number;
+    title: string;
+    description: string;
+    price: number;
+    num_booked: number;
+}
+
 export interface TicketOption {
     id: number;
     title: string;
@@ -43,6 +51,7 @@ export interface TicketOption {
 export interface FormContent {
     ticket_options: Array<TicketOption>;
     beverage_options: Array<BeverageOption>;
+    food_options: Array<FoodOption>;
     work_shifts: Array<WorkShift>;
     materials: Array<Material>;
 }
@@ -54,6 +63,7 @@ export interface Booking {
     phone: string;
     ticket_id: number;
     beverage_id: number;
+    food_id: number;
     timeslot_priority_1: number;
     timeslot_priority_2: number;
     timeslot_priority_3: number;
