@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS BeverageOptions  (
     price REAL NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS FOODOptions  (
+CREATE TABLE IF NOT EXISTS FoodOptions  (
     id INTEGER PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
     description TEXT,
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS Bookings  (
     FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE,
     FOREIGN KEY(ticket_option_id) REFERENCES TicketOptions(id) ON DELETE SET NULL,
     FOREIGN KEY(beverage_option_id) REFERENCES BeverageOptions(id) ON DELETE SET NULL,
-    FOREIGN KEY(food_option_id) REFERENCES FOODOptions(id) ON DELETE SET NULL,
+    FOREIGN KEY(food_option_id) REFERENCES FoodOptions(id) ON DELETE SET NULL,
     FOREIGN KEY(first_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL,
     FOREIGN KEY(second_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL,
     FOREIGN KEY(third_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL

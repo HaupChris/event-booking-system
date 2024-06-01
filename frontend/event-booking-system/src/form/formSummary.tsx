@@ -35,6 +35,7 @@ function FormSummary(props: IProps) {
     } = props.booking;
     const ticket = findItemById(props.formContent.ticket_options, ticket_id);
     const beverage = findItemById(props.formContent.beverage_options, beverage_id);
+    const food = findItemById(props.formContent.food_options, props.booking.food_id);
     const shift_slot_1 = getShiftAndTimeslot(props.formContent.work_shifts, timeslot_priority_1);
     const shift_slot_2 = getShiftAndTimeslot(props.formContent.work_shifts, timeslot_priority_2);
     const shift_slot_3 = getShiftAndTimeslot(props.formContent.work_shifts, timeslot_priority_3);
@@ -99,6 +100,14 @@ function FormSummary(props: IProps) {
                         primary={<Typography variant="subtitle1" color={"text.primary"}><strong>Bierflatrate:  </strong>
                             <Typography variant="body1" color={"text.secondary"}
                                         display={"inline"}>{beverage !== undefined ? beverage.title + " - " + beverage.price + "€" : "Keine"}</Typography>
+                        </Typography>}
+                    />
+                </ListItem>
+                <ListItem>
+                    <ListItemText
+                        primary={<Typography variant="subtitle1" color={"text.primary"}><strong>Essensauswahl:  </strong>
+                            <Typography variant="body1" color={"text.secondary"}
+                                        display={"inline"}>{food !== undefined ? food.title + " - " + food.price + "€" : "Keine"}</Typography>
                         </Typography>}
                     />
                 </ListItem>

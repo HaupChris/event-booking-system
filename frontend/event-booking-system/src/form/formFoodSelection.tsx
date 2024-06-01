@@ -9,15 +9,19 @@ import Typography from '@mui/material/Typography';
 import {FormProps} from "./formContainer";
 
 // import image from the image folder
-import beverages_0 from '../img/beverages_1.jpg';
-import beverages_1 from '../img/beverages_2.jpg';
-import beverages_2 from '../img/beverages_3.jpg';
+import gyros from '../img/gyros.png';
+import grillgemuese from '../img/grillgemuese.png';
+import vegan_diet from '../img/vegan_diet.png';
+import vegetarian_diet from '../img/vegetarian_diet.png';
+
 import portholeImage from '../img/porthole_transparent.png';
 
 import '../css/formBeverageSelection.css';
 
+const index_to_image = [gyros, gyros, grillgemuese, grillgemuese, vegan_diet, vegetarian_diet]
 
-function FoodForm(props: FormProps) {
+
+function FormFoodSelection(props: FormProps) {
     // Function to handle beverage selection
     const handleFoodSelect = (id: number) => () => {
         props.updateBooking('food_id', id);
@@ -26,8 +30,8 @@ function FoodForm(props: FormProps) {
     return (
         <div>
             <Typography variant="body1" sx={{mb: 2, mt: 2}}>
-                Auf dem Festival steht eine frei zugängliche Zapfanlage, an der du dich für gewählten Zeitraum so oft du
-                willst bedienen kannst.
+                Dieses Jahr kannst du dein Essen bei uns vorbestellen. Es wird jeweils Freitag und Samstag Abend ein Gereicht geben.
+                Wann es was gibt, werden wir noch über die WhatsApp Gruppe bekannt geben.
             </Typography>
 
             <List dense sx={{width: '100%'}}>
@@ -56,7 +60,7 @@ function FoodForm(props: FormProps) {
                                 <ListItemAvatar>
                                     <div className="avatar-container"> {/* New container */}
                                         <Avatar alt={option.title}
-                                                src={option.id === 1 ? beverages_1 : option.id === 2 ? beverages_2 : beverages_0}
+                                                src={index_to_image[option.id]}
                                                 sx={{width: '4em', height: '4em', marginRight: '1.5em'}}
                                         />
                                         <img src={portholeImage} className="porthole-image"/> {/* Porthole */}
@@ -65,10 +69,10 @@ function FoodForm(props: FormProps) {
 
 
                                 <ListItemText
-                                    primary={option.title}
+                                    primary={option.title + " - " + option.price + "€"}
                                     primaryTypographyProps={{variant: 'h5'}}
-                                    secondary={option.price + "€"}
-                                    secondaryTypographyProps={{variant: 'h6'}}
+                                    secondary={option.description}
+                                    secondaryTypographyProps={{variant: 'subtitle1'}}
                                 />
                             </ListItemButton>
                         </ListItem>
@@ -79,4 +83,4 @@ function FoodForm(props: FormProps) {
     );
 }
 
-export default FoodForm;
+export default FormFoodSelection;

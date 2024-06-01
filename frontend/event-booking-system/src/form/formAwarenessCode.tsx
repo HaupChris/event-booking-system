@@ -16,7 +16,7 @@ function FormAwarnessCode() {
         {items.map((item, index) => (
           <ListItem key={index}>
             <ListItemText
-              primary={<Typography variant="subtitle1" component="div"><strong>{item.title}:</strong></Typography>}
+              primary={<Typography variant="subtitle1" color={"secondary"} component="div"><strong>{item.title}</strong></Typography>}
               secondary={<Typography variant="body1" component="div">{item.text}</Typography>}
             />
           </ListItem>

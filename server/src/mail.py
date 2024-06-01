@@ -19,6 +19,10 @@ def get_booking_details(booking: Booking, form_content: Dict) -> str:
     beverage_option = next((bo for bo in form_content['beverage_options'] if bo['id'] == booking.beverage_id), None)
     beverage_info = f"Getränkeoption: {beverage_option['title']} - Preis: {beverage_option['price']}€" if beverage_option else "Getränkeoption: Nicht gefunden"
 
+    # Retrieve food option
+    food_option = next((fo for fo in form_content['food_options'] if fo['id'] == booking.food_id), None)
+    food_info = f"Essensoption: {food_option['title']} - Preis: {food_option['price']}€" if food_option else "Essensoption: Nicht gefunden"
+
     # Function to find and format timeslot information
     def format_timeslot_info(timeslot_id):
         for ws in form_content['work_shifts']:
@@ -43,7 +47,7 @@ def get_booking_details(booking: Booking, form_content: Dict) -> str:
     materials_info = materials_info if booking.material_ids else "Du bringst keine Materialien mit."
 
     # Combine all information
-    details = f"{ticket_info}\n\n{beverage_info}\n\n{timeslot_info}\n\n{materials_info}\n\nGesamtpreis: {booking.total_price}€"
+    details = f"{ticket_info}\n\n{beverage_info}\n\n{food_info}\n\n{timeslot_info}\n\n{materials_info}\n\nGesamtpreis: {booking.total_price}€"
     return details
 
 
@@ -59,6 +63,8 @@ def send_confirmation_mail(booking: Booking, form_content: Dict) -> None:
     booking_ticket_title = booking_ticket['title'] if booking_ticket else "Ticket nicht gefunden"
     beverage_option = next((bo for bo in form_content['beverage_options'] if bo['id'] == booking.beverage_id), None)
     beverage_option_title = beverage_option['title'] if beverage_option else "Getränkeoption nicht gefunden"
+    food_option = next((fo for fo in form_content['food_options'] if fo['id'] == booking.food_id), None)
+    food_option_title = food_option['title'] if food_option else "Essensoption nicht gefunden"
 
     # Prepare the HTML message
     html = f"""
@@ -104,11 +110,11 @@ def send_confirmation_mail(booking: Booking, form_content: Dict) -> None:
     </div>
     <div class="content">
         Liebe/r <strong>{booking.first_name} {booking.last_name}</strong>,<br><br>
-        Wir freuen uns, dass du bei unserem 5 jährigen Jubiläum dabei bist! Hier sind die Details deiner Buchung:<br><br>
+        Wir schön, dass du bei unserem 5 jährigen Jubiläum dabei bist! Hier die Zusammenfassung für deinen Besuch:<br><br>
         {booking_details_html}<br><br>
         Falls noch nicht geschehen, sende bitte deinen Beitrag an unser Paypal: <a href="https://www.paypal.me/StephanHau">https://www.paypal.me/StephanHau</a> 
         <br>
-        Betreff: <u>WW24 - {booking.first_name}, {booking.last_name} - {booking_ticket_title} - {beverage_option_title}</u>
+        Betreff: <u>WW24 - {booking.first_name}, {booking.last_name} - {booking_ticket_title} - {beverage_option_title} - {food_option_title}</u>
         <br><br>      
         Alle weiteren Informationen teilen wir dir rechtzeitig in der Whatsapp Gruppe mit.
         <br><br>

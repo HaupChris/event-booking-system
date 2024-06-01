@@ -55,19 +55,34 @@
   ],
   "food_options": [
     {
-      "title": "Freitag",
-      "description": "Am Freitag gibts Pishausser Schoaßfleckerl, direkt aus Hintertupfingen vom Metzgermeister.",
+      "title": "Gyros mit Zaziki, linsensalat und Brot",
+      "description": "vegetarische Variante",
+      "price": 5.0
+    },
+    {
+      "title": "Gyros mit Zaziki, linsensalat und Brot",
+      "description": "vegane Variante",
+      "price": 5.0
+    },
+    {
+      "title": "Grillgemüse mit Feta, Humus und Brot",
+      "description": "vegane Variante",
+      "price": 5.0
+    },
+    {
+      "title": "Grillgemüse mit Feta, Humus und Brot",
+      "description": "vegetarische Variante",
+      "price": 5.0
+    },
+    {
+      "title": "Beide Essen vegan",
+      "description": "",
       "price": 10.0
     },
     {
-      "title": "Samstag",
-      "description": "Pizzabaguttes und dazu a kloans Bier.",
+      "title": "Beide Essen vegetarisch",
+      "description": "",
       "price": 10.0
-    },
-    {
-      "title": "Beide Tage",
-      "description": "Für dich beide Tage was feines zum Essen.",
-      "price": 20.0
     }
   ],
   "work_shifts": [
@@ -292,13 +307,19 @@
       "description": "Koch- und Verkaufsdienst für unseren Essenswagen. ",
       "time_slots": [
         {
+          "title": "Donnerstag, Einkauf (Auto nötig)",
+            "start_time": "12:00",
+            "end_time": "16:00",
+            "num_needed": 2
+        },
+        {
           "title": "Freitag, Vorbereitung",
           "start_time": "14:00",
           "end_time": "17:30",
-          "num_needed": 2
+          "num_needed": 4
         },
         {
-          "title": "Freitag, Backen, Ausgabe",
+          "title": "Freitag, Kochen, Ausgabe",
           "start_time": "17:30",
           "end_time": "20:00",
           "num_needed": 2
@@ -307,10 +328,10 @@
           "title": "Samstag, Vorbereitung",
           "start_time": "15:00",
           "end_time": "17:30",
-          "num_needed": 2
+          "num_needed": 4
         },
         {
-          "title": "Samstag, Backen, Ausgabe",
+          "title": "Samstag, Kochen, Ausgabe",
           "start_time": "17:30",
           "end_time": "20:00",
           "num_needed": 2
@@ -320,8 +341,48 @@
   ],
   "materials": [
     {
-      "title": "Lichterketten (kein Glas)",
+      "title": "Lichterketten für draußen geeignet",
+      "num_needed": 4
+    },
+    {
+      "title": "Lichterketten (kein Glas, egal welche)",
+      "num_needed": 5
+    },
+    {
+      "title": "Windspiele",
+      "num_needed": 2
+    },
+    {
+      "title": "Solarlichter",
+      "num_needed": 4
+    },
+    {
+      "title": "Volleyballfeld",
+      "num_needed": 1
+    },
+    {
+      "title": "Spikeball",
+      "num_needed": 2
+    },
+    {
+      "title": "Bierpong-Tisch",
+      "num_needed": 2
+    },
+    {
+      "title": "Goa-Tücher / bunte Tücher",
       "num_needed": 8
+    },
+    {
+      "title": "Wäscheständer",
+      "num_needed": 0
+    },
+    {
+      "title": "Seile (mindestens 10m)",
+      "num_needed": 5
+    },
+    {
+      "title": "Pavillon (z.B. 3x3m, gerne mit Seitenwänden)",
+      "num_needed": 3
     },
     {
       "title": "Mehrfachstecker",
@@ -332,28 +393,8 @@
       "num_needed": 4
     },
     {
-      "title": "Verlängerungskabel",
-      "num_needed": 6
-    },
-    {
-      "title": "Feuerlöscher",
+      "title": "Verlängerungskabel (mindestens 5m)",
       "num_needed": 4
-    },
-    {
-      "title": "Bunte Tücher / Goa Tücher",
-      "num_needed": 8
-    },
-    {
-      "title": "Seile (dick oder dünnn)",
-      "num_needed": 4
-    },
-    {
-      "title": "Pavillon mit Seitenwänden",
-      "num_needed": 1
-    },
-    {
-      "title": "Pavillon ohne Seitenwände",
-      "num_needed": 3
     },
     {
       "title": "Werkzeugkoffer",
@@ -364,43 +405,43 @@
       "num_needed": 4
     },
     {
-      "title": "alte Regenschirme/Gestelle",
-      "num_needed": 4
-    },
-    {
-      "title": "Solarlichter",
-      "num_needed": 5
+      "title": "Feuerlöscher",
+      "num_needed": 3
     },
     {
       "title": "Hängematte",
+      "num_needed": 0
+    },
+    {
+      "title": "Benzin- und Dieselkanister",
       "num_needed": 3
     },
     {
-      "title": "Benzin und Diesel Kanister",
-      "num_needed": 5
+      "title": "Eddings",
+      "num_needed": 0
     },
     {
       "title": "Scheren",
-      "num_needed": 3
+      "num_needed": 0
     },
     {
-      "title": "alte Kissen",
-      "num_needed": 4
+      "title": "Alter Teppich",
+      "num_needed": 6
     },
     {
-      "title": "alter Teppich",
-      "num_needed": 3
-    },
-    {
-      "title": "Biertrichter",
+      "title": "Kühlbox",
       "num_needed": 2
     },
     {
-      "title": "Volleyballfeld",
-      "num_needed": 1
+      "title": "Kühlakkus",
+      "num_needed": 4
     },
     {
-      "title": "Wäscheständer",
+      "title": "Teleskopstangen / alte Wischmop-Stangen (für Quallen)",
+      "num_needed": 5
+    },
+    {
+      "title": "Beamer",
       "num_needed": 2
     }
   ]

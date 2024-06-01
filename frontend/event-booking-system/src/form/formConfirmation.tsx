@@ -34,7 +34,9 @@ function FormConfirmation(props: FinalBookingProps) {
 	const ticket = findItemById(props.formContent.ticket_options, props.booking.ticket_id);
 	const beverage_or_undefined = findItemById(props.formContent.beverage_options, props.booking.beverage_id);
 	const beverage = beverage_or_undefined ? beverage_or_undefined : {title: "Keine Bierflat"};
-	const betreff = `WWWW: ${props.booking.last_name}, ${props.booking.first_name} - ${ticket?.title}, ${beverage?.title}`;
+	const food_or_undefined = findItemById(props.formContent.food_options, props.booking.food_id);
+	const food = food_or_undefined ? food_or_undefined : {title: "Kein Essen"};
+	const betreff = `WWWW: ${props.booking.last_name}, ${props.booking.first_name} - ${ticket?.title}, ${beverage?.title}, ${food?.title}`;
 	const [copied, setCopied] = useState(false);
 	const [open, setOpen] = useState(false);
 	const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -163,7 +165,7 @@ function FormConfirmation(props: FinalBookingProps) {
 
 					</Typography>
 
-					<Button disabled={!isOnline} variant="contained" color="primary" onClick={submitBooking}>
+					<Button disabled={!isOnline} variant="contained" color="secondary" onClick={submitBooking}>
 						{
 							isOnline ?
 								<><Check/> Buchung absenden</>

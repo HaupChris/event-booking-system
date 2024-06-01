@@ -18,7 +18,7 @@ import FormConfirmation from "./formConfirmation";
 import {AuthContext, TokenContext} from "../AuthContext";
 import fishImage from "../img/fish.png";
 import LinearProgressWithImage from "./components/linearProgressWithImage";
-import FoodForm from "./FoodForm";
+import FormFoodSelection from "./formFoodSelection";
 
 
 enum FormSteps {
@@ -547,10 +547,10 @@ export function FormContainer() {
                                   formValidation={formValidation}
                                   formContent={formContent}/>}
                 {activeStep === FormSteps.Food &&
-                    <FoodForm updateBooking={updateBooking}
-                              currentBooking={booking}
-                              formValidation={formValidation}
-                              formContent={formContent}/>}
+                    <FormFoodSelection updateBooking={updateBooking}
+                                       currentBooking={booking}
+                                       formValidation={formValidation}
+                                       formContent={formContent}/>}
 
                 {activeStep === FormSteps.Workshift &&
                     <WorkshiftForm currentBooking={booking}

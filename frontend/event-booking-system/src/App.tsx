@@ -73,7 +73,8 @@ export const themeOptions: ThemeOptions = {
       main: '#00AEFF', // Ocean blue
     },
     secondary: {
-      main: '#F7D100', // A vibrant yellow
+      // main: '#F7D100', // A vibrant yellow
+        main: '#2A00F7'
     },
     background: {
       default: 'rgba(255, 255, 255, 0.2)', // Slightly more transparent
@@ -109,8 +110,8 @@ export const themeOptions: ThemeOptions = {
       styleOverrides: {
         root: {
           fontFamily: 'Kavoon',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(5px)',
+          backgroundColor: 'rgba(255,255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
         },
       },
     },

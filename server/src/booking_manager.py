@@ -47,6 +47,11 @@ class BookingManager:
             connection.execute("INSERT INTO BeverageOptions (id, title, description, price) VALUES (?, ?, ?, ?)", (
                 beverage_option.id, beverage_option.title, beverage_option.description, beverage_option.price))
 
+        # Insert food options
+        for food_option in self.form_content.food_options:
+            connection.execute("INSERT INTO FoodOptions (id, title, description, price) VALUES (?, ?, ?, ?)", (
+                food_option.id, food_option.title, food_option.description, food_option.price))
+
         # Insert work shifts
         for work_shift in self.form_content.work_shifts:
             connection.execute("INSERT INTO WorkShifts (id, title, description) VALUES (?, ?, ?)", (

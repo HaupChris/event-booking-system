@@ -129,8 +129,7 @@ function WorkShiftForm(props: FormProps) {
                     return 0;
                 })
                 .map((workShift, index) => (
-                    <div>
-                        {/*// style={{borderRadius: "20px", backgroundColor: (index % 2 == 0 ? "rgba(43, 160, 214, 0.8)" : "rgba(103, 197, 231, 0.8)")}}>*/}
+                    <>
                         <WorkShift
                             key={workShift.id}
                             workShift={workShift}
@@ -139,7 +138,7 @@ function WorkShiftForm(props: FormProps) {
                             updateBooking={props.updateBooking}
                         />
                         <CustomDivider style={{display: index >= props.formContent.work_shifts.length -1 ? "None" : ""}}/>
-                    </div>
+                    </>
                 ))}
         </List>
 
