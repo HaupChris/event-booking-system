@@ -6,7 +6,7 @@ from typing import Dict, List
 import json
 import os
 from dataclasses import asdict
-from .views import FormContent, Booking
+from .views import FormContent, Booking, BookingWithTimestamp
 
 
 # define your table schema here
@@ -199,7 +199,7 @@ class BookingManager:
         with open(file_path, 'wb') as file:
             file.write(img_data)
 
-    def get_all_bookings(self) -> List[Booking]:
+    def get_all_bookings(self) -> List[BookingWithTimestamp]:
         with closing(sqlite3.connect(self.db_file_path)) as connection:
             cursor = connection.cursor()
 
@@ -218,7 +218,8 @@ class BookingManager:
                     b.third_priority_timeslot_id, 
                     b.amount_shifts, 
                     b.supporter_buddy,
-                    b.total_price, 
+                    b.total_price,
+                    b.Timestamp, 
                     b.signature                    
                 FROM Users u
                 JOIN Bookings b ON u.id = b.user_id
@@ -237,7 +238,7 @@ class BookingManager:
 
                 material_ids = [item[0] for item in cursor.fetchall()]
 
-                booking = Booking(
+                booking = BookingWithTimestamp(
                     last_name=row[1],
                     first_name=row[2],
                     email=row[3],
@@ -252,7 +253,8 @@ class BookingManager:
                     amount_shifts=row[11],
                     supporter_buddy=row[12],
                     total_price=row[13],
-                    signature=row[14] if row[14] else ''
+                    timestamp=row[14],
+                    signature=row[15] if row[15] else ''
                 )
                 bookings.append(booking)
 

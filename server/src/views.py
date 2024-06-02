@@ -109,5 +109,9 @@ class Booking(Interface):
     total_price: float
     signature: str
 
+@dataclass
+class BookingWithTimestamp(Booking):
+    timestamp: str
+
 
 

@@ -13,58 +13,8 @@ import AdminDashboard from "./form/admin/adminDashboard";
 import AdminLogin from './form/adminLogin';
 
 import './css/global.css';
+import Dashboard from "./form/adminArea/Dashboard";
 
-
-// export const themeOptions: ThemeOptions = {
-//   palette: {
-//     mode: 'light', // Switching to light mode for a friendlier vibe
-//     primary: {
-//       main: 'rgb(2,79,152)', // Keeping white for legibility
-//     },
-//     secondary: {
-//       main: 'rgba(0,0,0,0.9)', // A brighter yellow for vibrancy
-//     },
-//     background: {
-//       default: 'rgba(255, 255, 255, 0.3)', // Light translucent background for form
-//       paper: 'rgba(255, 255, 255, 0.7)', // Lighter for paper elements with less transparency
-//     },
-//     divider: 'rgba(30, 144, 255, 0.5)', // Using a sky blue for a friendlier divider color
-//     text: {
-//       primary: 'rgb(2,79,152)', // Dark text for contrast and readability
-//       secondary: 'rgba(0, 0, 0, 0.7)', // Slightly dimmed for secondary text
-//     },
-//   },
-//   typography: {
-//     fontFamily: [
-//       'Kavoon',
-//       'Roboto',
-//       '"Helvetica Neue"',
-//       'Arial',
-//       'sans-serif',
-//     ].join(','),
-//     body1: {
-//       fontFamily: 'Kavoon',
-//     },
-//     h1: {
-//       fontFamily: 'Kavoon',
-//     },
-//     button: {
-//       fontFamily: 'Kavoon',
-//     },
-//   },
-//   components: {
-//     MuiCard: {
-//       styleOverrides: {
-//         root: {
-//           fontFamily: 'Kavoon',
-//           backgroundColor: 'rgba(255, 255, 255, 0.1)', // Very light background for card elements
-//           backdropFilter: 'blur(5px)', // Optional: Apply a blur effect to the background
-//         },
-//       },
-//     },
-//     // If you use other components that need to be styled, add them here
-//   },
-// };
 
 export const themeOptions: ThemeOptions = {
   palette: {
@@ -173,7 +123,7 @@ const App = () => {
                             <Route path="/admin"
                                    element={isAdmin ? <Navigate replace to="/admin/dashboard"/> : <AdminLogin/>}/>
                             <Route path="/admin/dashboard"
-                                   element={isAdmin ? <AdminDashboard/> : <Navigate replace to={"/admin"}/>}/>
+                                   element={isAdmin ? <Dashboard/> : <Navigate replace to={"/admin"}/>}/>
                         </Routes>
                     </BrowserRouter>
                 </TokenContext.Provider>
