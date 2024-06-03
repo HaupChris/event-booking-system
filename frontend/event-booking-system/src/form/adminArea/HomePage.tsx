@@ -1,44 +1,11 @@
-import React, {useContext, useEffect, useState} from 'react';
+
 import {Box, Card, CardContent, Typography, Grid} from '@mui/material';
-import {TokenContext} from '../../AuthContext';
-import axios from 'axios';
-import {getDummyFormContent} from "../formContainer";
+import {useFetchData} from "./useFetchData";
 
-interface BookingOverview {
-    ticketTypes: { [key: string]: number };
-    beverageTypes: { [key: string]: number };
-    foodTypes: { [key: string]: number };
-}
+function HomePage(){
+    const {bookings, formContent} = useFetchData();
 
-const HomePage: React.FC = () => {
-    const [bookingOverview, setBookingOverview] = useState<BookingOverview>({
-        ticketTypes: {},
-        beverageTypes: {},
-        foodTypes: {},
-    });
-    const [bookings, setBookings] = useState([]);
-    const [formContent, setFormContent] = useState(getDummyFormContent());
-    const {token} = useContext(TokenContext);
-
-    useEffect(() => {
-        axios.get('/api/data', {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            .then(response => setBookings(response.data))
-            .catch(error => console.error('Error:', error));
-
-        axios.get('/api/formcontent', {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            .then(response => setFormContent(response.data))
-            .catch(error => console.error('Error:', error));
-    }, [token]);
-
-    return (
-        <Box>
-            <Typography variant="h4" gutterBottom>
-                Overview
-            </Typography>
+    return <Box>
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6} md={4}>
                     <Card>
@@ -112,7 +79,6 @@ const HomePage: React.FC = () => {
                 </Grid>
             </Grid>
         </Box>
-    );
-};
+}
 
 export default HomePage;
