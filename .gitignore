@@ -15,8 +15,7 @@ server/db/*
 
 server/*.log
 
-.env
-
 email.html
 venv
 
+server/.env
