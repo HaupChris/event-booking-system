@@ -121,15 +121,7 @@ const WorkshiftsPage: React.FC = () => {
         return workshiftSortOrder === 'asc' ? progressA - progressB : progressB - progressA;
     });
 
-    const sortedBookings = [...bookings].sort((a, b) => {
-        if (peopleSortOrder === 'asc') {
-            return a.first_name.localeCompare(b.first_name);
-        } else {
-            return b.first_name.localeCompare(a.first_name);
-        }
-    });
-
-    const csvData = sortedBookings.map(booking => {
+    const csvData = bookings.map(booking => {
         const priority1Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_1);
         const priority2Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_2);
         const priority3Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_3);
@@ -170,7 +162,7 @@ const WorkshiftsPage: React.FC = () => {
                         {sortedWorkshifts.map((workshift) => {
                             const {progress, totalNeeded, totalBooked} = getWorkshiftProgress(workshift.id);
                             return (
-                                <React.Fragment key={workshift.id}>
+                                <div key={workshift.id}>
                                     <ListItemButton onClick={() => toggleWorkshiftExpanded(workshift.id)}>
                                         <ListItemText primary={workshift.title}/>
                                         <Box width="50%" mr={1}>
@@ -211,7 +203,7 @@ const WorkshiftsPage: React.FC = () => {
                                             })}
                                         </List>
                                     </Collapse>
-                                </React.Fragment>
+                                </div>
                             );
                         })}
                     </List>
@@ -219,49 +211,56 @@ const WorkshiftsPage: React.FC = () => {
             )}
             {tabValue === 1 && (
                 <>
-                    <Box display="flex" justifyContent="flex-end" mb={2} mx={"1em"}>
+                    <Box display="flex" justifyContent="flex-end" mb={2}>
                         <Button
                             variant="contained"
                             color="primary"
-                            onClick={() => setPeopleSortOrder(peopleSortOrder === 'asc' ? 'desc' : 'asc')}
+                            onClick={() => {
+                                const newOrder = peopleSortOrder === 'asc' ? 'desc' : 'asc';
+                                setPeopleSortOrder(newOrder);
+                            }}
                             startIcon={peopleSortOrder === 'asc' ? <ArrowUpwardIcon/> : <ArrowDownwardIcon/>}
                         >
                             {peopleSortOrder === 'asc' ? 'Ascending' : 'Descending'}
                         </Button>
                     </Box>
-                    <List sx={{backgroundColor: "white"}}>
-                        {sortedBookings.map(booking => {
-                            const personName = `${booking.first_name} ${booking.last_name}`;
-                            return (
-                                <React.Fragment key={personName}>
-                                    <ListItemButton onClick={() => togglePersonExpanded(personName)}>
-                                        <ListItemText
-                                            primary={personName}
-                                            secondary={`Shifts: ${booking.amount_shifts}, Supporter Buddy: ${booking.supporter_buddy}`}
-                                        />
-                                        {expandedPerson === personName ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
-                                    </ListItemButton>
-                                    <Collapse in={expandedPerson === personName} timeout="auto" unmountOnExit>
-                                        <List component="div" disablePadding>
-                                            {getTimeslotsForUser(booking).map((timeslot, index) => {
-                                                const workshift = formContent.work_shifts.find(ws => ws.time_slots.some(ts => ts.id === timeslot.id));
-                                                return (
-                                                    <ListItem key={timeslot.id} sx={{pl: 4}}>
-                                                        <ListItemText
-                                                            primary={`${timeslot.title} (${timeslot.start_time} - ${timeslot.end_time})`}
-                                                            secondary={workshift?.title}
-                                                        />
-                                                        {index === 0 && "Prio 1"}
-                                                        {index === 1 && "Prio 2"}
-                                                        {index === 2 && "Prio 3"}
-                                                    </ListItem>
-                                                );
-                                            })}
-                                        </List>
-                                    </Collapse>
-                                </React.Fragment>
-                            );
-                        })}
+
+
+                    <List key={peopleSortOrder} sx={{backgroundColor: "white"}}>
+                        {bookings
+                            .sort((a, b) => (peopleSortOrder === 'asc' ? a.first_name.localeCompare(b.first_name) : b.first_name.localeCompare(a.first_name)))
+                            .map(booking => {
+                                const personName = `${booking.first_name} ${booking.last_name}`;
+                                return (
+                                    <div key={personName}>
+                                        <ListItemButton onClick={() => togglePersonExpanded(personName)}>
+                                            <ListItemText
+                                                primary={personName}
+                                                secondary={`Shifts: ${booking.amount_shifts}, Supporter Buddy: ${booking.supporter_buddy}`}
+                                            />
+                                            {expandedPerson === personName ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
+                                        </ListItemButton>
+                                        <Collapse in={expandedPerson === personName} timeout="auto" unmountOnExit>
+                                            <List component="div" disablePadding>
+                                                {getTimeslotsForUser(booking).map((timeslot, index) => {
+                                                    const workshift = formContent.work_shifts.find(ws => ws.time_slots.some(ts => ts.id === timeslot.id));
+                                                    return (
+                                                        <ListItem key={timeslot.id} sx={{pl: 4}}>
+                                                            <ListItemText
+                                                                primary={`${timeslot.title} (${timeslot.start_time} - ${timeslot.end_time})`}
+                                                                secondary={workshift?.title}
+                                                            />
+                                                            {index === 0 && "Prio 1"}
+                                                            {index === 1 && "Prio 2"}
+                                                            {index === 2 && "Prio 3"}
+                                                        </ListItem>
+                                                    );
+                                                })}
+                                            </List>
+                                        </Collapse>
+                                    </div>
+                                );
+                            })}
                     </List>
                 </>
             )}
