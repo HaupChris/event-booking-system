@@ -69,7 +69,7 @@ const WorkshiftsPage: React.FC = () => {
 
     const getTimeslotCount = (timeslotId: number) => {
         return bookings.reduce((count, booking) => {
-            return count + ([booking.timeslot_priority_1, booking.timeslot_priority_2, booking.timeslot_priority_3].includes(timeslotId) ? 1 : 0);
+            return count + ([booking.timeslot_priority_1].includes(timeslotId) ? 1 : 0);
         }, 0);
     };
 
