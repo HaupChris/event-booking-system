@@ -1,6 +1,16 @@
-cd # event-booking-system
+# Refreshing the project in production system
+## Automatically
+Make sure update_project.sh is executable, if not then run the following command
+```
+chmod +x update_project.sh
+```
+Then run the following command
+```
+bash update_project.sh
+```
+Then checke the website.
 
-## Refreshing the project in production system
+## Manually
 
 1. cd to the project folder
 2. git pull
