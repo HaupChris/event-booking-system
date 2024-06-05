@@ -1,24 +1,31 @@
 {
   "files": {
-    "main.css": "/static/css/main.6eae940f.css",
-    "main.js": "/static/js/main.44ee4a5c.js",
+    "main.css": "/static/css/main.98361acd.css",
+    "main.js": "/static/js/main.f0ec55b8.js",
     "static/js/787.4eb8244c.chunk.js": "/static/js/787.4eb8244c.chunk.js",
     "static/media/background_desktop_water.png": "/static/media/background_desktop_water.0748354fbcdaa477b0e5.png",
     "static/media/background_mobile_water.png": "/static/media/background_mobile_water.287566981d06f77eec27.png",
+    "static/media/grillgemuese.png": "/static/media/grillgemuese.7e20f81e0e1bfa92af90.png",
+    "static/media/gyros.png": "/static/media/gyros.dc62d780030b381667c1.png",
+    "static/media/vegetarian_diet.png": "/static/media/vegetarian_diet.dd743d853aefb1756696.png",
+    "static/media/vegan_diet.png": "/static/media/vegan_diet.8ed3abf440a612a28856.png",
     "static/media/jellyfish.png": "/static/media/jellyfish.ce2992bb15a7663ec83d.png",
     "static/media/porthole_transparent.png": "/static/media/porthole_transparent.62b43dce1bd27f5731f4.png",
-    "static/media/beverages_1.jpg": "/static/media/beverages_1.8bd627e271902437fc33.jpg",
+    "static/media/beverages_1.jpg": "/static/media/beverages_1.f19a83afa68c34b65aca.jpg",
+    "static/media/jellyfish_3.png": "/static/media/jellyfish_3.dd794fee90d195f17598.png",
+    "static/media/jellyfish_2.png": "/static/media/jellyfish_2.fa17a332ca486b503d15.png",
     "static/media/beverages_2.jpg": "/static/media/beverages_2.132cfa4eacbd046c1f99.jpg",
+    "static/media/jellyfish_1.png": "/static/media/jellyfish_1.3d0a0a5b83f6f1a15bdc.png",
     "static/media/beverages_3.jpg": "/static/media/beverages_3.76ecea8667853db81715.jpg",
     "static/media/fish.png": "/static/media/fish.a8613f613a90b25c0a77.png",
     "static/media/Kavoon-Regular.ttf": "/static/media/Kavoon-Regular.c08a345df4ce2b8326ec.ttf",
     "index.html": "/index.html",
-    "main.6eae940f.css.map": "/static/css/main.6eae940f.css.map",
-    "main.44ee4a5c.js.map": "/static/js/main.44ee4a5c.js.map",
+    "main.98361acd.css.map": "/static/css/main.98361acd.css.map",
+    "main.f0ec55b8.js.map": "/static/js/main.f0ec55b8.js.map",
     "787.4eb8244c.chunk.js.map": "/static/js/787.4eb8244c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.6eae940f.css",
-    "static/js/main.44ee4a5c.js"
+    "static/css/main.98361acd.css",
+    "static/js/main.f0ec55b8.js"
   ]
 }

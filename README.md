@@ -1,4 +1,4 @@
-# event-booking-system
+cd # event-booking-system
 
 ## Refreshing the project in production system
 
