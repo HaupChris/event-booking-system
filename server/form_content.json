@@ -99,6 +99,30 @@
       ]
     },
     {
+      "title": "Awareness",
+        "description": "Ansprechpartner für alle, die Hilfe brauchen oder sich unwohl fühlen. Genauere Schichtzeiten werden vor Ort abgesprochen.",
+      "time_slots": [
+        {
+          "title": "Donnerstag",
+            "start_time": "",
+            "end_time": "",
+            "num_needed": 8
+        },
+        {
+          "title": "Freitag",
+            "start_time": "",
+            "end_time": "",
+            "num_needed": 8
+        },
+        {
+          "title": "Samstag",
+            "start_time": "",
+            "end_time": "",
+            "num_needed": 8
+        }
+      ]
+    },
+    {
       "title": "Licht aus, Tür zu",
       "description": "Am Sonntag packen wir alles zusammen. Bitte stellt sicher, dass ihr und eure Mitfahrgelegenheit Zeit bis zum Ende habt.",
       "time_slots": [
@@ -231,20 +255,8 @@
       ]
     },
     {
-      "title": "Bunde Hunde",
-      "description": "Wir basteln die Deko und gestalten das Festivalgelände. Wichtig: Die Arbeit findet hauptsächlich vor dem Festival statt & wir haben einen extra Aufbautag. Außerdem trifft sich das Deko-Team in Würzburg, das sollte also nicht zu weit weg von dir sein!",
-      "time_slots": [
-        {
-          "title": "Deko Team",
-          "start_time": "",
-          "end_time": "",
-          "num_needed": 10
-        }
-      ]
-    },
-    {
       "title": "Verkehrsgroßraum Poppenwind",
-      "description": "Musikanlage und Generator müssen transportiert werden. Bitte nur melden, wenn du ein Auto mit Anhänger fahren kannst und darfst oder einen kleinen Transporter hast.",
+      "description": "Generatoren müssen transportiert werden. Bitte nur melden, wenn du ein Auto mit Anhänger fahren kannst und darfst oder einen kleinen Transporter hast.",
       "time_slots": [
         {
           "title": "Generator Anlieferung",
@@ -253,20 +265,8 @@
           "num_needed": 2
         },
         {
-          "title": "Musikanlage Anlieferung",
-          "start_time": "Mittwoch oder Donnerstag",
-          "end_time": "",
-          "num_needed": 2
-        },
-        {
           "title": "Generator Rücktransport",
           "start_time": "Sonntag Abend",
-          "end_time": "",
-          "num_needed": 2
-        },
-        {
-          "title": "Musikanlage Rücktransport",
-          "start_time": "Sonntag Abend oder Montag",
           "end_time": "",
           "num_needed": 2
         }
