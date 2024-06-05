@@ -29,6 +29,8 @@ function MaterialsForm(props: MaterialFormProps) {
 		  .sort((a, b) => (b.num_needed -b.num_booked) - (a.num_needed - a.num_booked) )
 		  .map((material: Material) => {
         const labelId = `checkbox-list-secondary-label-${material.id}`;
+		const num_booked = material.num_booked + (props.currentBooking.material_ids.includes(material.id) ? 1 : 0);
+
         return (
           <ListItem
             key={material.id}
@@ -44,7 +46,7 @@ function MaterialsForm(props: MaterialFormProps) {
           >
             <ListItemButton onClick={() => handleToggle(material.id)}>
               <ListItemAvatar>
-				  <CircularProgressWithLabel valueCurrent={material.num_booked} valueMax={material.num_needed}/>
+				  <CircularProgressWithLabel valueCurrent={num_booked} valueMax={material.num_needed}/>
               </ListItemAvatar>
               <ListItemText id={labelId} primary={material.title} />
             </ListItemButton>
