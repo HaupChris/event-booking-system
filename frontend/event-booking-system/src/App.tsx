@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
 import PasswordPage from "./form/passwordPage";
 import {AuthContext, TokenContext} from "./AuthContext";
@@ -9,7 +9,6 @@ import backgroundImageMobile from './img/background_mobile_water.png';
 
 
 import {ThemeOptions, ThemeProvider} from '@mui/material/styles';
-import AdminDashboard from "./form/admin/adminDashboard";
 import AdminLogin from './form/adminLogin';
 
 import './css/global.css';

@@ -17,9 +17,10 @@ interface TimeSlotProps {
     selectedPriority: string;
     updateBooking: (key: keyof Booking, value: any) => void;
     availablePriorities: string[];
+    currentBooking: Booking;
 }
 
-function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePriorities}: TimeSlotProps) {
+function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePriorities, currentBooking}: TimeSlotProps) {
     const isFull = timeSlot.num_booked >= timeSlot.num_needed;
     const timeslotAvailablePriorities = availablePriorities.concat([selectedPriority]);
 
@@ -48,6 +49,8 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
         }
     }
 
+    const timeslotNumBooked = timeSlot.num_booked + (currentBooking.timeslot_priority_1 == timeSlot.id ? 1 : 0);
+
 
     return <ListItem key={timeSlot.title + '-' + timeSlot.id} sx={{
         border: selectedPriorityBorder,
@@ -57,7 +60,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
         borderRadius: "10px"
     }}>
         <ListItemAvatar>
-        	<CircularProgressWithLabel valueCurrent={timeSlot.num_booked} valueMax={timeSlot.num_needed}/>
+        	<CircularProgressWithLabel valueCurrent={timeslotNumBooked} valueMax={timeSlot.num_needed}/>
         </ListItemAvatar>
         <LinearProgress color={"secondary"} variant={"determinate"} value={200}/>
         <ListItemText>

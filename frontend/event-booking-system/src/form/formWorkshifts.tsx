@@ -14,11 +14,16 @@ import {
 } from "@mui/material";
 import {TimeSlot} from "./interface";
 import {styled} from "@mui/system";
+import Avatar from "@mui/material/Avatar";
 
-const CustomDivider = styled(Divider)(({ theme }) => ({
-  margin: '16px 0',
-  borderColor: theme.palette.primary.main,
-  borderWidth: '2px',
+import jellyfish_1 from '../img/jellyfish_1.png';
+import jellyfish_2 from '../img/jellyfish_2.png';
+import jellyfish_3 from '../img/jellyfish_3.png';
+
+const CustomDivider = styled(Divider)(({theme}) => ({
+    margin: '16px 0',
+    borderColor: theme.palette.primary.main,
+    borderWidth: '2px',
 }));
 
 function WorkShiftForm(props: FormProps) {
@@ -46,6 +51,19 @@ function WorkShiftForm(props: FormProps) {
         setAvailabelPriorities(prevPriorities => availablePriorities);
     }
 
+    const renderJellyfishImage = () => {
+        switch (props.currentBooking.amount_shifts) {
+            case 1:
+                return <Avatar sx={{width: 56, height: 56}} src={jellyfish_1} alt="Moderately Happy Jellyfish"/>;
+            case 2:
+                return <Avatar sx={{width: 56, height: 56}} src={jellyfish_2} alt="Happy Jellyfish"/>;
+            case 3:
+                return <Avatar sx={{width: 56, height: 56}} src={jellyfish_3} alt="Very Happy Jellyfish"/>;
+            default:
+                return <Avatar sx={{width: 56, height: 56}} src={jellyfish_1} alt="Moderately Happy Jellyfish"/>;
+        }
+    };
+
 
     return <Box
         sx={{
@@ -70,7 +88,7 @@ function WorkShiftForm(props: FormProps) {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '95%',
+            width: '90%',
             marginTop: '16px',
             marginBottom: '8px'
         }}>
@@ -99,8 +117,11 @@ function WorkShiftForm(props: FormProps) {
             marginTop: '16px',
             marginBottom: '8px'
         }}>
+            <div style={{paddingRight: "1em"}}>
+                {renderJellyfishImage()}
+            </div>
             <Select
-                sx={{ml: 1, minWidth: '90%'}}
+                sx={{ml: 1, minWidth: '70%'}}
                 variant={"filled"}
                 label="Anzahl Schichten"
                 labelId="shift-select-label"
@@ -111,6 +132,7 @@ function WorkShiftForm(props: FormProps) {
                 <MenuItem value={2}>2</MenuItem>
                 <MenuItem value={3}>3</MenuItem>
             </Select>
+
         </FormControl>
 
 
@@ -137,7 +159,8 @@ function WorkShiftForm(props: FormProps) {
                             currentBooking={props.currentBooking}
                             updateBooking={props.updateBooking}
                         />
-                        <CustomDivider style={{display: index >= props.formContent.work_shifts.length -1 ? "None" : ""}}/>
+                        <CustomDivider
+                            style={{display: index >= props.formContent.work_shifts.length - 1 ? "None" : ""}}/>
                     </>
                 ))}
         </List>

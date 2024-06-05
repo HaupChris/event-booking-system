@@ -53,6 +53,7 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
                                 ? "Mittlere" : currentBooking.timeslot_priority_3 === timeSlot.id
                                     ? "Notnagel" : "";
                         return <TimeSlot
+                            currentBooking={currentBooking}
                             timeSlot={timeSlot}
                             availablePriorities={availablePriorities}
                             selectedPriority={selectedPriority}
