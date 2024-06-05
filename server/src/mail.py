@@ -110,7 +110,7 @@ def send_confirmation_mail(booking: Booking, form_content: Dict) -> None:
     </div>
     <div class="content">
         Liebe/r <strong>{booking.first_name} {booking.last_name}</strong>,<br><br>
-        Wir schön, dass du bei unserem 5 jährigen Jubiläum dabei bist! Hier die Zusammenfassung für deinen Besuch:<br><br>
+        Wie schön, dass du bei unserem 5 jährigen Jubiläum dabei bist! Hier die Zusammenfassung für deinen Besuch:<br><br>
         {booking_details_html}<br><br>
         Falls noch nicht geschehen, sende bitte deinen Beitrag an unser Paypal: <a href="https://www.paypal.me/StephanHau">https://www.paypal.me/StephanHau</a> 
         <br>

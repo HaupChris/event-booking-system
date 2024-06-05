@@ -36,7 +36,7 @@ function FormConfirmation(props: FinalBookingProps) {
 	const beverage = beverage_or_undefined ? beverage_or_undefined : {title: "Keine Bierflat"};
 	const food_or_undefined = findItemById(props.formContent.food_options, props.booking.food_id);
 	const food = food_or_undefined ? food_or_undefined : {title: "Kein Essen"};
-	const betreff = `WWWW: ${props.booking.last_name}, ${props.booking.first_name} - ${ticket?.title}, ${beverage?.title}, ${food?.title}`;
+	const betreff = `WWWW: ${props.booking.last_name}, ${props.booking.first_name} - ${ticket?.title} - ${beverage?.title} - ${food?.title}`;
 	const [copied, setCopied] = useState(false);
 	const [open, setOpen] = useState(false);
 	const [isOnline, setIsOnline] = useState(navigator.onLine);
