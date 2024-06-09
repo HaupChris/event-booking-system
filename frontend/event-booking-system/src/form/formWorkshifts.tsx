@@ -2,15 +2,15 @@ import {FormProps} from "./formContainer";
 import React, {useEffect, useState} from "react";
 import WorkShift from "./components/workShift";
 import {
-    Box,
+    Box, Button, ClickAwayListener,
     Divider,
     FormControl,
-    FormHelperText,
+    FormHelperText, IconButton,
     InputLabel,
     List,
     MenuItem,
     Select,
-    TextField, Typography
+    TextField, Tooltip, Typography
 } from "@mui/material";
 import {TimeSlot} from "./interface";
 import {styled} from "@mui/system";
@@ -19,6 +19,7 @@ import Avatar from "@mui/material/Avatar";
 import jellyfish_1 from '../img/jellyfish_1.png';
 import jellyfish_2 from '../img/jellyfish_2.png';
 import jellyfish_3 from '../img/jellyfish_3.png';
+import {Info} from "@mui/icons-material";
 
 const CustomDivider = styled(Divider)(({theme}) => ({
     margin: '16px 0',
@@ -29,6 +30,7 @@ const CustomDivider = styled(Divider)(({theme}) => ({
 function WorkShiftForm(props: FormProps) {
     const [availablePriorities, setAvailabelPriorities] = useState<string[]>(["Höchste", "Mittlere", "Notnagel", ""]);
     const errorMessage = props.formValidation["timeslot_priority_1"];
+    const [tooltipOpen, setTooltipOpen] = useState(false);
 
 
     useEffect(() => {
@@ -64,6 +66,10 @@ function WorkShiftForm(props: FormProps) {
         }
     };
 
+    const infoText = `Wir führen den Wiesenwahn durch ohne, dass irgendwer damit Geld verdient. Deshalb brauchen wir aber auch eure Unterstützung. <br/> <br/>
+    Jede/r Teilnehmer*in übernimmt mindestens eine Schicht. Damit wir die Schichten optimal besetzen können, bitten wir dich, uns drei Prioritäten zu nennen.<br/><br/>
+Falls du mehr als eine Schicht übernehmen möchtest, gib bitte an, wie viele Schichten du maximal übernehmen möchtest. Vielen Dank für deine Unterstützung!`
+
 
     return <Box
         sx={{
@@ -73,37 +79,32 @@ function WorkShiftForm(props: FormProps) {
             justifyContent: 'center',
             maxWidth: '90vw'
         }}>
-        <Typography variant="body2">
+        <Typography variant="body2" component="div">
             Wir freuen uns, wenn du uns bei einer Supportschicht unterstützen könntest!
             Wähle bitte <strong>drei</strong> Prioritäten aus.
-            Die Zahlen zeigen, wie viele Helfer:innen schon dabei sind und wie viele wir noch brauchen.
-
+            Die Zahlen zeigen, wie viele Helfer:innen schon dabei sind und wie viele wir noch brauchen. <ClickAwayListener onClickAway={() => setTooltipOpen(false)}>
+        <span style={{display: 'inline-block', verticalAlign: 'middle'}}>
+          <Tooltip
+              title={<span dangerouslySetInnerHTML={{__html: infoText}}/>}
+              PopperProps={{
+                  disablePortal: true,
+              }}
+              onClose={() => setTooltipOpen(false)}
+              open={tooltipOpen}
+              disableFocusListener
+              enterTouchDelay={0}
+          >
+            <IconButton
+                color="secondary"
+                onClick={() => setTooltipOpen(true)}
+                style={{padding: 0, marginLeft: 4, verticalAlign: 'middle'}}
+            >
+              <Info fontSize="small"/>
+            </IconButton>
+          </Tooltip>
+        </span>
+            </ClickAwayListener>
         </Typography>
-        <CustomDivider sx={{width: '100%', margin: '1em'}}/>
-        <Typography variant="body2">
-            Mit wem möchtest du zusammen arbeiten?
-        </Typography>
-        <FormControl sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '90%',
-            marginTop: '16px',
-            marginBottom: '8px'
-        }}>
-            <TextField
-                sx={{mt: '8px', width: '90%'}}
-                error={!!props.formValidation.supporter_buddy}
-                variant="outlined"
-                margin="normal"
-                id="supporter-buddy"
-                label="Dein Buddy..."
-                name="name"
-                value={props.currentBooking.supporter_buddy}
-                onChange={e => props.updateBooking("supporter_buddy", e.target.value)}
-            />
-        </FormControl>
         <CustomDivider sx={{width: '100%', margin: '1em'}}/>
         <Typography variant="body2" align={"center"}>
             Wie viele Schichten möchtest du maximal übernehmen?
@@ -132,7 +133,33 @@ function WorkShiftForm(props: FormProps) {
                 <MenuItem value={2}>2</MenuItem>
                 <MenuItem value={3}>3</MenuItem>
             </Select>
+        </FormControl>
 
+
+        <CustomDivider sx={{width: '100%', margin: '1em'}}/>
+        <Typography variant="body2">
+            Mit wem möchtest du zusammen arbeiten?
+        </Typography>
+        <FormControl sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '90%',
+            marginTop: '16px',
+            marginBottom: '8px'
+        }}>
+            <TextField
+                sx={{mt: '8px', width: '90%'}}
+                error={!!props.formValidation.supporter_buddy}
+                variant="outlined"
+                margin="normal"
+                id="supporter-buddy"
+                label="Dein Buddy..."
+                name="name"
+                value={props.currentBooking.supporter_buddy}
+                onChange={e => props.updateBooking("supporter_buddy", e.target.value)}
+            />
         </FormControl>
 
 
@@ -166,7 +193,8 @@ function WorkShiftForm(props: FormProps) {
         </List>
 
 
-    </Box>;
+    </Box>
+        ;
 }
 
 export default WorkShiftForm;
