@@ -10,7 +10,8 @@ import {
 } from '@mui/material';
 import React from 'react';
 import {CircularProgressWithLabel} from './circularProgressWithLabel';
-import {AccessTime, Close} from "@mui/icons-material";
+import {Close} from "@mui/icons-material";
+import { PRIORITIES } from "../constants";
 
 interface TimeSlotProps {
     timeSlot: TimeSlotType;
@@ -26,25 +27,43 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 
 
     const handlePriorityChange = (event: SelectChangeEvent<{ value: unknown }>) => {
-        if (event.target.value === "Höchste") {
+        const newPriority = event.target.value as string;
+
+        if (newPriority === PRIORITIES.FIRST) {
             updateBooking("timeslot_priority_1", timeSlot.id);
-        } else if (event.target.value === "Mittlere") {
+            if (currentBooking.timeslot_priority_2 === timeSlot.id) {
+                updateBooking("timeslot_priority_2", -1);
+            }
+            if (currentBooking.timeslot_priority_3 === timeSlot.id) {
+                updateBooking("timeslot_priority_3", -1);
+            }
+        } else if (newPriority === PRIORITIES.SECOND) {
             updateBooking("timeslot_priority_2", timeSlot.id);
-        } else if (event.target.value === "Notnagel") {
+            if (currentBooking.timeslot_priority_1 === timeSlot.id) {
+                updateBooking("timeslot_priority_1", -1);
+            }
+            if (currentBooking.timeslot_priority_3 === timeSlot.id) {
+                updateBooking("timeslot_priority_3", -1);
+            }
+        } else if (newPriority === PRIORITIES.THIRD) {
             updateBooking("timeslot_priority_3", timeSlot.id);
+            if (currentBooking.timeslot_priority_1 === timeSlot.id) {
+                updateBooking("timeslot_priority_1", -1);
+            }
+            if (currentBooking.timeslot_priority_2 === timeSlot.id) {
+                updateBooking("timeslot_priority_2", -1);
+            }
         }
     };
 
-
-    const priorityColor = selectedPriority === "Höchste" ? 'green' : selectedPriority === "Mittlere" ? 'lightgreen' : selectedPriority === "Notnagel" ? 'lightgrey' : 'transparent';
-    const selectedPriorityBorder = selectedPriority === "Höchste" ? '3px solid green' : selectedPriority === "Mittlere" ? '3px solid lightgreen' : selectedPriority === "Notnagel" ? '3px solid lightgrey' : '1px solid transparent';
+    const selectedPriorityBorder = selectedPriority === PRIORITIES.FIRST ? '3px solid green' : selectedPriority === PRIORITIES.SECOND ? '3px solid lightgreen' : selectedPriority === PRIORITIES.THIRD ? '3px solid lightgrey' : '1px solid transparent';
 
     const handleReset = () => {
-        if (selectedPriority === "Höchste") {
+        if (selectedPriority === PRIORITIES.FIRST) {
             updateBooking("timeslot_priority_1", -1);
-        } else if (selectedPriority === "Mittlere") {
+        } else if (selectedPriority === PRIORITIES.SECOND) {
             updateBooking("timeslot_priority_2", -1);
-        } else if (selectedPriority === "Notnagel") {
+        } else if (selectedPriority === PRIORITIES.THIRD) {
             updateBooking("timeslot_priority_3", -1);
         }
     }
@@ -92,7 +111,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                     />}
                 >
                     {timeslotAvailablePriorities.map((priority) => (
-                        <MenuItem value={priority}>{priority}</MenuItem>
+                        <MenuItem key={priority} value={priority}>{priority}</MenuItem>
                     ))}
                 </Select>
             </FormControl>

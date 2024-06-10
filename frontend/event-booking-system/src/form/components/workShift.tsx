@@ -3,7 +3,7 @@ import {Box, Divider, List, ListItem, Typography} from '@mui/material';
 import React, {useEffect, useState} from 'react';
 import TimeSlot from './timeSlot';
 import '../../css/workShift.css';
-import portholeImage from "../../img/porthole_transparent.png";
+import { PRIORITIES } from "../constants";
 
 interface WorkShiftProps {
     workShift: WorkShiftType;
@@ -28,7 +28,6 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
         setSortedTimeSlots(sorted);
     }, [workShift]);
 
-
     return (
         <Box sx={{
             display: 'flex',
@@ -49,9 +48,9 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
                 <List className={'timeslot-list'}>
                     {sortedTimeSlots.map((timeSlot) => {
                         const selectedPriority = currentBooking.timeslot_priority_1 === timeSlot.id
-                            ? "Höchste" : currentBooking.timeslot_priority_2 === timeSlot.id
-                                ? "Mittlere" : currentBooking.timeslot_priority_3 === timeSlot.id
-                                    ? "Notnagel" : "";
+                            ? PRIORITIES.FIRST : currentBooking.timeslot_priority_2 === timeSlot.id
+                                ? PRIORITIES.SECOND : currentBooking.timeslot_priority_3 === timeSlot.id
+                                    ? PRIORITIES.THIRD : "";
                         return <TimeSlot
                             currentBooking={currentBooking}
                             timeSlot={timeSlot}
