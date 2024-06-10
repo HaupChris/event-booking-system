@@ -3,6 +3,7 @@ import {Booking, FormContent, TimeSlot, WorkShift} from './interface';
 
 import "../css/formSummary.css";
 import React from "react";
+import {PRIORITIES} from "./constants";
 
 
 function findItemById<T extends { id: number }>(array: T[], id: number): T | undefined {
@@ -118,15 +119,15 @@ function FormSummary(props: IProps) {
                         secondary={
                             <Typography variant="body1" component="div" color={"text.secondary"}>
                                 {(shift_slot_1 !== undefined && shift_slot_1.shift !== undefined && shift_slot_1.timeslot !== undefined) ?
-                                    ("Höchste: " + shift_slot_1.shift.title + ", " + shift_slot_1.timeslot.title + " " + shift_slot_1.timeslot.start_time + " - " + shift_slot_1.timeslot.end_time)
+                                    (PRIORITIES.FIRST + ": " + shift_slot_1.shift.title + ", " + shift_slot_1.timeslot.title + " " + shift_slot_1.timeslot.start_time + " - " + shift_slot_1.timeslot.end_time)
                                     : ""}
                                 <br/>
                                 {(shift_slot_2 !== undefined && shift_slot_2.shift !== undefined && shift_slot_2.timeslot !== undefined) ?
-                                    ("Mittlere: " + shift_slot_2.shift.title + ", " + shift_slot_2.timeslot.title + " " + shift_slot_2.timeslot.start_time + " - " + shift_slot_2.timeslot.end_time)
+                                    (PRIORITIES.SECOND + ": " + shift_slot_2.shift.title + ", " + shift_slot_2.timeslot.title + " " + shift_slot_2.timeslot.start_time + " - " + shift_slot_2.timeslot.end_time)
                                     : ""}
                                 <br/>
                                 {(shift_slot_3 !== undefined && shift_slot_3.shift !== undefined && shift_slot_3.timeslot !== undefined) ?
-                                    ("Notnagel: " + shift_slot_3.shift.title + ", " + shift_slot_3.timeslot.title + " " + shift_slot_3.timeslot.start_time + " - " + shift_slot_3.timeslot.end_time)
+                                    (PRIORITIES.THIRD + ": " + shift_slot_3.shift.title + ", " + shift_slot_3.timeslot.title + " " + shift_slot_3.timeslot.start_time + " - " + shift_slot_3.timeslot.end_time)
                                     : ""}
                             </Typography>}
                     />
