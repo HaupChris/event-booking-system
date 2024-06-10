@@ -112,12 +112,16 @@ def serve(path):
 def submit_form():
     # booking object is sent as json
     booking = Booking(**request.json)
-    booking_manager.insert_booking(booking)
-    app.logger.info('Form submitted successfully')
-    form_content_dict = booking_manager.get_up_to_date_form_content()
-    send_confirmation_mail(booking, form_content_dict)
-    app.logger.info('Confirmation mail sent successfully')
-    return 'Form submitted successfully', 200
+    success = booking_manager.insert_booking(booking)
+    if success:
+        app.logger.info('Form submitted successfully')
+        form_content_dict = booking_manager.get_up_to_date_form_content()
+        send_confirmation_mail(booking, form_content_dict)
+        app.logger.info('Confirmation mail sent successfully')
+        return 'Form submitted successfully', 200
+    else:
+        app.logger.info('Duplicate booking detected')
+        return 'Duplicate booking detected', 400
 
 
 @app.route("/api/data", methods=["GET"])

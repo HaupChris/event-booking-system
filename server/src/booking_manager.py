@@ -145,38 +145,54 @@ class BookingManager:
 
         return form_content_dict
 
-    def insert_booking(self, booking: Booking):
+    def insert_booking(self, booking: Booking) -> bool:
+        """
+        Inserts a booking into the database. Checks for duplicate bookings based on first name, last name, and email.
+        Returns True if the booking was successfully inserted, False otherwise.
+        :param booking:
+        :return:
+        """
         booking_timestamp = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
 
         with closing(sqlite3.connect(self.db_file_path)) as connection:
             cursor = connection.cursor()
 
+            # Check if a booking already exists with the same first name, last name, and email
+            cursor.execute("""
+                SELECT COUNT(*) FROM Users u
+                JOIN Bookings b ON u.id = b.user_id
+                WHERE u.first_name = ? AND u.last_name = ? AND u.email = ?
+            """, (booking.first_name, booking.last_name, booking.email))
+
+            if cursor.fetchone()[0] > 0:
+                # Booking already exists
+                return False
+
             # First, we'll insert the user's information into the Users table
             cursor.execute("""
                 INSERT INTO Users (last_name, first_name, email, phone_number) VALUES (?, ?, ?, ?)
-                """, (
-                booking.last_name, booking.first_name, booking.email,
-                booking.phone))
+            """, (booking.last_name, booking.first_name, booking.email, booking.phone))
 
             user_id = cursor.lastrowid  # Get the ID of the last inserted row
 
             # Then we'll insert the booking into the Bookings table
             cursor.execute("""
                 INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, food_option_id, first_priority_timeslot_id, second_priority_timeslot_id, third_priority_timeslot_id, amount_shifts, supporter_buddy, signature, total_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (user_id, booking.ticket_id, booking.beverage_id, booking.food_id, booking.timeslot_priority_1,
-                      booking.timeslot_priority_2, booking.timeslot_priority_3, booking.amount_shifts, booking.supporter_buddy,
-                      booking.signature, booking.total_price))
+            """, (user_id, booking.ticket_id, booking.beverage_id, booking.food_id, booking.timeslot_priority_1,
+                  booking.timeslot_priority_2, booking.timeslot_priority_3, booking.amount_shifts,
+                  booking.supporter_buddy, booking.signature, booking.total_price))
             booking_id = cursor.lastrowid
 
             # Then we'll insert the materials into the Materials table
             for material_id in booking.material_ids:
                 cursor.execute("""
                     INSERT INTO BookingMaterials (booking_id, material_id) VALUES (?, ?)
-                    """, (booking_id, material_id))
+                """, (booking_id, material_id))
 
             connection.commit()
 
             self.save_signature_image(booking)
+            return True
 
     def check_email_exists(self, email: str) -> bool:
         with closing(sqlite3.connect(self.db_file_path)) as connection:
