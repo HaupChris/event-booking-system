@@ -31,7 +31,7 @@ export const themeOptions: ThemeOptions = {
     },
     divider: 'rgba(0, 174, 255, 0.8)', // Brighter ocean blue
     text: {
-      primary: '#024F98', // A darker blue for better contrast
+      primary: '#2A00F7', // A darker blue for better contrast
       secondary: 'rgba(0, 0, 0, 0.8)',
     },
   },
