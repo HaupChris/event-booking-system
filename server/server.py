@@ -1,9 +1,9 @@
 import dataclasses
-import datetime
 import logging
 import os
 import sys
-from datetime import timedelta
+from datetime import timedelta, datetime
+
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 from src.mail import send_confirmation_mail
 from src.booking_manager import BookingManager
-from src.views import Booking, FormContent
+from src.views import Booking
 
 app = Flask(__name__, static_folder='../frontend/event-booking-system/build')
 
