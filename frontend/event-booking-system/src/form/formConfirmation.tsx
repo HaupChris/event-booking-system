@@ -177,14 +177,14 @@ function FormConfirmation(props: FinalBookingProps) {
 
                     </Typography>
 
-                    <Button disabled={!isOnline} variant="contained" color="secondary" onClick={submitBooking}>
-                        {
-                            isOnline ?
-                                <><Check/> Buchung absenden</>
-                                :
-                                <><CircularProgress sx={{mr: 1}}/> Keine Internetverbindung</>
-
-                        }
+                    <Button
+                        disabled={!isOnline || props.bookingState.isSubmitting}
+                        variant="contained"
+                        color="secondary"
+                        onClick={submitBooking}
+                    >
+                        {props.bookingState.isSubmitting ? <CircularProgress size={24}/> : <><Check/> Buchung
+                            absenden</>}
                     </Button>
                     <Snackbar
                         open={open}

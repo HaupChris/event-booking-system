@@ -180,7 +180,9 @@ export interface FormProps {
 
 export interface BookingState {
     isSubmitted: boolean;
+    isSubmitting: boolean;
     isSuccessful: boolean;
+
 }
 
 
@@ -202,6 +204,7 @@ export function FormContainer() {
     const [activeStep, setActiveStep] = useState<FormSteps>(safelyParseJSON(localStorage.getItem('activeStep'), FormSteps.NameAndAddress));
     const [bookingState, setBookingState] = useState<BookingState>(safelyParseJSON(localStorage.getItem('bookingState'), {
         isSubmitted: false,
+        isSubmitting: false,
         isSuccessful: false
     }));
     const [currentError, setCurrentError] = useState<string>("");
@@ -261,7 +264,8 @@ export function FormContainer() {
         const storedActiveStep = safelyParseJSON(localStorage.getItem('activeStep'), FormSteps.NameAndAddress);
         const storedBookingState = safelyParseJSON(localStorage.getItem('bookingState'), {
             isSubmitted: false,
-            isSuccessful: false
+            isSuccessful: false,
+            isSubmitting: false
         });
         const storedCurrentError = safelyParseJSON(localStorage.getItem('currentError'), "");
 
@@ -445,6 +449,7 @@ export function FormContainer() {
     }
 
     function submitBooking() {
+        setBookingState(prevState => ({ ...prevState, isSubmitting: true }));
         axios.post('/api/submitForm', booking, {
                 headers: {Authorization: `Bearer ${token}`}
             })
@@ -453,6 +458,7 @@ export function FormContainer() {
                 setBookingState(() => {
                     return {
                         isSuccessful: true,
+                        isSubmitting: false,
                         isSubmitted: true
                     }
                 })
@@ -474,7 +480,8 @@ export function FormContainer() {
                     setBookingState(() => {
                         return {
                             isSuccessful: false,
-                            isSubmitted: true
+                            isSubmitted: true,
+                            isSubmitting: false
                         };
                     })
 

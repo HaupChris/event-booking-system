@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 import logging
 import os
 import sys
@@ -110,17 +111,19 @@ def serve(path):
 @limiter.limit("90/minute")
 @jwt_required()
 def submit_form():
-    # booking object is sent as json
     booking = Booking(**request.json)
     success = booking_manager.insert_booking(booking)
+    request_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    app.logger.info(f'Received booking submission at {request_time} for {booking.first_name} {booking.last_name}')
+
     if success:
-        app.logger.info('Form submitted successfully')
+        app.logger.info(f'Form submitted successfully for {booking.first_name} {booking.last_name}')
         form_content_dict = booking_manager.get_up_to_date_form_content()
         send_confirmation_mail(booking, form_content_dict)
-        app.logger.info('Confirmation mail sent successfully')
+        app.logger.info(f'Confirmation mail sent successfully to {booking.first_name} {booking.last_name}')
         return 'Form submitted successfully', 200
     else:
-        app.logger.info('Duplicate booking detected')
+        app.logger.info(f'Duplicate booking detected for {booking.first_name} {booking.last_name}')
         return 'Duplicate booking detected', 400
 
 
