@@ -6,7 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from typing import Dict
 from dotenv import load_dotenv
 
-from views import Booking, FormContent
+from .views import Booking, FormContent
 
 
 # Function to find the human-readable details based on booking, now including workshift information and formatting in German

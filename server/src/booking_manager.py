@@ -6,7 +6,7 @@ from typing import Dict, List
 import json
 import os
 from dataclasses import asdict
-from views import FormContent, Booking, BookingWithTimestamp
+from .views import FormContent, Booking, BookingWithTimestamp
 
 
 # define your table schema here
