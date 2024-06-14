@@ -11,7 +11,7 @@ import {
     Box, createTheme,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import {Home, SportsBar, Handyman, LunchDining, Work, People} from '@mui/icons-material';
+import {Home, SportsBar, Handyman, LunchDining, Work, People, LocalActivity} from '@mui/icons-material';
 import HomePage from './HomePage';
 import {getDummyFormContent} from "../formContainer";
 import {TokenContext} from "../../AuthContext";
@@ -23,6 +23,7 @@ import FoodPage from "./FoodPage";
 import {ThemeOptions, ThemeProvider} from "@mui/material/styles";
 import MaterialsPage from "./MaterialsPage";
 import WorkshiftsPage from "./WorkshiftsPage";
+import TicketsPage from "./TicketsPage";
 
 export const themeOptions: ThemeOptions = {
     components: {
@@ -48,10 +49,11 @@ function Dashboard() {
     const {token} = useContext(TokenContext);
     const labels = ["Bookings", "Ticket Options", "Beverage Options", "Work Shifts", "Materials"];
 
-    const pageTitles = ["Home", "Bookings", "Beer", "Food", "Material", "Support"];
+    const pageTitles = ["Home", "Bookings", "Tickets", "Beer", "Food", "Material", "Support"];
     const pageTitleIcons = [
         <Home style={{verticalAlign: "middle"}}/>,
         <People style={{verticalAlign: "middle"}}/>,
+        <LocalActivity style={{verticalAlign: "middle"}}/>,
         <SportsBar style={{verticalAlign: "middle"}}/>,
         <LunchDining style={{verticalAlign: "middle"}}/>,
         <Handyman style={{verticalAlign: "middle"}}/>,
@@ -84,12 +86,14 @@ function Dashboard() {
             case 1:
                 return <BookingsPage/>;
             case 2:
-                return <BeveragesPage/>;
+                return <TicketsPage/>;
             case 3:
-                return <FoodPage/>;
+                return <BeveragesPage/>;
             case 4:
-                return <MaterialsPage/>;
+                return <FoodPage/>;
             case 5:
+                return <MaterialsPage/>;
+            case 6:
                 return <WorkshiftsPage/>;
             default:
                 return <HomePage/>;
