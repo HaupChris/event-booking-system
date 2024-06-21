@@ -110,14 +110,14 @@ class BookingManager:
 
         c.execute("""
             SELECT second_priority_timeslot_id, COUNT(*) FROM Bookings
-            WHERE second_priority_timeslot_id IS NOT NULL
+            WHERE second_priority_timeslot_id IS NOT NULL AND amount_shifts >=2
             GROUP BY second_priority_timeslot_id
         """)
         timeslot_bookings_2 = {row[0]: row[1] for row in c.fetchall()}
 
         c.execute("""
             SELECT third_priority_timeslot_id, COUNT(*) FROM Bookings
-            WHERE third_priority_timeslot_id IS NOT NULL
+            WHERE third_priority_timeslot_id IS NOT NULL AND amount_shifts >=3
             GROUP BY third_priority_timeslot_id
         """)
         timeslot_bookings_3 = {row[0]: row[1] for row in c.fetchall()}
@@ -141,7 +141,8 @@ class BookingManager:
 
         for work_shift in form_content_dict['work_shifts']:
             for timeslot in work_shift['time_slots']:
-                timeslot['num_booked'] = timeslot_bookings_1.get(timeslot['id'], 0)
+                timeslot['num_booked'] = timeslot_bookings_1.get(timeslot['id'], 0) + timeslot_bookings_2.get(
+                    timeslot['id'], 0) + timeslot_bookings_3.get(timeslot['id'], 0)
 
         return form_content_dict
 
