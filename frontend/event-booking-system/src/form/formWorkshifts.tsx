@@ -19,10 +19,12 @@ import Avatar from "@mui/material/Avatar";
 import { Info } from "@mui/icons-material";
 import { PRIORITIES } from "./constants";
 
+import '../css/workShift.css';
+
 import jellyfish_1 from "../img/jellyfish_1.png";
 import jellyfish_2 from "../img/jellyfish_2.png";
 import jellyfish_3 from "../img/jellyfish_3.png";
-import {TimeSlot} from "./interface";
+import { TimeSlot } from "./interface";
 
 const CustomDivider = styled(Divider)(({ theme }) => ({
   margin: "16px 0",
@@ -40,6 +42,7 @@ function WorkShiftForm(props: FormProps) {
 
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [tooltipNumShiftsOpen, setTooltipNumShiftsOpen] = useState(false);
+  const [imageClass, setImageClass] = useState("jellyfish");
 
   useEffect(() => {
     updateAvailablePriorities();
@@ -48,6 +51,14 @@ function WorkShiftForm(props: FormProps) {
     props.currentBooking.timeslot_priority_2,
     props.currentBooking.timeslot_priority_3,
   ]);
+
+  useEffect(() => {
+    setImageClass("jellyfish gelatine");
+    const timer = setTimeout(() => {
+      setImageClass("jellyfish");
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [props.currentBooking.amount_shifts]);
 
   function updateAvailablePriorities() {
     let availablePriorities = [
@@ -82,6 +93,7 @@ function WorkShiftForm(props: FormProps) {
       case 1:
         return (
           <Avatar
+            className={imageClass}
             sx={{ width: 56, height: 56 }}
             src={jellyfish_1}
             alt="Moderately Happy Jellyfish"
@@ -90,6 +102,7 @@ function WorkShiftForm(props: FormProps) {
       case 2:
         return (
           <Avatar
+            className={imageClass}
             sx={{ width: 56, height: 56 }}
             src={jellyfish_2}
             alt="Happy Jellyfish"
@@ -98,6 +111,7 @@ function WorkShiftForm(props: FormProps) {
       case 3:
         return (
           <Avatar
+            className={imageClass}
             sx={{ width: 56, height: 56 }}
             src={jellyfish_3}
             alt="Very Happy Jellyfish"
@@ -106,6 +120,7 @@ function WorkShiftForm(props: FormProps) {
       default:
         return (
           <Avatar
+            className={imageClass}
             sx={{ width: 56, height: 56 }}
             src={jellyfish_1}
             alt="Moderately Happy Jellyfish"
