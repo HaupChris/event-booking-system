@@ -134,8 +134,8 @@ Solltest du mehr als eine Schicht übernehmen wollen, teile uns bitte die Anzahl
       <Typography variant="body2" component="div">
         Wir freuen uns, wenn du uns bei einer Supportschicht unterstützen
         könntest! Wähle bitte <u>drei</u> Prioritäten aus: <u>{PRIORITIES.FIRST}</u>,{" "}
-        <u>{PRIORITIES.SECOND}</u> und <u>{PRIORITIES.THIRD}</u>. Die Zahlen zeigen, wie viele
-        Helfer:innen schon dabei sind und wie viele wir noch brauchen.{" "}
+        <u>{PRIORITIES.SECOND}</u> und <u>{PRIORITIES.THIRD}</u>. Die erste Zahl zeigt, wie viele
+        Helfer:innen schon dabei, die zweite wie viele wir insgesamt brauchen.{" "}
         <ClickAwayListener onClickAway={() => setTooltipOpen(false)}>
           <span style={{ display: "inline-block", verticalAlign: "middle" }}>
             <Tooltip

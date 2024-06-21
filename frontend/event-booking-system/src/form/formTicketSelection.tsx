@@ -12,7 +12,7 @@ function TicketForm(props: TicketFormProps) {
 		props.updateBooking('ticket_id', Number((event.target as HTMLInputElement).value));
 	};
 
-	const maxNumTicketsPerDay = 110;
+	const maxNumTicketsPerDay = 100;
 	let visitorsThursday = 0;
 	let visitorsFriday = 0;
 	let visitorsSaturday = 0;
