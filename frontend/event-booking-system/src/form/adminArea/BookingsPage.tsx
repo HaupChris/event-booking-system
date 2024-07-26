@@ -1,10 +1,8 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
-    Box, Card, CardContent, Typography, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Paper, Modal, IconButton, Select, MenuItem, FormControl, InputLabel, Button
+    Box, Typography, Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, Paper, Modal, IconButton, Select, MenuItem, FormControl, InputLabel, Button, TextField
 } from '@mui/material';
-import {TokenContext} from '../../AuthContext';
-import axios from 'axios';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
@@ -18,8 +16,9 @@ const BookingsPage: React.FC = () => {
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
     const [openModal, setOpenModal] = useState(false);
     const [sortCriterion, setSortCriterion] = useState('timestamp');
-    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-    const {token} = useContext(TokenContext);
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    const [searchQuery, setSearchQuery] = useState('');
+
 
 
     const handleOpenModal = (booking: Booking) => {
@@ -70,9 +69,25 @@ const BookingsPage: React.FC = () => {
         }
     };
 
+     const filteredBookings = bookings.filter(booking =>
+        booking.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booking.last_name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+
     return (
         <Box>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Box  mx={2} mb={2}>
+                <TextField
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    placeholder="Suche nach Vorname oder Nachname"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+            </Box>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mx={2} mb={2}>
                 <FormControl variant="outlined" size="small">
                     <InputLabel>Sort By</InputLabel>
                     <Select
@@ -80,9 +95,9 @@ const BookingsPage: React.FC = () => {
                         onChange={(e) => setSortCriterion(e.target.value as string)}
                         label="Sort By"
                     >
-                        <MenuItem value="first_name">First Name</MenuItem>
-                        <MenuItem value="last_name">Last Name</MenuItem>
-                        <MenuItem value="timestamp">Timestamp</MenuItem>
+                        <MenuItem value="first_name">Vorname</MenuItem>
+                        <MenuItem value="last_name">Nachname</MenuItem>
+                        <MenuItem value="timestamp">Anmeldedatum</MenuItem>
                     </Select>
                 </FormControl>
                 <Button
@@ -91,21 +106,21 @@ const BookingsPage: React.FC = () => {
                     onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                     startIcon={sortOrder === 'asc' ? <ArrowUpwardIcon/> : <ArrowDownwardIcon/>}
                 >
-                    {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+                    {sortOrder === 'asc' ? 'Aufsteigend' : 'Absteigend'}
                 </Button>
             </Box>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>First Name</TableCell>
-                            <TableCell>Last Name</TableCell>
-                            <TableCell>Timestamp</TableCell>
+                            <TableCell>Vorname</TableCell>
+                            <TableCell>Nachname</TableCell>
+                            <TableCell>Anmeldedatum</TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {bookings.sort(sortBookings).map((booking) => (
+                        {filteredBookings.sort(sortBookings).map((booking) => (
                             <TableRow key={booking.id}>
                                 <TableCell>{booking.first_name}</TableCell>
                                 <TableCell>{booking.last_name}</TableCell>
