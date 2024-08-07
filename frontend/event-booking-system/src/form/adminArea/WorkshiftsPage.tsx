@@ -28,8 +28,6 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ListItemButton from "@mui/material/ListItemButton";
 
 
-import {CSVLink} from 'react-csv';
-
 const WorkshiftsPage: React.FC = () => {
     const {bookings, formContent} = useFetchData();
     const [selectedTimeslot, setSelectedTimeslot] = useState<number | null>(null);
@@ -89,27 +87,6 @@ const WorkshiftsPage: React.FC = () => {
         return formContent.work_shifts.flatMap(ws => ws.time_slots.filter(ts => timeslotIds.includes(ts.id)));
     };
 
-    const getWorkshiftAndTimeslotDetails = (timeslotId: number) => {
-        for (const workshift of formContent.work_shifts) {
-            for (const timeslot of workshift.time_slots) {
-                if (timeslot.id === timeslotId) {
-                    return {
-                        workshiftTitle: workshift.title,
-                        timeslotTitle: timeslot.title,
-                        startTime: timeslot.start_time,
-                        endTime: timeslot.end_time
-                    };
-                }
-            }
-        }
-        return {
-            workshiftTitle: 'Unknown',
-            timeslotTitle: 'Unknown',
-            startTime: 'Unknown',
-            endTime: 'Unknown'
-        };
-    };
-
     const toggleWorkshiftExpanded = (workshiftId: number) => {
         setExpandedWorkshift(expandedWorkshift === workshiftId ? null : workshiftId);
     };
@@ -124,22 +101,6 @@ const WorkshiftsPage: React.FC = () => {
         return workshiftSortOrder === 'asc' ? progressA - progressB : progressB - progressA;
     });
 
-    const csvData = bookings.map(booking => {
-        const priority1Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_1);
-        const priority2Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_2);
-        const priority3Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_3);
-
-        return {
-            firstName: booking.first_name,
-            lastName: booking.last_name,
-            amountShifts: booking.amount_shifts,
-            supporterBuddy: booking.supporter_buddy,
-            workshiftPriority1: `${priority1Details.workshiftTitle} - ${priority1Details.timeslotTitle} (${priority1Details.startTime} - ${priority1Details.endTime})`,
-            workshiftPriority2: `${priority2Details.workshiftTitle} - ${priority2Details.timeslotTitle} (${priority2Details.startTime} - ${priority2Details.endTime})`,
-            workshiftPriority3: `${priority3Details.workshiftTitle} - ${priority3Details.timeslotTitle} (${priority3Details.startTime} - ${priority3Details.endTime})`
-        };
-    });
-
     return (
         <Box>
             <Tabs value={tabValue} onChange={handleTabChange} centered sx={{paddingBottom: "1em"}}>
@@ -149,9 +110,7 @@ const WorkshiftsPage: React.FC = () => {
             {tabValue === 0 && (
                 <>
                     <Box display="flex" justifyContent="space-between" mb={2} mx={"1em"}>
-                        <CSVLink data={csvData} filename="bookings.csv" style={{textDecoration: 'none'}}>
-                            <Button variant="contained" color="primary">Export CSV</Button>
-                        </CSVLink>
+
                         <Button
                             variant="contained"
                             color="primary"
