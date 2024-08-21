@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.198f7b0b.css",
-    "main.js": "/static/js/main.293503d5.js",
+    "main.js": "/static/js/main.cd1eeed9.js",
     "static/js/787.4eb8244c.chunk.js": "/static/js/787.4eb8244c.chunk.js",
     "static/media/background_desktop_water.png": "/static/media/background_desktop_water.0748354fbcdaa477b0e5.png",
     "static/media/background_mobile_water.png": "/static/media/background_mobile_water.287566981d06f77eec27.png",
@@ -21,11 +21,11 @@
     "static/media/Kavoon-Regular.ttf": "/static/media/Kavoon-Regular.c08a345df4ce2b8326ec.ttf",
     "index.html": "/index.html",
     "main.198f7b0b.css.map": "/static/css/main.198f7b0b.css.map",
-    "main.293503d5.js.map": "/static/js/main.293503d5.js.map",
+    "main.cd1eeed9.js.map": "/static/js/main.cd1eeed9.js.map",
     "787.4eb8244c.chunk.js.map": "/static/js/787.4eb8244c.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.198f7b0b.css",
-    "static/js/main.293503d5.js"
+    "static/js/main.cd1eeed9.js"
   ]
 }

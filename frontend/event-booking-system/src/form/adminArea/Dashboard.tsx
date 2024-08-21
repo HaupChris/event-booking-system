@@ -153,6 +153,7 @@ function Dashboard() {
         return {
             firstName: booking.first_name,
             lastName: booking.last_name,
+            phone: booking.phone,
             ticket: ticketDetails || '-',
             beverage: beverageDetails || '-',
             food: foodDetails || '-',
@@ -215,10 +216,14 @@ function Dashboard() {
         const priority1Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_1, formContent);
         const priority2Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_2, formContent);
         const priority3Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_3, formContent);
+        const ticketDetails = formContent.ticket_options.find((ticketOption) => ticketOption.id === booking.ticket_id)?.title;
+
 
         return {
             firstName: booking.first_name,
             lastName: booking.last_name,
+            phone: booking.phone,
+            ticket: ticketDetails,
             amountShifts: booking.amount_shifts,
             supporterBuddy: booking.supporter_buddy,
             workshiftPriority1: `${priority1Details.workshiftTitle} - ${priority1Details.timeslotTitle} (${priority1Details.startTime} - ${priority1Details.endTime})`,
@@ -263,7 +268,7 @@ function Dashboard() {
 
                             data={getExportData()}
                             filename={`${pageTitles[value].toLowerCase()}_data.csv`}
-                            style={{textDecoration: 'none', display: value == DashboardView.Home ? "none": "flex"}}
+                            style={{textDecoration: 'none', display: value == DashboardView.Home ? "none" : "flex"}}
                         >
                             <IconButton edge="end" color="inherit">
                                 <Download/>
