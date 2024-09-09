@@ -11,10 +11,20 @@ import {
     Box, createTheme
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import {Home, SportsBar, Handyman, LunchDining, Work, People, LocalActivity, Download} from '@mui/icons-material';
+import {
+    Home,
+    SportsBar,
+    Handyman,
+    LunchDining,
+    Work,
+    People,
+    LocalActivity,
+    Download,
+    ViewQuilt, EuroSymbol, PointOfSale
+} from '@mui/icons-material';
 import HomePage from './HomePage';
 import {getDummyFormContent} from "../userArea/formContainer";
-import {TokenContext} from "../../AuthContext";
+import {AuthContext, TokenContext} from "../../AuthContext";
 import axios from "axios";
 import ListItemButton from "@mui/material/ListItemButton";
 import BookingsPage from "./BookingsPage";
@@ -26,6 +36,9 @@ import WorkshiftsPage from "./WorkshiftsPage";
 import TicketsPage from "./TicketsPage";
 import {CSVLink} from "react-csv";
 import {Booking, FormContent} from "../userArea/interface";
+import FinancialsOverviewPage from "./FinancialsOverviewPage";
+import PaymentConfirmationsPage from "./PaymentConfirmationsPage";
+import ShiftAssignmentsPage from "./ShiftAssignmentsPage";
 
 export const themeOptions: ThemeOptions = {
     components: {
@@ -50,7 +63,10 @@ enum DashboardView {
     Beverages = 3,
     Food = 4,
     Material = 5,
-    Supportshifts = 6
+    Supportshifts = 6,
+    FinancialsOverview = 7,
+    PaymentConfirmations = 8,
+    ShiftAssignments = 9
 }
 
 const getWorkshiftAndTimeslotDetails = (timeslotId: number, formContent: FormContent) => {
@@ -74,15 +90,29 @@ const getWorkshiftAndTimeslotDetails = (timeslotId: number, formContent: FormCon
     };
 };
 
-function Dashboard() {
+function AdminDashboard() {
     const [value, setValue] = useState(0);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [formContent, setFormContent] = useState(getDummyFormContent());
     const [bookings, setBookings] = useState<Booking[]>([]);
     const {token} = useContext(TokenContext);
-    const labels = ["Bookings", "Ticket Options", "Beverage Options", "Work Shifts", "Materials"];
+    // const {adminPermissions} = useContext(AuthContext);
+const adminPermissions = ["read", "financial"];
+    const viewPermissions = {
+        [DashboardView.Home]: ['read'],
+        [DashboardView.Bookings]: ['read'],
+        [DashboardView.Tickets]: ['read'],
+        [DashboardView.Beverages]: ['read'],
+        [DashboardView.Food]: ['read'],
+        [DashboardView.Material]: ['read'],
+        [DashboardView.Supportshifts]: ['read'],
+        [DashboardView.FinancialsOverview]: ['financial'],
+        [DashboardView.PaymentConfirmations]: ['financial'],
+        [DashboardView.ShiftAssignments]: ['shift_management']
+    };
 
-    const pageTitles = ["Home", "Bookings", "Tickets", "Beer", "Food", "Material", "Support"];
+
+    const pageTitles = ["Home", "Bookings", "Tickets", "Beer", "Food", "Material", "Support", "Financials Overview", "Payment Confirmations", "Shift Assignments"];
     const pageTitleIcons = [
         <Home style={{verticalAlign: "middle"}}/>,
         <People style={{verticalAlign: "middle"}}/>,
@@ -90,8 +120,25 @@ function Dashboard() {
         <SportsBar style={{verticalAlign: "middle"}}/>,
         <LunchDining style={{verticalAlign: "middle"}}/>,
         <Handyman style={{verticalAlign: "middle"}}/>,
-        <Work style={{verticalAlign: "middle"}}/>
+        <Work style={{verticalAlign: "middle"}}/>,
+        <EuroSymbol style={{verticalAlign: "middle"}}/>,
+        <PointOfSale style={{verticalAlign: "middle"}}/>,
+        <ViewQuilt style={{verticalAlign: "middle"}}/>
     ]
+
+    const authorizedViews = Object.entries(viewPermissions)
+        .filter(([_, permissions]) =>
+            permissions.some(permission => adminPermissions.includes(permission))
+        )
+        .map(([view]) => parseInt(view));
+
+    const authorizedPageTitles = pageTitles.filter((_, index) => authorizedViews.includes(index));
+    const authorizedPageTitleIcons = pageTitleIcons.filter((_, index) => authorizedViews.includes(index));
+
+    console.log("auth stuff");
+    console.log(authorizedViews);
+    console.log(authorizedPageTitles);
+    console.log(authorizedPageTitleIcons);
 
     useEffect(() => {
         axios.get('/api/data', {
@@ -107,7 +154,6 @@ function Dashboard() {
             .catch(error => console.error('Error:', error));
     }, [token]);
 
-
     const handleDrawerToggle = () => {
         setDrawerOpen(!drawerOpen);
     };
@@ -115,21 +161,27 @@ function Dashboard() {
     const renderPage = () => {
         switch (value) {
             case DashboardView.Home:
-                return <HomePage/>;
+                return <HomePage />;
             case DashboardView.Bookings:
-                return <BookingsPage/>;
+                return <BookingsPage />;
             case DashboardView.Tickets:
-                return <TicketsPage/>;
+                return <TicketsPage />;
             case DashboardView.Beverages:
-                return <BeveragesPage/>;
+                return <BeveragesPage />;
             case DashboardView.Food:
-                return <FoodPage/>;
+                return <FoodPage />;
             case DashboardView.Material:
-                return <MaterialsPage/>;
+                return <MaterialsPage />;
             case DashboardView.Supportshifts:
-                return <WorkshiftsPage/>;
+                return <WorkshiftsPage />;
+            case DashboardView.FinancialsOverview:
+                return <FinancialsOverviewPage />;
+            case DashboardView.PaymentConfirmations:
+                return <PaymentConfirmationsPage />;
+            case DashboardView.ShiftAssignments:
+                return <ShiftAssignmentsPage />;
             default:
-                return <HomePage/>;
+                return <HomePage />;
         }
     };
 
@@ -261,7 +313,7 @@ function Dashboard() {
                         </IconButton>
                         <Box display="flex" flexGrow={1} justifyContent="center">
                             <Typography variant="h6" display="flex" alignItems="center">
-                                {pageTitleIcons[value]}
+                                {authorizedPageTitleIcons[value]}
                             </Typography>
                         </Box>
                         <CSVLink
@@ -278,7 +330,7 @@ function Dashboard() {
                 </AppBar>
                 <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
                     <List>
-                        {pageTitles.map((title, index) => (
+                        {authorizedPageTitles.map((title, index) => (
                             <ListItemButton onClick={() => handleMenuClick(index)} key={index}>
                                 <ListItemIcon>{pageTitleIcons[index]}</ListItemIcon>
                                 <ListItemText primary={title}/>
@@ -300,4 +352,4 @@ function Dashboard() {
     );
 }
 
-export default Dashboard;
+export default AdminDashboard;

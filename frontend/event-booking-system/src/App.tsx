@@ -11,7 +11,7 @@ import {ThemeOptions, ThemeProvider} from '@mui/material/styles';
 import AdminLogin from './form/userArea/adminLogin';
 
 import './css/global.css';
-import Dashboard from "./form/adminArea/Dashboard";
+import AdminDashboard from "./form/adminArea/AdminDashboard";
 import UserLoginPage from "./userLoginPage";
 
 
@@ -78,6 +78,7 @@ const App = () => {
     const [auth, setAuth] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const [token, setToken] = useState("");
+    const [adminPermissions, setAdminPermissions] = useState(["readOnly"])
 
     // Restore token from local storage at startup
     useEffect(() => {
@@ -115,7 +116,7 @@ const App = () => {
                     backgroundPosition: 'center',
                 }}
             >
-                <AuthContext.Provider value={{ auth, setAuth, isAdmin, setIsAdmin }}>
+                <AuthContext.Provider value={{auth, setAuth, isAdmin, setIsAdmin, adminPermissions, setAdminPermissions}}>
                     <TokenContext.Provider value={{ token, setToken }}>
                         <BrowserRouter>
                             <Routes>
@@ -124,7 +125,7 @@ const App = () => {
                                 <Route path="/admin"
                                        element={isAdmin ? <Navigate replace to="/admin/dashboard"/> : <AdminLogin/>}/>
                                 <Route path="/admin/dashboard"
-                                       element={isAdmin ? <Dashboard/> : <Navigate replace to="/admin"/>}/>
+                                       element={isAdmin ? <AdminDashboard/> : <Navigate replace to="/admin"/>}/>
                             </Routes>
                         </BrowserRouter>
                     </TokenContext.Provider>
