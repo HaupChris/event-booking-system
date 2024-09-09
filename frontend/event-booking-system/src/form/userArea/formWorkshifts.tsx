@@ -250,7 +250,7 @@ Solltest du mehr als eine Schicht übernehmen wollen, teile uns bitte die Anzahl
           variant="outlined"
           margin="normal"
           id="supporter-buddy"
-          label="Dein Buddy..."
+          label="Vorname Nachname"
           name="name"
           value={props.currentBooking.supporter_buddy}
           onChange={(e) => props.updateBooking("supporter_buddy", e.target.value)}
