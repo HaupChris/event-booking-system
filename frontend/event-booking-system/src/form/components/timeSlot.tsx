@@ -1,4 +1,4 @@
-import {Booking, TimeSlot as TimeSlotType} from '../interface';
+import {Booking, TimeSlot as TimeSlotType} from '../userArea/interface';
 import {
     FormControl, IconButton, Input, InputLabel, LinearProgress,
     ListItem,
@@ -11,7 +11,7 @@ import {
 import React from 'react';
 import {CircularProgressWithLabel} from './circularProgressWithLabel';
 import {Close} from "@mui/icons-material";
-import { PRIORITIES } from "../constants";
+import { PRIORITIES } from "../userArea/constants";
 
 interface TimeSlotProps {
     timeSlot: TimeSlotType;

@@ -9,13 +9,12 @@ import Typography from '@mui/material/Typography';
 import {FormProps} from "./formContainer";
 
 // import image from the image folder
-import image from '../img/test3.png';
-import beverages_0 from '../img/beverages_1.jpg';
-import beverages_1 from '../img/beverages_2.jpg';
-import beverages_2 from '../img/beverages_3.jpg';
-import portholeImage from '../img/porthole_transparent.png';
+import beverages_0 from '../../img/beverages_1.jpg';
+import beverages_1 from '../../img/beverages_2.jpg';
+import beverages_2 from '../../img/beverages_3.jpg';
+import portholeImage from '../../img/porthole_transparent.png';
 
-import '../css/formBeverageSelection.css';
+import '../../css/formBeverageSelection.css';
 
 
 function BeverageForm(props: FormProps) {

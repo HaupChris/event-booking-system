@@ -13,7 +13,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import {Home, SportsBar, Handyman, LunchDining, Work, People, LocalActivity, Download} from '@mui/icons-material';
 import HomePage from './HomePage';
-import {getDummyFormContent} from "../formContainer";
+import {getDummyFormContent} from "../userArea/formContainer";
 import {TokenContext} from "../../AuthContext";
 import axios from "axios";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -25,7 +25,7 @@ import MaterialsPage from "./MaterialsPage";
 import WorkshiftsPage from "./WorkshiftsPage";
 import TicketsPage from "./TicketsPage";
 import {CSVLink} from "react-csv";
-import {Booking, FormContent} from "../interface";
+import {Booking, FormContent} from "../userArea/interface";
 
 export const themeOptions: ThemeOptions = {
     components: {

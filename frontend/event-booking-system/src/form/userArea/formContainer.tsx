@@ -1,5 +1,5 @@
 import {Alert, Box, Button, Card, CardContent, Grid, Typography} from "@mui/material";
-import '../css/formContainer.css';
+import '../../css/formContainer.css';
 import {NavigateBefore, NavigateNext} from "@mui/icons-material";
 import axios from 'axios';
 import React, {useContext, useEffect, useState} from "react";
@@ -7,7 +7,7 @@ import React, {useContext, useEffect, useState} from "react";
 import {Booking, FormContent} from "./interface";
 
 import NameAndAddressForm from "./nameAndAddress";
-import {FormSignature} from "./formSignature";
+import FormSignature from "./formSignature";
 import TicketForm from "./formTicketSelection";
 import BeverageForm from "./formBeverageSelection";
 import WorkshiftForm from "./formWorkshifts";
@@ -15,9 +15,9 @@ import MaterialsForm from "./formMaterials";
 import FormAwarnessCode from "./formAwarenessCode";
 import FormSummary from "./formSummary";
 import FormConfirmation from "./formConfirmation";
-import {AuthContext, TokenContext} from "../AuthContext";
-import fishImage from "../img/fish.png";
-import LinearProgressWithImage from "./components/linearProgressWithImage";
+import {AuthContext, TokenContext} from "../../AuthContext";
+import fishImage from "../../img/fish.png";
+import LinearProgressWithImage from "../components/linearProgressWithImage";
 import FormFoodSelection from "./formFoodSelection";
 
 

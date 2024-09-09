@@ -16,9 +16,9 @@ import {
     SignalCellularNodata,
 } from "@mui/icons-material";
 
-import '../css/formConfirmation.css';
+import '../../css/formConfirmation.css';
 import {BookingState} from "./formContainer";
-import jellyfishImage from '../img/jellyfish.png';
+import jellyfishImage from '../../img/jellyfish.png';
 
 interface FinalBookingProps {
     booking: Booking;

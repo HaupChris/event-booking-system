@@ -1,12 +1,12 @@
 import React, {useContext, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {AuthContext, TokenContext} from "../AuthContext";
+import {AuthContext, TokenContext} from "../../AuthContext";
 
 const SHA256 = require("crypto-js/sha256");
 import axios from "axios";
 import {Alert, Box, Button, Snackbar, TextField, Typography} from "@mui/material";
 
-import "../css/formContainer.css"
+import "../../css/formContainer.css"
 
 function PasswordPage() {
 	const [password, setPassword] = useState('');

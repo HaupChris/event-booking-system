@@ -9,14 +9,14 @@ import Typography from '@mui/material/Typography';
 import {FormProps} from "./formContainer";
 
 // import image from the image folder
-import gyros from '../img/gyros.png';
-import grillgemuese from '../img/grillgemuese.png';
-import vegan_diet from '../img/vegan_diet.png';
-import vegetarian_diet from '../img/vegetarian_diet.png';
+import gyros from '../../img/gyros.png';
+import grillgemuese from '../../img/grillgemuese.png';
+import vegan_diet from '../../img/vegan_diet.png';
+import vegetarian_diet from '../../img/vegetarian_diet.png';
 
-import portholeImage from '../img/porthole_transparent.png';
+import portholeImage from '../../img/porthole_transparent.png';
 
-import '../css/formBeverageSelection.css';
+import '../../css/formBeverageSelection.css';
 
 const index_to_image = [gyros, gyros, grillgemuese, grillgemuese, vegan_diet, vegetarian_diet]
 

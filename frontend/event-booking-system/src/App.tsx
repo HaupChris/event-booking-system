@@ -1,18 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
-import PasswordPage from "./form/passwordPage";
 import {AuthContext, TokenContext} from "./AuthContext";
-import {FormContainer} from "./form/formContainer";
+import {FormContainer} from "./form/userArea/formContainer";
 import {Box, createTheme} from "@mui/material";
 import backgroundImageDesktop from './img/background_desktop_water.png';
 import backgroundImageMobile from './img/background_mobile_water.png';
 
 
 import {ThemeOptions, ThemeProvider} from '@mui/material/styles';
-import AdminLogin from './form/adminLogin';
+import AdminLogin from './form/userArea/adminLogin';
 
 import './css/global.css';
 import Dashboard from "./form/adminArea/Dashboard";
+import UserLoginPage from "./userLoginPage";
 
 
 export const themeOptions: ThemeOptions = {
@@ -85,6 +85,7 @@ const App = () => {
         if (storedToken) {
             setToken(storedToken);
             setAuth(true);
+            // You might want to verify the token here and set isAdmin if applicable
         }
 
         window.addEventListener('resize', documentHeight);
@@ -95,40 +96,42 @@ const App = () => {
     useEffect(() => {
         if (token) {
             window.localStorage.setItem("token", token);
+        } else {
+            window.localStorage.removeItem("token");
         }
     }, [token]);
 
-    return <ThemeProvider theme={theme}>
-        <Box
-            sx={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                // backgroundImage: `url(${backgroundImage})`,
-                // check for mobile
-                backgroundImage: `url(${window.innerWidth < 600 ? backgroundImageMobile : backgroundImageDesktop})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            }}
-        >
-            <AuthContext.Provider value={{auth, setAuth, isAdmin, setIsAdmin}}>
-                <TokenContext.Provider value={{token, setToken}}>
-                    <BrowserRouter>
-                        <Routes>
-                            <Route path="/" element={auth ? <Navigate replace to="/form"/> : <PasswordPage/>}/>
-                            <Route path="/form" element={auth ? <FormContainer/> : <Navigate replace to="/"/>}/>
-                            <Route path="/admin"
-                                   element={isAdmin ? <Navigate replace to="/admin/dashboard"/> : <AdminLogin/>}/>
-                            <Route path="/admin/dashboard"
-                                   element={isAdmin ? <Dashboard/> : <Navigate replace to={"/admin"}/>}/>
-                        </Routes>
-                    </BrowserRouter>
-                </TokenContext.Provider>
-            </AuthContext.Provider>
-        </Box>
-    </ThemeProvider>
+    return (
+        <ThemeProvider theme={theme}>
+            <Box
+                sx={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    backgroundImage: `url(${window.innerWidth < 600 ? backgroundImageMobile : backgroundImageDesktop})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                }}
+            >
+                <AuthContext.Provider value={{ auth, setAuth, isAdmin, setIsAdmin }}>
+                    <TokenContext.Provider value={{ token, setToken }}>
+                        <BrowserRouter>
+                            <Routes>
+                                <Route path="/" element={auth ? <Navigate replace to="/form"/> : <UserLoginPage/>}/>
+                                <Route path="/form" element={auth ? <FormContainer/> : <Navigate replace to="/"/>}/>
+                                <Route path="/admin"
+                                       element={isAdmin ? <Navigate replace to="/admin/dashboard"/> : <AdminLogin/>}/>
+                                <Route path="/admin/dashboard"
+                                       element={isAdmin ? <Dashboard/> : <Navigate replace to="/admin"/>}/>
+                            </Routes>
+                        </BrowserRouter>
+                    </TokenContext.Provider>
+                </AuthContext.Provider>
+            </Box>
+        </ThemeProvider>
+    );
 };
 
 export default App;

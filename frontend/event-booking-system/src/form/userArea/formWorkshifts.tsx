@@ -1,6 +1,6 @@
 import { FormProps } from "./formContainer";
 import React, { useEffect, useState } from "react";
-import WorkShift from "./components/workShift";
+import WorkShift from "../components/workShift";
 import {
   Box,
   ClickAwayListener,
@@ -19,11 +19,11 @@ import Avatar from "@mui/material/Avatar";
 import { Info } from "@mui/icons-material";
 import { PRIORITIES } from "./constants";
 
-import '../css/workShift.css';
+import '../../css/workShift.css';
 
-import jellyfish_1 from "../img/jellyfish_1.png";
-import jellyfish_2 from "../img/jellyfish_2.png";
-import jellyfish_3 from "../img/jellyfish_3.png";
+import jellyfish_1 from "../../img/jellyfish_1.png";
+import jellyfish_2 from "../../img/jellyfish_2.png";
+import jellyfish_3 from "../../img/jellyfish_3.png";
 import { TimeSlot } from "./interface";
 
 const CustomDivider = styled(Divider)(({ theme }) => ({

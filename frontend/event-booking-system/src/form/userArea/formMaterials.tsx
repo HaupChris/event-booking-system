@@ -1,8 +1,8 @@
 import {Booking, FormContent, Material} from "./interface";
 import React from "react";
 import {Checkbox, List, ListItem, ListItemAvatar, ListItemButton, ListItemText} from "@mui/material";
-import {CircularProgressWithLabel} from "./components/circularProgressWithLabel";
-import "../css/formMaterials.css";
+import {CircularProgressWithLabel} from "../components/circularProgressWithLabel";
+import "../../css/formMaterials.css";
 
 
 export interface MaterialFormProps {

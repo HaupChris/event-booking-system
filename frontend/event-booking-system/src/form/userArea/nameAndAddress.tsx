@@ -1,5 +1,5 @@
 import React, {useContext, useState} from "react";
-import {AuthContext, PasswordContext} from "../AuthContext";
+import {AuthContext, PasswordContext} from "../../AuthContext";
 import {useNavigate} from "react-router-dom";
 import {Button, Container, TextField, Typography} from "@mui/material";
 import {FormProps} from "./formContainer";

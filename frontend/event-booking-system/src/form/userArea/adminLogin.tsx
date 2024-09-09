@@ -1,6 +1,6 @@
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
-import {AuthContext, TokenContext} from "../AuthContext";
+import {AuthContext, TokenContext} from "../../AuthContext";
 import React, {useContext, useState} from "react";
 import {Box} from "@mui/material";
 

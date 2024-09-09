@@ -1,8 +1,8 @@
-import SignaturePad from "./components/signature";
+import SignaturePad from "../components/signature";
 import {FormProps} from "./formContainer";
 import {Box, Typography} from "@mui/material";
 
-export function FormSignature(props: FormProps) {
+function FormSignature(props: FormProps) {
 	return (
 		<Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
 			<Typography>
@@ -18,3 +18,5 @@ export function FormSignature(props: FormProps) {
 		</Box>
 	)
 }
+
+export default FormSignature;
