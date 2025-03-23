@@ -23,6 +23,13 @@ def get_booking_details(booking: Booking, form_content: Dict) -> str:
     food_option = next((fo for fo in form_content['food_options'] if fo['id'] == booking.food_id), None)
     food_info = f"Essensoption: {food_option['title']} - Preis: {food_option['price']}€" if food_option else "Essensoption: Nicht gefunden"
 
+    if booking.role == "Artist":
+        ticket_info = "Ticket: Kostenfrei"
+        beverage_info = "Getränkeoption: Kostenfrei"
+        food_info = "Essensoption: 1 Freies Essen zugeteilt"
+    elif booking.role == "ArtistGuest":
+        artist_reference_info = f"Mit Künstler: {booking.artist_reference}"
+
     # Function to find and format timeslot information
     def format_timeslot_info(timeslot_id):
         for ws in form_content['work_shifts']:

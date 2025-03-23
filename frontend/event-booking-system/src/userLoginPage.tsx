@@ -4,38 +4,37 @@ import { AuthContext, TokenContext } from './AuthContext';
 import { Box, Button, TextField, Typography, Container } from '@mui/material';
 
 function UserLoginPage() {
-    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const { setAuth } = useContext(AuthContext);
     const { setToken } = useContext(TokenContext);
+    const { setRole } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
-        setError('');
+    event.preventDefault();
+    setError('');
 
-        try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
+    try {
+        const response = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password }),
+        });
 
-            if (response.ok) {
-                const data = await response.json();
-                setToken(data.access_token);
-                setAuth(true);
-                navigate('/form');
-            } else {
-                setError('Invalid username or password');
-            }
-        } catch (error) {
-            setError('An error occurred. Please try again.');
+        if (response.ok) {
+            const data = await response.json();
+            setToken(data.access_token);
+            setAuth(true);
+            setRole(data.role);  // Store user role
+            navigate('/form');
+        } else {
+            setError('Invalid password');
         }
-    };
+    } catch (error) {
+        setError('An error occurred. Please try again.');
+    }
+};
 
     return (
         <Container component="main" maxWidth="xs">
@@ -51,18 +50,6 @@ function UserLoginPage() {
                     Sign in
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="username"
-                        label="Username"
-                        name="username"
-                        autoComplete="username"
-                        autoFocus
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
                     <TextField
                         margin="normal"
                         required
@@ -92,6 +79,6 @@ function UserLoginPage() {
             </Box>
         </Container>
     );
-};
+}
 
 export default UserLoginPage;

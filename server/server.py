@@ -60,7 +60,9 @@ limiter = Limiter(
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
 
-hashed_password = generate_password_hash(os.environ.get("PASSWORD"), method="pbkdf2:sha256", salt_length=8)
+normal_guest_hashed_password = generate_password_hash(os.environ.get("PASSWORD"), method="pbkdf2:sha256", salt_length=8)
+artist_artist_guest_hashed_password = generate_password_hash(os.environ.get("ARTIST_ARTIST_GUEST_PASSWORD"), method="pbkdf2:sha256", salt_length=8)
+
 admin_hashed_password = generate_password_hash(os.environ.get("ADMIN_PASSWORD"), method="pbkdf2:sha256", salt_length=8)
 
 app.logger.info('Passwords hashed')
@@ -85,11 +87,17 @@ def authenticate():
     password = request.json.get("password", None)
     if not password:
         return jsonify({"msg": "Missing password"}), 400
-    if not check_password_hash(hashed_password, password):
+
+    if check_password_hash(normal_guest_hashed_password, password):
+        role = "NormalGuest"
+    elif check_password_hash(artist_artist_guest_hashed_password, password):
+        role = "ArtistOrArtistGuest"
+    else:
         return jsonify({"msg": "Bad password"}), 401
-    access_token = create_access_token(identity="user")
-    app.logger.info('User authentication successful')
-    return jsonify(access_token=access_token), 200
+
+    access_token = create_access_token(identity=role)
+    app.logger.info(f'User authentication successful as {role}')
+    return jsonify(access_token=access_token, role=role), 200
 
 
 booking_manager = BookingManager(json_path=os.path.join(script_dir, 'form_content.json'),

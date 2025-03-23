@@ -11,8 +11,8 @@ import "../../css/formContainer.css"
 function PasswordPage() {
 	const [password, setPassword] = useState('');
 	const [display, setDisplay] = useState(false);
-	const {auth, setAuth} = useContext(AuthContext);
-	const {token, setToken} = useContext(TokenContext);
+	const {setAuth} = useContext(AuthContext);
+	const {setToken} = useContext(TokenContext);
 	const navigate = useNavigate();
 	const [passwordIsWrong, setPasswordIsWrong] = useState(false);
 

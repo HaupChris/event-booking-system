@@ -34,13 +34,14 @@ enum FormSteps {
     Confirmation = 9,
 }
 
-
 function getEmptyBooking(): Booking {
     return {
         last_name: "",
         first_name: "",
         email: "",
         phone: "",
+        role: "",
+        artist_reference: "",
         ticket_id: -1,
         beverage_id: -1,
         food_id: -1,
@@ -170,7 +171,6 @@ export function getDummyFormContent(): FormContent {
     };
 }
 
-
 export interface FormProps {
     updateBooking: (key: keyof Booking, value: any) => void;
     currentBooking: Booking;
@@ -212,6 +212,7 @@ export function FormContainer() {
     const {token, setToken} = useContext(TokenContext);
     const maxSteps = Object.keys(FormSteps).length / 2;
     const {auth, setAuth} = useContext(AuthContext);
+    const {role, setRole} = useContext(AuthContext);
 
     const stepTitles = {
         [FormSteps.NameAndAddress]: " Herzlich Willkommen zum Weiher Wald und Wiesenwahn!",
@@ -226,7 +227,7 @@ export function FormContainer() {
         [FormSteps.Confirmation]: "Fast geschafft!"
     }
     const requiredFields: { [key: number]: (keyof Booking)[] } = {
-        [FormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone'],
+        [FormSteps.NameAndAddress]: role === "ArtistorArtistGuest" ? ['last_name', 'first_name', 'email', 'phone', 'role', 'artist_reference'] : ['last_name', 'first_name', 'email', 'phone'],
         [FormSteps.Ticket]: ['ticket_id'],
         [FormSteps.Beverage]: [],
         [FormSteps.Food]: [],
@@ -240,7 +241,7 @@ export function FormContainer() {
     };
 
 // Define the current version number of the form
-    const VERSION_NUMBER = '1.1';
+    const VERSION_NUMBER = '1.2';
 
 // Function to check and clear outdated data from local storage
     const clearOutdatedData = () => {
@@ -293,22 +294,6 @@ export function FormContainer() {
 
     }, [formValidation, booking, activeStep, bookingState, currentError]);
 
-    useEffect(() => {
-        axios.get('/api/formcontent', {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            .then((response) => {
-                    setFormContent(response.data);
-                }
-            )
-            .catch((error) => {
-                // 	catch 401 and redirect to login
-                setAuth(false);
-                setToken("");
-
-            });
-    }, []);
-
     function validateName(value: string, nameString: string): string {
         const pattern = /^[A-Za-zÄÖÜöüß\s]+$/;
         if (value === '') return 'Bitte gib einen ' + nameString + ' an';
@@ -356,6 +341,12 @@ export function FormContainer() {
                 break;
             case 'phone':
                 errorMessage = validatePhone(value);
+                break;
+            case 'role':
+                errorMessage = value === '' ? 'Bitte gib an, ob du Gast oder Künstler*in bist.' : '';
+                break;
+            case 'artist_reference':
+                errorMessage = value === '' ? 'Bitte gib den Namen einer Band oder eines*r Künstlers*in an.' : '';
                 break;
             case 'ticket_id':
                 errorMessage = value === -1 ? 'Bitte wähle ein Ticket aus.' : '';
@@ -449,7 +440,7 @@ export function FormContainer() {
     }
 
     function submitBooking() {
-        setBookingState(prevState => ({ ...prevState, isSubmitting: true }));
+        setBookingState(prevState => ({...prevState, isSubmitting: true}));
         axios.post('/api/submitForm', booking, {
                 headers: {Authorization: `Bearer ${token}`}
             })
@@ -496,6 +487,34 @@ export function FormContainer() {
 
     }
 
+    function increaseFormStep() {
+        if (isStepValid()) {
+            if (activeStep === FormSteps.Confirmation) {
+                return;
+            }
+
+            if (activeStep === FormSteps.NameAndAddress) {
+                axios.get('/api/formcontent', {
+                        headers: {Authorization: `Bearer ${token}`}
+                    })
+                    .then((response) => {
+                            setFormContent(response.data);
+                        }
+                    )
+                    .catch((error) => {
+                        // 	catch 401 and redirect to login
+                        setAuth(false);
+                        setToken("");
+
+                    });
+            }
+
+
+            setActiveStep(activeStep + 1);
+            setCurrentError("");
+        }
+    }
+
 
     return <Card className={"form-container"}>
         <Grid container className={"navigation"}>
@@ -515,12 +534,7 @@ export function FormContainer() {
                 <Button
                     variant={"outlined"}
                     sx={{'display': activeStep >= maxSteps - 1 ? "none" : "inline-block"}}
-                    onClick={() => {
-                        if (isStepValid()) {
-                            setActiveStep(activeStep + 1);
-                            setCurrentError("");
-                        }
-                    }}>
+                    onClick={increaseFormStep}>
                     <NavigateNext/>
                 </Button>
             </Grid>

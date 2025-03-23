@@ -3,6 +3,8 @@ import React from 'react';
 type AuthContextType = {
     auth: boolean;
     setAuth: (isAuth: boolean) => void;
+    role: string;
+    setRole: (role: string) => void;
     isAdmin: boolean;
     setIsAdmin: (isAdmin: boolean) => void;
     adminPermissions: string[];
@@ -12,6 +14,8 @@ type AuthContextType = {
 export const AuthContext = React.createContext<AuthContextType>({
     auth: false,
     setAuth: () => {},
+    role: 'NormalGuest',
+    setRole: () => {},
     isAdmin: false,
     setIsAdmin: () => {},
     adminPermissions: [],

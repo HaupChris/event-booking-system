@@ -76,6 +76,7 @@ const documentHeight = () => {
 
 const App = () => {
     const [auth, setAuth] = useState(false);
+    const [role, setRole] = useState("NormalGuest");
     const [isAdmin, setIsAdmin] = useState(false);
     const [token, setToken] = useState("");
     const [adminPermissions, setAdminPermissions] = useState(["readOnly"])
@@ -116,7 +117,7 @@ const App = () => {
                     backgroundPosition: 'center',
                 }}
             >
-                <AuthContext.Provider value={{auth, setAuth, isAdmin, setIsAdmin, adminPermissions, setAdminPermissions}}>
+                <AuthContext.Provider value={{auth, setAuth, role, setRole, isAdmin, setIsAdmin, adminPermissions, setAdminPermissions}}>
                     <TokenContext.Provider value={{ token, setToken }}>
                         <BrowserRouter>
                             <Routes>
