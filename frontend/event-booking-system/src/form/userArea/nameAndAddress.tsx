@@ -1,19 +1,16 @@
-import React, {useContext, useState} from "react";
-import {AuthContext, PasswordContext} from "../../AuthContext";
-import {useNavigate} from "react-router-dom";
-import {Button, Container, TextField, Typography} from "@mui/material";
+import React, {useContext} from "react";
+import {AuthContext} from "../../AuthContext";
+import {Container, TextField, Typography} from "@mui/material";
 import {FormProps} from "./formContainer";
 
 
 function NameAndAddressForm(props: FormProps) {
     const {auth} = useContext(AuthContext);
-    const {password} = useContext(PasswordContext);
-    const history = useNavigate();
 
     return auth ? (
         <Container component="main" maxWidth="xs">
             <Typography variant="body1">
-                Do, 29.08. - So, 01.09.2024
+                Do, 8.08. - So, 31.08.2025
             </Typography>
             <form>
                 <TextField

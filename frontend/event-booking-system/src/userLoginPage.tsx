@@ -4,7 +4,6 @@ import { AuthContext, TokenContext } from './AuthContext';
 import { Box, Button, TextField, Typography, Container } from '@mui/material';
 
 function UserLoginPage() {
-    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const { setAuth } = useContext(AuthContext);
@@ -16,12 +15,12 @@ function UserLoginPage() {
         setError('');
 
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch('/api/auth', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({password}),
             });
 
             if (response.ok) {
@@ -30,10 +29,10 @@ function UserLoginPage() {
                 setAuth(true);
                 navigate('/form');
             } else {
-                setError('Invalid username or password');
+                setError('Falsches Passwort');
             }
         } catch (error) {
-            setError('An error occurred. Please try again.');
+            setError('Ein Fehler ist aufgetreten, bitte versuche es erneut.');
         }
     };
 
@@ -51,18 +50,6 @@ function UserLoginPage() {
                     Sign in
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="username"
-                        label="Username"
-                        name="username"
-                        autoComplete="username"
-                        autoFocus
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
                     <TextField
                         margin="normal"
                         required
