@@ -112,7 +112,6 @@ body {
 
     .form-container {
         height: 98%;
-        height: var(--doc-height);
         width: 98%;
         margin: 0;
         position: absolute;

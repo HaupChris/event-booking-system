@@ -4,7 +4,7 @@
 
 .progress-fish {
     position: absolute;
-    left: 0%; /* Start at the beginning */
+    left: 0; /* Start at the beginning */
     top: 50%;
     transform: translateY(-50%); /* Vertical centering */
     width: 30px; /* Adjust the size of your fish */
