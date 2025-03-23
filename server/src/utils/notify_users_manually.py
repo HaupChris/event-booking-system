@@ -25,9 +25,6 @@ script_dir = os.path.dirname(__file__)
 bm = BookingManager(json_path=os.path.join(script_dir,  'form_content.json'),
                                  db_dir=os.path.join(script_dir, 'db'))
 name_list = [
-    ("Maren", "Baethmann"),
-    ("Amelie", "Striegel"),
-    ("Lola", "Riehlein"),
-    ("Fabian", "Braun")
+    ("Hans", "Test"),
 ]
 send_confirmation_mails(name_list, bm)

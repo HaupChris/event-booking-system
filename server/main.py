@@ -19,7 +19,7 @@ load_dotenv()
 
 app = Flask(
     __name__,
-    static_folder=os.path.join(os.path.dirname(__file__), '../frontend/event-booking-system/build')
+    static_folder=os.path.join(os.path.dirname(__file__), '../frontend/build')
 )
 
 # Setup CORS
