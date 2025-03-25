@@ -76,7 +76,7 @@ import {ThemeOptions} from '@mui/material/styles';
 // };
 
 
-const spaceTheme = createTheme({
+export const spaceTheme = createTheme({
     palette: {
         mode: 'dark',
         primary: {
@@ -179,8 +179,6 @@ const documentHeight = () => {
     doc.style.setProperty('--doc-height', `${window.innerHeight - 8}px`)
 }
 
-const theme = createTheme(spaceTheme);
-
 const App = () => {
     const [auth, setAuth] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -203,7 +201,7 @@ const App = () => {
     }, [token]);
 
     return (
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={spaceTheme}>
             {/* Our new starfield background behind everything */}
             <SpaceBackground/>
 

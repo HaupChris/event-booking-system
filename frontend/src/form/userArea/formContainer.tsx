@@ -214,16 +214,16 @@ export function FormContainer() {
     const {auth, setAuth} = useContext(AuthContext);
 
     const stepTitles = {
-        [FormSteps.NameAndAddress]: " Herzlich Willkommen zum Weiher Wald und Wiesenwahn!",
-        [FormSteps.Ticket]: "Ich komme an folgenden Tagen (Sonntag ist Abbau)",
-        [FormSteps.Beverage]: "Was wollen wir trinken?",
-        [FormSteps.Food]: "Hunger?",
-        [FormSteps.Workshift]: "Festival Support",
-        [FormSteps.Material]: "Ich kann folgende Materialien mitbringen",
-        [FormSteps.AwarenessCode]: "Damit wir alle eine entspannte Zeit haben",
-        [FormSteps.Signature]: "Please sign here",
+        [FormSteps.NameAndAddress]: " Herzlich Willkommen zum Weiher Wald und Weltall-Wahn!",
+        [FormSteps.Ticket]: "Ich fliege an folgenden Tagen mit (Sonntag ist Abbau)",
+        [FormSteps.Beverage]: "Ein Spacebier gefällig?",
+        [FormSteps.Food]: "Wähle deine Astronautenkost",
+        [FormSteps.Workshift]: "Tritt der Crew bei",
+        [FormSteps.Material]: "Ich bringe folgende Ersatzteile mit",
+        [FormSteps.AwarenessCode]: "Ein paar Regeln für unsere Reise durch die Galaxis",
+        [FormSteps.Signature]: "Ein Abenteuer auf eigene Gefahr",
         [FormSteps.Summary]: "Zusammenfassung",
-        [FormSteps.Confirmation]: "Fast geschafft!"
+        [FormSteps.Confirmation]: "Start in T Minus Gleich"
     }
     const requiredFields: { [key: number]: (keyof Booking)[] } = {
         [FormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone'],
@@ -484,16 +484,12 @@ export function FormContainer() {
                             isSubmitting: false
                         };
                     })
-
                     setTimeout(() => {
                         setToken("");
                         setAuth(false);
                     }, 1000 * 10);
                 }
-
-
             });
-
     }
 
 
@@ -505,10 +501,12 @@ export function FormContainer() {
             </Grid>
             <Grid item xs={12} className={"navigation-buttons"}
                   sx={{display: bookingState.isSubmitted ? "None" : ""}}>
-                <Button variant={"outlined"} sx={{'display': activeStep < 1 ? "none" : "inline-block"}}
+                <Button variant={"outlined"} sx={{'opacity': activeStep < 1 ? "0" : "100%"}}
                         onClick={() => {
-                            setActiveStep(activeStep - 1);
-                            setCurrentError("");
+                            if (activeStep > 0) {
+                                setActiveStep(activeStep - 1);
+                                setCurrentError("");
+                            }
                         }}>
                     <NavigateBefore/>
                 </Button>
@@ -532,7 +530,7 @@ export function FormContainer() {
                 alignItems: 'center',
                 justifyContent: 'center'
             }}>
-                <Typography variant={"h5"}>{stepTitles[activeStep]}</Typography>
+                <Typography align="center" variant={"h4"} sx={{paddingBottom: "1em"}}>{stepTitles[activeStep]}</Typography>
                 <Alert variant={"outlined"} sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>
                     {currentError}
                 </Alert>

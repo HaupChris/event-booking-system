@@ -38,8 +38,8 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
             marginTop: '8px'
         }}>
             <Box sx={{display: "flex", flexDirection: "column"}}>
-                <Typography align={"center"} color={"text-primary"} variant="h5">{workShift.title}</Typography>
-                <Typography align={"justify"} sx={{ color: (theme) => theme.palette.text.secondary }} variant="body2">{workShift.description}</Typography>
+                <Typography align={"center"} color={"text-primary"} sx={{paddingBottom: "1em"}} variant="h4">{workShift.title}</Typography>
+                <Typography align={"justify"} sx={{ color: (theme) => theme.palette.text.secondary }} variant="subtitle1">{workShift.description}</Typography>
 
             </Box>
 

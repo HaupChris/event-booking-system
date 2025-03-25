@@ -27,7 +27,8 @@ import jellyfish_3 from "../../img/jellyfish_3.png";
 import { TimeSlot } from "./interface";
 
 const CustomDivider = styled(Divider)(({ theme }) => ({
-  margin: "16px 0",
+  margin: "32px 0",
+  width: "100%",
   borderColor: theme.palette.primary.main,
   borderWidth: "2px",
 }));
@@ -43,6 +44,12 @@ function WorkShiftForm(props: FormProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [tooltipNumShiftsOpen, setTooltipNumShiftsOpen] = useState(false);
   const [imageClass, setImageClass] = useState("jellyfish");
+  const [supporterBuddyFirstName, setSupporterBuddyFirstName] = useState(props.currentBooking.supporter_buddy.split(" ")[0]);
+  const [supporterBuddyLastName, setSupporterBuddyLastName] = useState(props.currentBooking.supporter_buddy.split(" ")[1]);
+
+  useEffect(() => {
+    props.updateBooking("supporter_buddy", supporterBuddyFirstName + " " + supporterBuddyLastName);
+  }, [supporterBuddyFirstName, supporterBuddyFirstName]);
 
   useEffect(() => {
     updateAvailablePriorities();
@@ -130,7 +137,13 @@ function WorkShiftForm(props: FormProps) {
   };
 
   const infoText = `Wir sind ein nicht kommerzielles Event. 
-Jeder Teilnehmer*in übernimmt mindestens eine Schicht. Bitte gib uns drei Prioritäten: <u>${PRIORITIES.FIRST}</u>, <u>${PRIORITIES.SECOND}</u> und <u>${PRIORITIES.THIRD}</u>.
+Jeder Teilnehmer*in übernimmt mindestens eine Schicht. Bitte gib uns drei Prioritäten: 
+<ul>
+<li><u>${PRIORITIES.FIRST}</u></li>
+<li><u>${PRIORITIES.SECOND}</u> und</li>
+<li> <u>${PRIORITIES.THIRD}</u></li>
+</ul>
+
 Nach der Anmeldungsphase planen wir die Schichten und versuchen, alle Vorlieben zu berücksichtigen.<br/><br/>
 Solltest du mehr als eine Schicht übernehmen wollen, teile uns bitte die Anzahl mit. Vielen Dank für deine Unterstützung!`;
 
@@ -146,11 +159,16 @@ Solltest du mehr als eine Schicht übernehmen wollen, teile uns bitte die Anzahl
         maxWidth: "90vw",
       }}
     >
-      <Typography variant="body2" component="div">
+      <Typography variant="subtitle1" component="div" style={{paddingTop: "1em"}}>
         Wir freuen uns, wenn du uns bei einer Supportschicht unterstützen
-        könntest! Wähle bitte <u>drei</u> Prioritäten aus: <u>{PRIORITIES.FIRST}</u>,{" "}
-        <u>{PRIORITIES.SECOND}</u> und <u>{PRIORITIES.THIRD}</u>. Die erste Zahl zeigt, wie viele
-        Helfer:innen schon dabei, die zweite wie viele wir insgesamt brauchen.{" "}
+        könntest! Wähle bitte <u>drei</u> Prioritäten aus:
+        <ul>
+          <li><u>{PRIORITIES.FIRST}</u>,</li>
+          <li><u>{PRIORITIES.SECOND}</u> und</li>
+          <li><u>{PRIORITIES.THIRD}</u>.</li>
+        </ul>
+        Links neben jeder Schicht stehen zwei Zahlen. Die erste zeigt, wie viele
+        Astronaut:innen schon dabei, die zweite wie viele wir insgesamt brauchen.{" "}
         <ClickAwayListener onClickAway={() => setTooltipOpen(false)}>
           <span style={{ display: "inline-block", verticalAlign: "middle" }}>
             <Tooltip
@@ -174,8 +192,10 @@ Solltest du mehr als eine Schicht übernehmen wollen, teile uns bitte die Anzahl
           </span>
         </ClickAwayListener>
       </Typography>
-      <CustomDivider sx={{ width: "100%", margin: "1em" }} />
-      <Typography variant="body2" align={"center"}>
+
+      <CustomDivider />
+
+      <Typography variant="h6" align={"center"}>
         Wie viele Schichten möchtest du maximal übernehmen?{" "}
         <ClickAwayListener onClickAway={() => setTooltipNumShiftsOpen(false)}>
           <span style={{ display: "inline-block", verticalAlign: "middle" }}>
@@ -231,8 +251,8 @@ Solltest du mehr als eine Schicht übernehmen wollen, teile uns bitte die Anzahl
         </Select>
       </FormControl>
 
-      <CustomDivider sx={{ width: "100%", margin: "1em" }} />
-      <Typography variant="body2">Mit wem möchtest du zusammen arbeiten?</Typography>
+      <CustomDivider/>
+      <Typography align={"center"} variant="h6">Mit wem möchtest du zusammen arbeiten?</Typography>
       <FormControl
         sx={{
           display: "flex",
@@ -250,14 +270,25 @@ Solltest du mehr als eine Schicht übernehmen wollen, teile uns bitte die Anzahl
           variant="outlined"
           margin="normal"
           id="supporter-buddy"
-          label="Dein Buddy..."
-          name="name"
-          value={props.currentBooking.supporter_buddy}
-          onChange={(e) => props.updateBooking("supporter_buddy", e.target.value)}
+          label="Vorname"
+          name="first_name"
+          value={supporterBuddyFirstName}
+          onChange={(e) => setSupporterBuddyFirstName(e.target.value)}
+        />
+        <TextField
+          sx={{ mt: "8px", width: "90%" }}
+          error={!!props.formValidation.supporter_buddy}
+          variant="outlined"
+          margin="normal"
+          id="supporter-buddy"
+          label="Nachname"
+          name="last_name"
+          value={supporterBuddyLastName}
+          onChange={(e) => setSupporterBuddyLastName(e.target.value)}
         />
       </FormControl>
 
-      <CustomDivider sx={{ width: "100%", margin: "1em" }} />
+      <CustomDivider/>
       <List>
         {props.formContent.work_shifts
           .sort((shift_a, shift_b) => {

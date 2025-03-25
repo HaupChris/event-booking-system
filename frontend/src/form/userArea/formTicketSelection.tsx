@@ -54,6 +54,7 @@ function TicketForm(props: TicketFormProps) {
 			>
 				{props.formContent.ticket_options.map((option: TicketOption) => (
 					<FormControlLabel
+						sx={{padding: "0.5em 0em"}}
 						key={option.id}
 						disabled={dayIsSoldOut(option.title)}
 						value={option.id}

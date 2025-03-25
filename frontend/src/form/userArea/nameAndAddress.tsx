@@ -9,7 +9,7 @@ function NameAndAddressForm(props: FormProps) {
 
     return auth ? (
         <Container component="main" maxWidth="xs">
-            <Typography variant="body1">
+            <Typography variant="subtitle1" align={"center"} sx={{padding: "1em 0em"}}>
                 Do, 8.08. - So, 31.08.2025
             </Typography>
             <form>

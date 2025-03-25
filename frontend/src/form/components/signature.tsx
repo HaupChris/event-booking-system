@@ -4,6 +4,7 @@ import SignatureCanvas from 'react-signature-canvas';
 import {Booking} from "../userArea/interface";
 import '../../css/signature.css';
 import CustomSignaturePad from "./customSignaturePad";
+import {spaceTheme} from "../../App";
 
 interface IProps {
 	updateBooking: (key: keyof Booking, value: any) => void;
@@ -60,12 +61,12 @@ export function SignaturePad(props: IProps) {
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
             <CustomSignaturePad
-                penColor="secondary"
+                penColor={spaceTheme.palette.primary.main}
                 existingSignature={props.booking.signature}
                 onEnd={(signatureURL) => handleSignatureEnd(signatureURL)}
                 clearOnResize={false}
             />
-            <Button color={"secondary"} onClick={clearSignature}>Löschen</Button>
+            <Button color={"primary"} onClick={clearSignature}>Löschen</Button>
         </Box>
     );
 }
