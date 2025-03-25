@@ -3,40 +3,48 @@ import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
 import {AuthContext, TokenContext} from "./AuthContext";
 import {FormContainer} from "./form/userArea/formContainer";
 import {Box, createTheme} from "@mui/material";
-import backgroundImageDesktop from './img/background_desktop_water.png';
-import backgroundImageMobile from './img/background_mobile_water.png';
+// import backgroundImageDesktop from './img/background_desktop_water.png';
+// import backgroundImageMobile from './img/background_mobile_water.png';
 
 
-import {ThemeOptions, ThemeProvider} from '@mui/material/styles';
+import {ThemeProvider} from '@mui/material/styles';
 import AdminLogin from './form/userArea/adminLogin';
 
 import './css/global.css';
 import Dashboard from "./form/adminArea/Dashboard";
 import UserLoginPage from "./userLoginPage";
+import SpaceBackground from "./form/components/spaceBackground";
 
+
+import { ThemeOptions } from '@mui/material/styles';
 
 export const themeOptions: ThemeOptions = {
   palette: {
-    mode: 'light',
+    mode: 'dark',
     primary: {
-      main: '#00AEFF', // Ocean blue
+      // A cosmic purple
+      main: '#C679FF',
     },
     secondary: {
-      // main: '#F7D100', // A vibrant yellow
-        main: '#2A00F7'
+      // A complementary accent (gold, pink, or any star-like color)
+      main: '#FFD54F',
     },
     background: {
-      default: 'rgba(255, 255, 255, 0.2)', // Slightly more transparent
-      paper: 'rgba(255, 255, 255, 0.5)',
+      // Fully black background
+      default: '#000000',
+      // Slightly lighter/darker gray for “paper” elements
+      paper: '#1A1A1A',
     },
-    divider: 'rgba(0, 174, 255, 0.8)', // Brighter ocean blue
+    divider: 'rgba(198, 121, 255, 0.3)', // Purple-tinted divider
     text: {
-      primary: '#2A00F7', // A darker blue for better contrast
-      secondary: 'rgba(0, 0, 0, 0.8)',
+      // White primary text for good contrast on dark background
+      primary: '#FFFFFF',
+      // Softer secondary text
+      secondary: '#AAAAAA',
     },
   },
   typography: {
-    // Keep your friendly font family
+    // Keep the festival’s friendly font family
     fontFamily: [
       'Kavoon',
       'Roboto',
@@ -59,8 +67,8 @@ export const themeOptions: ThemeOptions = {
       styleOverrides: {
         root: {
           fontFamily: 'Kavoon',
-          backgroundColor: 'rgba(255,255, 255, 0.1)',
-          backdropFilter: 'blur(10px)',
+          backgroundColor: 'rgba(255,255,255,0.0)', // Slightly transparent for a spacey look
+          // backdropFilter: 'blur(10px)',
         },
       },
     },
@@ -68,31 +76,26 @@ export const themeOptions: ThemeOptions = {
 };
 
 
-const theme = createTheme(themeOptions);
 const documentHeight = () => {
     const doc = document.documentElement
     doc.style.setProperty('--doc-height', `${window.innerHeight - 8}px`)
 }
+
+const theme = createTheme(themeOptions);
 
 const App = () => {
     const [auth, setAuth] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const [token, setToken] = useState("");
 
-    // Restore token from local storage at startup
     useEffect(() => {
         const storedToken = window.localStorage.getItem("token");
         if (storedToken) {
             setToken(storedToken);
             setAuth(true);
-            // You might want to verify the token here and set isAdmin if applicable
         }
-
-        window.addEventListener('resize', documentHeight);
-        documentHeight()
     }, []);
 
-    // Save token to local storage whenever it changes
     useEffect(() => {
         if (token) {
             window.localStorage.setItem("token", token);
@@ -102,35 +105,35 @@ const App = () => {
     }, [token]);
 
     return (
-        <ThemeProvider theme={theme}>
-            <Box
-                sx={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100vw',
-                    height: '100vh',
-                    backgroundImage: `url(${window.innerWidth < 600 ? backgroundImageMobile : backgroundImageDesktop})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                }}
-            >
-                <AuthContext.Provider value={{ auth, setAuth, isAdmin, setIsAdmin }}>
-                    <TokenContext.Provider value={{ token, setToken }}>
-                        <BrowserRouter>
-                            <Routes>
-                                <Route path="/" element={auth ? <Navigate replace to="/form"/> : <UserLoginPage/>}/>
-                                <Route path="/form" element={auth ? <FormContainer/> : <Navigate replace to="/"/>}/>
-                                <Route path="/admin"
-                                       element={isAdmin ? <Navigate replace to="/admin/dashboard"/> : <AdminLogin/>}/>
-                                <Route path="/admin/dashboard"
-                                       element={isAdmin ? <Dashboard/> : <Navigate replace to="/admin"/>}/>
-                            </Routes>
-                        </BrowserRouter>
-                    </TokenContext.Provider>
-                </AuthContext.Provider>
-            </Box>
-        </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        {/* Our new starfield background behind everything */}
+        <SpaceBackground />
+
+        {/* Content container (on top) */}
+        <Box
+          sx={{
+            position: 'relative',
+            width: '100vw',
+            height: '100vh',
+            overflow: 'auto'
+          }}
+        >
+            <AuthContext.Provider value={{ auth, setAuth, isAdmin, setIsAdmin }}>
+                <TokenContext.Provider value={{ token, setToken }}>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/" element={auth ? <Navigate replace to="/form"/> : <UserLoginPage/>}/>
+                            <Route path="/form" element={auth ? <FormContainer/> : <Navigate replace to="/"/>}/>
+                            <Route path="/admin"
+                                  element={isAdmin ? <Navigate replace to="/admin/dashboard"/> : <AdminLogin/>}/>
+                            <Route path="/admin/dashboard"
+                                  element={isAdmin ? <Dashboard/> : <Navigate replace to="/admin"/>}/>
+                        </Routes>
+                    </BrowserRouter>
+                </TokenContext.Provider>
+            </AuthContext.Provider>
+        </Box>
+      </ThemeProvider>
     );
 };
 
