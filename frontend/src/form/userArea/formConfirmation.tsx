@@ -73,7 +73,7 @@ function FormConfirmation(props: FinalBookingProps) {
     }, [redirecting]);
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(betreff);
+        navigator.clipboard.writeText(betreff).then();
     }
 
     const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {

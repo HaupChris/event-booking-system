@@ -1,5 +1,5 @@
 import {Booking, WorkShift as WorkShiftType} from '../userArea/interface';
-import {Box, Divider, List, ListItem, Typography} from '@mui/material';
+import {Box, List, ListItem, Typography} from '@mui/material';
 import React, {useEffect, useState} from 'react';
 import TimeSlot from './timeSlot';
 import '../../css/workShift.css';

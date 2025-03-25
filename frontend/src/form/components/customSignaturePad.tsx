@@ -154,6 +154,6 @@ function CustomSignaturePad(props: SignaturePadProps) {
 			height={200}
 		/>
 	);
-};
+}
 
 export default CustomSignaturePad;

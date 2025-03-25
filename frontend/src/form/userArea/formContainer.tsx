@@ -302,7 +302,7 @@ export function FormContainer() {
                 }
             )
             .catch((error) => {
-                // 	catch 401 and redirect to login
+                // 	catch 401 and redirect to log in
                 setAuth(false);
                 setToken("");
 
@@ -408,9 +408,9 @@ export function FormContainer() {
 
     function updateBooking(key: keyof Booking, value: any) {
         setBooking((prevBooking) => {
-            let ticketOption = undefined;
-            let beverageOption = undefined;
-            let foodOption = undefined;
+            let ticketOption;
+            let beverageOption;
+            let foodOption;
             let total_price = 0;
             let newBooking = {...prevBooking};
 

@@ -1,4 +1,4 @@
-import { FormControl, FormControlLabel, Radio, RadioGroup, FormHelperText } from "@mui/material";
+import { FormControl, FormControlLabel, Radio, RadioGroup } from "@mui/material";
 import { FormProps } from './formContainer';
 import {FormContent, TicketOption} from './interface';
 import React from "react";

@@ -79,6 +79,6 @@ function UserLoginPage() {
             </Box>
         </Container>
     );
-};
+}
 
 export default UserLoginPage;

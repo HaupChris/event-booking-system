@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {Box, Button, Typography} from '@mui/material';
+import {Box, Button} from '@mui/material';
 import SignatureCanvas from 'react-signature-canvas';
 import {Booking} from "../userArea/interface";
 import '../../css/signature.css';
