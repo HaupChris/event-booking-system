@@ -1,4 +1,13 @@
 @font-face {
-  font-family: 'Kavoon';
-  src: url('../fonts/Kavoon-Regular.ttf') format('truetype');
+    font-family: 'DSEG7Classic';
+    src: url('../../public/orbitron-latin-500-normal.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+
 }
+
+body {
+    letter-spacing: 0.03em;
+    word-spacing: 0.6em;
+}
+
