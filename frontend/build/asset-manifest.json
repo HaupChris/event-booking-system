@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/static/css/main.198f7b0b.css",
-    "main.js": "/static/js/main.cd1eeed9.js",
-    "static/js/787.4eb8244c.chunk.js": "/static/js/787.4eb8244c.chunk.js",
+    "main.css": "/static/css/main.7c163eaa.css",
+    "main.js": "/static/js/main.7b86ba8a.js",
+    "static/js/453.73decd4e.chunk.js": "/static/js/453.73decd4e.chunk.js",
     "static/media/background_desktop_water.png": "/static/media/background_desktop_water.0748354fbcdaa477b0e5.png",
     "static/media/background_mobile_water.png": "/static/media/background_mobile_water.287566981d06f77eec27.png",
     "static/media/grillgemuese.png": "/static/media/grillgemuese.7e20f81e0e1bfa92af90.png",
@@ -20,12 +20,12 @@
     "static/media/fish.png": "/static/media/fish.a8613f613a90b25c0a77.png",
     "static/media/Kavoon-Regular.ttf": "/static/media/Kavoon-Regular.c08a345df4ce2b8326ec.ttf",
     "index.html": "/index.html",
-    "main.198f7b0b.css.map": "/static/css/main.198f7b0b.css.map",
-    "main.cd1eeed9.js.map": "/static/js/main.cd1eeed9.js.map",
-    "787.4eb8244c.chunk.js.map": "/static/js/787.4eb8244c.chunk.js.map"
+    "main.7c163eaa.css.map": "/static/css/main.7c163eaa.css.map",
+    "main.7b86ba8a.js.map": "/static/js/main.7b86ba8a.js.map",
+    "453.73decd4e.chunk.js.map": "/static/js/453.73decd4e.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.198f7b0b.css",
-    "static/js/main.cd1eeed9.js"
+    "static/css/main.7c163eaa.css",
+    "static/js/main.7b86ba8a.js"
   ]
 }
