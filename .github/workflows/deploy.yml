@@ -59,7 +59,7 @@ jobs:
                 image: ghcr.io/${{ env.REPO_OWNER_LOWERCASE }}/wiesenwahn-backend:latest
                 restart: always
                 volumes:
-                  - ./data:/app/db
+                  - ./data/bookings.db:/app/db/bookings.db
                   - ./logs:/app/logs
                 environment:
                   - JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
