@@ -20,3 +20,5 @@ venv
 
 server/.env
 /frontend/build/
+
+db_backup
