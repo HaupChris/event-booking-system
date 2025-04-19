@@ -37,7 +37,7 @@ jwt = JWTManager(app)
 limiter = Limiter(get_remote_address, app=app, default_limits=["20000 per day", "5000 per hour"])
 
 # Register blueprints
-app.register_blueprint(auth_bp, url_prefix="/api")
+app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(bookings_bp, url_prefix="/api")
 app.register_blueprint(formcontent_bp, url_prefix="/api")
 app.register_blueprint(health_bp, url_prefix="/api")

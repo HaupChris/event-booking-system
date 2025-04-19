@@ -14,11 +14,11 @@ auth_bp = Blueprint("auth", __name__)
 limiter_auth = Limiter(get_remote_address)
 
 # Pre-hash your environment variables if needed; or store hashed versions in .env
-PASSWORD = os.environ.get("PASSWORD", "")
+PASSWORD = os.environ.get("PASSWORD", "b")
 if PASSWORD == "":
     root_logger.debug("user password loading from environment variable failed!")
 
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "a")
 if ADMIN_PASSWORD == "":
     root_logger.debug("admin password loading from environment variable failed!")
 
@@ -44,7 +44,7 @@ def authenticate_admin():
     return jsonify(access_token=access_token), 200
 
 
-@auth_bp.route("/auth", methods=["POST"])  # e.g. /api/auth
+@auth_bp.route("/", methods=["POST"])  # e.g. /api/auth
 # @limiter_auth.limit("100/minute")
 def authenticate():
     password = request.json.get("password")
