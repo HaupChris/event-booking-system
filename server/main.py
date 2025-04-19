@@ -1,7 +1,7 @@
 import os
 import sys
 
-from flask import Flask, send_from_directory, request
+from flask import Flask, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_limiter import Limiter
@@ -18,10 +18,8 @@ from src.api.health import health_bp
 
 load_dotenv()
 
-app = Flask(
-    __name__,
-    static_folder=os.path.join(os.path.dirname(__file__), '../frontend/build')
-)
+app = Flask(__name__)
+
 
 # Setup CORS
 CORS(app)
@@ -39,7 +37,7 @@ jwt = JWTManager(app)
 limiter = Limiter(get_remote_address, app=app, default_limits=["20000 per day", "5000 per hour"])
 
 # Register blueprints
-app.register_blueprint(auth_bp, url_prefix="/api/auth")
+app.register_blueprint(auth_bp, url_prefix="/api")
 app.register_blueprint(bookings_bp, url_prefix="/api")
 app.register_blueprint(formcontent_bp, url_prefix="/api")
 app.register_blueprint(health_bp, url_prefix="/api")
@@ -72,19 +70,6 @@ def handle_exception(exc_type, exc_value, exc_traceback):
     app.logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
 sys.excepthook = handle_exception
-
-# Serve front-end build if desired
-@app.route("/", defaults={'path': ''})
-@app.route("/<path:path>")
-def serve_react(path):
-    """
-    Serves the React build from the static folder if found,
-    else falls back to index.html
-    """
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, "index.html")
 
 
 if __name__=="__main__":
