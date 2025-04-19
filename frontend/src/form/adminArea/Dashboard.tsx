@@ -24,7 +24,7 @@ import {
 } from '@mui/icons-material';
 import HomePage from './HomePage';
 import {getDummyFormContent} from "../userArea/formContainer";
-import {AuthContext, TokenContext} from "../../AuthContext";
+import {TokenContext} from "../../AuthContext";
 import axios from "axios";
 import ListItemButton from "@mui/material/ListItemButton";
 import BookingsPage from "./BookingsPage";
@@ -36,9 +36,7 @@ import WorkshiftsPage from "./WorkshiftsPage";
 import TicketsPage from "./TicketsPage";
 import {CSVLink} from "react-csv";
 import {Booking, FormContent} from "../userArea/interface";
-import FinancialsOverviewPage from "./FinancialsOverviewPage";
-import PaymentConfirmationsPage from "./PaymentConfirmationsPage";
-import ShiftAssignmentsPage from "./ShiftAssignmentsPage";
+
 
 export const themeOptions: ThemeOptions = {
     components: {
@@ -174,12 +172,6 @@ const adminPermissions = ["read", "financial"];
                 return <MaterialsPage />;
             case DashboardView.Supportshifts:
                 return <WorkshiftsPage />;
-            case DashboardView.FinancialsOverview:
-                return <FinancialsOverviewPage />;
-            case DashboardView.PaymentConfirmations:
-                return <PaymentConfirmationsPage />;
-            case DashboardView.ShiftAssignments:
-                return <ShiftAssignmentsPage />;
             default:
                 return <HomePage />;
         }
