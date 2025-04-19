@@ -26,6 +26,7 @@ function UserLoginPage() {
             if (response.ok) {
                 const data = await response.json();
                 setToken(data.access_token);
+                console.log("Auth successfull. Token: ", data.access_token);
                 setAuth(true);
                 navigate('/form');
             } else {

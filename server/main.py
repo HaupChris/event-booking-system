@@ -1,7 +1,7 @@
 import os
 import sys
 
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_limiter import Limiter
@@ -45,6 +45,26 @@ app.register_blueprint(formcontent_bp, url_prefix="/api")
 app.register_blueprint(health_bp, url_prefix="/api")
 
 
+@app.errorhandler(Exception)
+def handle_all_errors(e):
+    app.logger.exception("Unhandled Exception: %s", e)
+    return {"message": "Internal server error", "details": str(e)}, 500
+
+
+@app.before_request
+def log_request_info():
+    app.logger.debug('Headers: %s', request.headers)
+    app.logger.debug('Body: %s', request.get_data())
+    app.logger.debug('Route: %s %s', request.method, request.path)
+
+
+@app.after_request
+def log_response_info(response):
+    app.logger.debug('Response status: %s', response.status)
+    app.logger.debug('Response headers: %s', response.headers)
+    return response
+
+
 def handle_exception(exc_type, exc_value, exc_traceback):
     if issubclass(exc_type, KeyboardInterrupt):
         sys.__excepthook__(exc_type, exc_value, exc_traceback)
@@ -65,3 +85,7 @@ def serve_react(path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, "index.html")
+
+
+if __name__=="__main__":
+    app.run(debug=False, host="0.0.0.0", port=5001)
