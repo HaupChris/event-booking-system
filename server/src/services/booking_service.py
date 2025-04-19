@@ -2,7 +2,6 @@ import base64
 import os
 import sqlite3
 from contextlib import closing
-from datetime import datetime
 from typing import List
 
 from src.models.datatypes import Booking, BookingWithTimestamp
