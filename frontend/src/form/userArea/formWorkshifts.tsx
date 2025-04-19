@@ -45,11 +45,14 @@ function WorkShiftForm(props: FormProps) {
   const [tooltipNumShiftsOpen, setTooltipNumShiftsOpen] = useState(false);
   const [imageClass, setImageClass] = useState("jellyfish");
   const [supporterBuddyFirstName, setSupporterBuddyFirstName] = useState(props.currentBooking.supporter_buddy.split(" ")[0]);
-  const [supporterBuddyLastName, setSupporterBuddyLastName] = useState(props.currentBooking.supporter_buddy.split(" ")[1]);
+  const [supporterBuddyLastName, setSupporterBuddyLastName] = useState(props.currentBooking.supporter_buddy.split(" ")[1] || "");
 
   useEffect(() => {
+    console.log(supporterBuddyFirstName);
+    console.log(supporterBuddyLastName);
+
     props.updateBooking("supporter_buddy", supporterBuddyFirstName + " " + supporterBuddyLastName);
-  }, [supporterBuddyFirstName, supporterBuddyFirstName]);
+  }, [supporterBuddyFirstName, supporterBuddyLastName]);
 
   useEffect(() => {
     updateAvailablePriorities();
