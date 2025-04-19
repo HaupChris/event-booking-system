@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
     Box, Typography, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, Paper, Modal, IconButton, Select, MenuItem, FormControl, InputLabel, Button, TextField
@@ -8,6 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import {useFetchData, Booking} from "./useFetchData";
+import {AuthContext} from "../../AuthContext";
 
 
 const BookingsPage: React.FC = () => {
@@ -18,6 +19,7 @@ const BookingsPage: React.FC = () => {
     const [sortCriterion, setSortCriterion] = useState('timestamp');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
     const [searchQuery, setSearchQuery] = useState('');
+    const {adminPermissions} = useContext(AuthContext);
 
 
 

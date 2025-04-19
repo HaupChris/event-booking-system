@@ -34,7 +34,6 @@ enum FormSteps {
     Confirmation = 9,
 }
 
-
 function getEmptyBooking(): Booking {
     return {
         last_name: "",
@@ -170,7 +169,6 @@ export function getDummyFormContent(): FormContent {
     };
 }
 
-
 export interface FormProps {
     updateBooking: (key: keyof Booking, value: any) => void;
     currentBooking: Booking;
@@ -240,7 +238,7 @@ export function FormContainer() {
     };
 
 // Define the current version number of the form
-    const VERSION_NUMBER = '1.1';
+    const VERSION_NUMBER = '1.2';
 
 // Function to check and clear outdated data from local storage
     const clearOutdatedData = () => {

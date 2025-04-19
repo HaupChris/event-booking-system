@@ -63,6 +63,8 @@ class Booking(Interface):
     first_name: str
     email: str
     phone: str
+    role: str # "Artist", "ArtistGuest" or "NormalGuest"
+    artist_reference: str # Only for "ArtistGuest" to reference the artist
     ticket_id: int
     beverage_id: int
     food_id: int

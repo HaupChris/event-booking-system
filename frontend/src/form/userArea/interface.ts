@@ -61,6 +61,8 @@ export interface Booking {
     first_name: string;
     email: string;
     phone: string;
+    role: string;
+    artist_reference: string;
     ticket_id: number;
     beverage_id: number;
     food_id: number;
