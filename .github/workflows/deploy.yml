@@ -22,19 +22,22 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Convert repository owner to lowercase
+        run: echo "REPO_OWNER_LOWERCASE=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+
       - name: Build and push backend
         uses: docker/build-push-action@v4
         with:
           context: ./server
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/wiesenwahn-backend:latest
+          tags: ghcr.io/${{ env.REPO_OWNER_LOWERCASE }}/wiesenwahn-backend:latest
 
       - name: Build and push frontend
         uses: docker/build-push-action@v4
         with:
           context: ./frontend
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/wiesenwahn-frontend:latest
+          tags: ghcr.io/${{ env.REPO_OWNER_LOWERCASE }}/wiesenwahn-frontend:latest
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.0
@@ -53,7 +56,7 @@ jobs:
             
             services:
               backend:
-                image: ghcr.io/${{ github.repository_owner }}/wiesenwahn-backend:latest
+                image: ghcr.io/${{ env.REPO_OWNER_LOWERCASE }}/wiesenwahn-backend:latest
                 restart: always
                 volumes:
                   - ./data:/app/db
@@ -66,7 +69,7 @@ jobs:
                   - GMAIL_PASS=${{ secrets.GMAIL_PASS }}
             
               frontend:
-                image: ghcr.io/${{ github.repository_owner }}/wiesenwahn-frontend:latest
+                image: ghcr.io/${{ env.REPO_OWNER_LOWERCASE }}/wiesenwahn-frontend:latest
                 restart: always
                 ports:
                   - "8080:80"  # Exposed only on localhost for Nginx to proxy
