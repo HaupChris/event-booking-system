@@ -1,0 +1,89 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./server
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/wiesenwahn-backend:latest
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/wiesenwahn-frontend:latest
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          port: ${{ secrets.SERVER_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Create deployment directory if it doesn't exist
+            mkdir -p /opt/wiesenwahn
+            
+            # Create docker-compose file
+            cat > /opt/wiesenwahn/docker-compose.yml << 'EOL'
+            version: '3.8'
+            
+            services:
+              backend:
+                image: ghcr.io/${{ github.repository_owner }}/wiesenwahn-backend:latest
+                restart: always
+                volumes:
+                  - ./data:/app/db
+                  - ./logs:/app/logs
+                environment:
+                  - JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+                  - PASSWORD=${{ secrets.USER_PASSWORD }}
+                  - ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+                  - GMAIL_USER=${{ secrets.GMAIL_USER }}
+                  - GMAIL_PASS=${{ secrets.GMAIL_PASS }}
+            
+              frontend:
+                image: ghcr.io/${{ github.repository_owner }}/wiesenwahn-frontend:latest
+                restart: always
+                ports:
+                  - "8080:80"  # Exposed only on localhost for Nginx to proxy
+                depends_on:
+                  - backend
+            EOL
+            
+            # Backup the database before updating
+            bash /opt/wiesenwahn/backup.sh deploy-backup || true
+            
+            # Pull latest images
+            cd /opt/wiesenwahn
+            docker-compose pull
+            
+            # Restart services
+            docker-compose down
+            docker-compose up -d
+            
+            # Clean up old images
+            docker image prune -af

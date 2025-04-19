@@ -14,6 +14,7 @@ from src.api.formcontent import formcontent_bp
 
 from src.utils.config import load_config
 from src.utils.logger import configure_logging
+from src.api.health import health_bp
 
 load_dotenv()
 
@@ -41,6 +42,7 @@ limiter = Limiter(get_remote_address, app=app, default_limits=["20000 per day", 
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(bookings_bp, url_prefix="/api")
 app.register_blueprint(formcontent_bp, url_prefix="/api")
+app.register_blueprint(health_bp, url_prefix="/api")
 
 
 def handle_exception(exc_type, exc_value, exc_traceback):
