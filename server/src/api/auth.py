@@ -44,7 +44,7 @@ def authenticate_admin():
     return jsonify(access_token=access_token), 200
 
 
-@auth_bp.route("/", methods=["POST"])  # e.g. /api/auth
+@auth_bp.route("", methods=["POST"])  # e.g. /api/auth
 # @limiter_auth.limit("100/minute")
 def authenticate():
     password = request.json.get("password")
