@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { TokenContext } from '../../AuthContext';
+import {FormContent} from "../userArea/interface";
 
 export interface Booking {
   id: number;
@@ -22,13 +23,6 @@ export interface Booking {
   material_ids: number[];
 }
 
-export interface FormContent {
-  ticket_options: { id: number; title: string; num_booked: number }[];
-  beverage_options: { id: number; title: string; num_booked: number }[];
-  food_options: { id: number; title: string; num_booked: number }[];
-  work_shifts: { id: number; title: string; time_slots: { id: number; title: string, start_time: string, end_time: string, num_booked: number, num_needed: number}[] }[];
-  materials: { id: number; title: string; num_needed: number }[];
-}
 
 export const useFetchData = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -51,7 +45,10 @@ export const useFetchData = () => {
     axios.get('/api/formcontent', {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(response => setFormContent(response.data))
+      .then(response => {
+        console.log("/api/formcontent: ", response.data);
+        setFormContent(response.data)
+      })
       .catch(error => console.error('Error:', error));
   }, [token]);
 
