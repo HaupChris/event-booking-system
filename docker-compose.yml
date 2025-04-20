@@ -4,6 +4,8 @@ services:
   backend:
     image: ghcr.io/${{ github.repository_owner }}/wiesenwahn-backend:latest
     restart: always
+    ports:
+      - "127.0.0.1:5001:5001"   # bind container’s 5001 → host’s 127.0.0.1:5001
     volumes:
       - ./data:/app/db
       - ./logs:/app/logs
