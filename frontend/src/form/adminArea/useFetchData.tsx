@@ -1,31 +1,16 @@
-import { useEffect, useState, useContext } from 'react';
+import {useEffect, useState, useContext, useCallback} from 'react';
 import axios from 'axios';
 import { TokenContext } from '../../AuthContext';
-import {FormContent} from "../userArea/interface";
+import {Booking, FormContent} from "../userArea/interface";
 
-export interface Booking {
-  id: number;
-  last_name: string;
-  first_name: string;
-  timestamp: string;
-  email: string;
-  phone: string;
-  ticket_id: number;
-  beverage_id: number;
-  food_id: number;
-  timeslot_priority_1: number;
-  timeslot_priority_2: number;
-  timeslot_priority_3: number;
-  amount_shifts: number;
-  supporter_buddy: string;
-  signature: string;
-  total_price: number;
-  material_ids: number[];
+
+export interface BookingWithTimestamp extends Booking {
+  id: number
+  timestamp: string
 }
 
-
 export const useFetchData = () => {
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookings, setBookings] = useState<BookingWithTimestamp[]>([]);
   const [formContent, setFormContent] = useState<FormContent>({
     ticket_options: [],
     beverage_options: [],
@@ -35,22 +20,27 @@ export const useFetchData = () => {
   });
   const { token } = useContext(TokenContext);
 
-  useEffect(() => {
-    axios.get('/api/data', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(response => setBookings(response.data))
-      .catch(error => console.error('Error:', error));
+  const fetchData = useCallback(async () => {
+    try {
+      const [bookingsResponse, formContentResponse] = await Promise.all([
+        axios.get('/api/data', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('/api/formcontent', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
 
-    axios.get('/api/formcontent', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(response => {
-        console.log("/api/formcontent: ", response.data);
-        setFormContent(response.data)
-      })
-      .catch(error => console.error('Error:', error));
+      setBookings(bookingsResponse.data);
+      setFormContent(formContentResponse.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   }, [token]);
 
-  return { bookings, formContent };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { bookings, formContent, refetch: fetchData };
 };

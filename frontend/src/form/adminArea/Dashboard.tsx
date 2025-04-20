@@ -37,6 +37,7 @@ import TicketsPage from "./TicketsPage";
 import {CSVLink} from "react-csv";
 import {Booking, FormContent} from "../userArea/interface";
 import FinancialsOverviewPage from "./FinancialsOverviewPage";
+import PaymentConfirmationsPage from "./PaymentConfirmationsPage";
 
 
 export const themeOptions: ThemeOptions = {
@@ -175,6 +176,8 @@ const adminPermissions = ["read", "financial"];
                 return <WorkshiftsPage />;
             case DashboardView.FinancialsOverview:
                 return <FinancialsOverviewPage />;
+            case DashboardView.PaymentConfirmations:
+                return <PaymentConfirmationsPage />;
             default:
                 return <HomePage />;
         }

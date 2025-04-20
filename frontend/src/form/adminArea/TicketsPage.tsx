@@ -10,18 +10,18 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {useFetchData} from './useFetchData';
-import {Booking} from './useFetchData';
+import {BookingWithTimestamp} from './useFetchData';
 
 function TicketsPage() {
     const {bookings, formContent} = useFetchData();
-    const [attendees, setAttendees] = useState<{ [key: string]: Booking[] }>({
+    const [attendees, setAttendees] = useState<{ [key: string]: BookingWithTimestamp[] }>({
         Donnerstag: [],
         Freitag: [],
         Samstag: []
     });
 
     useEffect(() => {
-        const newAttendees: { [key: string]: Booking[] } = {
+        const newAttendees: { [key: string]: BookingWithTimestamp[] } = {
             Donnerstag: [],
             Freitag: [],
             Samstag: []

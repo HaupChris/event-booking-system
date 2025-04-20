@@ -36,6 +36,7 @@ enum FormSteps {
 
 function getEmptyBooking(): Booking {
     return {
+        id: 0,
         last_name: "",
         first_name: "",
         email: "",
@@ -51,6 +52,10 @@ function getEmptyBooking(): Booking {
         supporter_buddy: "",
         total_price: -1.0,
         signature: "",
+        is_paid: false,
+        paid_amount: 0,
+        payment_date: "",
+        payment_notes: ""
     }
 }
 

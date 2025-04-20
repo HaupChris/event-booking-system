@@ -57,6 +57,7 @@ export interface FormContent {
 }
 
 export interface Booking {
+    id: number;
     last_name: string;
     first_name: string;
     email: string;
@@ -72,4 +73,8 @@ export interface Booking {
     amount_shifts: number;
     supporter_buddy: string;
     total_price: number;
+    is_paid: boolean;
+    paid_amount: number;
+    payment_notes: string;
+    payment_date: string;
 }

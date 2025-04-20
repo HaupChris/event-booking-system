@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import List
 from py_ts_interfaces import Interface
 
 @dataclass
@@ -74,7 +74,12 @@ class Booking(Interface):
     supporter_buddy: str
     total_price: float
     signature: str
+    is_paid: bool
+    paid_amount: float
+    payment_notes: str
+    payment_date: str
 
 @dataclass
 class BookingWithTimestamp(Booking):
+    id: int
     timestamp: str

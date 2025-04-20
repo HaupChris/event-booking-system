@@ -9,6 +9,8 @@ from src.models.datatypes import Booking
 from src.services.booking_service import insert_booking, get_all_bookings, get_up_to_date_form_content
 from src.services.mail_service import send_confirmation_mail
 
+from services.booking_service import update_booking_db, update_booking_payment
+
 bookings_bp = Blueprint("bookings", __name__)
 limiter_bookings = Limiter(get_remote_address)
 
@@ -18,6 +20,8 @@ limiter_bookings = Limiter(get_remote_address)
 @jwt_required()
 def submit_form():
     booking_data = request.json
+    if "id" in booking_data:
+        del booking_data["id"]
     booking = Booking(**booking_data)
 
     success = insert_booking(booking)
@@ -46,3 +50,48 @@ def get_bookings():
 
     all_bookings = get_all_bookings()
     return jsonify([dataclasses.asdict(b) for b in all_bookings]), 200
+
+
+@bookings_bp.route("/booking/<int:booking_id>", methods=["PUT"])
+@limiter_bookings.limit("60/minute")
+@jwt_required()
+def update_booking(booking_id):
+    booking_data = request.json
+
+    # Validate input data
+    required_fields = ["first_name", "last_name", "email", "phone", "ticket_id",
+                       "beverage_id", "food_id", "total_price"]
+
+    for field in required_fields:
+        if field not in booking_data:
+            return jsonify({"error": f"Missing required field: {field}"}), 400
+
+    success = update_booking_db(booking_id, booking_data)
+
+    if success:
+        return jsonify({"message": "Booking updated successfully"}), 200
+    else:
+        return jsonify({"error": "Failed to update booking"}), 404
+
+
+# Add to server/src/api/bookings.py
+
+@bookings_bp.route("/booking/<int:booking_id>/payment", methods=["PUT"])
+@limiter_bookings.limit("60/minute")
+@jwt_required()
+def update_payment_status(booking_id):
+    payment_data = request.json
+
+    # Validate input data
+    required_fields = ["is_paid", "paid_amount"]
+
+    for field in required_fields:
+        if field not in payment_data:
+            return jsonify({"error": f"Missing required field: {field}"}), 400
+
+    success = update_booking_payment(booking_id, payment_data)
+
+    if success:
+        return jsonify({"message": "Payment status updated successfully"}), 200
+    else:
+        return jsonify({"error": "Failed to update payment status"}), 404
