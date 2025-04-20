@@ -58,6 +58,8 @@ jobs:
               backend:
                 image: ghcr.io/${{ env.REPO_OWNER_LOWERCASE }}/wiesenwahn-backend:latest
                 restart: always
+                ports:
+                  - "127.0.0.1:5001:5001"
                 volumes:
                   - ./data/bookings.db:/app/db/bookings.db
                   - ./logs:/app/logs
