@@ -89,7 +89,7 @@ def create_booking(user_id: int, booking: Booking) -> int:
                            booking.total_price,
                            booking.is_paid,
                            booking.paid_amount,
-                           booking.paymenet_notes,
+                           booking.payment_notes,
                            booking.payment_date
                        ))
         conn.commit()
