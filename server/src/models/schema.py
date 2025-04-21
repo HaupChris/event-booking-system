@@ -1,7 +1,6 @@
 import sqlite3
 
 
-
 def apply_migration(db_file_path: str) -> None:
     """
     Applies a migration SQL script to the database.
