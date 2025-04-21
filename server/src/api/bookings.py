@@ -95,3 +95,33 @@ def update_payment_status(booking_id):
         return jsonify({"message": "Payment status updated successfully"}), 200
     else:
         return jsonify({"error": "Failed to update payment status"}), 404
+
+
+@bookings_bp.route("/submitArtistForm", methods=["POST"])
+@limiter_bookings.limit("90/minute")
+@jwt_required()
+def submit_artist_form():
+    booking_data = request.json
+    if "id" in booking_data:
+        del booking_data["id"]
+
+    # Ensure the artist flag is set
+    booking_data["is_artist"] = True
+
+    # Create a Booking object from the request data
+    booking = Booking(**booking_data)
+
+    success = insert_booking(booking)
+    request_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{request_time}] Received artist booking from {booking.first_name} {booking.last_name}")
+
+    if success:
+        # Send email
+        form_content_dict = get_up_to_date_form_content()
+        # Here you could create a custom email template for artists
+        send_confirmation_mail(booking, form_content_dict)
+        print(f"Artist booking & mail done for {booking.first_name} {booking.last_name}")
+        return jsonify({"msg": "Artist booking successful"}), 200
+    else:
+        print(f"Duplicate artist booking attempt for {booking.first_name} {booking.last_name}")
+        return jsonify({"error": "Duplicate booking"}), 400

@@ -1,6 +1,13 @@
 // Generated using py-ts-interfaces.
 // See https://github.com/cs-cordero/py-ts-interfaces
 
+export interface ArtistMaterial {
+    id: number;
+    title: string;
+    num_needed: number;
+    num_booked: number;
+}
+
 export interface TimeSlot {
     id: number;
     title: string;
@@ -54,6 +61,7 @@ export interface FormContent {
     food_options: Array<FoodOption>;
     work_shifts: Array<WorkShift>;
     materials: Array<Material>;
+    artist_materials: Array<ArtistMaterial>;
 }
 
 export interface Booking {
@@ -77,4 +85,9 @@ export interface Booking {
     paid_amount: number;
     payment_notes: string;
     payment_date: string;
+    is_artist: boolean; // New field
+    artist_equipment: string; // New field
+    special_requests: string; // New field
+    performance_details: string; // New field
+    artist_material_ids: Array<number>; // New field
 }

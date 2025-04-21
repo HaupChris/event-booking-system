@@ -17,6 +17,8 @@ import SpaceBackground from "./form/components/spaceBackground";
 
 
 import {ThemeOptions} from '@mui/material/styles';
+import { ArtistFormContainer } from './form/artistArea/artistFormContainer';
+import ArtistLoginPage from "./artistLoginPage";
 
 // export const themeOptions: ThemeOptions = {
 //   palette: {
@@ -220,6 +222,10 @@ const App = () => {
                             <Routes>
                                 <Route path="/" element={auth ? <Navigate replace to="/form"/> : <UserLoginPage/>}/>
                                 <Route path="/form" element={auth ? <FormContainer/> : <Navigate replace to="/"/>}/>
+                                <Route path="/artist"
+                                       element={auth ? <Navigate replace to="/artist-form"/> : <ArtistLoginPage/>}/>
+                                <Route path="/artist-form"
+                                       element={auth ? <ArtistFormContainer/> : <Navigate replace to="/artist"/>}/>
                                 <Route path="/admin"
                                        element={isAdmin ? <Navigate replace to="/admin/dashboard"/> : <AdminLogin/>}/>
                                 <Route path="/admin/dashboard"

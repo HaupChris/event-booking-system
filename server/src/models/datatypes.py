@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 from py_ts_interfaces import Interface
 
@@ -20,6 +20,13 @@ class WorkShift(Interface):
 
 @dataclass
 class Material(Interface):
+    id: int
+    title: str
+    num_needed: int
+    num_booked: int = 0
+
+@dataclass
+class ArtistMaterial(Interface):
     id: int
     title: str
     num_needed: int
@@ -56,6 +63,7 @@ class FormContent(Interface):
     food_options: List[FoodOption]
     work_shifts: List[WorkShift]
     materials: List[Material]
+    artist_materials: List[ArtistMaterial] = field(default_factory=list)
 
 @dataclass
 class Booking(Interface):
@@ -78,8 +86,13 @@ class Booking(Interface):
     paid_amount: float
     payment_notes: str
     payment_date: str
+    is_artist: bool = False
+    artist_equipment: str = ""
+    special_requests: str = ""
+    performance_details: str = ""
+    artist_material_ids: List[int] = field(default_factory=list)
 
 @dataclass
 class BookingWithTimestamp(Booking):
-    id: int
-    timestamp: str
+    id: int = -1
+    timestamp: str = ""

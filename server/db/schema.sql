@@ -49,6 +49,13 @@ CREATE TABLE IF NOT EXISTS Materials  (
     num_needed INTEGER NOT NULL
 );
 
+-- New table for artist materials
+CREATE TABLE IF NOT EXISTS ArtistMaterials (
+    id INTEGER PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    num_needed INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS Bookings  (
     id INTEGER PRIMARY KEY NOT NULL,
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -67,6 +74,9 @@ CREATE TABLE IF NOT EXISTS Bookings  (
     paid_amount REAL DEFAULT 0.0,
     payment_notes TEXT DEFAULT '',
     payment_date TEXT DEFAULT NULL,
+    is_artist INTEGER DEFAULT 0,
+    special_requests TEXT DEFAULT '',
+    performance_details TEXT DEFAULT '',
     FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE,
     FOREIGN KEY(ticket_option_id) REFERENCES TicketOptions(id) ON DELETE SET NULL,
     FOREIGN KEY(beverage_option_id) REFERENCES BeverageOptions(id) ON DELETE SET NULL,
@@ -76,6 +86,15 @@ CREATE TABLE IF NOT EXISTS Bookings  (
     FOREIGN KEY(third_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL
 );
 
+
+CREATE TABLE IF NOT EXISTS BookingArtistMaterials  (
+    id INTEGER PRIMARY KEY NOT NULL,
+    booking_id INTEGER,
+    artist_material_id INTEGER,
+    FOREIGN KEY(booking_id) REFERENCES Bookings(id) ON DELETE CASCADE,
+    FOREIGN KEY(artist_material_id) REFERENCES ArtistMaterials(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS BookingMaterials  (
     id INTEGER PRIMARY KEY NOT NULL,
     booking_id INTEGER,
@@ -83,6 +102,11 @@ CREATE TABLE IF NOT EXISTS BookingMaterials  (
     FOREIGN KEY(booking_id) REFERENCES Bookings(id) ON DELETE CASCADE,
     FOREIGN KEY(material_id) REFERENCES Materials(id) ON DELETE CASCADE
 );
+
+
+
+
+
 
 -- -- Insert dummy data into Users
 -- INSERT INTO Users (last_name, first_name, email, phone_number) VALUES

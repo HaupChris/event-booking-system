@@ -429,5 +429,63 @@
       "title": "Beamer",
       "num_needed": 2
     }
+  ],
+  "artist_materials": [
+    {
+      "title": "PA-Anlage",
+      "num_needed": 1
+    },
+    {
+      "title": "DJ-Equipment",
+      "num_needed": 1
+    },
+    {
+      "title": "Mikrofone",
+      "num_needed": 5
+    },
+    {
+      "title": "Lichterketten für Bühne",
+      "num_needed": 5
+    },
+    {
+      "title": "Bühnenbeleuchtung",
+      "num_needed": 3
+    },
+    {
+      "title": "Gitarrenverstärker",
+      "num_needed": 2
+    },
+    {
+      "title": "Bassverstärker",
+      "num_needed": 1
+    },
+    {
+      "title": "Schlagzeug",
+      "num_needed": 1
+    },
+    {
+      "title": "Keyboard/Synthesizer",
+      "num_needed": 1
+    },
+    {
+      "title": "Monitore/Bühnenboxen",
+      "num_needed": 4
+    },
+    {
+      "title": "Mischpult",
+      "num_needed": 1
+    },
+    {
+      "title": "Verlängerungskabel/Stromkabel",
+      "num_needed": 8
+    },
+    {
+      "title": "Raumtrenner/Paravents",
+      "num_needed": 2
+    },
+    {
+      "title": "Dekorationsmaterialien",
+      "num_needed": 10
+    }
   ]
 }

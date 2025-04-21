@@ -42,6 +42,11 @@ function getEmptyBooking(): Booking {
         email: "",
         phone: "",
         ticket_id: -1,
+        artist_equipment: "",
+        artist_material_ids: [],
+        is_artist: false,
+        performance_details: "",
+        special_requests: "",
         beverage_id: -1,
         food_id: -1,
         timeslot_priority_1: -1,
@@ -61,6 +66,14 @@ function getEmptyBooking(): Booking {
 
 export function getDummyFormContent(): FormContent {
     return {
+        artist_materials: [
+            {
+                id: 0,
+                title: "Boxen",
+                num_needed: 2,
+                num_booked: 0,
+            }
+        ],
         ticket_options: [
             {
                 id: 1,
@@ -170,7 +183,7 @@ export function getDummyFormContent(): FormContent {
                 num_needed: 15,
                 num_booked: 10,
             },
-        ],
+        ]
     };
 }
 

@@ -6,7 +6,7 @@ from typing import Callable
 
 from src.models.datatypes import (
     FormContent,
-    TicketOption, BeverageOption, FoodOption, WorkShift, TimeSlot, Material
+    TicketOption, BeverageOption, FoodOption, WorkShift, TimeSlot, Material, ArtistMaterial
 )
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), '../../data')
@@ -64,13 +64,21 @@ def get_form_content_obj() -> FormContent:
         for idx, material in enumerate(data['materials'])
     ]
 
+    # For artist materials
+    artist_materials = [
+        ArtistMaterial(id=idx, **am)
+        for idx, am in enumerate(data.get('artist_materials', []))
+    ]
+
     return FormContent(
         ticket_options=ticket_options,
         beverage_options=beverage_options,
         food_options=food_options,
         work_shifts=work_shifts,
-        materials=materials
+        materials=materials,
+        artist_materials=artist_materials
     )
+
 
 
 def update_form_content_with_db_counts(
@@ -100,6 +108,16 @@ def update_form_content_with_db_counts(
     # MATERIAL
     cursor.execute("SELECT material_id, COUNT(*) FROM BookingMaterials GROUP BY material_id")
     material_bookings = dict(cursor.fetchall())
+
+    # ARTIST MATERIAL
+    cursor.execute("SELECT artist_material_id, COUNT(*) FROM BookingArtistMaterials GROUP BY artist_material_id")
+    artist_material_bookings = dict(cursor.fetchall())
+
+    # Update the in-memory object section, add after the Materials section:
+
+    # Artist Materials
+    for am in form_content_obj.artist_materials:
+        am.num_booked = artist_material_bookings.get(am.id, 0)
 
     # TIMESLOT: first priority
     cursor.execute("""
