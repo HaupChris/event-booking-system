@@ -9,7 +9,7 @@ from src.models.datatypes import Booking
 from src.services.booking_service import insert_booking, get_all_bookings, get_up_to_date_form_content
 from src.services.mail_service import send_confirmation_mail
 
-from services.booking_service import update_booking_db, update_booking_payment
+from src.services.booking_service import update_booking_db, update_booking_payment
 
 bookings_bp = Blueprint("bookings", __name__)
 limiter_bookings = Limiter(get_remote_address)
