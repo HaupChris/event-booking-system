@@ -301,14 +301,20 @@ export function FormContainer() {
                 headers: {Authorization: `Bearer ${token}`}
             })
             .then((response) => {
-                    setFormContent(response.data);
-                }
-            )
+                console.log("API response success:", response.data);
+                setFormContent(response.data);
+            })
             .catch((error) => {
-                // 	catch 401 and redirect to log in
+                console.error("API error details:", {
+                    status: error.response?.status,
+                    statusText: error.response?.statusText,
+                    data: error.response?.data,
+                    headers: error.response?.headers
+                });
+
+                // Your existing error handling
                 setAuth(false);
                 setToken("");
-
             });
     }, []);
 
@@ -452,7 +458,7 @@ export function FormContainer() {
     }
 
     function submitBooking() {
-        setBookingState(prevState => ({ ...prevState, isSubmitting: true }));
+        setBookingState(prevState => ({...prevState, isSubmitting: true}));
         axios.post('/api/submitForm', booking, {
                 headers: {Authorization: `Bearer ${token}`}
             })
@@ -533,7 +539,8 @@ export function FormContainer() {
                 alignItems: 'center',
                 justifyContent: 'center'
             }}>
-                <Typography align="center" variant={"h4"} sx={{paddingBottom: "1em"}}>{stepTitles[activeStep]}</Typography>
+                <Typography align="center" variant={"h4"}
+                            sx={{paddingBottom: "1em"}}>{stepTitles[activeStep]}</Typography>
                 <Alert variant={"outlined"} sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>
                     {currentError}
                 </Alert>
