@@ -40,7 +40,10 @@ def authenticate_admin():
         return jsonify({"msg": "Missing password"}), 400
     if not check_password_hash(hashed_admin_password, password):
         return jsonify({"msg": "Bad password"}), 401
-    access_token = create_access_token(identity={"role": "admin"})
+    access_token = create_access_token(
+        identity="admin",
+        additional_claims={"role": "admin"}
+    )
     return jsonify(access_token=access_token), 200
 
 
@@ -52,5 +55,8 @@ def authenticate():
         return jsonify({"msg": "Missing password"}), 400
     if not check_password_hash(hashed_user_password, password):
         return jsonify({"msg": "Bad password"}), 401
-    access_token = create_access_token(identity={"role": "user"})
+    access_token = create_access_token(
+        identity="user",  # Make this a string
+        additional_claims={"role": "user"}  # Put role in additional claims
+    )
     return jsonify(access_token=access_token), 200
