@@ -1,8 +1,7 @@
-// frontend/src/form/artistArea/artistEquipment.tsx
-
 import React from 'react';
 import { Box, TextField, Typography, Paper } from '@mui/material';
 import { ArtistFormProps } from './artistFormContainer';
+
 
 function ArtistEquipmentForm(props: ArtistFormProps) {
     return (
@@ -22,10 +21,10 @@ function ArtistEquipmentForm(props: ArtistFormProps) {
                     rows={6}
                     label="Technische Anforderungen"
                     placeholder="z.B. Mikrofonbedarf, Verstärker, Monitore, Licht, etc."
-                    value={props.currentBooking.artist_equipment}
-                    onChange={(e) => props.updateBooking('artist_equipment', e.target.value)}
-                    error={!!props.formValidation.artist_equipment}
-                    helperText={props.formValidation.artist_equipment || ""}
+                    value={props.currentBooking.equipment}
+                    onChange={(e) => props.updateBooking('equipment', e.target.value)}
+                    error={!!props.formValidation.equipment}
+                    helperText={props.formValidation.equipment || ""}
                     required
                     sx={{ mb: 2 }}
                 />

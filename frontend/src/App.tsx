@@ -17,7 +17,7 @@ import SpaceBackground from "./form/components/spaceBackground";
 
 
 import {ThemeOptions} from '@mui/material/styles';
-import { ArtistFormContainer } from './form/artistArea/artistFormContainer';
+import {ArtistFormContainer} from './form/artistArea/artistFormContainer';
 import ArtistLoginPage from "./artistLoginPage";
 
 // export const themeOptions: ThemeOptions = {
@@ -220,12 +220,17 @@ const App = () => {
                     <TokenContext.Provider value={{token, setToken}}>
                         <BrowserRouter>
                             <Routes>
+                                {/* Regular user routes */}
                                 <Route path="/" element={auth ? <Navigate replace to="/form"/> : <UserLoginPage/>}/>
                                 <Route path="/form" element={auth ? <FormContainer/> : <Navigate replace to="/"/>}/>
+
+                                {/* Artist routes */}
                                 <Route path="/artist"
                                        element={auth ? <Navigate replace to="/artist-form"/> : <ArtistLoginPage/>}/>
                                 <Route path="/artist-form"
                                        element={auth ? <ArtistFormContainer/> : <Navigate replace to="/artist"/>}/>
+
+                                {/* Admin routes */}
                                 <Route path="/admin"
                                        element={isAdmin ? <Navigate replace to="/admin/dashboard"/> : <AdminLogin/>}/>
                                 <Route path="/admin/dashboard"

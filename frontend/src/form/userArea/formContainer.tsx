@@ -36,17 +36,11 @@ enum FormSteps {
 
 function getEmptyBooking(): Booking {
     return {
-        id: 0,
         last_name: "",
         first_name: "",
         email: "",
         phone: "",
         ticket_id: -1,
-        artist_equipment: "",
-        artist_material_ids: [],
-        is_artist: false,
-        performance_details: "",
-        special_requests: "",
         beverage_id: -1,
         food_id: -1,
         timeslot_priority_1: -1,
@@ -66,14 +60,6 @@ function getEmptyBooking(): Booking {
 
 export function getDummyFormContent(): FormContent {
     return {
-        artist_materials: [
-            {
-                id: 0,
-                title: "Boxen",
-                num_needed: 2,
-                num_booked: 0,
-            }
-        ],
         ticket_options: [
             {
                 id: 1,
@@ -227,7 +213,7 @@ export function FormContainer() {
 
     const {token, setToken} = useContext(TokenContext);
     const maxSteps = Object.keys(FormSteps).length / 2;
-    const {auth, setAuth} = useContext(AuthContext);
+    const {setAuth} = useContext(AuthContext);
 
     const stepTitles = {
         [FormSteps.NameAndAddress]: " Herzlich Willkommen zum Weiher Wald und Weltall-Wahn!",
@@ -434,7 +420,6 @@ export function FormContainer() {
             let beverageOption;
             let foodOption;
             let total_price = 0;
-            let newBooking = {...prevBooking};
 
             if (key === 'ticket_id') {
                 ticketOption = formContent.ticket_options.find((ticket) => ticket.id === value);
@@ -458,9 +443,7 @@ export function FormContainer() {
             total_price += beverageOption ? beverageOption.price : 0;
             total_price += foodOption ? foodOption.price : 0;
 
-            newBooking = {...prevBooking, [key]: value, total_price: total_price};
-
-            return newBooking;
+            return {...prevBooking, [key]: value, total_price: total_price};
         });
     }
 

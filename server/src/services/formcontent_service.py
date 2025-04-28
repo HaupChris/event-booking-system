@@ -6,7 +6,7 @@ from typing import Callable
 
 from src.models.datatypes import (
     FormContent,
-    TicketOption, BeverageOption, FoodOption, WorkShift, TimeSlot, Material, ArtistMaterial
+    TicketOption, BeverageOption, FoodOption, WorkShift, TimeSlot, Material, ArtistMaterial, ArtistFormContent
 )
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), '../../data')
@@ -79,6 +79,41 @@ def get_form_content_obj() -> FormContent:
         artist_materials=artist_materials
     )
 
+
+def get_artist_form_content_obj() -> ArtistFormContent:
+    """
+    Loads and returns an ArtistFormContent object from JSON.
+    """
+    ARTIST_FORM_CONTENT_PATH = os.path.join(DATA_DIR, 'artist_form_content.json')
+
+    with open(ARTIST_FORM_CONTENT_PATH, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    # Reconstruct the nested objects with IDs
+    ticket_options = [
+        TicketOption(id=idx, **ticket)
+        for idx, ticket in enumerate(data['ticket_options'])
+    ]
+    beverage_options = [
+        BeverageOption(id=idx, **bev)
+        for idx, bev in enumerate(data['beverage_options'])
+    ]
+    food_options = [
+        FoodOption(id=idx, **food)
+        for idx, food in enumerate(data['food_options'])
+    ]
+
+    artist_materials = [
+        ArtistMaterial(id=idx, **am)
+        for idx, am in enumerate(data['artist_materials'])
+    ]
+
+    return ArtistFormContent(
+        ticket_options=ticket_options,
+        beverage_options=beverage_options,
+        food_options=food_options,
+        artist_materials=artist_materials
+    )
 
 
 def update_form_content_with_db_counts(
@@ -172,5 +207,61 @@ def update_form_content_with_db_counts(
             num2 = timeslot_bookings_2.get(ts.id, 0)
             num3 = timeslot_bookings_3.get(ts.id, 0)
             ts.num_booked = num1 + num2 + num3
+
+    return asdict(form_content_obj)
+
+
+def update_artist_form_content_with_db_counts(
+    form_content_obj: FormContent,
+    db_connect_func: Callable[[], sqlite3.Connection]
+) -> dict:
+    """
+    Given a loaded FormContent object and a DB connection function,
+    queries the DB for existing bookings, updates num_booked fields,
+    and returns a dictionary.
+    """
+    conn = db_connect_func()
+    cursor = conn.cursor()
+
+    # TICKETS
+    cursor.execute("SELECT ticket_option_id, COUNT(*) FROM ArtistBookings GROUP BY ticket_option_id")
+    ticket_bookings = dict(cursor.fetchall())
+
+    # BEVERAGE
+    cursor.execute("SELECT beverage_option_id, COUNT(*) FROM ArtistBookings GROUP BY beverage_option_id")
+    beverage_bookings = dict(cursor.fetchall())
+
+    # FOOD
+    cursor.execute("SELECT food_option_id, COUNT(*) FROM ArtistBookings GROUP BY food_option_id")
+    food_bookings = dict(cursor.fetchall())
+
+    # ARTISTMAterials
+    cursor.execute("SELECT artist_material_id, COUNT(*) FROM ArtistBookingMaterials GROUP BY artist_material_id")
+    artist_material_bookings = dict(cursor.fetchall())
+
+    # Update the in-memory object section, add after the Materials section:
+
+    # Artist Materials
+    for am in form_content_obj.artist_materials:
+        am.num_booked = artist_material_bookings.get(am.id, 0)
+
+    conn.close()
+
+    # Now update the in-memory object
+    # Ticket
+    for t in form_content_obj.ticket_options:
+        t.num_booked = ticket_bookings.get(t.id, 0)
+
+    # Beverage
+    for b in form_content_obj.beverage_options:
+        b.num_booked = beverage_bookings.get(b.id, 0)
+
+    # Food
+    for f in form_content_obj.food_options:
+        f.num_booked = food_bookings.get(f.id, 0)
+
+    # Materials
+    for m in form_content_obj.artist_materials:
+        m.num_booked = artist_material_bookings.get(m.id, 0)
 
     return asdict(form_content_obj)

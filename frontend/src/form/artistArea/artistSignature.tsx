@@ -9,8 +9,8 @@ function ArtistSignatureForm(props: ArtistFormProps) {
 	return (
 		<Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
 			<Paper elevation={3} sx={{ p: 3 }}>
-				<Typography variant="body1" paragraph>
-					Hiermit bestätige ich, dass ich als Künstler/in auf eigene Gefahr am "Weiher Wald und Wiesenwahn 2024" vom 29.08.2024 bis zum 01.09.2024 teilnehme.
+				<Typography variant="body1" align={"justify"} paragraph>
+					Hiermit bestätige ich, dass ich als Künstler/in auf eigene Gefahr am "Weiher Wald und Weltallwahn 2025" vom 29.08.2025 bis zum 01.09.2025 teilnehme. <br/><br/>
 					Der Veranstalter haftet bei Personen-, Sach- und Vermögensschäden nicht für leichte Fahrlässigkeit. Dies gilt sowohl für eigene Handlungen, als auch für Handlungen
 					seiner Vertreter, Erfüllungsgehilfen oder Dritter, derer sich der Veranstalter im Zusammenhang mit der Durchführung der Veranstaltung bedient.
 				</Typography>
@@ -19,8 +19,8 @@ function ArtistSignatureForm(props: ArtistFormProps) {
 					Bitte unterschreibe hier:
 				</Typography>
 				<SignaturePad
-					booking={props.currentBooking}
-					updateBooking={props.updateBooking}
+					currentSignature={props.currentBooking.signature}
+					updateCurrentSignature={(signature: string) => props.updateBooking("signature", signature)}
 				/>
 			</Paper>
 		</Box>

@@ -1,11 +1,10 @@
-import { Alert, Box, Button, Card, CardContent, Typography } from "@mui/material";
+import {Alert, Box, Button, Card, CardContent, Typography} from "@mui/material";
 import '../../css/formContainer.css';
-import { NavigateBefore, NavigateNext } from "@mui/icons-material";
+import {NavigateBefore, NavigateNext} from "@mui/icons-material";
 import axios from 'axios';
-import React, { useContext, useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 
-import { Booking, FormContent } from "../userArea/interface";
-import { AuthContext, TokenContext } from "../../AuthContext";
+import {AuthContext, TokenContext} from "../../AuthContext";
 import fishImage from "../../img/fish.png";
 import LinearProgressWithImage from "../components/linearProgressWithImage";
 
@@ -22,6 +21,7 @@ import ArtistSummary from "./artistSummary";
 import ArtistConfirmation from "./artistConfirmation";
 import FormAwarnessCode from "../userArea/formAwarenessCode";
 import {getDummyFormContent} from "../userArea/formContainer";
+import {ArtistBooking, ArtistFormContent} from "./interface";
 
 enum ArtistFormSteps {
     NameAndAddress = 0,
@@ -37,9 +37,8 @@ enum ArtistFormSteps {
     Confirmation = 10,
 }
 
-function getEmptyArtistBooking(): Booking {
+function getEmptyArtistBooking(): ArtistBooking {
     return {
-        id: 0,
         last_name: "",
         first_name: "",
         email: "",
@@ -47,27 +46,20 @@ function getEmptyArtistBooking(): Booking {
         ticket_id: -1,
         beverage_id: -1,
         food_id: -1,
-        timeslot_priority_1: -1,
-        timeslot_priority_2: -1,
-        timeslot_priority_3: -1,
-        material_ids: [],
-        amount_shifts: 0, // Artists don't need shifts
-        supporter_buddy: "",
         total_price: 0, // Artists start with no cost
         signature: "",
         is_paid: false,
         paid_amount: 0,
         payment_date: "",
         payment_notes: "",
-        is_artist: true, // Mark as artist
-        artist_equipment: "",
+        equipment: "",
         special_requests: "",
         performance_details: "",
         artist_material_ids: []
     }
 }
 
-export function getDummyFormContentArtists(): FormContent {
+export function getDummyFormContentArtists(): ArtistFormContent {
     // Similar to the regular getDummyFormContent but including artist_materials
     const baseContent = getDummyFormContent();
 
@@ -91,10 +83,10 @@ export function getDummyFormContentArtists(): FormContent {
 }
 
 export interface ArtistFormProps {
-    updateBooking: (key: keyof Booking, value: any) => void;
-    currentBooking: Booking;
-    formValidation: { [key in keyof Booking]?: string };
-    formContent: FormContent;
+    updateBooking: (key: keyof ArtistBooking, value: any) => void;
+    currentBooking: ArtistBooking;
+    formValidation: { [key in keyof ArtistBooking]?: string };
+    formContent: ArtistFormContent;
 }
 
 export interface BookingState {
@@ -115,9 +107,9 @@ function safelyParseJSON<T>(json: string | null, fallback: T): T {
 }
 
 export function ArtistFormContainer() {
-    const [formContent, setFormContent] = useState<FormContent>(getDummyFormContentArtists);
-    const [formValidation, setFormValidation] = useState<{ [key in keyof Booking]?: string }>({});
-    const [booking, setBooking] = useState<Booking>(safelyParseJSON(localStorage.getItem('artistBooking'), getEmptyArtistBooking()));
+    const [formContent, setFormContent] = useState<ArtistFormContent>(getDummyFormContentArtists());
+    const [formValidation, setFormValidation] = useState<{ [key in keyof ArtistBooking]?: string }>({});
+    const [booking, setBooking] = useState<ArtistBooking>(safelyParseJSON(localStorage.getItem('artistBooking'), getEmptyArtistBooking()));
     const [activeStep, setActiveStep] = useState<ArtistFormSteps>(safelyParseJSON(localStorage.getItem('artistActiveStep'), ArtistFormSteps.NameAndAddress));
     const [bookingState, setBookingState] = useState<BookingState>(safelyParseJSON(localStorage.getItem('artistBookingState'), {
         isSubmitted: false,
@@ -126,9 +118,9 @@ export function ArtistFormContainer() {
     }));
     const [currentError, setCurrentError] = useState<string>("");
 
-    const { token, setToken } = useContext(TokenContext);
+    const {token, setToken} = useContext(TokenContext);
     const maxSteps = Object.keys(ArtistFormSteps).length / 2;
-    const { auth, setAuth } = useContext(AuthContext);
+    const {auth, setAuth} = useContext(AuthContext);
 
     const stepTitles = {
         [ArtistFormSteps.NameAndAddress]: "Willkommen zum Weiher Wald und Weltall-Wahn! (Künstler-Registrierung)",
@@ -144,13 +136,13 @@ export function ArtistFormContainer() {
         [ArtistFormSteps.Confirmation]: "Start in T Minus Gleich"
     }
 
-    const requiredFields: { [key: number]: (keyof Booking)[] } = {
+    const requiredFields: { [key: number]: (keyof ArtistBooking)[] } = {
         [ArtistFormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone'],
         [ArtistFormSteps.Ticket]: ['ticket_id'],
         [ArtistFormSteps.Beverage]: [],
         [ArtistFormSteps.Food]: [],
         [ArtistFormSteps.Materials]: [],
-        [ArtistFormSteps.Equipment]: ['artist_equipment'],
+        [ArtistFormSteps.Equipment]: ['equipment'],
         [ArtistFormSteps.Performance]: ['performance_details'],
         [ArtistFormSteps.AwarenessCode]: [],
         [ArtistFormSteps.Signature]: ['signature'],
@@ -210,23 +202,18 @@ export function ArtistFormContainer() {
 
     // Fetch form content from API
     useEffect(() => {
-        axios.get('/api/formcontent', {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-        .then((response) => {
-            console.log("API response success:", response.data);
-            setFormContent(response.data);
-        })
-        .catch((error) => {
-            console.error("API error details:", {
-                status: error.response?.status,
-                statusText: error.response?.statusText,
-                data: error.response?.data,
-                headers: error.response?.headers
+        axios.get('/api/artist/formcontent', {
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            .then((response) => {
+                console.log("API response success:", response.data);
+                setFormContent(response.data);
+            })
+            .catch((error) => {
+                console.error("API error details:", error);
+                setAuth(false);
+                setToken("");
             });
-            setAuth(false);
-            setToken("");
-        });
     }, []);
 
     // Validation functions
@@ -262,7 +249,7 @@ export function ArtistFormContainer() {
     }, [booking]);
 
     // Validate a specific field
-    function validateField(key: keyof Booking, value: any) {
+    function validateField(key: keyof ArtistBooking, value: any) {
         let errorMessage = '';
         switch (key) {
             case 'last_name':
@@ -280,7 +267,7 @@ export function ArtistFormContainer() {
             case 'ticket_id':
                 errorMessage = value === -1 ? 'Bitte wähle deine Anwesenheitstage.' : '';
                 break;
-            case 'artist_equipment':
+            case 'equipment':
                 errorMessage = value === '' ? 'Bitte gib deine technischen Anforderungen an.' : '';
                 break;
             case 'performance_details':
@@ -290,7 +277,7 @@ export function ArtistFormContainer() {
                 errorMessage = value === '' ? 'Wir würden uns freuen, wenn du das Formular unterschreibst' : '';
                 break;
         }
-        setFormValidation(prev => ({ ...prev, [key]: errorMessage }));
+        setFormValidation(prev => ({...prev, [key]: errorMessage}));
         return errorMessage;
     }
 
@@ -322,9 +309,9 @@ export function ArtistFormContainer() {
     }
 
     // Update booking data
-    function updateBooking(key: keyof Booking, value: any) {
+    function updateBooking(key: keyof ArtistBooking, value: any) {
         setBooking((prevBooking) => {
-            let newBooking = { ...prevBooking, [key]: value };
+            let newBooking = {...prevBooking, [key]: value};
 
             // Special pricing rules for artists
             let total_price = 0;
@@ -334,12 +321,12 @@ export function ArtistFormContainer() {
                 const foodOption = formContent.food_options.find(f => f.id === value);
                 // First meal is free, only charge for additional meals
                 if (foodOption && foodOption.title.includes("Beide Essen")) {
-                    total_price += foodOption.price / 2; // Charge only for one meal
+                    total_price += foodOption.price;
                 }
             } else if (prevBooking.food_id !== -1) {
                 const foodOption = formContent.food_options.find(f => f.id === prevBooking.food_id);
                 if (foodOption && foodOption.title.includes("Beide Essen")) {
-                    total_price += foodOption.price / 2;
+                    total_price += foodOption.price;
                 }
             }
 
@@ -360,77 +347,72 @@ export function ArtistFormContainer() {
 
     // Submit booking
     function submitBooking() {
-        setBookingState(prevState => ({ ...prevState, isSubmitting: true }));
+        setBookingState(prevState => ({...prevState, isSubmitting: true}));
 
-        // Ensure is_artist flag is set
-        const artistBooking = {
-            ...booking,
-            is_artist: true
-        };
-
-        axios.post('/api/submitArtistForm', artistBooking, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-        .then(function (response: any) {
-            setBookingState({
-                isSuccessful: true,
-                isSubmitting: false,
-                isSubmitted: true
-            });
-
-            // Auto logout after an hour
-            setTimeout(() => {
-                setToken("");
-                setAuth(false);
-            }, 1000 * 60 * 60);
-        })
-        .catch(function (error: any) {
-            console.log(error);
-
-            if (error.status === 401) {
-                setToken("");
-                setAuth(false);
-            } else {
+        axios.post('/api/submitArtistForm', booking, {
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            .then(function (response: any) {
                 setBookingState({
-                    isSuccessful: false,
-                    isSubmitted: true,
-                    isSubmitting: false
+                    isSuccessful: true,
+                    isSubmitting: false,
+                    isSubmitted: true
                 });
 
+                // Auto logout after an hour
                 setTimeout(() => {
                     setToken("");
                     setAuth(false);
-                }, 1000 * 10);
-            }
-        });
+                }, 1000 * 60 * 60);
+            })
+            .catch(function (error: any) {
+                console.log(error);
+
+                if (error.status === 401) {
+                    setToken("");
+                    setAuth(false);
+                } else {
+                    setBookingState({
+                        isSuccessful: false,
+                        isSubmitted: true,
+                        isSubmitting: false
+                    });
+
+                    setTimeout(() => {
+                        setToken("");
+                        setAuth(false);
+                    }, 1000 * 10);
+                }
+            });
     }
 
     return (
         <Card className={"form-container"}>
             <Box className={"navigation"}>
                 <Box className={"navigation-progress"}>
-                    <LinearProgressWithImage activeStep={activeStep} maxSteps={maxSteps} variant={"determinate"} image={fishImage} />
+                    <LinearProgressWithImage activeStep={activeStep} maxSteps={maxSteps} variant={"determinate"}
+                                             image={fishImage}/>
                 </Box>
-                <Box className={"navigation-buttons"} sx={{ display: bookingState.isSubmitted ? "None" : "" }}>
-                    <Button variant={"outlined"} sx={{ 'opacity': activeStep < 1 ? "0" : "100%" }}
-                        onClick={() => {
-                            if (activeStep > 0) {
-                                setActiveStep(activeStep - 1);
-                                setCurrentError("");
-                            }
-                        }}>
-                        <NavigateBefore />
+                <Box className={"navigation-buttons"} sx={{display: bookingState.isSubmitted ? "None" : ""}}>
+                    <Button variant={"outlined"} sx={{'opacity': activeStep < 1 ? "0" : "100%"}}
+                            onClick={() => {
+                                if (activeStep > 0) {
+                                    setActiveStep(activeStep - 1);
+                                    setCurrentError("");
+                                }
+                            }}>
+                        <NavigateBefore/>
                     </Button>
                     <Button
                         variant={"outlined"}
-                        sx={{ 'display': activeStep >= maxSteps - 1 ? "none" : "inline-block" }}
+                        sx={{'display': activeStep >= maxSteps - 1 ? "none" : "inline-block"}}
                         onClick={() => {
                             if (isStepValid()) {
                                 setActiveStep(activeStep + 1);
                                 setCurrentError("");
                             }
                         }}>
-                        <NavigateNext />
+                        <NavigateNext/>
                     </Button>
                 </Box>
             </Box>
@@ -441,10 +423,10 @@ export function ArtistFormContainer() {
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}>
-                    <Typography align="center" variant={"h4"} sx={{ paddingBottom: "1em" }}>
+                    <Typography align="center" variant={"h4"} sx={{paddingBottom: "1em"}}>
                         {stepTitles[activeStep]}
                     </Typography>
-                    <Alert variant={"outlined"} sx={{ display: currentError === "" ? "None" : "" }} severity={"error"}>
+                    <Alert variant={"outlined"} sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>
                         {currentError}
                     </Alert>
 
@@ -507,7 +489,7 @@ export function ArtistFormContainer() {
                         />
                     )}
                     {activeStep === ArtistFormSteps.AwarenessCode && (
-                        <FormAwarnessCode />
+                        <FormAwarnessCode/>
                     )}
                     {activeStep === ArtistFormSteps.Signature && (
                         <ArtistSignatureForm

@@ -4,7 +4,7 @@ import React from 'react';
 import { Box, Checkbox, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, Typography } from '@mui/material';
 import { CircularProgressWithLabel } from "../components/circularProgressWithLabel";
 import { ArtistFormProps } from './artistFormContainer';
-import { ArtistMaterial } from '../userArea/interface';
+import { ArtistMaterial } from '../artistArea/interface';
 
 interface ArtistMaterialFormProps extends ArtistFormProps {
     updateArtistMaterialIds: (material_ids: Array<number>) => void;
@@ -63,24 +63,6 @@ function ArtistMaterialsForm(props: ArtistMaterialFormProps) {
                         );
                     })}
                 </List>
-            </Paper>
-
-            <Paper elevation={3} sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                    Hinweise zu Materialien
-                </Typography>
-                <Typography variant="body2">
-                    Als Künstler bitten wir dich, das Festival durch das Mitbringen von Materialien zu unterstützen. Diese Materialien helfen uns, ein besonderes Ambiente zu schaffen und die Kosten niedrig zu halten.
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 2 }}>
-                    Folgende Materialien sind besonders wertvoll:
-                </Typography>
-                <ul>
-                    <li>Lichterketten und Beleuchtung für die Bühne und Umgebung</li>
-                    <li>Dekorationsmaterialien passend zum Weltall-Thema</li>
-                    <li>Kleine Verstärker und Soundequipment</li>
-                    <li>Kabeltrommel und Verlängerungskabel</li>
-                </ul>
             </Paper>
         </Box>
     );

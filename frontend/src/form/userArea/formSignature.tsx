@@ -14,7 +14,7 @@ function FormSignature(props: FormProps) {
 			<Typography sx={{p: 3}}>
 				Bitte unterschreibe hier:
 			</Typography>
-			<SignaturePad booking={props.currentBooking} updateBooking={props.updateBooking} />
+			<SignaturePad currentSignature={props.currentBooking.signature} updateCurrentSignature={(signature: string) => props.updateBooking("signature", signature)} />
 		</Box>
 	)
 }

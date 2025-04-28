@@ -1,5 +1,3 @@
-// frontend/src/form/artistArea/artistPerformance.tsx
-
 import React from 'react';
 import { Box, TextField, Typography, Paper, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { ArtistFormProps } from './artistFormContainer';

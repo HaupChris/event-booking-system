@@ -1,0 +1,73 @@
+{
+  "ticket_options": [
+    {
+      "title": "Donnerstag, Freitag, Samstag",
+      "price": 0.0,
+      "amount": 20
+    },
+    {
+      "title": "Freitag, Samstag",
+      "price": 0.0,
+      "amount": 10
+    },
+    {
+      "title": "Donnerstag, Freitag",
+      "price": 0.0,
+      "amount": 10
+    },
+    {
+      "title": "Samstag",
+      "price": 0.0,
+      "amount": 10
+    },
+    {
+      "title": "Freitag",
+      "price": 0.0,
+      "amount": 10
+    },
+    {
+      "title": "Donnerstag",
+      "price": 0.0,
+      "amount": 10
+    }
+  ],
+  "beverage_options": [
+    {
+      "title": "Ein Tag",
+      "description": "Entspricht 5 Litern Bier",
+      "price": 0.0
+    },
+    {
+      "title": "Zwei Tage",
+      "description": "Entspricht 10 Litern Bier",
+      "price": 0.0
+    },
+    {
+      "title": "Drei Tage",
+      "description": "Entspricht 15 Litern Bier",
+      "price": 0.0
+    }
+  ],
+  "food_options": [
+    {
+      "title": "Gyros mit Zaziki, linsensalat und Brot",
+      "description": "Eine Mahlzeit kostenlos für Künstler",
+      "price": 0.0
+    },
+    {
+      "title": "Beide Essen",
+      "description": "Erste Mahlzeit kostenlos, zweite kostenpflichtig",
+      "price": 5.0
+    }
+  ],
+  "artist_materials": [
+    {
+      "title": "PA-Anlage",
+      "num_needed": 1
+    },
+    {
+      "title": "Mikrofone",
+      "num_needed": 5
+    }
+  ]
+}

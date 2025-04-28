@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useState } from 'react';
 import {
     AppBar,
     Toolbar,
@@ -8,7 +8,8 @@ import {
     List,
     ListItemIcon,
     ListItemText,
-    Box, createTheme
+    Box,
+    createTheme,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
@@ -20,25 +21,30 @@ import {
     People,
     LocalActivity,
     Download,
-    ViewQuilt, EuroSymbol, PointOfSale
+    EuroSymbol,
+    PointOfSale,
+    MusicNote,
+    Mic
 } from '@mui/icons-material';
-import HomePage from './HomePage';
-import {getDummyFormContent} from "../userArea/formContainer";
-import {TokenContext} from "../../AuthContext";
-import axios from "axios";
 import ListItemButton from "@mui/material/ListItemButton";
-import BookingsPage from "./BookingsPage";
-import BeveragesPage from "./BeveragesPage";
-import FoodPage from "./FoodPage";
-import {ThemeOptions, ThemeProvider} from "@mui/material/styles";
-import MaterialsPage from "./MaterialsPage";
-import WorkshiftsPage from "./WorkshiftsPage";
-import TicketsPage from "./TicketsPage";
-import {CSVLink} from "react-csv";
-import {Booking, FormContent} from "../userArea/interface";
-import FinancialsOverviewPage from "./FinancialsOverviewPage";
-import PaymentConfirmationsPage from "./PaymentConfirmationsPage";
+import { ThemeOptions, ThemeProvider } from "@mui/material/styles";
+import { CSVLink } from "react-csv";
 
+// Import all page components
+import HomePage from './HomePage';
+import BookingsPage from './BookingsPage';
+import TicketsPage from './TicketsPage';
+import BeveragesPage from './BeveragesPage';
+import FoodPage from './FoodPage';
+import MaterialsPage from './MaterialsPage';
+import WorkshiftsPage from './WorkshiftsPage';
+import ArtistsPage from './ArtistsPage';
+import ArtistMaterialsPage from './ArtistMaterialsPage';
+import FinancialsOverviewPage from './FinancialsOverviewPage';
+import PaymentConfirmationsPage from './PaymentConfirmationsPage';
+
+// Import data hook
+import { useFetchData } from './useFetchData';
 
 export const themeOptions: ThemeOptions = {
     components: {
@@ -56,246 +62,266 @@ export const themeOptions: ThemeOptions = {
 
 const theme = createTheme(themeOptions);
 
-enum DashboardView {
-    Home = 0,
-    Bookings = 1,
-    Tickets = 2,
-    Beverages = 3,
-    Food = 4,
-    Material = 5,
-    Supportshifts = 6,
-    FinancialsOverview = 7,
-    PaymentConfirmations = 8,
-    ShiftAssignments = 9
+// Define all possible dashboard tabs
+interface DashboardTab {
+    id: string;
+    label: string;
+    icon: React.JSX.Element;
+    permissions: string[];
 }
 
-const getWorkshiftAndTimeslotDetails = (timeslotId: number, formContent: FormContent) => {
-    for (const workshift of formContent.work_shifts) {
-        for (const timeslot of workshift.time_slots) {
-            if (timeslot.id === timeslotId) {
-                return {
-                    workshiftTitle: workshift.title,
-                    timeslotTitle: timeslot.title,
-                    startTime: timeslot.start_time,
-                    endTime: timeslot.end_time
-                };
-            }
-        }
-    }
-    return {
-        workshiftTitle: 'Unknown',
-        timeslotTitle: 'Unknown',
-        startTime: 'Unknown',
-        endTime: 'Unknown'
-    };
-};
+const dashboardTabs: DashboardTab[] = [
+    { id: 'home', label: 'Home', icon: <Home />, permissions: ['read'] },
+    { id: 'bookings', label: 'Bookings', icon: <People />, permissions: ['read'] },
+    { id: 'tickets', label: 'Tickets', icon: <LocalActivity />, permissions: ['read'] },
+    { id: 'beverages', label: 'Beer', icon: <SportsBar />, permissions: ['read'] },
+    { id: 'food', label: 'Food', icon: <LunchDining />, permissions: ['read'] },
+    { id: 'materials', label: 'Material', icon: <Handyman />, permissions: ['read'] },
+    { id: 'workShifts', label: 'Support', icon: <Work />, permissions: ['read'] },
+    { id: 'artists', label: 'Artists', icon: <MusicNote />, permissions: ['read'] },
+    { id: 'artistMaterials', label: 'Artist Materials', icon: <Mic />, permissions: ['read'] },
+    { id: 'financials', label: 'Financials', icon: <EuroSymbol />, permissions: ['financial'] },
+    { id: 'payments', label: 'Payments', icon: <PointOfSale />, permissions: ['financial'] }
+];
 
-function AdminDashboard() {
-    const [value, setValue] = useState(0);
+function Dashboard() {
+    // Use fetch hook for data
+    const { 
+        regularBookings, 
+        artistBookings, 
+        formContent, 
+        artistFormContent,
+        refetch
+    } = useFetchData();
+    
+    const [activeTab, setActiveTab] = useState('home');
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [formContent, setFormContent] = useState(getDummyFormContent());
-    const [bookings, setBookings] = useState<Booking[]>([]);
-    const {token} = useContext(TokenContext);
-    // const {adminPermissions} = useContext(AuthContext);
-const adminPermissions = ["read", "financial"];
-    const viewPermissions = {
-        [DashboardView.Home]: ['read'],
-        [DashboardView.Bookings]: ['read'],
-        [DashboardView.Tickets]: ['read'],
-        [DashboardView.Beverages]: ['read'],
-        [DashboardView.Food]: ['read'],
-        [DashboardView.Material]: ['read'],
-        [DashboardView.Supportshifts]: ['read'],
-        [DashboardView.FinancialsOverview]: ['financial'],
-        [DashboardView.PaymentConfirmations]: ['financial'],
-        [DashboardView.ShiftAssignments]: ['shift_management']
-    };
 
+    // Assume admin permissions for this implementation
+    const adminPermissions = ['read', 'financial', 'shift_management'];
 
-    const pageTitles = ["Home", "Bookings", "Tickets", "Beer", "Food", "Material", "Support", "Financials Overview", "Payment Confirmations", "Shift Assignments"];
-    const pageTitleIcons = [
-        <Home style={{verticalAlign: "middle"}}/>,
-        <People style={{verticalAlign: "middle"}}/>,
-        <LocalActivity style={{verticalAlign: "middle"}}/>,
-        <SportsBar style={{verticalAlign: "middle"}}/>,
-        <LunchDining style={{verticalAlign: "middle"}}/>,
-        <Handyman style={{verticalAlign: "middle"}}/>,
-        <Work style={{verticalAlign: "middle"}}/>,
-        <EuroSymbol style={{verticalAlign: "middle"}}/>,
-        <PointOfSale style={{verticalAlign: "middle"}}/>,
-        <ViewQuilt style={{verticalAlign: "middle"}}/>
-    ]
-
-    const authorizedViews = Object.entries(viewPermissions)
-        .filter(([_, permissions]) =>
-            permissions.some(permission => adminPermissions.includes(permission))
-        )
-        .map(([view]) => parseInt(view));
-
-    const authorizedPageTitles = pageTitles.filter((_, index) => authorizedViews.includes(index));
-    const authorizedPageTitleIcons = pageTitleIcons.filter((_, index) => authorizedViews.includes(index));
-
-    console.log("auth stuff");
-    console.log(authorizedViews);
-    console.log(authorizedPageTitles);
-    console.log(authorizedPageTitleIcons);
-
-    useEffect(() => {
-        axios.get('/api/data', {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            .then(response => setBookings(response.data))
-            .catch(error => console.error('Error:', error));
-
-        axios.get('/api/formcontent', {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            .then(response => setFormContent(response.data))
-            .catch(error => console.error('Error:', error));
-    }, [token]);
+    // Filter tabs based on admin permissions
+    const authorizedTabs = dashboardTabs.filter(tab => 
+        tab.permissions.some(perm => adminPermissions.includes(perm))
+    );
 
     const handleDrawerToggle = () => {
         setDrawerOpen(!drawerOpen);
     };
 
+    const handleMenuClick = (tabId: string) => {
+        setActiveTab(tabId);
+        setDrawerOpen(false);
+    };
+
     const renderPage = () => {
-        switch (value) {
-            case DashboardView.Home:
+        switch (activeTab) {
+            case 'home': 
                 return <HomePage />;
-            case DashboardView.Bookings:
+            case 'bookings': 
                 return <BookingsPage />;
-            case DashboardView.Tickets:
+            case 'tickets': 
                 return <TicketsPage />;
-            case DashboardView.Beverages:
+            case 'beverages': 
                 return <BeveragesPage />;
-            case DashboardView.Food:
+            case 'food': 
                 return <FoodPage />;
-            case DashboardView.Material:
+            case 'materials': 
                 return <MaterialsPage />;
-            case DashboardView.Supportshifts:
+            case 'workShifts': 
                 return <WorkshiftsPage />;
-            case DashboardView.FinancialsOverview:
+            case 'artists':
+                return <ArtistsPage />;
+            case 'artistMaterials':
+                return <ArtistMaterialsPage />;
+            case 'financials': 
                 return <FinancialsOverviewPage />;
-            case DashboardView.PaymentConfirmations:
+            case 'payments': 
                 return <PaymentConfirmationsPage />;
-            default:
+            default: 
                 return <HomePage />;
         }
     };
 
-    const handleMenuClick = (index: number) => {
-        setValue(index);
-        setDrawerOpen(false);
-    };
-
-    const exportBookings = bookings.map(booking => {
-        const ticketDetails = formContent.ticket_options.find((ticketOption) => ticketOption.id === booking.ticket_id)?.title;
-        const beverageDetails = formContent.beverage_options.find((beverageOption) => beverageOption.id === booking.beverage_id)?.title;
-        const foodDetails = formContent.food_options.find((foodOption) => foodOption.id === booking.food_id)?.title;
-        const priority1Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_1, formContent);
-        const materialTitles = booking.material_ids.map(id => {
-            const material = formContent.materials.find(material => material.id === id);
-            return material ? material.title : 'Unknown';
-        }).join(', ');
-        const priority2Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_2, formContent);
-        const priority3Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_3, formContent);
-
-        return {
-            firstName: booking.first_name,
-            lastName: booking.last_name,
-            phone: booking.phone,
-            ticket: ticketDetails || '-',
-            beverage: beverageDetails || '-',
-            food: foodDetails || '-',
-            materials: materialTitles || '-',
-            amountShifts: booking.amount_shifts,
-            supporterBuddy: booking.supporter_buddy,
-            workshiftPriority1: `${priority1Details.workshiftTitle} - ${priority1Details.timeslotTitle} (${priority1Details.startTime} - ${priority1Details.endTime})`,
-            workshiftPriority2: `${priority2Details.workshiftTitle} - ${priority2Details.timeslotTitle} (${priority2Details.startTime} - ${priority2Details.endTime})`,
-            workshiftPriority3: `${priority3Details.workshiftTitle} - ${priority3Details.timeslotTitle} (${priority3Details.startTime} - ${priority3Details.endTime})`
-        };
-    });
-
-    const exportTickets = bookings.map(booking => {
-        const ticketDetails = formContent.ticket_options.find((ticketOption) => ticketOption.id === booking.ticket_id)?.title;
-
-        return {
-            firstName: booking.first_name,
-            lastName: booking.last_name,
-            ticket: ticketDetails || 'Unknown',
-        };
-    });
-
-    const exportBeverages = bookings.map(booking => {
-        const beverageDetails = formContent.beverage_options.find((beverageOption) => beverageOption.id === booking.beverage_id)?.title;
-
-        return {
-            firstName: booking.first_name,
-            lastName: booking.last_name,
-            beverage: beverageDetails || 'Unknown',
-        };
-    });
-
-    const exportFood = bookings.map(booking => {
-        const foodDetails = formContent.food_options.find((foodOption) => foodOption.id === booking.food_id)?.title;
-
-        return {
-            firstName: booking.first_name,
-            lastName: booking.last_name,
-            food: foodDetails || 'Unknown',
-        };
-    });
-
-    const exportMaterial = bookings
-        .filter(booking => booking.material_ids.length > 0)
-        .map(booking => {
-            const materialTitles = booking.material_ids.map(id => {
-                const material = formContent.materials.find(material => material.id === id);
-                return material ? material.title : 'Unknown';
-            }).join(', ');
-
-            return {
-                firstName: booking.first_name,
-                lastName: booking.last_name,
-                materials: materialTitles
-            };
-        });
-
-
-    const exportSupportshifts = bookings.map(booking => {
-        const priority1Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_1, formContent);
-        const priority2Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_2, formContent);
-        const priority3Details = getWorkshiftAndTimeslotDetails(booking.timeslot_priority_3, formContent);
-        const ticketDetails = formContent.ticket_options.find((ticketOption) => ticketOption.id === booking.ticket_id)?.title;
-
-
-        return {
-            firstName: booking.first_name,
-            lastName: booking.last_name,
-            phone: booking.phone,
-            ticket: ticketDetails,
-            amountShifts: booking.amount_shifts,
-            supporterBuddy: booking.supporter_buddy,
-            workshiftPriority1: `${priority1Details.workshiftTitle} - ${priority1Details.timeslotTitle} (${priority1Details.startTime} - ${priority1Details.endTime})`,
-            workshiftPriority2: `${priority2Details.workshiftTitle} - ${priority2Details.timeslotTitle} (${priority2Details.startTime} - ${priority2Details.endTime})`,
-            workshiftPriority3: `${priority3Details.workshiftTitle} - ${priority3Details.timeslotTitle} (${priority3Details.startTime} - ${priority3Details.endTime})`
-        };
-    });
-
     const getExportData = () => {
-        switch (value) {
-            case DashboardView.Bookings:
-                return exportBookings;
-            case DashboardView.Tickets:
-                return exportTickets;
-            case DashboardView.Beverages:
-                return exportBeverages;
-            case DashboardView.Food:
-                return exportFood;
-            case DashboardView.Material:
-                return exportMaterial;
-            case DashboardView.Supportshifts:
-                return exportSupportshifts;
+        // Preparing export data based on active tab
+        switch (activeTab) {
+            case 'bookings':
+                return [
+                    ...regularBookings.map(b => ({
+                        Type: 'Regular',
+                        FirstName: b.first_name,
+                        LastName: b.last_name,
+                        Email: b.email,
+                        Phone: b.phone,
+                        Ticket: formContent.ticket_options.find(t => t.id === b.ticket_id)?.title || 'Unknown',
+                        Price: b.total_price,
+                        PaymentStatus: b.is_paid ? 'Paid' : 'Unpaid',
+                        RegistrationDate: b.timestamp
+                    })),
+                    ...artistBookings.map(b => ({
+                        Type: 'Artist',
+                        FirstName: b.first_name,
+                        LastName: b.last_name,
+                        Email: b.email,
+                        Phone: b.phone,
+                        Ticket: artistFormContent.ticket_options.find(t => t.id === b.ticket_id)?.title || 'Unknown',
+                        Price: b.total_price,
+                        PaymentStatus: b.is_paid ? 'Paid' : 'Unpaid',
+                        RegistrationDate: b.timestamp
+                    }))
+                ];
+            case 'tickets':
+                return [
+                    ...regularBookings.map(b => ({
+                        Type: 'Regular',
+                        FirstName: b.first_name,
+                        LastName: b.last_name,
+                        Email: b.email,
+                        Ticket: formContent.ticket_options.find(t => t.id === b.ticket_id)?.title || 'Unknown',
+                        TicketPrice: formContent.ticket_options.find(t => t.id === b.ticket_id)?.price || 0
+                    })),
+                    ...artistBookings.map(b => ({
+                        Type: 'Artist',
+                        FirstName: b.first_name,
+                        LastName: b.last_name,
+                        Email: b.email,
+                        Ticket: artistFormContent.ticket_options.find(t => t.id === b.ticket_id)?.title || 'Unknown',
+                        TicketPrice: artistFormContent.ticket_options.find(t => t.id === b.ticket_id)?.price || 0
+                    }))
+                ];
+            case 'beverages':
+                return [
+                    ...regularBookings.map(b => ({
+                        Type: 'Regular',
+                        FirstName: b.first_name,
+                        LastName: b.last_name,
+                        Beverage: formContent.beverage_options.find(bev => bev.id === b.beverage_id)?.title || 'None',
+                        BeveragePrice: formContent.beverage_options.find(bev => bev.id === b.beverage_id)?.price || 0
+                    })),
+                    ...artistBookings.map(b => ({
+                        Type: 'Artist',
+                        FirstName: b.first_name,
+                        LastName: b.last_name,
+                        Beverage: artistFormContent.beverage_options.find(bev => bev.id === b.beverage_id)?.title || 'None',
+                        BeveragePrice: artistFormContent.beverage_options.find(bev => bev.id === b.beverage_id)?.price || 0
+                    }))
+                ];
+            case 'food':
+                return [
+                    ...regularBookings.map(b => ({
+                        Type: 'Regular',
+                        FirstName: b.first_name,
+                        LastName: b.last_name,
+                        Food: formContent.food_options.find(f => f.id === b.food_id)?.title || 'None',
+                        FoodPrice: formContent.food_options.find(f => f.id === b.food_id)?.price || 0
+                    })),
+                    ...artistBookings.map(b => ({
+                        Type: 'Artist',
+                        FirstName: b.first_name,
+                        LastName: b.last_name,
+                        Food: artistFormContent.food_options.find(f => f.id === b.food_id)?.title || 'None',
+                        FoodPrice: artistFormContent.food_options.find(f => f.id === b.food_id)?.price || 0
+                    }))
+                ];
+            case 'materials':
+                return regularBookings
+                    .filter(b => b.material_ids.length > 0)
+                    .flatMap(b => {
+                        return b.material_ids.map(materialId => ({
+                            FirstName: b.first_name,
+                            LastName: b.last_name,
+                            Material: formContent.materials.find(m => m.id === materialId)?.title || 'Unknown'
+                        }));
+                    });
+            case 'artistMaterials':
+                return artistBookings
+                    .filter(b => b.artist_material_ids?.length > 0)
+                    .flatMap(b => {
+                        return b.artist_material_ids?.map(materialId => ({
+                            FirstName: b.first_name,
+                            LastName: b.last_name,
+                            Material: artistFormContent.artist_materials.find(m => m.id === materialId)?.title || 'Unknown'
+                        })) || [];
+                    });
+            case 'workShifts':
+                return regularBookings.flatMap(b => {
+                    const shifts: { FirstName: string; LastName: string; Priority: string; Workshift: string; Timeslot: string; StartTime: string; EndTime: string; MaxShifts: number; }[] = [];
+                    const priorities = ['First', 'Second', 'Third'];
+                    
+                    [b.timeslot_priority_1, b.timeslot_priority_2, b.timeslot_priority_3]
+                        .forEach((timeslotId, index) => {
+                            if (timeslotId === -1) return;
+                            
+                            // Find the workshift and timeslot
+                            for (const shift of formContent.work_shifts) {
+                                const timeslot = shift.time_slots.find(ts => ts.id === timeslotId);
+                                if (timeslot) {
+                                    shifts.push({
+                                        FirstName: b.first_name,
+                                        LastName: b.last_name,
+                                        Priority: priorities[index],
+                                        Workshift: shift.title,
+                                        Timeslot: timeslot.title,
+                                        StartTime: timeslot.start_time,
+                                        EndTime: timeslot.end_time,
+                                        MaxShifts: b.amount_shifts
+                                    });
+                                    break;
+                                }
+                            }
+                        });
+                    
+                    return shifts;
+                });
+            case 'artists':
+                return artistBookings.map(b => {
+                    let performanceDetails = '';
+                    try {
+                        if (b.performance_details) {
+                            const details = JSON.parse(b.performance_details);
+                            performanceDetails = `Day: ${details.preferredDay || '?'}, Time: ${details.preferredTime || '?'}, Duration: ${details.duration || '?'} min`;
+                        }
+                    } catch (e) {
+                        performanceDetails = 'Error parsing performance details';
+                    }
+                    
+                    return {
+                        FirstName: b.first_name,
+                        LastName: b.last_name,
+                        Email: b.email,
+                        Phone: b.phone,
+                        PerformanceDetails: performanceDetails,
+                        Equipment: b.equipment || 'None specified',
+                        SpecialRequests: b.special_requests || 'None'
+                    };
+                });
+            case 'financials':
+            case 'payments':
+                return [
+                    ...regularBookings.map(b => ({
+                        Type: 'Regular',
+                        FirstName: b.first_name,
+                        LastName: b.last_name,
+                        Email: b.email,
+                        TotalPrice: b.total_price,
+                        PaidAmount: b.paid_amount || 0,
+                        PaymentStatus: b.is_paid ? 'Paid' : 'Unpaid',
+                        PaymentDate: b.payment_date || 'Not paid',
+                        Notes: b.payment_notes || ''
+                    })),
+                    ...artistBookings.map(b => ({
+                        Type: 'Artist',
+                        FirstName: b.first_name,
+                        LastName: b.last_name,
+                        Email: b.email,
+                        TotalPrice: b.total_price,
+                        PaidAmount: b.paid_amount || 0,
+                        PaymentStatus: b.is_paid ? 'Paid' : 'Unpaid',
+                        PaymentDate: b.payment_date || 'Not paid',
+                        Notes: b.payment_notes || ''
+                    }))
+                ];
             default:
                 return [];
         }
@@ -311,31 +337,44 @@ const adminPermissions = ["read", "financial"];
                         </IconButton>
                         <Box display="flex" flexGrow={1} justifyContent="center">
                             <Typography variant="h6" display="flex" alignItems="center">
-                                {authorizedPageTitleIcons[value]}
+                                {/* Display the active tab icon */}
+                                {authorizedTabs.find(tab => tab.id === activeTab)?.icon}
+                                <span style={{ marginLeft: '8px' }}>
+                                    {authorizedTabs.find(tab => tab.id === activeTab)?.label}
+                                </span>
                             </Typography>
                         </Box>
-                        <CSVLink
-
-                            data={getExportData()}
-                            filename={`${pageTitles[value].toLowerCase()}_data.csv`}
-                            style={{textDecoration: 'none', display: value == DashboardView.Home ? "none" : "flex"}}
-                        >
-                            <IconButton edge="end" color="inherit">
-                                <Download/>
-                            </IconButton>
-                        </CSVLink>
+                        
+                        {/* Export button - only show for tabs with data */}
+                        {activeTab !== 'home' && (
+                            <CSVLink
+                                data={getExportData()}
+                                filename={`${activeTab}_data.csv`}
+                                style={{textDecoration: 'none'}}
+                            >
+                                <IconButton edge="end" color="inherit">
+                                    <Download/>
+                                </IconButton>
+                            </CSVLink>
+                        )}
                     </Toolbar>
                 </AppBar>
+                
                 <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
                     <List>
-                        {authorizedPageTitles.map((title, index) => (
-                            <ListItemButton onClick={() => handleMenuClick(index)} key={index}>
-                                <ListItemIcon>{pageTitleIcons[index]}</ListItemIcon>
-                                <ListItemText primary={title}/>
+                        {authorizedTabs.map((tab) => (
+                            <ListItemButton 
+                                onClick={() => handleMenuClick(tab.id)} 
+                                key={tab.id}
+                                selected={activeTab === tab.id}
+                            >
+                                <ListItemIcon>{tab.icon}</ListItemIcon>
+                                <ListItemText primary={tab.label}/>
                             </ListItemButton>
                         ))}
                     </List>
                 </Drawer>
+                
                 <Box component="main"
                      sx={{
                          flexGrow: 1,
@@ -350,4 +389,4 @@ const adminPermissions = ["read", "financial"];
     );
 }
 
-export default AdminDashboard;
+export default Dashboard;

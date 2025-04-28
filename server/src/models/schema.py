@@ -1,4 +1,5 @@
 import sqlite3
+from typing import List
 
 
 def apply_migration(db_file_path: str) -> None:
@@ -33,7 +34,7 @@ def apply_migration(db_file_path: str) -> None:
     conn.commit()
     conn.close()
 
-def init_db(db_file_path: str, schema_path: str) -> None:
+def init_db(db_file_path: str, schema_paths: List[str]) -> None:
     """
     Creates the SQLite database and applies the schema if not already done.
     """
@@ -41,9 +42,10 @@ def init_db(db_file_path: str, schema_path: str) -> None:
     conn = sqlite3.connect(db_file_path)
 
     # Read schema.sql
-    with open(schema_path, 'r') as f:
-        schema_script = f.read()
-        conn.executescript(schema_script)
-        conn.commit()
+    for schema_path in schema_paths:
+        with open(schema_path, 'r') as f:
+            schema_script = f.read()
+            conn.executescript(schema_script)
+            conn.commit()
 
     conn.close()

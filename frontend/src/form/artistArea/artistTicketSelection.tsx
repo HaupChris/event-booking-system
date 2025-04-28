@@ -1,5 +1,3 @@
-// frontend/src/form/artistArea/artistTicketSelection.tsx
-
 import React from 'react';
 import { FormControl, FormControlLabel, Radio, RadioGroup, Typography, Paper, Box } from "@mui/material";
 import { ArtistFormProps } from './artistFormContainer';
@@ -28,7 +26,7 @@ function ArtistTicketForm(props: ArtistFormProps) {
                                 key={option.id}
                                 value={option.id}
                                 control={<Radio />}
-                                label={`${option.title} - Künstler-Pass (kostenlos)`}
+                                label={`${option.title}`}
                             />
                         ))}
                     </RadioGroup>

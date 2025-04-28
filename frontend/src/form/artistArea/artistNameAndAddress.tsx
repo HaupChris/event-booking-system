@@ -1,7 +1,5 @@
-// frontend/src/form/artistArea/artistNameAndAddress.tsx
-
 import React from "react";
-import { Container, TextField, Typography, Paper, Box } from "@mui/material";
+import { TextField, Typography, Paper, Box } from "@mui/material";
 import { ArtistFormProps } from "./artistFormContainer";
 
 function ArtistNameAndAddressForm(props: ArtistFormProps) {

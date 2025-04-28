@@ -1,16 +1,15 @@
-// frontend/src/form/artistArea/artistSummary.tsx
-
 import React from 'react';
-import { Typography, Box, List, ListItem, ListItemText, Divider, Paper } from '@mui/material';
-import { Booking, FormContent, ArtistMaterial } from '../userArea/interface';
+import { Typography, Box, List, ListItem, ListItemText, Paper } from '@mui/material';
+import {ArtistBooking, ArtistFormContent, ArtistMaterial} from "./interface";
+
 
 function findItemById<T extends { id: number }>(array: T[], id: number): T | undefined {
     return array.find(item => item.id === id);
 }
 
 interface ArtistSummaryProps {
-    booking: Booking;
-    formContent: FormContent;
+    booking: ArtistBooking;
+    formContent: ArtistFormContent;
 }
 
 function ArtistSummary(props: ArtistSummaryProps) {
@@ -22,7 +21,7 @@ function ArtistSummary(props: ArtistSummaryProps) {
         ticket_id,
         beverage_id,
         food_id,
-        artist_equipment,
+        equipment,
         special_requests,
         performance_details,
         artist_material_ids,
@@ -158,7 +157,7 @@ function ArtistSummary(props: ArtistSummaryProps) {
                     <ListItem>
                         <ListItemText
                             primary={<Typography variant="subtitle1">Benötigte Ausrüstung</Typography>}
-                            secondary={artist_equipment || 'Keine speziellen Anforderungen'}
+                            secondary={equipment || 'Keine speziellen Anforderungen'}
                         />
                     </ListItem>
                     {special_requests && (

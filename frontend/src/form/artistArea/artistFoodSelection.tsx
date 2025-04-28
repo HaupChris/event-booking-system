@@ -26,9 +26,9 @@ function ArtistFoodSelection(props: ArtistFormProps) {
     // Determine if option is free for artist (first meal is free)
     const getArtistFoodPrice = (option: any) => {
         if (option.title.includes("Beide Essen")) {
-            return `${option.price / 2}€ (erste Mahlzeit kostenlos)`;
+            return `${option.price}€`;
         } else {
-            return "Kostenlos für Künstler";
+            return "Kostenlos";
         }
     };
 

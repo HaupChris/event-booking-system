@@ -5,9 +5,10 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from datetime import datetime
 
-from src.models.datatypes import Booking
+from src.models.datatypes import Booking, ArtistBooking
+from src.services.artist_service import insert_artist_booking, get_up_to_date_artist_form_content
 from src.services.booking_service import insert_booking, get_all_bookings, get_up_to_date_form_content
-from src.services.mail_service import send_confirmation_mail
+from src.services.mail_service import send_confirmation_mail, send_artist_confirmation_mail
 
 from src.services.booking_service import update_booking_db, update_booking_payment
 
@@ -105,21 +106,18 @@ def submit_artist_form():
     if "id" in booking_data:
         del booking_data["id"]
 
-    # Ensure the artist flag is set
-    booking_data["is_artist"] = True
-
     # Create a Booking object from the request data
-    booking = Booking(**booking_data)
+    booking = ArtistBooking(**booking_data)
 
-    success = insert_booking(booking)
+    success = insert_artist_booking(booking)
     request_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{request_time}] Received artist booking from {booking.first_name} {booking.last_name}")
 
     if success:
         # Send email
-        form_content_dict = get_up_to_date_form_content()
+        form_content_dict = get_up_to_date_artist_form_content()
         # Here you could create a custom email template for artists
-        send_confirmation_mail(booking, form_content_dict)
+        send_artist_confirmation_mail(booking, form_content_dict)
         print(f"Artist booking & mail done for {booking.first_name} {booking.last_name}")
         return jsonify({"msg": "Artist booking successful"}), 200
     else:

@@ -64,7 +64,7 @@ function ArtistBeverageForm(props: ArtistFormProps) {
                                     </ListItemAvatar>
 
                                     <ListItemText
-                                        primary={option.title + " - Künstler-Flatrate (kostenlos)"}
+                                        primary={option.title}
                                         primaryTypographyProps={{variant: 'h5'}}
                                         secondary={option.description}
                                         secondaryTypographyProps={{variant: 'subtitle1'}}

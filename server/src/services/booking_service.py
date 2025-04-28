@@ -6,17 +6,18 @@ from typing import List
 
 from src.models.datatypes import Booking, BookingWithTimestamp
 from src.services.formcontent_service import get_form_content_obj, update_form_content_with_db_counts
-from src.models.schema import init_db, apply_migration
+from src.models.schema import init_db
 
 DB_DIR = os.path.join(os.path.dirname(__file__), '../../db')
 DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
-SCHEMA_PATH = os.path.join(DB_DIR, 'schema.sql')
+REGULAR_SCHEMA_PATH = os.path.join(DB_DIR, 'schema.sql')
+ARTIST_SCHEMA_PATH = os.path.join(DB_DIR, 'artist_schema.sql')
+
 
 # Ensure database is initialized on import
 
 # Even if it exists, optionally re-apply schema if you want. Usually you'd skip reinit in production.
-init_db(DB_FILE_PATH, SCHEMA_PATH)
-apply_migration(DB_FILE_PATH)
+init_db(DB_FILE_PATH, [REGULAR_SCHEMA_PATH, ARTIST_SCHEMA_PATH])
 
 
 def _connect_db() -> sqlite3.Connection:
@@ -321,8 +322,6 @@ def update_booking_db(booking_id: int, booking_data: dict) -> bool:
             print(f"Error updating booking: {e}")
             return False
 
-
-# Add to server/src/services/booking_service.py
 
 def update_booking_payment(booking_id: int, payment_data: dict) -> bool:
     """

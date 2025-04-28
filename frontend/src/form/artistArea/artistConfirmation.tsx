@@ -1,5 +1,3 @@
-// frontend/src/form/artistArea/artistConfirmation.tsx
-
 import React, { useState, useEffect } from 'react';
 import {
     Button,
@@ -9,15 +7,15 @@ import {
     Snackbar, Alert, CircularProgress,
     Modal, Paper
 } from '@mui/material';
-import { Booking, FormContent } from "../userArea/interface";
 import { Check, ErrorOutline, FileCopy, OpenInNew, SignalCellularNodata } from "@mui/icons-material";
-import { BookingState } from "./artistFormContainer";
 import jellyfishImage from '../../img/jellyfish.png';
+import {ArtistBooking, ArtistFormContent} from "./interface";
+import {BookingState} from "./artistFormContainer";
 
 interface ArtistConfirmationProps {
-    booking: Booking;
+    booking: ArtistBooking;
     submitBooking: () => void;
-    formContent: FormContent;
+    formContent: ArtistFormContent;
     bookingState: BookingState;
 }
 

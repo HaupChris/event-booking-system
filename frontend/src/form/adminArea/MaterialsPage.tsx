@@ -58,7 +58,7 @@ const MaterialsPage: React.FC = () => {
     };
 
     const getUsersForMaterial = (materialId: number) => {
-        return bookings.filter(booking => booking.material_ids.includes(materialId)).map(booking => ({
+        return bookings.filter(booking => booking.material_ids?.includes(materialId)).map(booking => ({
             first_name: booking.first_name,
             last_name: booking.last_name
         }));
@@ -66,7 +66,7 @@ const MaterialsPage: React.FC = () => {
 
     const getMaterialCount = (materialId: number) => {
         return bookings.reduce((count, booking) => {
-            return count + (booking.material_ids.includes(materialId) ? 1 : 0);
+            return count + (booking.material_ids?.includes(materialId) ? 1 : 0);
         }, 0);
     };
 
