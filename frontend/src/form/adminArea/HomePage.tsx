@@ -23,10 +23,10 @@ function HomePage() {
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         padding: '8px 8px',
-                                        backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : 'transparent'
+                                        backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0, 0, 0, 0.1)'
                                     }}
                                 >
-                                    <Typography variant="body2">{option.title}</Typography>
+                                    <Typography maxWidth={"70%"} variant="body2">{option.title}</Typography>
                                     <Typography
                                         variant="body2">{option.num_booked} / {artistTicketOption?.num_booked || 0} </Typography>
                                 </Box>;
@@ -52,10 +52,10 @@ function HomePage() {
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         padding: '8px 8px',
-                                        backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : 'transparent'
+                                        backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0, 0, 0, 0.1)'
                                     }}
                                 >
-                                    <Typography variant="body2">{option.title}</Typography>
+                                    <Typography maxWidth={"70%"} variant="body2">{option.title}</Typography>
                                     <Typography
                                         variant="body2">{option.num_booked} / {artistBeverageOption?.num_booked || 0}</Typography>
                                 </Box>;
@@ -80,10 +80,10 @@ function HomePage() {
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         padding: '8px 8px',
-                                        backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : 'transparent'
+                                        backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0, 0, 0, 0.1)'
                                     }}
                                 >
-                                    <Typography variant="body2">{option.title}</Typography>
+                                    <Typography maxWidth={"70%"} variant="body2">{option.title}</Typography>
                                     <Typography variant="body2">{option.num_booked} / {artistFoodOption?.num_booked || 0}</Typography>
                                 </Box>
                             }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
     AppBar,
     Toolbar,
@@ -9,7 +9,7 @@ import {
     ListItemIcon,
     ListItemText,
     Box,
-    createTheme,
+    Paper,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
@@ -23,12 +23,10 @@ import {
     Download,
     EuroSymbol,
     PointOfSale,
-    MusicNote,
-    Mic
+    MusicNote
 } from '@mui/icons-material';
 import ListItemButton from "@mui/material/ListItemButton";
-import { ThemeOptions, ThemeProvider } from "@mui/material/styles";
-import { CSVLink } from "react-csv";
+import {CSVLink} from "react-csv";
 
 // Import all page components
 import HomePage from './HomePage';
@@ -42,25 +40,9 @@ import ArtistsPage from './ArtistsPage';
 import ArtistMaterialsPage from './ArtistMaterialsPage';
 import FinancialsOverviewPage from './FinancialsOverviewPage';
 import PaymentConfirmationsPage from './PaymentConfirmationsPage';
+import {useFetchData} from './useFetchData';
 
-// Import data hook
-import { useFetchData } from './useFetchData';
 
-export const themeOptions: ThemeOptions = {
-    components: {
-        MuiCard: {
-            styleOverrides: {
-                root: {
-                    fontFamily: 'Kavoon',
-                    backgroundColor: 'rgba(255,255, 255, 0.6)',
-                    backdropFilter: 'blur(10px)',
-                },
-            },
-        },
-    },
-};
-
-const theme = createTheme(themeOptions);
 
 // Define all possible dashboard tabs
 interface DashboardTab {
@@ -71,29 +53,27 @@ interface DashboardTab {
 }
 
 const dashboardTabs: DashboardTab[] = [
-    { id: 'home', label: 'Home', icon: <Home />, permissions: ['read'] },
-    { id: 'bookings', label: 'Bookings', icon: <People />, permissions: ['read'] },
-    { id: 'tickets', label: 'Tickets', icon: <LocalActivity />, permissions: ['read'] },
-    { id: 'beverages', label: 'Beer', icon: <SportsBar />, permissions: ['read'] },
-    { id: 'food', label: 'Food', icon: <LunchDining />, permissions: ['read'] },
-    { id: 'materials', label: 'Material', icon: <Handyman />, permissions: ['read'] },
-    { id: 'workShifts', label: 'Support', icon: <Work />, permissions: ['read'] },
-    { id: 'artists', label: 'Artists', icon: <MusicNote />, permissions: ['read'] },
-    { id: 'artistMaterials', label: 'Artist Materials', icon: <Mic />, permissions: ['read'] },
-    { id: 'financials', label: 'Financials', icon: <EuroSymbol />, permissions: ['financial'] },
-    { id: 'payments', label: 'Payments', icon: <PointOfSale />, permissions: ['financial'] }
+    {id: 'home', label: 'Home', icon: <Home/>, permissions: ['read']},
+    {id: 'bookings', label: 'Bookings', icon: <People/>, permissions: ['read']},
+    {id: 'tickets', label: 'Tickets', icon: <LocalActivity/>, permissions: ['read']},
+    {id: 'beverages', label: 'Beer', icon: <SportsBar/>, permissions: ['read']},
+    {id: 'food', label: 'Food', icon: <LunchDining/>, permissions: ['read']},
+    {id: 'materials', label: 'Material', icon: <Handyman/>, permissions: ['read']},
+    {id: 'workShifts', label: 'Support', icon: <Work/>, permissions: ['read']},
+    {id: 'artists', label: 'Artists', icon: <MusicNote/>, permissions: ['read']},
+    {id: 'financials', label: 'Financials', icon: <EuroSymbol/>, permissions: ['financial']},
+    {id: 'payments', label: 'Payments', icon: <PointOfSale/>, permissions: ['financial']}
 ];
 
 function Dashboard() {
     // Use fetch hook for data
-    const { 
-        regularBookings, 
-        artistBookings, 
-        formContent, 
+    const {
+        regularBookings,
+        artistBookings,
+        formContent,
         artistFormContent,
-        refetch
     } = useFetchData();
-    
+
     const [activeTab, setActiveTab] = useState('home');
     const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -101,7 +81,7 @@ function Dashboard() {
     const adminPermissions = ['read', 'financial', 'shift_management'];
 
     // Filter tabs based on admin permissions
-    const authorizedTabs = dashboardTabs.filter(tab => 
+    const authorizedTabs = dashboardTabs.filter(tab =>
         tab.permissions.some(perm => adminPermissions.includes(perm))
     );
 
@@ -116,30 +96,30 @@ function Dashboard() {
 
     const renderPage = () => {
         switch (activeTab) {
-            case 'home': 
-                return <HomePage />;
-            case 'bookings': 
-                return <BookingsPage />;
-            case 'tickets': 
-                return <TicketsPage />;
-            case 'beverages': 
-                return <BeveragesPage />;
-            case 'food': 
-                return <FoodPage />;
-            case 'materials': 
-                return <MaterialsPage />;
-            case 'workShifts': 
-                return <WorkshiftsPage />;
+            case 'home':
+                return <HomePage/>;
+            case 'bookings':
+                return <BookingsPage/>;
+            case 'tickets':
+                return <TicketsPage/>;
+            case 'beverages':
+                return <BeveragesPage/>;
+            case 'food':
+                return <FoodPage/>;
+            case 'materials':
+                return <MaterialsPage/>;
+            case 'workShifts':
+                return <WorkshiftsPage/>;
             case 'artists':
-                return <ArtistsPage />;
+                return <ArtistsPage/>;
             case 'artistMaterials':
-                return <ArtistMaterialsPage />;
-            case 'financials': 
-                return <FinancialsOverviewPage />;
-            case 'payments': 
-                return <PaymentConfirmationsPage />;
-            default: 
-                return <HomePage />;
+                return <ArtistMaterialsPage/>;
+            case 'financials':
+                return <FinancialsOverviewPage/>;
+            case 'payments':
+                return <PaymentConfirmationsPage/>;
+            default:
+                return <HomePage/>;
         }
     };
 
@@ -246,13 +226,22 @@ function Dashboard() {
                     });
             case 'workShifts':
                 return regularBookings.flatMap(b => {
-                    const shifts: { FirstName: string; LastName: string; Priority: string; Workshift: string; Timeslot: string; StartTime: string; EndTime: string; MaxShifts: number; }[] = [];
+                    const shifts: {
+                        FirstName: string;
+                        LastName: string;
+                        Priority: string;
+                        Workshift: string;
+                        Timeslot: string;
+                        StartTime: string;
+                        EndTime: string;
+                        MaxShifts: number;
+                    }[] = [];
                     const priorities = ['First', 'Second', 'Third'];
-                    
+
                     [b.timeslot_priority_1, b.timeslot_priority_2, b.timeslot_priority_3]
                         .forEach((timeslotId, index) => {
                             if (timeslotId === -1) return;
-                            
+
                             // Find the workshift and timeslot
                             for (const shift of formContent.work_shifts) {
                                 const timeslot = shift.time_slots.find(ts => ts.id === timeslotId);
@@ -271,7 +260,7 @@ function Dashboard() {
                                 }
                             }
                         });
-                    
+
                     return shifts;
                 });
             case 'artists':
@@ -285,7 +274,7 @@ function Dashboard() {
                     } catch (e) {
                         performanceDetails = 'Error parsing performance details';
                     }
-                    
+
                     return {
                         FirstName: b.first_name,
                         LastName: b.last_name,
@@ -328,7 +317,6 @@ function Dashboard() {
     };
 
     return (
-        <ThemeProvider theme={theme}>
             <Box sx={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
                 <AppBar position="fixed">
                     <Toolbar>
@@ -339,12 +327,12 @@ function Dashboard() {
                             <Typography variant="h6" display="flex" alignItems="center">
                                 {/* Display the active tab icon */}
                                 {authorizedTabs.find(tab => tab.id === activeTab)?.icon}
-                                <span style={{ marginLeft: '8px' }}>
+                                <span style={{marginLeft: '8px'}}>
                                     {authorizedTabs.find(tab => tab.id === activeTab)?.label}
                                 </span>
                             </Typography>
                         </Box>
-                        
+
                         {/* Export button - only show for tabs with data */}
                         {activeTab !== 'home' && (
                             <CSVLink
@@ -359,12 +347,12 @@ function Dashboard() {
                         )}
                     </Toolbar>
                 </AppBar>
-                
+
                 <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
                     <List>
                         {authorizedTabs.map((tab) => (
-                            <ListItemButton 
-                                onClick={() => handleMenuClick(tab.id)} 
+                            <ListItemButton
+                                onClick={() => handleMenuClick(tab.id)}
                                 key={tab.id}
                                 selected={activeTab === tab.id}
                             >
@@ -374,7 +362,7 @@ function Dashboard() {
                         ))}
                     </List>
                 </Drawer>
-                
+
                 <Box component="main"
                      sx={{
                          flexGrow: 1,
@@ -382,10 +370,11 @@ function Dashboard() {
                          overflowY: 'auto',
                          paddingX: {sm: "0", md: "2em"}
                      }}>
-                    {renderPage()}
+                    <Paper elevation={3} sx={{p: 3}}>
+                        {renderPage()}
+                    </Paper>
                 </Box>
             </Box>
-        </ThemeProvider>
     );
 }
 

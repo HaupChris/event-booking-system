@@ -6,7 +6,7 @@ import {
     Switch, FormControlLabel, Chip, InputAdornment
 } from '@mui/material';
 import {
-    Check, Clear, Edit, Save, Receipt, MoneyOff,
+    Check, Clear, Save, Receipt, MoneyOff,
     CalendarToday, ArrowUpward, ArrowDownward
 } from '@mui/icons-material';
 import axios from 'axios';
@@ -142,7 +142,7 @@ const PaymentConfirmationsPage: React.FC = () => {
             {/* Statistics Cards */}
             <Grid container spacing={2} sx={{mb: 3}}>
                 <Grid item xs={12} sm={6} md={3}>
-                    <Paper sx={{p: 2, bgcolor: 'primary.light', color: 'white'}}>
+                    <Paper sx={{p: 2, bgcolor: 'primary', color: 'white'}}>
                         <Typography variant="h6">Total Expected</Typography>
                         <Typography variant="h4">€{totalExpected.toFixed(2)}</Typography>
                     </Paper>
@@ -268,8 +268,8 @@ const PaymentConfirmationsPage: React.FC = () => {
                 }}>
                     {editedBooking && (
                         <>
-                            <Typography variant="h5" gutterBottom>Payment Management</Typography>
-                            <Typography variant="subtitle1">
+                            <Typography variant="h5" color={"text.primary"} gutterBottom>Payment Management</Typography>
+                            <Typography color={"text.primary"} variant="subtitle1">
                                 {editedBooking.first_name} {editedBooking.last_name}
                             </Typography>
                             <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -280,6 +280,7 @@ const PaymentConfirmationsPage: React.FC = () => {
                             <Grid container spacing={2} sx={{mt: 2}}>
                                 <Grid item xs={12}>
                                     <FormControlLabel
+
                                         control={
                                             <Switch
                                                 checked={editedBooking.is_paid}
@@ -287,7 +288,7 @@ const PaymentConfirmationsPage: React.FC = () => {
                                                 color={editedBooking.is_paid ? "success" : "error"}
                                             />
                                         }
-                                        label={editedBooking.is_paid ? 'Ist bezahlt' : 'Noch nicht bezahlt'}
+                                        label={<Typography color={editedBooking.is_paid ? "success.light" : "error"}>{editedBooking.is_paid ? 'Ist bezahlt' : 'Noch nicht bezahlt'}</Typography>}
                                     />
                                 </Grid>
 

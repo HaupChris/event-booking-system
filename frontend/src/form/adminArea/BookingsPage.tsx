@@ -1,29 +1,50 @@
 // src/form/adminArea/BookingsPage.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Modal, IconButton, Select, MenuItem,
   FormControl, InputLabel, Button, TextField, Snackbar, Alert, Grid,
-  InputAdornment, Chip, Tab, Tabs
+  InputAdornment, Chip, Tab, Tabs, useMediaQuery, useTheme, FormControlLabel, Checkbox, Tooltip, Menu
 } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowUpward';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import axios from 'axios';
 import { useFetchData } from "./useFetchData";
 import { TokenContext } from "../../AuthContext";
+import { Search } from "@mui/icons-material";
 
 const BookingsPage: React.FC = () => {
   // Use the updated useFetchData hook that separates booking types
   const { regularBookings, artistBookings, formContent, artistFormContent, refetch } = useFetchData();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // Column visibility state
+  const [columnVisibility, setColumnVisibility] = useState<{[key: string]: boolean}>({
+    type: true,
+    name: true,
+    email: !isMobile,
+    ticket: !isMobile,
+    price: !isMobile,
+    actions: true,
+  });
+
+  // Column filter menu state
+  const [columnFilterAnchorEl, setColumnFilterAnchorEl] = useState<null | HTMLElement>(null);
+  const columnFilterOpen = Boolean(columnFilterAnchorEl);
 
   // State for filtering and viewing
   const [viewType, setViewType] = useState('all'); // 'all', 'regular', 'artist'
+  const [viewTypeAnchorEl, setViewTypeAnchorEl] = useState<null | HTMLElement>(null);
+  const viewTypeMenuOpen = Boolean(viewTypeAnchorEl);
+
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
   const [editedBooking, setEditedBooking] = useState<any | null>(null);
   const [openModal, setOpenModal] = useState(false);
@@ -35,6 +56,18 @@ const BookingsPage: React.FC = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const { token } = React.useContext(TokenContext);
+
+  // Set default column visibility based on screen size
+  useEffect(() => {
+    setColumnVisibility({
+      type: true,
+      name: true,
+      email: !isMobile,
+      ticket: !isMobile,
+      price: !isMobile,
+      actions: true,
+    });
+  }, [isMobile]);
 
   // Combine bookings based on the selected view type
   const getAllBookings = () => {
@@ -97,7 +130,7 @@ const BookingsPage: React.FC = () => {
       setSnackbarMessage('Booking updated successfully');
       setSnackbarSeverity('success');
       setShowSnackbar(true);
-      refetch(); // Refresh data
+      refetch().then(); // Refresh data
       setEditMode(false);
     } catch (error) {
       console.error('Error updating booking:', error);
@@ -163,22 +196,174 @@ const BookingsPage: React.FC = () => {
     setViewType(newValue);
   };
 
+  // Handle view type dropdown menu
+  const handleViewTypeMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setViewTypeAnchorEl(event.currentTarget);
+  };
+
+  const handleViewTypeMenuClose = () => {
+    setViewTypeAnchorEl(null);
+  };
+
+  const handleViewTypeSelect = (type: string) => {
+    setViewType(type);
+    handleViewTypeMenuClose();
+  };
+
+  // Handle column filter menu
+  const handleColumnFilterOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setColumnFilterAnchorEl(event.currentTarget);
+  };
+
+  const handleColumnFilterClose = () => {
+    setColumnFilterAnchorEl(null);
+  };
+
+  const handleColumnVisibilityChange = (column: string) => {
+    setColumnVisibility(prev => ({
+      ...prev,
+      [column]: !prev[column]
+    }));
+  };
+
   return (
     <Box>
-      {/* View type tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-        <Tabs
-          value={viewType}
-          onChange={handleViewChange}
-          centered
-        >
-          <Tab label="All Bookings" value="all" />
-          <Tab label="Regular Participants" value="regular" />
-          <Tab label="Artists" value="artist" />
-        </Tabs>
+      {/* Control panel */}
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        mb: 2,
+        gap: 1,
+        p: 1,
+        backgroundColor: 'background.paper',
+        borderRadius: 1
+      }}>
+        {/* View Type Selection - Either Tabs or Dropdown based on screen size */}
+        {isMobile ? (
+          <Box>
+            <Button
+              variant="outlined"
+              onClick={handleViewTypeMenuOpen}
+              endIcon={<FilterAltIcon />}
+              size="small"
+            >
+              {viewType === 'all' ? 'All Bookings' :
+               viewType === 'regular' ? 'Regular' : 'Artists'}
+            </Button>
+            <Menu
+              anchorEl={viewTypeAnchorEl}
+              open={viewTypeMenuOpen}
+              onClose={handleViewTypeMenuClose}
+            >
+              <MenuItem onClick={() => handleViewTypeSelect('all')}>All Bookings</MenuItem>
+              <MenuItem onClick={() => handleViewTypeSelect('regular')}>Regular Participants</MenuItem>
+              <MenuItem onClick={() => handleViewTypeSelect('artist')}>Artists</MenuItem>
+            </Menu>
+          </Box>
+        ) : (
+          <Tabs
+            value={viewType}
+            onChange={handleViewChange}
+            sx={{ minWidth: '300px' }}
+          >
+            <Tab label="All Bookings" value="all" />
+            <Tab label="Regular Participants" value="regular" />
+            <Tab label="Artists" value="artist" />
+          </Tabs>
+        )}
+
+        {/* Column Visibility Button */}
+        <Box>
+          <Tooltip title="Select visible columns">
+            <IconButton
+              onClick={handleColumnFilterOpen}
+              color="primary"
+              size="small"
+            >
+              <ViewColumnIcon />
+            </IconButton>
+          </Tooltip>
+          <Menu
+            anchorEl={columnFilterAnchorEl}
+            open={columnFilterOpen}
+            onClose={handleColumnFilterClose}
+          >
+            <MenuItem disabled>
+              <Typography variant="subtitle2">Show Columns</Typography>
+            </MenuItem>
+            <MenuItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={columnVisibility.type}
+                    onChange={() => handleColumnVisibilityChange('type')}
+                  />
+                }
+                label="Type"
+              />
+            </MenuItem>
+            <MenuItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={columnVisibility.name}
+                    onChange={() => handleColumnVisibilityChange('name')}
+                  />
+                }
+                label="Name"
+              />
+            </MenuItem>
+            <MenuItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={columnVisibility.email}
+                    onChange={() => handleColumnVisibilityChange('email')}
+                  />
+                }
+                label="Email"
+              />
+            </MenuItem>
+            <MenuItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={columnVisibility.ticket}
+                    onChange={() => handleColumnVisibilityChange('ticket')}
+                  />
+                }
+                label="Ticket"
+              />
+            </MenuItem>
+            <MenuItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={columnVisibility.price}
+                    onChange={() => handleColumnVisibilityChange('price')}
+                  />
+                }
+                label="Price"
+              />
+            </MenuItem>
+          </Menu>
+        </Box>
       </Box>
 
-      <Box mx={2} mb={2}>
+      {/* Search and Sort Controls */}
+      <Box sx={{
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 2,
+        gap: 1,
+        p: 1
+      }}>
+        {/* Search */}
         <TextField
           fullWidth
           variant="outlined"
@@ -189,46 +374,56 @@ const BookingsPage: React.FC = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <FilterListIcon />
+                <Search />
               </InputAdornment>
             ),
           }}
+          sx={{ flexGrow: 1, maxWidth: isMobile ? '100%' : '60%' }}
         />
-      </Box>
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mx={2} mb={2}>
-        <FormControl variant="outlined" size="small">
-          <InputLabel>Sort By</InputLabel>
-          <Select
-            value={sortCriterion}
-            onChange={(e) => setSortCriterion(e.target.value as string)}
-            label="Sort By"
+        {/* Sort Controls */}
+        <Box sx={{
+          display: 'flex',
+          gap: 1,
+          mt: "1em",
+          width: isMobile ? '100%' : 'auto',
+          justifyContent: isMobile ? 'space-between' : 'flex-end'
+        }}>
+          <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Sort By</InputLabel>
+            <Select
+              value={sortCriterion}
+              onChange={(e) => setSortCriterion(e.target.value as string)}
+              label="Sort By"
+            >
+              <MenuItem value="first_name">First Name</MenuItem>
+              <MenuItem value="last_name">Last Name</MenuItem>
+              <MenuItem value="timestamp">Registration Date</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+            startIcon={sortOrder === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+            size="small"
           >
-            <MenuItem value="first_name">First Name</MenuItem>
-            <MenuItem value="last_name">Last Name</MenuItem>
-            <MenuItem value="timestamp">Registration Date</MenuItem>
-          </Select>
-        </FormControl>
-
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-          startIcon={sortOrder === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-        >
-          {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-        </Button>
+            {sortOrder === 'asc' ? 'Asc' : 'Desc'}
+          </Button>
+        </Box>
       </Box>
 
+      {/* Bookings Table */}
       <TableContainer component={Paper}>
-        <Table>
+        <Table size={isMobile ? "small" : "medium"}>
           <TableHead>
             <TableRow>
-              <TableCell>Type</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Ticket</TableCell>
-              <TableCell>Price</TableCell>
+              {columnVisibility.type && <TableCell>Type</TableCell>}
+              {columnVisibility.name && <TableCell>Name</TableCell>}
+              {columnVisibility.email && <TableCell>Email</TableCell>}
+              {columnVisibility.ticket && <TableCell>Ticket</TableCell>}
+              {columnVisibility.price && <TableCell>Price</TableCell>}
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -242,19 +437,29 @@ const BookingsPage: React.FC = () => {
                     : 'transparent'
                 }}
               >
+                {columnVisibility.type && (
+                  <TableCell>
+                    {booking.bookingType === 'artist' ? (
+                      <Chip label="Artist" color="primary" size="small" />
+                    ) : (
+                      <Chip label="Regular" color="default" size="small" />
+                    )}
+                  </TableCell>
+                )}
+                {columnVisibility.name && (
+                  <TableCell>{booking.first_name} {booking.last_name}</TableCell>
+                )}
+                {columnVisibility.email && (
+                  <TableCell>{booking.email}</TableCell>
+                )}
+                {columnVisibility.ticket && (
+                  <TableCell>{getTicketTitle(booking.ticket_id, booking.bookingType)}</TableCell>
+                )}
+                {columnVisibility.price && (
+                  <TableCell>€{booking.total_price.toFixed(2)}</TableCell>
+                )}
                 <TableCell>
-                  {booking.bookingType === 'artist' ? (
-                    <Chip label="Artist" color="primary" size="small" />
-                  ) : (
-                    <Chip label="Regular" color="default" size="small" />
-                  )}
-                </TableCell>
-                <TableCell>{booking.first_name} {booking.last_name}</TableCell>
-                <TableCell>{booking.email}</TableCell>
-                <TableCell>{getTicketTitle(booking.ticket_id, booking.bookingType)}</TableCell>
-                <TableCell>€{booking.total_price.toFixed(2)}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleOpenModal(booking)}>
+                  <IconButton onClick={() => handleOpenModal(booking)} size="small">
                     <MoreHorizIcon />
                   </IconButton>
                 </TableCell>
@@ -450,8 +655,8 @@ const BookingsPage: React.FC = () => {
                         multiline
                         rows={3}
                         label="Equipment Details"
-                        value={editedBooking.equipment || ''}
-                        onChange={(e) => handleInputChange('equipment', e.target.value)}
+                        value={editedBooking.artist_equipment || ''}
+                        onChange={(e) => handleInputChange('artist_equipment', e.target.value)}
                         disabled={!editMode}
                         margin="normal"
                       />
@@ -486,7 +691,7 @@ const BookingsPage: React.FC = () => {
                 {/* Payment information for all booking types */}
                 <Grid item xs={12}>
                   <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>Payment Status:</Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+                  <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 2 }}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel>Paid</InputLabel>
                       <Select
