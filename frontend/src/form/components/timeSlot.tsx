@@ -1,16 +1,21 @@
-import {Booking, TimeSlot as TimeSlotType} from '../userArea/interface';
+import { Booking, TimeSlot as TimeSlotType } from '../userArea/interface';
 import {
-    FormControl, IconButton, Input, InputLabel, LinearProgress,
+    FormControl,
+    IconButton,
+    Input,
+    InputLabel,
     ListItem,
     ListItemAvatar,
     ListItemText,
     MenuItem,
-    Select, SelectChangeEvent,
-    Typography
+    Select,
+    SelectChangeEvent,
+    Typography,
+    Paper
 } from '@mui/material';
 import React from 'react';
-import {CircularProgressWithLabel} from './circularProgressWithLabel';
-import {Close} from "@mui/icons-material";
+import { CircularProgressWithLabel } from './circularProgressWithLabel';
+import { Close } from "@mui/icons-material";
 import { PRIORITIES } from "../userArea/constants";
 
 interface TimeSlotProps {
@@ -21,10 +26,9 @@ interface TimeSlotProps {
     currentBooking: Booking;
 }
 
-function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePriorities, currentBooking}: TimeSlotProps) {
+function TimeSlot({ timeSlot, selectedPriority, updateBooking, availablePriorities, currentBooking }: TimeSlotProps) {
     const isFull = timeSlot.num_booked >= timeSlot.num_needed;
-    const timeslotAvailablePriorities = availablePriorities.concat([selectedPriority]);
-
+    const timeslotAvailablePriorities = availablePriorities.concat([selectedPriority]).filter(p => p !== "");
 
     const handlePriorityChange = (event: SelectChangeEvent<{ value: unknown }>) => {
         const newPriority = event.target.value as string;
@@ -56,7 +60,12 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
         }
     };
 
-    const selectedPriorityBorder = selectedPriority === PRIORITIES.FIRST ? '3px solid green' : selectedPriority === PRIORITIES.SECOND ? '3px solid lightgreen' : selectedPriority === PRIORITIES.THIRD ? '3px solid lightgrey' : '1px solid transparent';
+    const getPriorityBorderColor = () => {
+        if (selectedPriority === PRIORITIES.FIRST) return 'success.main';
+        if (selectedPriority === PRIORITIES.SECOND) return 'info.main';
+        if (selectedPriority === PRIORITIES.THIRD) return 'warning.main';
+        return 'transparent';
+    };
 
     const handleReset = () => {
         if (selectedPriority === PRIORITIES.FIRST) {
@@ -66,57 +75,91 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
         } else if (selectedPriority === PRIORITIES.THIRD) {
             updateBooking("timeslot_priority_3", -1);
         }
-    }
+    };
 
-    const timeslotNumBooked = timeSlot.num_booked + (currentBooking.timeslot_priority_1 == timeSlot.id ? 1 : 0);
+    const timeslotNumBooked = timeSlot.num_booked + (currentBooking.timeslot_priority_1 === timeSlot.id ? 1 : 0);
 
+    return (
+        <Paper
+            elevation={1}
+            sx={{
+                mb: 2,
+                border: selectedPriority ? `2px solid` : 'none',
+                borderColor: getPriorityBorderColor(),
+                borderRadius: 2,
+                opacity: isFull ? 0.6 : 1,
+                transition: 'all 0.3s ease',
+                background: 'rgba(26, 26, 26, 0.3)',
+                '&:hover': {
+                    background: 'rgba(26, 26, 26, 0.5)',
+                }
+            }}
+        >
+            <ListItem>
+                <ListItemAvatar>
+                    <CircularProgressWithLabel
+                        valueCurrent={timeslotNumBooked}
+                        valueMax={timeSlot.num_needed}
+                    />
+                </ListItemAvatar>
 
-    return <ListItem key={timeSlot.title + '-' + timeSlot.id} sx={{
-        border: selectedPriorityBorder,
-        opacity: isFull ? '40%' : '100%',
-        marginLeft: 0,
-        paddingLeft: 0,
-        borderRadius: "10px"
-    }}>
-        <ListItemAvatar>
-        	<CircularProgressWithLabel valueCurrent={timeslotNumBooked} valueMax={timeSlot.num_needed}/>
-        </ListItemAvatar>
-        <LinearProgress color={"secondary"} variant={"determinate"} value={200}/>
-        <ListItemText>
-            <Typography
-                sx={{display: 'inline', mx: 2}}
-                component="span"
-                variant="body2"
-                color="text.primary"
-            >
-                {`${timeSlot.title}`}
+                <ListItemText>
+                    <Typography
+                        sx={{ display: 'inline', mx: 2 }}
+                        component="span"
+                        variant="body1"
+                        color="text.primary"
+                    >
+                        {timeSlot.title}
+                        {timeSlot.start_time.length !== 0 && timeSlot.end_time.length !== 0 ? (
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                component="div"
+                                sx={{ mt: 0.5 }}
+                            >
+                                {`${timeSlot.start_time} - ${timeSlot.end_time}`}
+                            </Typography>
+                        ) : null}
+                    </Typography>
+                </ListItemText>
 
-                {timeSlot.start_time.length !== 0 && timeSlot.end_time.length !== 0 ? <>
-                    <br/> {`${timeSlot.start_time} - ${timeSlot.end_time}`}</> : ""}
-            </Typography>
-        </ListItemText>
-        <ListItemText>
-            <FormControl variant="standard" sx={{minWidth: "100px"}}>
-                <InputLabel id="demo-simple-select-standard-label"> Priorität </InputLabel>
-                <Select
-                    labelId="demo-simple-select-standard-label"
-                    id="demo-simple-select-standard"
-                    // @ts-ignore
-                    value={selectedPriority}
-                    onChange={handlePriorityChange}
-                    label="--Select Priority--"
-                    input={<Input
-                        endAdornment={<IconButton sx={{display: selectedPriority !== "" ? "" : "none", marginRight: 2}}
-                                                  onClick={handleReset} size="small"><Close/></IconButton>}
-                    />}
-                >
-                    {timeslotAvailablePriorities.map((priority) => (
-                        <MenuItem key={priority} value={priority}>{priority}</MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-        </ListItemText>
-    </ListItem>
+                <FormControl variant="standard" sx={{ minWidth: "120px" }}>
+                    <InputLabel id={`priority-select-label-${timeSlot.id}`}>Priorität</InputLabel>
+                    <Select
+                        labelId={`priority-select-label-${timeSlot.id}`}
+                        id={`priority-select-${timeSlot.id}`}
+                        // @ts-ignore
+                        value={selectedPriority}
+                        onChange={handlePriorityChange}
+                        label="Priorität"
+                        input={
+                            <Input
+                                endAdornment={
+                                    selectedPriority ? (
+                                        <IconButton
+                                            onClick={handleReset}
+                                            size="small"
+                                            sx={{ mr: 1 }}
+                                        >
+                                            <Close fontSize="small" />
+                                        </IconButton>
+                                    ) : null
+                                }
+                            />
+                        }
+                        disabled={isFull && !selectedPriority}
+                    >
+                        {timeslotAvailablePriorities.map((priority) => (
+                            <MenuItem key={priority} value={priority}>
+                                {priority}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </ListItem>
+        </Paper>
+    );
 }
 
 export default TimeSlot;

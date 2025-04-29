@@ -1,5 +1,5 @@
-import {Box, List, ListItem, ListItemText, Typography} from "@mui/material";
-
+import React from "react";
+import { Box, List, ListItem, ListItemText, Typography, Paper } from "@mui/material";
 
 function FormAwarnessCode() {
   const items = [
@@ -11,17 +11,23 @@ function FormAwarnessCode() {
   ];
 
   return (
-    <Box sx={{mt: 3, p: 2, borderRadius: '5px'}}>
-      <List>
-        {items.map((item, index) => (
-          <ListItem key={index}>
-            <ListItemText
-              primary={<Typography variant="h5" color={"secondary"} component="div" align={"center"} sx={{paddingBottom:"0.5em"}}><strong>{item.title}</strong></Typography>}
-              secondary={<Typography variant="subtitle1" component="div" align={"justify"}>{item.text}</Typography>}
-            />
-          </ListItem>
-        ))}
-      </List>
+    <Box sx={{ width: '100%', maxWidth: 800, mx: 'auto' }}>
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h5" align="center" gutterBottom>
+          Unser Bewusstseins-Code für ein gelungenes Festival
+        </Typography>
+
+        <List>
+          {items.map((item, index) => (
+            <ListItem key={index} sx={{ flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}>
+              <ListItemText
+                primary={<Typography variant="h6" color="secondary" component="div" align="center" sx={{ paddingBottom: "0.5em" }}><strong>{item.title}</strong></Typography>}
+                secondary={<Typography variant="body1" component="div" align="justify">{item.text}</Typography>}
+              />
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
     </Box>
   );
 }

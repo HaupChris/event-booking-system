@@ -1,6 +1,6 @@
-import {Booking, WorkShift as WorkShiftType} from '../userArea/interface';
-import {Box, List, ListItem, Typography} from '@mui/material';
-import React, {useEffect, useState} from 'react';
+import { Booking, WorkShift as WorkShiftType } from '../userArea/interface';
+import { Box, List, ListItem, Typography, Paper } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import TimeSlot from './timeSlot';
 import '../../css/workShift.css';
 import { PRIORITIES } from "../userArea/constants";
@@ -12,10 +12,11 @@ interface WorkShiftProps {
     availablePriorities: string[];
 }
 
-function WorkShift({workShift, currentBooking, updateBooking, availablePriorities}: WorkShiftProps) {
+function WorkShift({ workShift, currentBooking, updateBooking, availablePriorities }: WorkShiftProps) {
     const [sortedTimeSlots, setSortedTimeSlots] = useState(workShift.time_slots);
 
     useEffect(() => {
+        // Sort time slots so that filled ones appear at the bottom
         const sorted = [...workShift.time_slots].sort((a, b) => {
             if (a.num_booked >= a.num_needed && b.num_booked < b.num_needed) {
                 return 1;
@@ -29,39 +30,54 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
     }, [workShift]);
 
     return (
-        <Box sx={{
-            display: 'flex',
-            'flexDirection': 'column',
-            'alignItems': 'center',
-            'justifyContent': 'center',
-            maxWidth: '90vw',
-            marginTop: '8px'
-        }}>
-            <Box sx={{display: "flex", flexDirection: "column"}}>
-                <Typography align={"center"} color={"text-primary"} sx={{paddingBottom: "1em"}} variant="h4">{workShift.title}</Typography>
-                <Typography align={"justify"} sx={{ color: (theme) => theme.palette.text.secondary }} variant="subtitle1">{workShift.description}</Typography>
+        <Paper elevation={2} sx={{ p: 2, mb: 2, bgcolor: 'rgba(26, 26, 26, 0.7)' }}>
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Typography
+                    align="center"
+                    color="primary"
+                    sx={{ mb: 2 }}
+                    variant="h5"
+                >
+                    {workShift.title}
+                </Typography>
 
+                <Typography
+                    align="justify"
+                    sx={{ color: "text.secondary", mb: 3 }}
+                    variant="body1"
+                >
+                    {workShift.description}
+                </Typography>
             </Box>
 
-            <ListItem key={workShift.title + "-" + workShift.id}
-                      sx={{paddingLeft: 0, paddingRight: 0, display: 'flex', justifyContent: 'center'}}>
-                <List className={'timeslot-list'}>
+            <ListItem
+                key={workShift.title + "-" + workShift.id}
+                sx={{ display: 'flex', justifyContent: 'center', p: 0 }}
+            >
+                <List className="timeslot-list" sx={{ width: '100%' }}>
                     {sortedTimeSlots.map((timeSlot) => {
                         const selectedPriority = currentBooking.timeslot_priority_1 === timeSlot.id
-                            ? PRIORITIES.FIRST : currentBooking.timeslot_priority_2 === timeSlot.id
-                                ? PRIORITIES.SECOND : currentBooking.timeslot_priority_3 === timeSlot.id
-                                    ? PRIORITIES.THIRD : "";
-                        return <TimeSlot
-                            currentBooking={currentBooking}
-                            timeSlot={timeSlot}
-                            availablePriorities={availablePriorities}
-                            selectedPriority={selectedPriority}
-                            updateBooking={updateBooking}
-                        />;
+                            ? PRIORITIES.FIRST
+                            : currentBooking.timeslot_priority_2 === timeSlot.id
+                                ? PRIORITIES.SECOND
+                                : currentBooking.timeslot_priority_3 === timeSlot.id
+                                    ? PRIORITIES.THIRD
+                                    : "";
+
+                        return (
+                            <TimeSlot
+                                key={timeSlot.id}
+                                currentBooking={currentBooking}
+                                timeSlot={timeSlot}
+                                availablePriorities={availablePriorities}
+                                selectedPriority={selectedPriority}
+                                updateBooking={updateBooking}
+                            />
+                        );
                     })}
                 </List>
             </ListItem>
-        </Box>
+        </Paper>
     );
 }
 
