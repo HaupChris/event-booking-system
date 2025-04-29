@@ -44,14 +44,7 @@ def submit_artist_form():
 @jwt_required()
 def get_artist_formcontent():
     try:
-        form_content = get_artist_form_content_obj()
-        # Convert to dict for serialization
-        form_content_dict = {
-            "ticket_options": [vars(t) for t in form_content.ticket_options],
-            "beverage_options": [vars(b) for b in form_content.beverage_options],
-            "food_options": [vars(f) for f in form_content.food_options],
-            "artist_materials": [vars(m) for m in form_content.artist_materials]
-        }
+        form_content_dict = get_up_to_date_artist_form_content()
         return jsonify(form_content_dict), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -63,7 +56,7 @@ def get_artist_formcontent():
 def get_artist_bookings():
     # Check if user has admin permissions
     identity = get_jwt_identity()
-    if identity.get("role") not in ["admin"]:
+    if identity not in ["admin"]:
         return jsonify({"error": "Unauthorized"}), 403
 
     all_bookings = get_all_artist_bookings()
@@ -76,7 +69,7 @@ def get_artist_bookings():
 def get_artist_booking(booking_id):
     # Check if user has admin permissions
     identity = get_jwt_identity()
-    if identity.get("role") not in ["admin"]:
+    if identity not in ["admin"]:
         return jsonify({"error": "Unauthorized"}), 403
 
     booking = get_artist_booking_by_id(booking_id)

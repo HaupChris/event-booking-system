@@ -2,7 +2,7 @@ import {Box, Card, CardContent, Typography, Grid} from '@mui/material';
 import {useFetchData} from "./useFetchData";
 
 function HomePage() {
-    const {bookings, formContent} = useFetchData();
+    const {bookings, formContent, artistFormContent} = useFetchData();
 
     const artistCount = bookings.filter(b => b.bookingType === 'artist').length;
     const regularCount = bookings.filter(b => b.bookingType === 'regular').length;
@@ -13,22 +13,26 @@ function HomePage() {
                 <Card>
                     <CardContent>
                         <Typography variant="h5" component="div" gutterBottom>
-                            Ticket Bookings
+                            Ticket Buchungen (Normal / Künstler*innen)
                         </Typography>
-                        {formContent.ticket_options.map((option, index) => (
-                            <Box
-                                key={index}
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    padding: '8px 8px',
-                                    backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : 'transparent'
-                                }}
-                            >
-                                <Typography variant="body2">{option.title}</Typography>
-                                <Typography variant="body2">{option.num_booked}</Typography>
-                            </Box>
-                        ))}
+                        {formContent.ticket_options.map((option, index) => {
+                                const artistTicketOption = artistFormContent.ticket_options.find((to) => to.title === option.title)
+                                return <Box
+                                    key={index}
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        padding: '8px 8px',
+                                        backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : 'transparent'
+                                    }}
+                                >
+                                    <Typography variant="body2">{option.title}</Typography>
+                                    <Typography
+                                        variant="body2">{option.num_booked} / {artistTicketOption?.num_booked || 0} </Typography>
+                                </Box>;
+
+                            }
+                        )}
                     </CardContent>
 
                 </Card>
@@ -37,22 +41,26 @@ function HomePage() {
                 <Card>
                     <CardContent>
                         <Typography variant="h5" component="div" gutterBottom>
-                            Bierflat
+                            Bierflat (Normal / Künstler*innen)
                         </Typography>
-                        {formContent.beverage_options.map((option, index) => (
-                            <Box
-                                key={index}
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    padding: '8px 8px',
-                                    backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : 'transparent'
-                                }}
-                            >
-                                <Typography variant="body2">{option.title}</Typography>
-                                <Typography variant="body2">{option.num_booked}</Typography>
-                            </Box>
-                        ))}
+                        {formContent.beverage_options.map((option, index) => {
+
+                                const artistBeverageOption = artistFormContent.beverage_options.find((to) => to.title === option.title)
+                                return <Box
+                                    key={index}
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        padding: '8px 8px',
+                                        backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : 'transparent'
+                                    }}
+                                >
+                                    <Typography variant="body2">{option.title}</Typography>
+                                    <Typography
+                                        variant="body2">{option.num_booked} / {artistBeverageOption?.num_booked || 0}</Typography>
+                                </Box>;
+                            }
+                        )}
                     </CardContent>
                 </Card>
             </Grid>
@@ -60,22 +68,26 @@ function HomePage() {
                 <Card>
                     <CardContent>
                         <Typography variant="h5" component="div" gutterBottom>
-                            Essen
+                            Essen (Normal / Künstler*innen)
                         </Typography>
-                        {formContent.food_options.map((option, index) => (
-                            <Box
-                                key={index}
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    padding: '8px 8px',
-                                    backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : 'transparent'
-                                }}
-                            >
-                                <Typography variant="body2">{option.title}</Typography>
-                                <Typography variant="body2">{option.num_booked}</Typography>
-                            </Box>
-                        ))}
+                        {formContent.food_options.map((option, index) => {
+
+                                const artistFoodOption = artistFormContent.food_options.find((to) => to.title === option.title)
+
+                                return <Box
+                                    key={index}
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        padding: '8px 8px',
+                                        backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : 'transparent'
+                                    }}
+                                >
+                                    <Typography variant="body2">{option.title}</Typography>
+                                    <Typography variant="body2">{option.num_booked} / {artistFoodOption?.num_booked || 0}</Typography>
+                                </Box>
+                            }
+                        )}
                     </CardContent>
                 </Card>
             </Grid>
