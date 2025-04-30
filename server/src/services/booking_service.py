@@ -8,10 +8,19 @@ from src.models.datatypes import Booking, BookingWithTimestamp
 from src.services.formcontent_service import get_form_content_obj, update_form_content_with_db_counts
 from src.models.schema import init_db
 
-DB_DIR = os.path.join(os.path.dirname(__file__), '../../db')
-DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
-REGULAR_SCHEMA_PATH = os.path.join(DB_DIR, 'schema.sql')
-ARTIST_SCHEMA_PATH = os.path.join(DB_DIR, 'artist_schema.sql')
+IN_DOCKER = os.environ.get('IN_DOCKER', 'False').lower() == 'true'
+
+if IN_DOCKER:
+    # Docker paths
+    DB_FILE_PATH = '/app/db/bookings.db'
+    REGULAR_SCHEMA_PATH = '/app/server/db/schema.sql'  # Adjust based on your container structure
+    ARTIST_SCHEMA_PATH = '/app/server/db/artist_schema.sql'
+else:
+    # Local development paths
+    DB_DIR = os.path.join(os.path.dirname(__file__), '../../db')
+    DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
+    REGULAR_SCHEMA_PATH = os.path.join(DB_DIR, 'schema.sql')
+    ARTIST_SCHEMA_PATH = os.path.join(DB_DIR, 'artist_schema.sql')
 
 
 # Ensure database is initialized on import

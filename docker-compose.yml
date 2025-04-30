@@ -7,12 +7,16 @@ services:
     ports:
       - "127.0.0.1:5001:5001"   # bind container’s 5001 → host’s 127.0.0.1:5001
     volumes:
-      - ./data:/app/db
-      - ./logs:/app/logs
+      - ./data/bookings.db:/app/db/bookings.db:rw
+      - ./data/schema.sql:/app/server/db/schema.sql:ro
+      - ./data/artist_schema.sql:/app/server/db/artist_schema.sql:ro
+      - ./logs:/app/logs:rw
     environment:
+      - IN_DOCKER=true
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - PASSWORD=${USER_PASSWORD}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ARTIST_PASSWORD=${ARTIST_PASSWORD}
       - GMAIL_USER=${GMAIL_USER}
       - GMAIL_PASS=${GMAIL_PASS}
     # Not exposed to outside world, only to frontend and within Docker network
