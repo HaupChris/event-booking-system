@@ -8,8 +8,6 @@ services:
       - "127.0.0.1:5001:5001"   # bind container’s 5001 → host’s 127.0.0.1:5001
     volumes:
       - ./data/bookings.db:/app/db/bookings.db:rw
-      - ./data/schema.sql:/app/server/db/schema.sql:ro
-      - ./data/artist_schema.sql:/app/server/db/artist_schema.sql:ro
       - ./logs:/app/logs:rw
     environment:
       - IN_DOCKER=true
@@ -19,8 +17,6 @@ services:
       - ARTIST_PASSWORD=${ARTIST_PASSWORD}
       - GMAIL_USER=${GMAIL_USER}
       - GMAIL_PASS=${GMAIL_PASS}
-    # Not exposed to outside world, only to frontend and within Docker network
-
   frontend:
     image: ghcr.io/${{ github.repository_owner }}/wiesenwahn-frontend:latest
     restart: always
