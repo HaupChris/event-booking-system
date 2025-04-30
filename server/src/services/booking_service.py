@@ -16,8 +16,8 @@ ARTIST_SCHEMA_PATH = os.path.join(DB_DIR, 'artist_schema.sql')
 
 # Ensure database is initialized on import
 
-# Even if it exists, optionally re-apply schema if you want. Usually you'd skip reinit in production.
-init_db(DB_FILE_PATH, [REGULAR_SCHEMA_PATH, ARTIST_SCHEMA_PATH])
+if not os.path.exists(DB_FILE_PATH):
+    init_db(DB_FILE_PATH, [REGULAR_SCHEMA_PATH, ARTIST_SCHEMA_PATH])
 
 
 def _connect_db() -> sqlite3.Connection:
