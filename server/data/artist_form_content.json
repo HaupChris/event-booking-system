@@ -2,37 +2,37 @@
   "ticket_options": [
     {
       "title": "Interstellarer Flug (Do, Fr, Sa)",
-      "price": 40.0,
+      "price": 0.0,
       "amount": 100
     },
     {
       "title": "Wochenend-Orbit (Fr, Sa)",
-      "price": 30.0,
+      "price": 0.0,
       "amount": 20
     },
     {
       "title": "Früher Start (Do, Fr)",
-      "price": 30.0,
+      "price": 0.0,
       "amount": 20
     },
     {
       "title": "Zwei-Phasen-Flug (Do, Sa)",
-      "price": 30.0,
+      "price": 0.0,
       "amount": 15
     },
     {
       "title": "Starttag (Nur Do)",
-      "price": 20.0,
+      "price": 0.0,
       "amount": 15
     },
     {
       "title": "Zwischenstopp (Nur Fr)",
-      "price": 20.0,
+      "price": 0.0,
       "amount": 15
     },
     {
       "title": "Landetag (Nur Sa)",
-      "price": 20.0,
+      "price": 0.0,
       "amount": 15
     }
   ],
@@ -40,17 +40,17 @@
     {
       "title": "Kurzer Tankstopp",
       "description": "Treibstoff für 1 Festivaltag (5 Liter Bier)",
-      "price": 10.0
+      "price": 0.0
     },
     {
       "title": "Zweites Antriebsmodul",
       "description": "Treibstoff für 2 Festivaltage (10 Liter Bier)",
-      "price": 19.0
+      "price": 0.0
     },
     {
       "title": "Hyperraum Antrieb",
       "description": "Treibstoff für 3 Festivaltage (15 Liter Bier)",
-      "price": 28.0
+      "price": 0.0
     }
   ],
   "food_options": [
