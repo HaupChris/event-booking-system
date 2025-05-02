@@ -12,12 +12,15 @@ IN_DOCKER = os.environ.get('IN_DOCKER', 'False').lower() == 'true'
 
 if IN_DOCKER:
     # Docker paths
-    DB_FILE_PATH = '/app/user_data/bookings.db'
-    REGULAR_SCHEMA_PATH = '/app/server/data/schema.sql'  # Adjust based on your container structure
-    ARTIST_SCHEMA_PATH = '/app/server/data/artist_schema.sql'
+    DB_DIR='/app/user_data'
+    DB_FILE_PATH = os.path.join('bookings.db')
+
+    DATA_DIR='/app/data'
+    REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, 'schema.sql')
+    ARTIST_SCHEMA_PATH = os.path.join(DATA_DIR, 'artist_schema.sql')
 else:
     # Local development paths
-    DB_DIR = os.path.join(os.path.dirname(__file__), '../../user_data')
+    DB_DIR = os.path.join(os.path.dirname(__file__), '../../db')
     DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
     DATA_DIR=os.path.join(os.path.dirname(__file__), '../../data')
     REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, 'schema.sql')
