@@ -1,5 +1,3 @@
-# src/api/artist_bookings.py
-
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_limiter import Limiter
@@ -13,7 +11,6 @@ from src.services.artist_service import (
     update_artist_booking,
     update_artist_payment, get_up_to_date_artist_form_content
 )
-from src.services.formcontent_service import get_artist_form_content_obj
 from src.services.mail_service import send_artist_confirmation_mail
 
 artist_bp = Blueprint("artist", __name__)

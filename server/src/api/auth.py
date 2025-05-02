@@ -27,8 +27,6 @@ if ARTIST_PASSWORD == "":
     root_logger.debug("artist password loading from environment variable failed!")
 
 
-print(f"password: {PASSWORD}")
-print(f"admin password: {ADMIN_PASSWORD}")
 
 
 # Optional: hash them on startup

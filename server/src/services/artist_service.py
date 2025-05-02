@@ -5,10 +5,8 @@ from contextlib import closing
 from typing import List, Optional
 
 from src.models.datatypes import ArtistBooking, ArtistBookingWithTimestamp
+from src.services.booking_service import DB_FILE_PATH, DB_DIR
 from src.services.formcontent_service import get_artist_form_content_obj, update_artist_form_content_with_db_counts
-
-DB_DIR = os.path.join(os.path.dirname(__file__), '../../db')
-DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
 
 
 def get_all_artist_bookings() -> List[ArtistBookingWithTimestamp]:
