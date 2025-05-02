@@ -10,6 +10,7 @@ Thumbs.db
 /server/db/event_booking.db
 
 server/db/*
+server/user_data/*
 
 **/logs
 
