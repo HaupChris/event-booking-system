@@ -13,7 +13,7 @@ IN_DOCKER = os.environ.get('IN_DOCKER', 'False').lower() == 'true'
 if IN_DOCKER:
     # Docker paths
     DB_DIR='/app/user_data'
-    DB_FILE_PATH = os.path.join('bookings.db')
+    DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
 
     DATA_DIR='/app/data'
     REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, 'schema.sql')

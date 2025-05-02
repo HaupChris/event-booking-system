@@ -5,7 +5,7 @@ import axios from 'axios';
 import React, {useContext, useEffect, useState} from "react";
 
 import {AuthContext, TokenContext} from "../../AuthContext";
-import fishImage from "../../img/fish.png";
+import rocketImage from "../../img/rocket.png";
 import LinearProgressWithImage from "../components/linearProgressWithImage";
 
 // Import artist-specific components
@@ -391,7 +391,7 @@ export function ArtistFormContainer() {
             <Box className={"navigation"}>
                 <Box className={"navigation-progress"}>
                     <LinearProgressWithImage activeStep={activeStep} maxSteps={maxSteps} variant={"determinate"}
-                                             image={fishImage}/>
+                                             image={rocketImage}/>
                 </Box>
                 <Box className={"navigation-buttons"} sx={{display: bookingState.isSubmitted ? "None" : ""}}>
                     <Button variant={"outlined"} sx={{'opacity': activeStep < 1 ? "0" : "100%"}}

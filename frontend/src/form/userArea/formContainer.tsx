@@ -16,7 +16,7 @@ import FormAwarnessCode from "./formAwarenessCode";
 import FormSummary from "./formSummary";
 import FormConfirmation from "./formConfirmation";
 import {AuthContext, TokenContext} from "../../AuthContext";
-import fishImage from "../../img/fish.png";
+import rocketImage from "../../img/rocket.png";
 import LinearProgressWithImage from "../components/linearProgressWithImage";
 import FormFoodSelection from "./formFoodSelection";
 
@@ -502,7 +502,7 @@ export function FormContainer() {
         <Grid container className={"navigation"}>
             <Grid item xs={12} className={"navigation-progress"}>
                 <LinearProgressWithImage activeStep={activeStep} maxSteps={maxSteps} variant={"determinate"}
-                                         image={fishImage}/>
+                                         image={rocketImage}/>
             </Grid>
             <Grid item xs={12} className={"navigation-buttons"}
                   sx={{display: bookingState.isSubmitted ? "None" : ""}}>
