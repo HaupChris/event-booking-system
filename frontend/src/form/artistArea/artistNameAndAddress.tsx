@@ -7,7 +7,7 @@ function ArtistNameAndAddressForm(props: ArtistFormProps) {
         <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="subtitle1" align={"center"} sx={{padding: "1em 0em"}}>
-                    Do, 8.08. - So, 31.08.2025
+                    Do, 28.08. - So, 31.08.2025
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 3 }}>
                     Bitte gib deine Kontaktinformationen als Künstler*in ein.
