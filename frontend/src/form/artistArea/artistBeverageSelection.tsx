@@ -11,7 +11,7 @@ import { ArtistFormProps } from './artistFormContainer';
 import beverages_0 from '../../img/beverages_1.jpg';
 import beverages_1 from '../../img/beverages_2.jpg';
 import beverages_2 from '../../img/beverages_3.jpg';
-import portholeImage from '../../img/porthole_transparent.png';
+import portholeImage from '../../img/rocket_porthole.png';
 
 import '../../css/formBeverageSelection.css';
 
