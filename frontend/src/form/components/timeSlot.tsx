@@ -125,7 +125,7 @@ function TimeSlot({ timeSlot, selectedPriority, updateBooking, availablePrioriti
                 </ListItemText>
 
                 <FormControl variant="standard" sx={{ minWidth: "120px" }}>
-                    <InputLabel id={`priority-select-label-${timeSlot.id}`}>Priorität</InputLabel>
+                    {selectedPriority ? "" :  <InputLabel id={`priority-select-label-${timeSlot.id}`}>Priorität</InputLabel>}
                     <Select
                         labelId={`priority-select-label-${timeSlot.id}`}
                         id={`priority-select-${timeSlot.id}`}
