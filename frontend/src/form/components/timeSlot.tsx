@@ -1,4 +1,4 @@
-import { Booking, TimeSlot as TimeSlotType } from '../userArea/interface';
+import {Booking, TimeSlot as TimeSlotType} from '../userArea/interface';
 import {
     FormControl,
     IconButton,
@@ -11,12 +11,14 @@ import {
     Select,
     SelectChangeEvent,
     Typography,
-    Paper
+    Paper,
+    Box, CircularProgress
 } from '@mui/material';
 import React from 'react';
-import { CircularProgressWithLabel } from './circularProgressWithLabel';
-import { Close } from "@mui/icons-material";
-import { PRIORITIES } from "../userArea/constants";
+import {CircularProgressWithLabel} from './circularProgressWithLabel';
+import {Close} from "@mui/icons-material";
+import {PRIORITIES} from "../userArea/constants";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 interface TimeSlotProps {
     timeSlot: TimeSlotType;
@@ -26,7 +28,7 @@ interface TimeSlotProps {
     currentBooking: Booking;
 }
 
-function TimeSlot({ timeSlot, selectedPriority, updateBooking, availablePriorities, currentBooking }: TimeSlotProps) {
+function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePriorities, currentBooking}: TimeSlotProps) {
     const isFull = timeSlot.num_booked >= timeSlot.num_needed;
     const timeslotAvailablePriorities = availablePriorities.concat([selectedPriority]).filter(p => p !== "");
 
@@ -81,8 +83,10 @@ function TimeSlot({ timeSlot, selectedPriority, updateBooking, availablePrioriti
 
     return (
         <Paper
-            elevation={1}
+            elevation={3}
             sx={{
+                breakInside: 'avoid',
+                pageBreakInside: 'avoid',
                 mb: 2,
                 border: selectedPriority ? `2px solid` : 'none',
                 borderColor: getPriorityBorderColor(),
@@ -95,68 +99,240 @@ function TimeSlot({ timeSlot, selectedPriority, updateBooking, availablePrioriti
                 }
             }}
         >
-            <ListItem>
-                <ListItemAvatar>
-                    <CircularProgressWithLabel
-                        valueCurrent={timeslotNumBooked}
-                        valueMax={timeSlot.num_needed}
-                    />
-                </ListItemAvatar>
-
-                <ListItemText>
+            <ListItem sx={{
+                display: 'flex',
+                flexDirection: {xs: 'column', sm: 'row'},
+                alignItems: {xs: 'flex-start', sm: 'center'},
+                py: {xs: 2, sm: 1},
+                px: {xs: 2, sm: 2}
+            }}>
+                {/* Mobile layout - stacked */}
+                <Box sx={{
+                    width: '100%',
+                    display: {xs: 'flex', sm: 'none'},
+                    flexDirection: 'column',
+                }}>
+                    {/* Row 1: Title */}
                     <Typography
-                        sx={{ display: 'inline', mx: 2 }}
-                        component="span"
+                        component="div"
                         variant="body1"
                         color="text.primary"
+                        sx={{width: '100%', mb: 1, fontWeight: 'medium', fontSize: '1.1rem'}}
                     >
                         {timeSlot.title}
-                        {timeSlot.start_time.length !== 0 && timeSlot.end_time.length !== 0 ? (
-                            <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                component="div"
-                                sx={{ mt: 0.5 }}
-                            >
+                    </Typography>
+
+                    {/* Row 2: Time with icon */}
+                    {timeSlot.start_time.length !== 0 && timeSlot.end_time.length !== 0 ? (
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            mb: 2,
+                            color: 'text.secondary'
+                        }}>
+                            <AccessTimeIcon sx={{fontSize: '1rem', mr: 0.5}}/>
+                            <Typography variant="body2" component="span">
                                 {`${timeSlot.start_time} - ${timeSlot.end_time}`}
                             </Typography>
-                        ) : null}
-                    </Typography>
-                </ListItemText>
+                        </Box>
+                    ) : null}
 
-                <FormControl variant="standard" sx={{ minWidth: "120px" }}>
-                    {selectedPriority ? "" :  <InputLabel id={`priority-select-label-${timeSlot.id}`}>Priorität</InputLabel>}
-                    <Select
-                        labelId={`priority-select-label-${timeSlot.id}`}
-                        id={`priority-select-${timeSlot.id}`}
-                        // @ts-ignore
-                        value={selectedPriority}
-                        onChange={handlePriorityChange}
-                        label="Priorität"
-                        input={
-                            <Input
+                    {/* Row 3: Interest indicator and Select in a card */}
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        width: '100%',
+                        bgcolor: 'background.paper',
+                        borderRadius: 1,
+                        p: 0,
+                        boxShadow: 1
+                    }}>
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            mb: 2
+                        }}>
+                            <Box sx={{position: 'relative'}}>
+                                <CircularProgress
+                                    variant="determinate"
+                                    value={timeslotNumBooked > 0 ? (timeslotNumBooked / timeSlot.num_needed) * 100 : 0}
+                                    size={40}
+                                    thickness={4}
+                                    sx={{
+                                        color: timeslotNumBooked >= timeSlot.num_needed ? 'error.main' : 'primary.main',
+                                        backgroundColor: 'rgba(0, 0, 0, 0.12)',
+                                        borderRadius: '50%'
+                                    }}
+                                />
+                                <Box
+                                    sx={{
+                                        top: 0,
+                                        left: 0,
+                                        bottom: 0,
+                                        right: 0,
+                                        position: 'absolute',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                    <Typography variant="caption" component="div" color="text.secondary">
+                                        {`${timeslotNumBooked}/${timeSlot.num_needed}`}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            <Typography variant="body2" sx={{ml: 2}}>
+                                {timeslotNumBooked >= timeSlot.num_needed
+                                    ? "Hohe Nachfrage – Zuteilung per Los"
+                                    : "Interesse angemeldet"}
+                            </Typography>
+                        </Box>
+
+                        <FormControl variant="outlined" size="small" sx={{width: '100%'}}>
+                            <InputLabel id={`priority-select-label-mobile-${timeSlot.id}`}>Priorität</InputLabel>
+                            <Select
+                                labelId={`priority-select-label-mobile-${timeSlot.id}`}
+                                id={`priority-select-mobile-${timeSlot.id}`}
+                                // @ts-ignore
+                                value={selectedPriority}
+                                onChange={handlePriorityChange}
+                                label="Priorität"
                                 endAdornment={
                                     selectedPriority ? (
                                         <IconButton
-                                            onClick={handleReset}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleReset();
+                                            }}
                                             size="small"
-                                            sx={{ mr: 1 }}
+                                            edge="end"
+                                            sx={{marginRight: 2}}
                                         >
-                                            <Close fontSize="small" />
+                                            <Close fontSize="small"/>
                                         </IconButton>
                                     ) : null
                                 }
-                            />
-                        }
-                        disabled={isFull && !selectedPriority}
-                    >
-                        {timeslotAvailablePriorities.map((priority) => (
-                            <MenuItem key={priority} value={priority}>
-                                {priority}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+                                disabled={isFull && !selectedPriority}
+                            >
+                                {timeslotAvailablePriorities.map((priority) => (
+                                    <MenuItem key={priority} value={priority}>
+                                        {priority}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Box>
+                </Box>
+
+                {/* Desktop layout - improved */}
+                <Box sx={{
+                    width: '100%',
+                    display: {xs: 'none', sm: 'flex'},
+                    alignItems: 'center'
+                }}>
+                    {/* Improved circular progress */}
+                    <Box sx={{position: 'relative', mr: 2}}>
+                        <CircularProgress
+                            variant="determinate"
+                            value={timeslotNumBooked > 0 ? (timeslotNumBooked / timeSlot.num_needed) * 100 : 0}
+                            size={40}
+                            thickness={4}
+                            sx={{
+                                color: timeslotNumBooked >= timeSlot.num_needed ? 'error.main' : 'primary.main',
+                                backgroundColor: 'rgba(0, 0, 0, 0.12)',
+                                borderRadius: '50%'
+                            }}
+                        />
+                        <Box
+                            sx={{
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0,
+                                position: 'absolute',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Typography variant="caption" component="div" color="text.secondary">
+                                {`${timeslotNumBooked}/${timeSlot.num_needed}`}
+                            </Typography>
+                        </Box>
+                    </Box>
+
+                    {/* Slot information */}
+                    <Box sx={{flexGrow: 1}}>
+                        <Typography
+                            variant="body1"
+                            color="text.primary"
+                            sx={{fontWeight: 'medium'}}
+                        >
+                            {timeSlot.title}
+                        </Typography>
+                        {timeSlot.start_time.length !== 0 && timeSlot.end_time.length !== 0 ? (
+                            <Box sx={{display: 'flex', alignItems: 'center', mt: 0.5}}>
+                                <AccessTimeIcon sx={{fontSize: '0.875rem', mr: 0.5, color: 'text.secondary'}}/>
+                                <Typography variant="body2" color="text.secondary">
+                                    {`${timeSlot.start_time} - ${timeSlot.end_time}`}
+                                </Typography>
+                            </Box>
+                        ) : null}
+                    </Box>
+
+                    {/* Status indicator for desktop */}
+                    {timeslotNumBooked >= timeSlot.num_needed && (
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                mr: 2,
+                                color: 'text.secondary',
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                borderRadius: 1,
+                                px: 1,
+                                py: 0.5
+                            }}
+                        >
+                            Hohe Nachfrage – Zuteilung per Los
+                        </Typography>
+                    )}
+
+                    {/* Priority selection */}
+                    <FormControl variant="outlined" size="small" sx={{minWidth: "150px"}}>
+                        <InputLabel id={`priority-select-label-${timeSlot.id}`}>Priorität</InputLabel>
+                        <Select
+                            labelId={`priority-select-label-${timeSlot.id}`}
+                            id={`priority-select-${timeSlot.id}`}
+                            // @ts-ignore
+                            value={selectedPriority}
+                            onChange={handlePriorityChange}
+                            label="Priorität"
+                            endAdornment={
+                                selectedPriority ? (
+                                    <IconButton
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleReset();
+                                        }}
+                                        size="small"
+                                        edge="end"
+                                        sx={{marginRight: 2}}
+                                    >
+                                        <Close fontSize="small"/>
+                                    </IconButton>
+                                ) : null
+                            }
+                            disabled={isFull && !selectedPriority}
+                        >
+                            {timeslotAvailablePriorities.map((priority) => (
+                                <MenuItem key={priority} value={priority}>
+                                    {priority}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Box>
             </ListItem>
         </Paper>
     );

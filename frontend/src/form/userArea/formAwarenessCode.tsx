@@ -12,7 +12,7 @@ function FormAwarnessCode() {
 
   return (
     <Box sx={{ width: '100%', maxWidth: 800, mx: 'auto' }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
+      <Paper elevation={0} sx={{ p: 3 }}>
         <Typography variant="h5" align="center" gutterBottom>
           Unser Bewusstseins-Code für ein gelungenes Festival
         </Typography>

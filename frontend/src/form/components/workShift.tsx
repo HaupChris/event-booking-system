@@ -1,9 +1,9 @@
-import { Booking, WorkShift as WorkShiftType } from '../userArea/interface';
-import { Box, List, ListItem, Typography, Paper } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import {Booking, WorkShift as WorkShiftType} from '../userArea/interface';
+import {Box, List, ListItem, Typography} from '@mui/material';
+import React, {useEffect, useState} from 'react';
 import TimeSlot from './timeSlot';
 import '../../css/workShift.css';
-import { PRIORITIES } from "../userArea/constants";
+import {PRIORITIES} from "../userArea/constants";
 
 interface WorkShiftProps {
     workShift: WorkShiftType;
@@ -12,7 +12,7 @@ interface WorkShiftProps {
     availablePriorities: string[];
 }
 
-function WorkShift({ workShift, currentBooking, updateBooking, availablePriorities }: WorkShiftProps) {
+function WorkShift({workShift, currentBooking, updateBooking, availablePriorities}: WorkShiftProps) {
     const [sortedTimeSlots, setSortedTimeSlots] = useState(workShift.time_slots);
 
     useEffect(() => {
@@ -30,12 +30,12 @@ function WorkShift({ workShift, currentBooking, updateBooking, availablePrioriti
     }, [workShift]);
 
     return (
-        <Paper elevation={2} sx={{ p: 2, mb: 2, bgcolor: 'rgba(26, 26, 26, 0.7)' }}>
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <>
+            <Box sx={{display: "flex", flexDirection: "column"}}>
                 <Typography
                     align="center"
                     color="primary"
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     variant="h5"
                 >
                     {workShift.title}
@@ -43,7 +43,7 @@ function WorkShift({ workShift, currentBooking, updateBooking, availablePrioriti
 
                 <Typography
                     align="justify"
-                    sx={{ color: "text.secondary", mb: 3 }}
+                    sx={{color: "text.secondary", mb: 3}}
                     variant="body1"
                 >
                     {workShift.description}
@@ -52,9 +52,9 @@ function WorkShift({ workShift, currentBooking, updateBooking, availablePrioriti
 
             <ListItem
                 key={workShift.title + "-" + workShift.id}
-                sx={{ display: 'flex', justifyContent: 'center', p: 0 }}
+                sx={{display: 'flex', justifyContent: 'center', p: 0}}
             >
-                <List className="timeslot-list" sx={{ width: '100%' }}>
+                <List className="timeslot-list" sx={{width: '100%'}}>
                     {sortedTimeSlots.map((timeSlot) => {
                         const selectedPriority = currentBooking.timeslot_priority_1 === timeSlot.id
                             ? PRIORITIES.FIRST
@@ -72,12 +72,13 @@ function WorkShift({ workShift, currentBooking, updateBooking, availablePrioriti
                                 availablePriorities={availablePriorities}
                                 selectedPriority={selectedPriority}
                                 updateBooking={updateBooking}
+
                             />
                         );
                     })}
                 </List>
             </ListItem>
-        </Paper>
+        </>
     );
 }
 

@@ -184,7 +184,6 @@ export interface BookingState {
     isSubmitted: boolean;
     isSubmitting: boolean;
     isSuccessful: boolean;
-
 }
 
 
@@ -198,6 +197,7 @@ function safelyParseJSON<T>(json: string | null, fallback: T): T {
         return fallback;
     }
 }
+
 
 export function FormContainer() {
     const [formContent, setFormContent] = useState<FormContent>(getDummyFormContent);
@@ -278,6 +278,10 @@ export function FormContainer() {
         setBookingState(storedBookingState);
         setCurrentError(storedCurrentError);
     };
+
+
+
+
 
 // Call loadDefaultValues function when the component mounts
     useEffect(() => {
@@ -497,7 +501,6 @@ export function FormContainer() {
             });
     }
 
-
     return <Card className={"form-container"}>
         <Grid container className={"navigation"}>
             <Grid item xs={12} className={"navigation-progress"}>
@@ -528,7 +531,7 @@ export function FormContainer() {
                 </Button>
             </Grid>
         </Grid>
-        <CardContent>
+        <CardContent sx={{p:0, marginTop:2}}>
             <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -537,7 +540,7 @@ export function FormContainer() {
             }}>
                 <Typography align="center" variant={"h4"}
                             sx={{paddingBottom: "1em"}}>{stepTitles[activeStep]}</Typography>
-                <Alert variant={"outlined"} sx={{display: currentError === "" ? "None" : ""}} severity={"error"}>
+                <Alert variant={"outlined"} sx={{display: currentError === "" ? "None" : "", my:2}} severity={"error"}>
                     {currentError}
                 </Alert>
                 {activeStep === FormSteps.NameAndAddress &&

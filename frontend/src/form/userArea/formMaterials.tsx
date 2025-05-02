@@ -26,7 +26,7 @@ function MaterialsForm(props: MaterialFormProps) {
 
     return (
         <Box sx={{ width: '100%', maxWidth: 800, mx: 'auto' }}>
-            <Paper elevation={3} sx={{ p: 3 }}>
+            <Paper elevation={0} sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>
                     Welche Materialien kannst du zum Festival mitbringen?
                 </Typography>

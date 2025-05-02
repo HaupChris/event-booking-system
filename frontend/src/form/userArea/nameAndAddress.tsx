@@ -8,7 +8,7 @@ function NameAndAddressForm(props: FormProps) {
 
     return auth ? (
         <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
-            <Paper elevation={3} sx={{ p: 3 }}>
+            <Paper elevation={0} sx={{ p: 3 }}>
                 <Typography variant="subtitle1" align={"center"} sx={{padding: "1em 0em"}}>
                     Do, 28.08. - So, 31.08.2025
                 </Typography>

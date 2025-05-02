@@ -6,7 +6,7 @@ import { Box, Typography, Paper } from "@mui/material";
 function FormSignature(props: FormProps) {
     return (
         <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
-            <Paper elevation={3} sx={{ p: 3 }}>
+            <Paper elevation={0} sx={{ p: 3 }}>
                 <Typography variant="body1" align={"justify"} paragraph>
                     Hiermit bestätige ich, dass ich auf eigene Gefahr am "Weiher Wald und Weltall-Wahn 2025" vom 29.08.2025 bis zum 01.09.2025 teilnehme.
                     Der Veranstalter haftet bei Personen-, Sach- und Vermögensschäden nicht für leichte Fahrlässigkeit. Dies gilt sowohl für eigene Handlungen, als auch für Handlungen

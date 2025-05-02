@@ -47,7 +47,7 @@ function TicketForm(props: TicketFormProps) {
 
 	return (
 		<Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
-			<Paper elevation={3} sx={{ p: 3 }}>
+			<Paper elevation={0} sx={{ p: 3 }}>
 				<Typography variant="body1" sx={{ mb: 3 }}>
 					Bitte wähle die Tage aus, an denen du am Festival teilnehmen möchtest.
 				</Typography>

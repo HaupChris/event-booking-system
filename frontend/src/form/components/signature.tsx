@@ -66,7 +66,12 @@ export function SignaturePad(props: IProps) {
                 onEnd={(signatureURL) => handleSignatureEnd(signatureURL)}
                 clearOnResize={false}
             />
-            <Button color={"primary"} onClick={clearSignature}>Löschen</Button>
+            <Button color={"primary"}
+                    onClick={clearSignature}
+                    sx={{mt:2}}
+            >
+                Löschen
+            </Button>
         </Box>
     );
 }
