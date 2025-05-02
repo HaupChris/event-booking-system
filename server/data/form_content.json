@@ -1,55 +1,55 @@
 {
   "ticket_options": [
     {
-      "title": "Donnerstag, Freitag, Samstag",
+      "title": "Interstellarer Flug (Do, Fr, Sa)",
       "price": 40.0,
       "amount": 100
     },
     {
-      "title": "Freitag, Samstag",
+      "title": "Wochenend-Orbit (Fr, Sa)",
       "price": 30.0,
       "amount": 20
     },
     {
-      "title": "Donnerstag, Freitag",
+      "title": "Früher Start (Do, Fr)",
       "price": 30.0,
       "amount": 20
     },
     {
-      "title": "Donnerstag, Samstag",
+      "title": "Zwei-Phasen-Flug (Do, Sa)",
       "price": 30.0,
       "amount": 15
     },
     {
-      "title": "Donnerstag",
+      "title": "Starttag (Nur Do)",
       "price": 20.0,
       "amount": 15
     },
     {
-      "title": "Freitag",
+      "title": "Zwischenstopp (Nur Fr)",
       "price": 20.0,
       "amount": 15
     },
     {
-      "title": "Samstag",
+      "title": "Landetag (Nur Sa)",
       "price": 20.0,
       "amount": 15
     }
   ],
   "beverage_options": [
     {
-      "title": "Ein Tag",
-      "description": "Entspricht 5 Litern Bier",
+      "title": "Kurzer Tankstopp",
+      "description": "Treibstoff für 1 Festivaltag (5 Liter Bier)",
       "price": 10.0
     },
     {
-      "title": "Zwei Tage",
-      "description": "Entspricht 10 Litern Bier",
+      "title": "Zweites Antriebsmodul",
+      "description": "Treibstoff für 2 Festivaltage (10 Liter Bier)",
       "price": 19.0
     },
     {
-      "title": "Drei Tage",
-      "description": "Entspricht 15 Litern Bier",
+      "title": "Hyperraum Antrieb",
+      "description": "Treibstoff für 3 Festivaltage (15 Liter Bier)",
       "price": 28.0
     }
   ],
@@ -87,44 +87,20 @@
   ],
   "work_shifts": [
     {
-      "title": "Schaffe schaffe Festival baue",
-      "description": "Aufbau der Bierzelte und des Bühnengestells vor Festivalbeginn. Findet wahrscheinlich am Wochenende VOR dem Festival statt. Genauer Termin wird abgestimmt.",
+      "title": "Aufbau der Startrampe",
+      "description": "Errichte mit uns Bühne und Bierzelte, damit unser Festival-Raumschiff startklar wird! Einsatz am Wochenende vor Festivalbeginn.",
       "time_slots": [
         {
-          "title": "vorm Festival",
-          "start_time": "Samstag",
-          "end_time": "Sonntag ",
+          "title": "23.08.2025",
+          "start_time": "11:00",
+          "end_time": "17:00 ",
           "num_needed": 12
         }
       ]
     },
     {
-      "title": "Awareness",
-        "description": "Ansprechpartner für alle, die Hilfe brauchen oder sich unwohl fühlen. Genauere Schichtzeiten werden vor Ort abgesprochen.",
-      "time_slots": [
-        {
-          "title": "Donnerstag",
-            "start_time": "",
-            "end_time": "",
-            "num_needed": 8
-        },
-        {
-          "title": "Freitag",
-            "start_time": "",
-            "end_time": "",
-            "num_needed": 8
-        },
-        {
-          "title": "Samstag",
-            "start_time": "",
-            "end_time": "",
-            "num_needed": 8
-        }
-      ]
-    },
-    {
-      "title": "Licht aus, Tür zu",
-      "description": "Am Sonntag packen wir alles zusammen. Bitte stellt sicher, dass ihr und eure Mitfahrgelegenheit Zeit bis zum Ende habt. Für die Frühschicht wird es ein kleines Frühstück geben. Die Spätschicht kommt in den Genuss am Ende des Tages auf den Sofas zu chillen, die letzten Sonnenstrahlen zu genießen und Pizza zu essen.",
+      "title": "Zurück am Boden",
+      "description": "Abbau und Aufräumen nach der Festival-Landung. Frühschicht erhält Frühstück, Spätschicht Pizza zum Abschluss.",
       "time_slots": [
         {
           "title": "Sonntag früh",
@@ -141,8 +117,8 @@
       ]
     },
     {
-      "title": "After Hour",
-      "description": "Verstauen der übrigen Sachen nach dem Festival und Wegfahren des Mülls.",
+      "title": "Abgefallene Teile bergen",
+      "description": "Verstauen übriger Materialien und Abtransport des restlichen Festival-Mülls.",
       "time_slots": [
         {
           "title": "Montag",
@@ -159,8 +135,8 @@
       ]
     },
     {
-      "title": "Cu Later, Generator",
-      "description": "Überwachen und Auftanken der Generatoren während des Festivals.",
+      "title": "Antriebsmodul abkoppeln",
+      "description": "Überwache und tanke unsere Generatoren, damit das Festival zuverlässig mit Energie versorgt ist.",
       "time_slots": [
         {
           "title": "Donnerstag",
@@ -201,8 +177,8 @@
       ]
     },
     {
-      "title": "Supersauberwahn",
-      "description": "Müllsammeln am Morgen vertreibt Kummer und Sorgen, darum soll jeden Morgen etwas Ordnung gemacht und das Gelände etwas aufgehübscht werden.",
+      "title": "Clear the Orbit",
+      "description": "Morgendliches Müllsammeln zur Erhaltung der Festivalbasis.",
       "time_slots": [
         {
           "title": "Freitag",
@@ -219,8 +195,8 @@
       ]
     },
     {
-      "title": "Volltanken bidde",
-      "description": "Kontrolle der Spritbestände und Einkauf von neuem Sprit. Wichtig: Führerschein, ein Auto und Nüchternheit (Kranplätze müssen verdichtet sein - Du nicht!)",
+      "title": "Interstellare Tankmission",
+      "description": "Kontrolle der Treibstoffbestände und Einkauf von neuem Sprit. Wichtig: Führerschein, ein Auto und Nüchternheit",
       "time_slots": [
         {
           "title": "Freitag",
@@ -237,8 +213,8 @@
       ]
     },
     {
-      "title": "Mr. and Ms. Poopybutthole",
-      "description": "Klokontrolle auf Klopapier, Seife und Sauberkeit. Reinigung der Toilette wenn nötig.",
+      "title": "Ab damit ins Schwarze Loch",
+      "description": "Regelmäßige Kontrolle der WCs auf Klopapier, Seife und Sauberkeit. Reinigung der Toilette wenn nötig.",
       "time_slots": [
         {
           "title": "Freitag",
@@ -255,56 +231,8 @@
       ]
     },
     {
-      "title": "Verkehrsgroßraum Poppenwind",
-      "description": "Generatoren müssen transportiert werden. Bitte nur melden, wenn du ein Auto mit Anhänger fahren kannst und darfst oder einen kleinen Transporter hast.",
-      "time_slots": [
-        {
-          "title": "Generator Anlieferung",
-          "start_time": "Mittwoch oder Donnerstag",
-          "end_time": "",
-          "num_needed": 2
-        },
-        {
-          "title": "Generator Rücktransport",
-          "start_time": "Sonntag Abend",
-          "end_time": "",
-          "num_needed": 2
-        }
-      ]
-    },
-    {
-      "title": "Hier spielt die Musik",
-      "description": "Bitte nur ankreuzen, wenn du als DJ oder Bandmitglied kommst.",
-      "time_slots": [
-        {
-          "title": "Wiesnmusik",
-          "start_time": "",
-          "end_time": "",
-          "num_needed": 15
-        }
-      ]
-    },
-    {
-      "title": "Brummi fahren",
-      "description": "Wassertanks müssen befüllt und Bier nachgeholt werden. Bitte hier nur melden, wenn du einen einen Traktor mit einem Anhänger fahren kannst.",
-      "time_slots": [
-        {
-          "title": "Freitag",
-          "start_time": "10:00",
-          "end_time": "12:00",
-          "num_needed": 1
-        },
-        {
-          "title": "Samstag",
-          "start_time": "10:00",
-          "end_time": "12:00",
-          "num_needed": 1
-        }
-      ]
-    },
-    {
-      "title": "Fünf Sterne Deluxe Küche",
-      "description": "Koch- und Verkaufsdienst für unseren Essenswagen. ",
+      "title": "Anstronaut:innen Kost pressen",
+      "description": "Vorbereitung und Ausgabe der Festival-Mahlzeiten in der Food-Station.",
       "time_slots": [
         {
           "title": "Donnerstag, Einkauf (Auto nötig)",
