@@ -42,8 +42,8 @@ jobs:
 
       - name: Prepare docker-compose.yml with environment variables
         run: |
-          # Replace variables in docker-compose.yml
-          sed -i 's/\${{ github.repository_owner }}/${{ env.REPO_OWNER_LOWERCASE }}/g' docker-compose.yml
+          # Set the repo owner in docker-compose.yml
+          sed -i 's/${REPO_OWNER}/${{ env.REPO_OWNER_LOWERCASE }}/g' docker-compose.yml
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.0

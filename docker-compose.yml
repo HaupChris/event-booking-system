@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: ghcr.io/$${{ github.repository_owner }}/wiesenwahn-backend:latest
+    image: ghcr.io/${REPO_OWNER}/wiesenwahn-backend:latest
     restart: always
     ports:
       - "127.0.0.1:5001:5001"   # bind container’s 5001 → host’s 127.0.0.1:5001
@@ -18,7 +18,7 @@ services:
       - GMAIL_USER=${GMAIL_USER}
       - GMAIL_PASS=${GMAIL_PASS}
   frontend:
-    image: ghcr.io/$${{ github.repository_owner }}/wiesenwahn-frontend:latest
+    image: ghcr.io/${REPO_OWNER}/wiesenwahn-frontend:latest
     restart: always
     ports:
       - "8080:80"  # Exposed only on localhost for Nginx to proxy
