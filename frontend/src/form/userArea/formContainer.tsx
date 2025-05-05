@@ -217,7 +217,7 @@ export function FormContainer() {
 
     const stepTitles = {
         [FormSteps.NameAndAddress]: " Herzlich Willkommen zum Weiher Wald und Weltall-Wahn!",
-        [FormSteps.Ticket]: "Ich fliege an folgenden Tagen mit (Sonntag ist Abbau)",
+        [FormSteps.Ticket]: "Wann fliegst du mit?",
         [FormSteps.Beverage]: "Ein Spacebier gefällig?",
         [FormSteps.Food]: "Wähle deine Astronautenkost",
         [FormSteps.Workshift]: "Tritt der Crew bei",
