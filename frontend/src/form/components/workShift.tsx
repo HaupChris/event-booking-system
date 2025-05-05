@@ -1,9 +1,10 @@
 import {Booking, WorkShift as WorkShiftType} from '../userArea/interface';
-import {Box, List, ListItem, Typography} from '@mui/material';
+import {Box, List, ListItem, Typography, alpha} from '@mui/material';
 import React, {useEffect, useState} from 'react';
 import TimeSlot from './timeSlot';
 import '../../css/workShift.css';
 import {PRIORITIES} from "../userArea/constants";
+import AssignmentIcon from '@mui/icons-material/Assignment';
 
 interface WorkShiftProps {
     workShift: WorkShiftType;
@@ -30,31 +31,61 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
     }, [workShift]);
 
     return (
-        <>
-            <Box sx={{display: "flex", flexDirection: "column"}}>
-                <Typography
-                    align="center"
-                    color="primary"
-                    sx={{mb: 2}}
-                    variant="h5"
-                >
-                    {workShift.title}
-                </Typography>
+        <Box sx={{
+            mb: 3,
+            p: 0,
+            borderRadius: '10px',
+        }}>
+            {/* Shift Title & Description */}
+            <Box sx={{
+                display: "flex",
+                flexDirection: "column",
+                mb: 3,
+            }}>
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    mb: 1,
+                }}>
+                    <AssignmentIcon sx={{ color: '#64b5f6', mr: 1 }} />
+                    <Typography
+                        color="primary"
+                        variant="h5"
+                        sx={{
+                            fontWeight: 'medium',
+                        }}
+                    >
+                        {workShift.title}
+                    </Typography>
+                </Box>
 
                 <Typography
-                    align="justify"
-                    sx={{color: "text.secondary", mb: 3}}
-                    variant="body1"
+                    sx={{
+                        color: alpha('#fff', 0.7),
+                        pl: 4, // Align with title (after icon)
+                    }}
+                    variant="body2"
                 >
                     {workShift.description}
                 </Typography>
             </Box>
 
+            {/* TimeSlots List */}
             <ListItem
                 key={workShift.title + "-" + workShift.id}
-                sx={{display: 'flex', justifyContent: 'center', p: 0}}
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    p: 0
+                }}
             >
-                <List className="timeslot-list" sx={{width: '100%'}}>
+                <List
+                    className="timeslot-list"
+                    sx={{
+                        width: '100%',
+                        pl: 0
+                    }}
+                >
                     {sortedTimeSlots.map((timeSlot) => {
                         const selectedPriority = currentBooking.timeslot_priority_1 === timeSlot.id
                             ? PRIORITIES.FIRST
@@ -72,13 +103,12 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
                                 availablePriorities={availablePriorities}
                                 selectedPriority={selectedPriority}
                                 updateBooking={updateBooking}
-
                             />
                         );
                     })}
                 </List>
             </ListItem>
-        </>
+        </Box>
     );
 }
 

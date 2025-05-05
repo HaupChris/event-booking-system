@@ -48,7 +48,7 @@ function TicketForm(props: TicketFormProps) {
     }
 
     return (
-        <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
+        <Box sx={{ width: '98%', maxWidth: 600, mx: 'auto' }}>
             <Paper
                 elevation={3}
                 sx={{
