@@ -48,13 +48,20 @@ function ArtistEquipmentForm(props: ArtistFormProps) {
                 <Typography variant="body2" paragraph>
                     Folgendes Equipment steht grundsätzlich zur Verfügung (Details können variieren):
                 </Typography>
+                Hauptbühne:
+
                 <ul>
-                    <li>PA-Anlage mit Mischpult</li>
-                    <li>Grundlegende Mikrofonierung (SM58, SM57)</li>
-                    <li>2 Monitorwege</li>
-                    <li>Grundlegendes Bühnenlicht</li>
-                    <li>Stromanschlüsse (220V)</li>
+                    <li>XDJ-XZ </li>
+                    <li> + 1x XDJ 1000</li>
+                    <li> + 1x Reloop rp7000 </li>
                 </ul>
+                Bandbühne
+                <ul>
+                    <li>Yamaha Stagepas 1K Stereo Bundle</li>
+                    <li>Behringer XR18 Wirless Mixer</li>
+                </ul>
+
+
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                     Bitte beachte: Spezielle Ausrüstung muss selbst mitgebracht werden oder im Vorfeld mit uns abgestimmt werden.
                 </Typography>

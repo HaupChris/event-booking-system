@@ -1,5 +1,3 @@
-// frontend/src/form/artistArea/artistMaterials.tsx
-
 import React from 'react';
 import { Box, Checkbox, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, Typography } from '@mui/material';
 import { CircularProgressWithLabel } from "../components/circularProgressWithLabel";
@@ -23,10 +21,10 @@ function ArtistMaterialsForm(props: ArtistMaterialFormProps) {
         <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
             <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
                 <Typography variant="h6" gutterBottom>
-                    Materialien für Künstler
+                    Materialien für Künstler*innen
                 </Typography>
                 <Typography variant="body2" paragraph>
-                    Als Künstler hast du die Möglichkeit, bestimmte Materialien mitzubringen, die für unsere Veranstaltung hilfreich sind. Bitte wähle aus, welche Materialien du mitbringen kannst.
+                    Als Künstler*ion hast du die Möglichkeit, bestimmte Materialien mitzubringen, die für unsere Veranstaltung hilfreich sind. Bitte wähle aus, welche Materialien du mitbringen kannst.
                 </Typography>
 
                 <List dense className={'material-list'}>
