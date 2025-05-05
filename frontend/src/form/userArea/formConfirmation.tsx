@@ -5,7 +5,8 @@ import {
     Typography,
     TextField,
     Snackbar, Alert, CircularProgress,
-    Modal, Paper, Divider, IconButton
+    Modal, Paper, Divider, IconButton,
+    alpha
 } from '@mui/material';
 import {Booking, FormContent} from "./interface";
 import {
@@ -18,7 +19,8 @@ import {
     EventAvailable,
     EuroSymbol,
     CheckCircleOutline,
-    Refresh
+    Refresh,
+    RocketLaunch
 } from "@mui/icons-material";
 
 import '../../css/formConfirmation.css';
@@ -128,153 +130,340 @@ function FormConfirmation(props: FinalBookingProps) {
     // Success State
     if (props.bookingState.isSubmitted && props.bookingState.isSuccessful) {
         return (
-            <Box sx={{width: '100%', maxWidth: 600, mx: 'auto'}}>
-                <Paper elevation={3} sx={{p: 4, borderRadius: 3}}>
-                    {/* Success Header */}
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        mb: 3,
-                        py: 2,
-                        backgroundColor: 'success.light',
-                        borderRadius: 2
-                    }}>
-                        <CheckCircleOutline sx={{color: 'success.main', fontSize: 60, mb: 1}}/>
-                        <Typography variant="h5" fontWeight="bold" align="center" sx={{color: 'success.dark'}}>
-                            Deine Buchung war erfolgreich!
-                        </Typography>
-                    </Box>
-
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        mb: 3,
+            <Box sx={{ width: '98%', maxWidth: 600, mx: 'auto' }}>
+                <Paper
+                    elevation={3}
+                    sx={{
+                        width: '100%',
+                        p: 0,
+                        borderRadius: '14px',
+                        background: 'radial-gradient(circle at bottom left, #061429 0%, #071f3b 100%)',
+                        boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
+                        overflow: 'hidden',
                         position: 'relative',
-                        '&:hover .jellyfish': {
-                            transform: 'scale(1.1)',
-                            opacity: 0.8,
+                        border: '1px solid',
+                        borderColor: alpha('#64b5f6', 0.2),
+                    }}
+                >
+                    {/* Decorative top pattern */}
+                    <Box sx={{
+                        width: '100%',
+                        height: '6px',
+                        background: 'linear-gradient(90deg, #1e88e5, #64b5f6, #bbdefb, #1e88e5)',
+                        backgroundSize: '300% 100%',
+                        animation: 'gradientMove 12s linear infinite',
+                        '@keyframes gradientMove': {
+                            '0%': { backgroundPosition: '0% 0%' },
+                            '100%': { backgroundPosition: '300% 0%' },
                         }
+                    }} />
+
+                    {/* Mission Briefing */}
+                    <Box sx={{
+                        py: 1.5,
+                        px: 2,
+                        backgroundColor: alpha('#000', 0.3),
+                        borderLeft: '4px solid',
+                        borderColor: '#1e88e5',
+                        mx: { xs: 1, sm: 2 },
+                        my: 2,
+                        borderRadius: '0 8px 8px 0',
                     }}>
-                        <img
-                            src={jellyfishImage}
-                            alt="jellyfish"
-                            className="jellyfish"
-                            style={{
-                                width: '150px',
-                                height: '150px',
-                                transition: 'transform 0.5s ease-in-out, opacity 0.5s ease-in-out'
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: alpha('#fff', 0.9),
+                                fontFamily: 'monospace',
+                                fontSize: '0.85rem',
                             }}
-                        />
+                        >
+                            <span style={{ color: '#64b5f6' }}>MISSION:</span> Deine Registrierung für das Weiher Wald & Weltall-Wahn war erfolgreich! Bitte bestätige jetzt deine Teilnahme durch Zahlung.
+                        </Typography>
                     </Box>
 
-                    <Typography variant="body1" paragraph sx={{mb: 3, fontSize: '1.1rem'}}>
-                        Du erhältst in Kürze eine Bestätigungsmail mit allen Details zu deiner Buchung. Bitte
-                        prüfe auch deinen Spam-Ordner, falls die Mail nicht sofort ankommt.
-                    </Typography>
-
-                    {/* Payment Box */}
-                    <Paper
-                        elevation={2}
-                        sx={{
-                            mt: 4,
-                            border: '2px solid',
-                            borderColor: 'primary.main',
-                            borderRadius: '12px',
-                            p: 3,
-                            position: 'relative',
-                            overflow: 'hidden',
-                            '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '8px',
-                                backgroundColor: 'primary.main'
-                            }
-                        }}
-                    >
-                        <Typography variant="h6" gutterBottom sx={{display: 'flex', alignItems: 'center'}}>
-                            <EuroSymbol sx={{mr: 1, color: 'primary.main'}}/>
-                            Zahlungsinformationen
-                        </Typography>
-
-                        <Divider sx={{my: 2}}/>
-
-                        <Box sx={{display: 'flex', justifyContent: 'center', mb: 2}}>
-                            <Typography variant="h4" fontWeight="bold" color="primary.main">
-                                {props.booking.total_price}€
-                            </Typography>
-                        </Box>
-
-                        <Box sx={{mt: 3, mb: 3}}>
-                            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                                Bitte verwende diesen Betreff für deine Überweisung:
-                            </Typography>
-
-                            <TextField
+                    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+                        {/* Success Header */}
+                        <Box sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            mb: 3,
+                        }}>
+                            <Paper
+                                elevation={2}
                                 sx={{
                                     width: '100%',
-                                    mb: 2,
-                                    bgcolor: 'background.paper',
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': {
-                                            borderColor: 'primary.light',
-                                            borderWidth: 2
-                                        },
-                                        '&:hover fieldset': {
-                                            borderColor: 'primary.main',
-                                        },
-                                    }
-                                }}
-                                variant="outlined"
-                                InputProps={{
-                                    endAdornment: (
-                                        <IconButton onClick={handleCopy} size="small">
-                                            <ContentCopy fontSize="small"/>
-                                        </IconButton>
-                                    ),
-                                    readOnly: true
-                                }}
-                                value={betreff}
-                                fullWidth
-                            />
-
-                            <Typography variant="body2" color="text.secondary" sx={{mb: 3}}>
-                                Der Betreff hilft uns, deine Zahlung korrekt zuzuordnen.
-                            </Typography>
-
-                            <Button
-                                fullWidth
-                                variant="contained"
-                                size="large"
-                                onClick={handlePaypalClick}
-                                startIcon={<OpenInNew/>}
-                                sx={{
-                                    py: 1.5,
-                                    fontWeight: 'bold',
-                                    fontSize: '1.1rem',
-                                    boxShadow: 3,
-                                    textTransform: 'none'
+                                    py: 2,
+                                    px: 1,
+                                    mb: 3,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    bgcolor: alpha('#4caf50', 0.1),
+                                    borderRadius: '10px',
+                                    border: '1px solid',
+                                    borderColor: alpha('#4caf50', 0.3),
                                 }}
                             >
-                                Jetzt mit PayPal bezahlen
-                            </Button>
+                                <CheckCircleOutline sx={{ color: '#4caf50', fontSize: 60, mb: 1 }} />
+                                <Typography
+                                    variant="h5"
+                                    fontWeight="bold"
+                                    align="center"
+                                    sx={{
+                                        color: alpha('#fff', 0.9),
+                                    }}
+                                >
+                                    Deine Buchung war erfolgreich!
+                                </Typography>
+                            </Paper>
+
+                            <Box sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                mb: 3,
+                                position: 'relative',
+                                '&:hover .jellyfish': {
+                                    transform: 'scale(1.1)',
+                                    opacity: 0.8,
+                                }
+                            }}>
+                                <img
+                                    src={jellyfishImage}
+                                    alt="jellyfish"
+                                    className="jellyfish"
+                                    style={{
+                                        width: '150px',
+                                        height: '150px',
+                                        transition: 'transform 0.5s ease-in-out, opacity 0.5s ease-in-out'
+                                    }}
+                                />
+                            </Box>
+
+                            <Typography
+                                variant="body1"
+                                paragraph
+                                sx={{
+                                    mb: 3,
+                                    fontSize: '1.1rem',
+                                    color: alpha('#fff', 0.8),
+                                    textAlign: 'center',
+                                }}
+                            >
+                                Du erhältst in Kürze eine Bestätigungsmail mit allen Details zu deiner Buchung. Bitte
+                                prüfe auch deinen Spam-Ordner, falls die Mail nicht sofort ankommt.
+                            </Typography>
                         </Box>
 
-                        <Divider sx={{my: 2}}/>
+                        {/* Payment Box */}
+                        <Paper
+                            elevation={2}
+                            sx={{
+                                mt: 4,
+                                p: 0,
+                                backgroundColor: alpha('#020c1b', 0.7),
+                                borderRadius: '10px',
+                                border: '1px solid',
+                                borderColor: alpha('#90caf9', 0.3),
+                                position: 'relative',
+                                overflow: 'hidden',
+                            }}
+                        >
+                            {/* Circuit background decoration */}
+                            <Box sx={{
+                                position: 'absolute',
+                                top: 0,
+                                right: 0,
+                                width: '200px',
+                                height: '200px',
+                                opacity: 0.03,
+                                zIndex: 0,
+                                backgroundImage: `
+                                    radial-gradient(circle, #64b5f6 1px, transparent 1px),
+                                    linear-gradient(to right, transparent 4px, #64b5f6 1px, transparent 1px),
+                                    linear-gradient(to bottom, transparent 4px, #64b5f6 1px, transparent 1px)
+                                `,
+                                backgroundSize: '20px 20px, 10px 10px, 10px 10px',
+                                backgroundPosition: '0 0, 10px 0, 0 10px',
+                                transform: 'rotate(15deg)',
+                            }} />
 
-                        <Typography variant="body2" sx={{textAlign: 'center', color: 'text.secondary'}}>
-                            Kein PayPal? Kontaktiere bitte direkt <strong>Stephan Hauptmann</strong> für alternative
-                            Zahlungsmöglichkeiten.
-                        </Typography>
-                    </Paper>
+                            <Box sx={{
+                                width: '100%',
+                                height: '6px',
+                                background: 'linear-gradient(90deg, #1e88e5, #64b5f6, #bbdefb, #1e88e5)',
+                                backgroundSize: '300% 100%',
+                                animation: 'gradientMove 12s linear infinite',
+                            }} />
 
-                    <Box sx={{mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Celebration sx={{mr: 1, color: 'secondary.main'}}/>
-                        <Typography variant="subtitle1" fontWeight="medium" color="secondary.main">
-                            Wir freuen uns auf dich beim Weiher Wald und Weltall-Wahn!
+                            <Box sx={{ p: 3, position: 'relative', zIndex: 1 }}>
+                                <Box sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    mb: 2
+                                }}>
+                                    <EuroSymbol sx={{ mr: 1, color: '#64b5f6' }} />
+                                    <Typography
+                                        variant="h6"
+                                        sx={{
+                                            color: alpha('#fff', 0.9),
+                                            fontWeight: 'medium',
+                                        }}
+                                    >
+                                        Zahlungsinformationen
+                                    </Typography>
+                                </Box>
+
+                                <Divider sx={{
+                                    my: 2,
+                                    borderColor: alpha('#64b5f6', 0.2)
+                                }} />
+
+                                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                                    <Typography
+                                        variant="h4"
+                                        fontWeight="bold"
+                                        sx={{
+                                            color: '#64b5f6',
+                                        }}
+                                    >
+                                        {props.booking.total_price}€
+                                    </Typography>
+                                </Box>
+
+                                <Box sx={{ mt: 3, mb: 3 }}>
+                                    <Typography
+                                        variant="subtitle2"
+                                        sx={{
+                                            color: alpha('#fff', 0.7),
+                                            mb: 1,
+                                        }}
+                                    >
+                                        Bitte verwende diesen Betreff für deine Überweisung:
+                                    </Typography>
+
+                                    <TextField
+                                        sx={{
+                                            width: '100%',
+                                            mb: 2,
+                                            '& .MuiOutlinedInput-root': {
+                                                backgroundColor: alpha('#020c1b', 0.4),
+                                                '& fieldset': {
+                                                    borderColor: alpha('#64b5f6', 0.3),
+                                                },
+                                                '&:hover fieldset': {
+                                                    borderColor: alpha('#64b5f6', 0.5),
+                                                },
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#1e88e5',
+                                                },
+                                            },
+                                            '& .MuiInputBase-input': {
+                                                color: alpha('#fff', 0.9),
+                                            },
+                                        }}
+                                        variant="outlined"
+                                        InputProps={{
+                                            endAdornment: (
+                                                <IconButton onClick={handleCopy} size="small">
+                                                    <ContentCopy sx={{ color: alpha('#fff', 0.7) }} />
+                                                </IconButton>
+                                            ),
+                                            readOnly: true
+                                        }}
+                                        value={betreff}
+                                        fullWidth
+                                    />
+
+                                    <Typography
+                                        variant="body2"
+                                        sx={{
+                                            mb: 3,
+                                            color: alpha('#fff', 0.6),
+                                        }}
+                                    >
+                                        Der Betreff hilft uns, deine Zahlung korrekt zuzuordnen.
+                                    </Typography>
+
+                                    <Button
+                                        fullWidth
+                                        variant="contained"
+                                        size="large"
+                                        onClick={handlePaypalClick}
+                                        startIcon={<OpenInNew />}
+                                        sx={{
+                                            py: 1.5,
+                                            fontWeight: 'bold',
+                                            fontSize: '1.1rem',
+                                            boxShadow: 3,
+                                            textTransform: 'none',
+                                            background: 'linear-gradient(45deg, #1e88e5, #64b5f6)',
+                                            '&:hover': {
+                                                background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                                            }
+                                        }}
+                                    >
+                                        Jetzt mit PayPal bezahlen
+                                    </Button>
+                                </Box>
+
+                                <Divider sx={{
+                                    my: 2,
+                                    borderColor: alpha('#64b5f6', 0.2)
+                                }} />
+
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        textAlign: 'center',
+                                        color: alpha('#fff', 0.6)
+                                    }}
+                                >
+                                    Kein PayPal? Kontaktiere bitte direkt <strong>Stephan Hauptmann</strong> für alternative
+                                    Zahlungsmöglichkeiten.
+                                </Typography>
+                            </Box>
+                        </Paper>
+
+                        <Box sx={{
+                            mt: 4,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                            <Celebration sx={{ mr: 1, color: '#64b5f6' }} />
+                            <Typography
+                                variant="subtitle1"
+                                fontWeight="medium"
+                                sx={{
+                                    color: alpha('#fff', 0.8),
+                                }}
+                            >
+                                Wir freuen uns auf dich beim Weiher Wald und Weltall-Wahn!
+                            </Typography>
+                        </Box>
+                    </Box>
+
+                    {/* Footer with space station ID */}
+                    <Box sx={{
+                        p: 1.5,
+                        backgroundColor: '#041327',
+                        borderTop: '1px solid',
+                        borderColor: alpha('#64b5f6', 0.2),
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                fontFamily: 'monospace',
+                                color: alpha('#fff', 0.7),
+                                letterSpacing: '1px',
+                                fontSize: '0.7rem'
+                            }}
+                        >
+                            WWWW-BOOKING-CONFIRMATION // ID-2025
                         </Typography>
                     </Box>
                 </Paper>
@@ -304,21 +493,33 @@ function FormConfirmation(props: FinalBookingProps) {
                         width: 350,
                         bgcolor: 'background.paper',
                         border: '2px solid',
-                        borderColor: 'primary.main',
-                        borderRadius: '24px',
+                        borderColor: '#1e88e5',
+                        borderRadius: '16px',
                         boxShadow: 24,
                         p: 4,
                         display: 'flex',
                         flexDirection: 'column',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        background: 'radial-gradient(circle at bottom left, #061429 0%, #071f3b 100%)',
                     }}>
-                        <CheckCircleOutline color="success" sx={{fontSize: 60, mb: 2}}/>
+                        <CheckCircleOutline sx={{fontSize: 60, mb: 2, color: '#4caf50' }} />
 
-                        <Typography variant="h6" component="h2" align="center" fontWeight="bold">
+                        <Typography
+                            variant="h6"
+                            component="h2"
+                            align="center"
+                            fontWeight="bold"
+                            sx={{ color: alpha('#fff', 0.9) }}
+                        >
                             Betreff wurde kopiert
                         </Typography>
 
-                        <Typography sx={{mt: 2, mb: 3, textAlign: 'center'}}>
+                        <Typography sx={{
+                            mt: 2,
+                            mb: 3,
+                            textAlign: 'center',
+                            color: alpha('#fff', 0.8)
+                        }}>
                             Bitte füge den Betreff in deine PayPal-Überweisung ein, damit wir deine Zahlung zuordnen
                             können.
                         </Typography>
@@ -337,7 +538,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                         value={((5 - countdown) / 5) * 100}
                                         size={50}
                                         thickness={5}
-                                        color="primary"
+                                        sx={{ color: '#64b5f6' }}
                                     />
                                     <Box sx={{
                                         top: 0, left: 0, bottom: 0, right: 0,
@@ -346,18 +547,34 @@ function FormConfirmation(props: FinalBookingProps) {
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                     }}>
-                                        <Typography variant="h6" component="div" fontWeight="bold">
+                                        <Typography
+                                            variant="h6"
+                                            component="div"
+                                            fontWeight="bold"
+                                            sx={{ color: alpha('#fff', 0.9) }}
+                                        >
                                             {countdown}
                                         </Typography>
                                     </Box>
                                 </Box>
-                                <Typography variant="subtitle1" fontWeight="medium" color="primary">
+                                <Typography
+                                    variant="subtitle1"
+                                    fontWeight="medium"
+                                    sx={{ color: '#64b5f6' }}
+                                >
                                     Weiterleitung zu PayPal in {countdown} Sekunden...
                                 </Typography>
                             </Box>
                         ) : (
                             <Box sx={{mt: 2, width: '100%'}}>
-                                <Typography sx={{mb: 2, fontWeight: 'medium', textAlign: 'center'}}>
+                                <Typography
+                                    sx={{
+                                        mb: 2,
+                                        fontWeight: 'medium',
+                                        textAlign: 'center',
+                                        color: alpha('#fff', 0.8)
+                                    }}
+                                >
                                     Du wurdest nicht weitergeleitet?
                                 </Typography>
                                 <a
@@ -370,9 +587,15 @@ function FormConfirmation(props: FinalBookingProps) {
                                         fullWidth
                                         variant="contained"
                                         size="large"
-                                        sx={{py: 1.5}}
+                                        sx={{
+                                            py: 1.5,
+                                            background: 'linear-gradient(45deg, #1e88e5, #64b5f6)',
+                                            '&:hover': {
+                                                background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                                            }
+                                        }}
                                     >
-                                        Manuell zu PayPal <OpenInNew sx={{ml: 1}}/>
+                                        Manuell zu PayPal <OpenInNew sx={{ml: 1}} />
                                     </Button>
                                 </a>
                             </Box>
@@ -386,63 +609,185 @@ function FormConfirmation(props: FinalBookingProps) {
     // Error State
     else if (props.bookingState.isSubmitted && !props.bookingState.isSuccessful) {
         return (
-            <Box sx={{width: '100%', maxWidth: 600, mx: 'auto'}}>
-                <Paper elevation={3} sx={{p: 4, borderRadius: 3}}>
+            <Box sx={{ width: '98%', maxWidth: 600, mx: 'auto' }}>
+                <Paper
+                    elevation={3}
+                    sx={{
+                        width: '100%',
+                        p: 0,
+                        borderRadius: '14px',
+                        background: 'radial-gradient(circle at bottom left, #061429 0%, #071f3b 100%)',
+                        boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        border: '1px solid',
+                        borderColor: alpha('#64b5f6', 0.2),
+                    }}
+                >
+                    {/* Decorative top pattern */}
                     <Box sx={{
-                        textAlign: 'center',
-                        p: 3,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        bgcolor: 'error.light',
-                        borderRadius: 2,
-                        mb: 3
+                        width: '100%',
+                        height: '6px',
+                        background: 'linear-gradient(90deg, #1e88e5, #64b5f6, #bbdefb, #1e88e5)',
+                        backgroundSize: '300% 100%',
+                        animation: 'gradientMove 12s linear infinite',
+                        '@keyframes gradientMove': {
+                            '0%': { backgroundPosition: '0% 0%' },
+                            '100%': { backgroundPosition: '300% 0%' },
+                        }
+                    }} />
+
+                    {/* Mission Briefing */}
+                    <Box sx={{
+                        py: 1.5,
+                        px: 2,
+                        backgroundColor: alpha('#000', 0.3),
+                        borderLeft: '4px solid',
+                        borderColor: '#1e88e5',
+                        mx: { xs: 1, sm: 2 },
+                        my: 2,
+                        borderRadius: '0 8px 8px 0',
                     }}>
-                        <ErrorOutline color="error" style={{fontSize: 70, marginBottom: 16}}/>
-                        <Typography variant="h5" fontWeight="bold" color="error.dark">
-                            Buchung fehlgeschlagen
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: alpha('#fff', 0.9),
+                                fontFamily: 'monospace',
+                                fontSize: '0.85rem',
+                            }}
+                        >
+                            <span style={{ color: '#64b5f6' }}>MISSION ALERT:</span> Wir haben ein Problem mit deiner Registrierung. Bitte versuche es erneut oder kontaktiere uns.
                         </Typography>
                     </Box>
 
-                    <Box sx={{p: 2}}>
-                        <Typography variant="body1" paragraph align="center">
-                            Leider konnte deine Buchung nicht abgeschlossen werden. Das kann verschiedene Gründe haben:
-                        </Typography>
-
+                    <Box sx={{ p: { xs: 2, sm: 3 } }}>
                         <Box sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
                             mb: 3,
-                            p: 2,
-                            borderLeft: '4px solid',
-                            borderColor: 'grey.400',
-                            backgroundColor: 'grey.100',
-                            borderRadius: '0 8px 8px 0'
                         }}>
-                            <Typography component="div" variant="body1" sx={{mb: 1}}>
-                                • Netzwerkprobleme oder Serverüberlastung
+                            <Paper
+                                elevation={2}
+                                sx={{
+                                    width: '100%',
+                                    py: 2,
+                                    px: 1,
+                                    mb: 3,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    bgcolor: alpha('#f44336', 0.1),
+                                    borderRadius: '10px',
+                                    border: '1px solid',
+                                    borderColor: alpha('#f44336', 0.3),
+                                }}
+                            >
+                                <ErrorOutline sx={{ color: '#f44336', fontSize: 60, mb: 1 }} />
+                                <Typography
+                                    variant="h5"
+                                    fontWeight="bold"
+                                    sx={{
+                                        color: alpha('#fff', 0.9),
+                                    }}
+                                >
+                                    Buchung fehlgeschlagen
+                                </Typography>
+                            </Paper>
+
+                            <Typography
+                                variant="body1"
+                                paragraph
+                                align="center"
+                                sx={{
+                                    color: alpha('#fff', 0.8),
+                                }}
+                            >
+                                Leider konnte deine Buchung nicht abgeschlossen werden. Das kann verschiedene Gründe haben:
                             </Typography>
-                            <Typography component="div" variant="body1" sx={{mb: 1}}>
-                                • Probleme bei der Datenverarbeitung
+
+                            <Paper
+                                elevation={2}
+                                sx={{
+                                    mb: 3,
+                                    p: 2.5,
+                                    width: '100%',
+                                    backgroundColor: alpha('#020c1b', 0.7),
+                                    borderRadius: '10px',
+                                    border: '1px solid',
+                                    borderColor: alpha('#90caf9', 0.3),
+                                    position: 'relative',
+                                }}
+                            >
+                                <Box component="ul" sx={{
+                                    pl: 2,
+                                    mb: 0,
+                                    '& > li': {
+                                        color: alpha('#fff', 0.8),
+                                        mb: 1,
+                                    }
+                                }}>
+                                    <li>Netzwerkprobleme oder Serverüberlastung</li>
+                                    <li>Probleme bei der Datenverarbeitung</li>
+                                    <li>Technische Schwierigkeiten im System</li>
+                                </Box>
+                            </Paper>
+
+                            <Typography
+                                variant="body1"
+                                paragraph
+                                fontWeight="medium"
+                                sx={{
+                                    textAlign: 'center',
+                                    mb: 3,
+                                    color: alpha('#fff', 0.8),
+                                }}
+                            >
+                                Bitte kontaktiere <strong>Christian Hauptmann</strong> per E-Mail oder Telefon, um deine
+                                Buchung manuell abzuschließen.
                             </Typography>
-                            <Typography component="div" variant="body1">
-                                • Technische Schwierigkeiten im System
-                            </Typography>
+
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                onClick={handleRetry}
+                                startIcon={<Refresh />}
+                                sx={{
+                                    mt: 2,
+                                    py: 1.5,
+                                    background: 'linear-gradient(45deg, #1e88e5, #64b5f6)',
+                                    '&:hover': {
+                                        background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                                    }
+                                }}
+                            >
+                                Erneut versuchen
+                            </Button>
                         </Box>
+                    </Box>
 
-                        <Typography variant="body1" paragraph fontWeight="medium" sx={{textAlign: 'center', mb: 3}}>
-                            Bitte kontaktiere <strong>Christian Hauptmann</strong> per E-Mail oder Telefon, um deine
-                            Buchung manuell abzuschließen.
-                        </Typography>
-
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            onClick={handleRetry}
-                            startIcon={<Refresh/>}
-                            sx={{mt: 2}}
+                    {/* Footer with space station ID */}
+                    <Box sx={{
+                        p: 1.5,
+                        backgroundColor: '#041327',
+                        borderTop: '1px solid',
+                        borderColor: alpha('#64b5f6', 0.2),
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                fontFamily: 'monospace',
+                                color: alpha('#fff', 0.7),
+                                letterSpacing: '1px',
+                                fontSize: '0.7rem'
+                            }}
                         >
-                            Erneut versuchen
-                        </Button>
+                            WWWW-ERROR-RECOVERY // ID-2025
+                        </Typography>
                     </Box>
                 </Paper>
             </Box>
@@ -452,86 +797,243 @@ function FormConfirmation(props: FinalBookingProps) {
     // Initial Submit State
     else {
         return (
-            <Box sx={{width: '100%', maxWidth: 600, mx: 'auto'}}>
-                <Paper elevation={3} sx={{p: 4, borderRadius: 3}}>
+            <Box sx={{ width: '98%', maxWidth: 600, mx: 'auto' }}>
+                <Paper
+                    elevation={3}
+                    sx={{
+                        width: '100%',
+                        p: 0,
+                        borderRadius: '14px',
+                        background: 'radial-gradient(circle at bottom left, #061429 0%, #071f3b 100%)',
+                        boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        border: '1px solid',
+                        borderColor: alpha('#64b5f6', 0.2),
+                    }}
+                >
+                    {/* Decorative top pattern */}
                     <Box sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        mb: 4
+                        width: '100%',
+                        height: '6px',
+                        background: 'linear-gradient(90deg, #1e88e5, #64b5f6, #bbdefb, #1e88e5)',
+                        backgroundSize: '300% 100%',
+                        animation: 'gradientMove 12s linear infinite',
+                        '@keyframes gradientMove': {
+                            '0%': { backgroundPosition: '0% 0%' },
+                            '100%': { backgroundPosition: '300% 0%' },
+                        }
+                    }} />
+
+                    {/* Mission Briefing */}
+                    <Box sx={{
+                        py: 1.5,
+                        px: 2,
+                        backgroundColor: alpha('#000', 0.3),
+                        borderLeft: '4px solid',
+                        borderColor: '#1e88e5',
+                        mx: { xs: 1, sm: 2 },
+                        my: 2,
+                        borderRadius: '0 8px 8px 0',
                     }}>
-                        <EventAvailable sx={{fontSize: 70, color: 'primary.main', mb: 2}}/>
-                        <Typography variant="h5" gutterBottom align="center" fontWeight="bold">
-                            Bereit zum Abheben!
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: alpha('#fff', 0.9),
+                                fontFamily: 'monospace',
+                                fontSize: '0.85rem',
+                            }}
+                        >
+                            <span style={{ color: '#64b5f6' }}>MISSION:</span> Bereit für den Start! Bitte bestätige deine Teilnahme durch Absenden der Buchung.
                         </Typography>
+                    </Box>
 
-                        <Typography variant="body1" paragraph align="center" sx={{mt: 2, fontSize: '1.1rem'}}>
-                            Wir freuen uns, dass du beim Weiher Wald und Weltall-Wahn dabei sein möchtest!
-                            Mit dem Absenden der Buchung reservierst du deinen Platz beim Festival.
-                        </Typography>
-
+                    <Box sx={{ p: { xs: 2, sm: 3 } }}>
                         <Box sx={{
-                            mt: 3,
-                            p: 3,
-                            width: '100%',
-                            borderRadius: 2,
-                            bgcolor: 'primary.light',
-                            color: 'primary.contrastText'
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            mb: 4
                         }}>
-                            <Typography variant="h6" align="center" gutterBottom>
-                                Dein Gesamtbeitrag:
+                            <Paper
+                                elevation={2}
+                                sx={{
+                                    width: '100%',
+                                    py: 2,
+                                    px: 1,
+                                    mb: 3,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    bgcolor: alpha('#020c1b', 0.7),
+                                    borderRadius: '10px',
+                                    border: '1px solid',
+                                    borderColor: alpha('#90caf9', 0.3),
+                                }}
+                            >
+                                <RocketLaunch sx={{ color: '#64b5f6', fontSize: 60, mb: 1 }} />
+                                <Typography
+                                    variant="h5"
+                                    align="center"
+                                    fontWeight="bold"
+                                    sx={{
+                                        color: alpha('#fff', 0.9),
+                                    }}
+                                >
+                                    Bereit zum Abheben!
+                                </Typography>
+                            </Paper>
+
+                            <Typography
+                                variant="body1"
+                                paragraph
+                                align="center"
+                                sx={{
+                                    mt: 2,
+                                    fontSize: '1.1rem',
+                                    color: alpha('#fff', 0.8),
+                                }}
+                            >
+                                Wir freuen uns, dass du beim Weiher Wald und Weltall-Wahn dabei sein möchtest!
+                                Mit dem Absenden der Buchung reservierst du deinen Platz beim Festival.
                             </Typography>
-                            <Typography variant="h4" align="center" fontWeight="bold">
-                                {props.booking.total_price}€
+
+                            <Box sx={{
+                                mt: 3,
+                                p: 3,
+                                width: '100%',
+                                borderRadius: '10px',
+                                bgcolor: alpha('#1e88e5', 0.1),
+                                border: '1px solid',
+                                borderColor: alpha('#1e88e5', 0.3),
+                            }}>
+                                <Typography
+                                    variant="h6"
+                                    align="center"
+                                    gutterBottom
+                                    sx={{
+                                        color: alpha('#fff', 0.9),
+                                    }}
+                                >
+                                    Dein Gesamtbeitrag:
+                                </Typography>
+                                <Typography
+                                    variant="h4"
+                                    align="center"
+                                    fontWeight="bold"
+                                    sx={{
+                                        color: '#64b5f6',
+                                    }}
+                                >
+                                    {props.booking.total_price}€
+                                </Typography>
+                            </Box>
+
+                            {!isOnline && (
+                                <Alert
+                                    severity="warning"
+                                    icon={<SignalCellularNodata />}
+                                    sx={{
+                                        mt: 3,
+                                        width: '100%',
+                                        bgcolor: alpha('#ff9800', 0.1),
+                                        color: alpha('#fff', 0.9),
+                                        border: '1px solid',
+                                        borderColor: alpha('#ff9800', 0.3),
+                                        '& .MuiAlert-icon': {
+                                            color: '#ff9800',
+                                        },
+                                    }}
+                                >
+                                    Du bist momentan offline. Bitte stelle eine Internetverbindung her, bevor du deine
+                                    Buchung absendest.
+                                </Alert>
+                            )}
+
+                            {submissionAttempted && !props.bookingState.isSubmitting && (
+                                <Alert
+                                    severity="error"
+                                    sx={{
+                                        mt: 3,
+                                        width: '100%',
+                                        bgcolor: alpha('#f44336', 0.1),
+                                        color: alpha('#fff', 0.9),
+                                        border: '1px solid',
+                                        borderColor: alpha('#f44336', 0.3),
+                                        '& .MuiAlert-icon': {
+                                            color: '#f44336',
+                                        },
+                                    }}
+                                >
+                                    Es gab ein Problem beim Absenden der Buchung. Bitte versuche es erneut oder kontaktiere
+                                    den Support.
+                                </Alert>
+                            )}
+
+                            <Button
+                                disabled={!isOnline || props.bookingState.isSubmitting}
+                                variant="contained"
+                                color="primary"
+                                onClick={submitBooking}
+                                size="large"
+                                sx={{
+                                    mt: 4,
+                                    py: 1.5,
+                                    px: 4,
+                                    fontWeight: 'bold',
+                                    fontSize: '1.1rem',
+                                    boxShadow: 3,
+                                    minWidth: '60%',
+                                    background: 'linear-gradient(45deg, #1e88e5, #64b5f6)',
+                                    '&:hover': {
+                                        background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                                    },
+                                    '&.Mui-disabled': {
+                                        background: alpha('#90caf9', 0.2),
+                                        color: alpha('#fff', 0.4),
+                                    }
+                                }}
+                                startIcon={props.bookingState.isSubmitting ? null : <Check />}
+                            >
+                                {props.bookingState.isSubmitting ?
+                                    <CircularProgress size={24} color="inherit" /> :
+                                    "Buchung absenden"
+                                }
+                            </Button>
+
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    mt: 2,
+                                    color: alpha('#fff', 0.6),
+                                    textAlign: 'center'
+                                }}
+                            >
+                                Du kannst deine Buchung später noch bezahlen.
                             </Typography>
                         </Box>
+                    </Box>
 
-                        {!isOnline && (
-                            <Alert
-                                severity="warning"
-                                icon={<SignalCellularNodata/>}
-                                sx={{mt: 3, width: '100%'}}
-                            >
-                                Du bist momentan offline. Bitte stelle eine Internetverbindung her, bevor du deine
-                                Buchung absendest.
-                            </Alert>
-                        )}
-
-                        {submissionAttempted && !props.bookingState.isSubmitting && (
-                            <Alert
-                                severity="error"
-                                sx={{mt: 3, width: '100%'}}
-                            >
-                                Es gab ein Problem beim Absenden der Buchung. Bitte versuche es erneut oder kontaktiere
-                                den Support.
-                            </Alert>
-                        )}
-
-                        <Button
-                            disabled={!isOnline || props.bookingState.isSubmitting}
-                            variant="contained"
-                            color="primary"
-                            onClick={submitBooking}
-                            size="large"
+                    {/* Footer with space station ID */}
+                    <Box sx={{
+                        p: 1.5,
+                        backgroundColor: '#041327',
+                        borderTop: '1px solid',
+                        borderColor: alpha('#64b5f6', 0.2),
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                        <Typography
+                            variant="caption"
                             sx={{
-                                mt: 4,
-                                py: 1.5,
-                                px: 4,
-                                fontWeight: 'bold',
-                                fontSize: '1.1rem',
-                                boxShadow: 3,
-                                minWidth: '60%'
+                                fontFamily: 'monospace',
+                                color: alpha('#fff', 0.7),
+                                letterSpacing: '1px',
+                                fontSize: '0.7rem'
                             }}
-                            startIcon={props.bookingState.isSubmitting ? null : <Check/>}
                         >
-                            {props.bookingState.isSubmitting ?
-                                <CircularProgress size={24} color="inherit"/> :
-                                "Buchung absenden"
-                            }
-                        </Button>
-
-                        <Typography variant="body2" sx={{mt: 2, color: 'text.secondary', textAlign: 'center'}}>
-                            Du kannst deine Buchung später noch bezahlen.
+                            WWWW-LAUNCH-SEQUENCE // ID-2025
                         </Typography>
                     </Box>
                 </Paper>
@@ -546,7 +1048,7 @@ function FormConfirmation(props: FinalBookingProps) {
                     <Alert
                         onClose={handleSnackbarClose}
                         severity="error"
-                        icon={<SignalCellularNodata/>}
+                        icon={<SignalCellularNodata />}
                         variant="filled"
                     >
                         Du bist gerade offline. Bitte stelle sicher, dass du mit dem Internet verbunden bist und
