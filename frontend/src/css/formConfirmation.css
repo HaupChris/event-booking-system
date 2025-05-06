@@ -29,3 +29,264 @@ a {
 a:active, a:hover {
     color: #31f605 !important;
 }
+
+
+.rocket-body {
+  position: absolute;
+  /*width: 150px;*/
+  /*height: 120px;*/
+  background-color: #e0e0e0;
+  border-radius: 50% 50% 0 0;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  z-index: 2;
+}
+
+.rocket-window {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: #64b5f6;
+  border-radius: 50%;
+  top: 30px;
+  left: 20px;
+  border: 2px solid #1e88e5;
+}
+
+.rocket-fin {
+  position: absolute;
+  width: 20px;
+  height: 30px;
+  background-color: #f44336;
+  bottom: 0;
+  z-index: 1;
+}
+
+.rocket-fin-left {
+  left: -15px;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.rocket-fin-right {
+  right: -15px;
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+
+.rocket-top {
+  position: absolute;
+  width: 30px;
+  height: 40px;
+  background-color: #f44336;
+  border-radius: 50% 50% 0 0;
+  top: -25px;
+  left: 15px;
+  z-index: 3;
+}
+
+/* Ensure there's no gap when the rocket container collapses */
+.rocket-container-wrapper {
+  min-height: 0;
+  transition: min-height 1s ease-in-out;
+}
+
+/* Add a small animation to move content up smoothly after rocket launches */
+@keyframes slideContentUp {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-200px); /* Adjust based on container height */
+  }
+}
+
+/* Apply slide-up to content that follows the rocket */
+.confirmation-message {
+  animation: slideContentUp 1s ease-in-out 4s forwards;
+}
+
+/* Additional styles for Payment Box to also slide up */
+.payment-box {
+  position: relative;
+  animation: slideContentUp 1s ease-in-out 4s forwards;
+}
+
+
+/* Rocket Animation Styles */
+.rocket-animation-container {
+  position: relative;
+  width: 400px;
+  height: 250px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+/* Rocket styles */
+.rocket {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 120px;
+  z-index: 10;
+  /* The animation */
+  animation: rocketLaunch 5s ease-in 1s forwards;
+}
+
+/* Custom rocket image styles */
+.custom-rocket {
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.rocket-img {
+  height: 500px; /* Adjust based on your image's dimensions */
+  width: auto;
+  z-index: 2;
+  position: relative;
+  bottom: 10px; /* Adjust to align with flames */
+}
+
+/* Flames */
+.rocket-flames {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  animation: flamesGrow 0.5s ease-in 1s forwards;
+}
+
+.flame {
+  position: absolute;
+  border-radius: 0 0 10px 10px;
+}
+
+.flame-main {
+  width: 30px;
+  height: 30px;
+  background-color: #ff9800;
+  animation: flameFlicker 0.1s infinite alternate;
+}
+
+.flame-inner {
+  width: 20px;
+  height: 20px;
+  background-color: #ffeb3b;
+  bottom: 0;
+  left: 5px;
+  animation: flameFlicker 0.2s infinite alternate;
+}
+
+/* Smoke */
+.smoke-container {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 40px;
+  opacity: 0;
+  animation: smokeAppear 0.5s ease-in 1s forwards, smokeExpand 2s ease-in 1.5s forwards;
+}
+
+.smoke {
+  position: absolute;
+  background-color: rgba(200, 200, 200, 0.8);
+  border-radius: 50%;
+}
+
+.smoke-1 {
+  width: 40px;
+  height: 40px;
+  bottom: -10px;
+  left: 5px;
+}
+
+.smoke-2 {
+  width: 30px;
+  height: 30px;
+  bottom: -5px;
+  left: 50px;
+}
+
+.smoke-3 {
+  width: 35px;
+  height: 35px;
+  bottom: -20px;
+  left: 25px;
+}
+
+/* Launchpad */
+.launchpad {
+  position: absolute;
+  width: 100px;
+  height: 10px;
+  background-color: #424242;
+  border-radius: 5px;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* Animations */
+@keyframes rocketLaunch {
+  0% {
+    transform: translateX(-50%) translateY(0);
+  }
+  20% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+  30% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-15px);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-800px) scale(0);
+  }
+}
+
+@keyframes flameFlicker {
+  0% {
+    opacity: 0.8;
+    height: 90%;
+  }
+  100% {
+    opacity: 1;
+    height: 100%;
+  }
+}
+
+@keyframes flamesGrow {
+  0% {
+    height: 30px;
+  }
+  100% {
+    height: 60px;
+  }
+}
+
+@keyframes smokeAppear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes smokeExpand {
+  0% {
+    transform: translateX(-50%) scale(1);
+  }
+  100% {
+    transform: translateX(-50%) scale(2);
+    opacity: 0;
+  }
+}
+

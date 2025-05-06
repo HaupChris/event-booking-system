@@ -16,7 +16,6 @@ import {
     OpenInNew,
     SignalCellularNodata,
     Celebration,
-    EventAvailable,
     EuroSymbol,
     CheckCircleOutline,
     Refresh,
@@ -25,7 +24,7 @@ import {
 
 import '../../css/formConfirmation.css';
 import {BookingState} from "./formContainer";
-import jellyfishImage from '../../img/jellyfish.png';
+import AnimatedRocket from "../components/animatedRocket";
 
 interface FinalBookingProps {
     booking: Booking;
@@ -53,6 +52,8 @@ function FormConfirmation(props: FinalBookingProps) {
     const [redirecting, setRedirecting] = useState(false);
     const [countdown, setCountdown] = useState(5);
     const [submissionAttempted, setSubmissionAttempted] = useState(false);
+
+    const [showRocket, setShowRocket] = useState(true);
 
     useEffect(() => {
         function updateOnlineStatus() {
@@ -130,7 +131,7 @@ function FormConfirmation(props: FinalBookingProps) {
     // Success State
     if (props.bookingState.isSubmitted && props.bookingState.isSuccessful) {
         return (
-            <Box sx={{ width: '98%', maxWidth: 600, mx: 'auto' }}>
+            <Box sx={{width: '98%', maxWidth: 600, mx: 'auto'}}>
                 <Paper
                     elevation={3}
                     sx={{
@@ -153,10 +154,10 @@ function FormConfirmation(props: FinalBookingProps) {
                         backgroundSize: '300% 100%',
                         animation: 'gradientMove 12s linear infinite',
                         '@keyframes gradientMove': {
-                            '0%': { backgroundPosition: '0% 0%' },
-                            '100%': { backgroundPosition: '300% 0%' },
+                            '0%': {backgroundPosition: '0% 0%'},
+                            '100%': {backgroundPosition: '300% 0%'},
                         }
-                    }} />
+                    }}/>
 
                     {/* Mission Briefing */}
                     <Box sx={{
@@ -165,7 +166,7 @@ function FormConfirmation(props: FinalBookingProps) {
                         backgroundColor: alpha('#000', 0.3),
                         borderLeft: '4px solid',
                         borderColor: '#1e88e5',
-                        mx: { xs: 1, sm: 2 },
+                        mx: {xs: 1, sm: 2},
                         my: 2,
                         borderRadius: '0 8px 8px 0',
                     }}>
@@ -177,11 +178,12 @@ function FormConfirmation(props: FinalBookingProps) {
                                 fontSize: '0.85rem',
                             }}
                         >
-                            <span style={{ color: '#64b5f6' }}>MISSION:</span> Deine Registrierung für das Weiher Wald & Weltall-Wahn war erfolgreich! Bitte bestätige jetzt deine Teilnahme durch Zahlung.
+                            <span style={{color: '#64b5f6'}}>MISSION:</span> Deine Registrierung für das Weiher Wald &
+                            Weltall-Wahn war erfolgreich! Bitte bestätige jetzt deine Teilnahme durch Zahlung.
                         </Typography>
                     </Box>
 
-                    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+                    <Box sx={{p: {xs: 2, sm: 3}}}>
                         {/* Success Header */}
                         <Box sx={{
                             display: 'flex',
@@ -205,7 +207,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                     borderColor: alpha('#4caf50', 0.3),
                                 }}
                             >
-                                <CheckCircleOutline sx={{ color: '#4caf50', fontSize: 60, mb: 1 }} />
+                                <CheckCircleOutline sx={{color: '#4caf50', fontSize: 60, mb: 1}}/>
                                 <Typography
                                     variant="h5"
                                     fontWeight="bold"
@@ -218,27 +220,18 @@ function FormConfirmation(props: FinalBookingProps) {
                                 </Typography>
                             </Paper>
 
-                            <Box sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                mb: 3,
-                                position: 'relative',
-                                '&:hover .jellyfish': {
-                                    transform: 'scale(1.1)',
-                                    opacity: 0.8,
-                                }
-                            }}>
-                                <img
-                                    src={jellyfishImage}
-                                    alt="jellyfish"
-                                    className="jellyfish"
-                                    style={{
-                                        width: '150px',
-                                        height: '150px',
-                                        transition: 'transform 0.5s ease-in-out, opacity 0.5s ease-in-out'
+                            {showRocket && (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        mb: 3,
+                                        position: 'relative',
                                     }}
-                                />
-                            </Box>
+                                >
+                                    <AnimatedRocket onAnimationComplete={() => setShowRocket(false)}/>
+                                </Box>
+                            )}
 
                             <Typography
                                 variant="body1"
@@ -286,7 +279,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                 backgroundSize: '20px 20px, 10px 10px, 10px 10px',
                                 backgroundPosition: '0 0, 10px 0, 0 10px',
                                 transform: 'rotate(15deg)',
-                            }} />
+                            }}/>
 
                             <Box sx={{
                                 width: '100%',
@@ -294,15 +287,15 @@ function FormConfirmation(props: FinalBookingProps) {
                                 background: 'linear-gradient(90deg, #1e88e5, #64b5f6, #bbdefb, #1e88e5)',
                                 backgroundSize: '300% 100%',
                                 animation: 'gradientMove 12s linear infinite',
-                            }} />
+                            }}/>
 
-                            <Box sx={{ p: 3, position: 'relative', zIndex: 1 }}>
+                            <Box sx={{p: 3, position: 'relative', zIndex: 1}}>
                                 <Box sx={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     mb: 2
                                 }}>
-                                    <EuroSymbol sx={{ mr: 1, color: '#64b5f6' }} />
+                                    <EuroSymbol sx={{mr: 1, color: '#64b5f6'}}/>
                                     <Typography
                                         variant="h6"
                                         sx={{
@@ -317,9 +310,9 @@ function FormConfirmation(props: FinalBookingProps) {
                                 <Divider sx={{
                                     my: 2,
                                     borderColor: alpha('#64b5f6', 0.2)
-                                }} />
+                                }}/>
 
-                                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                                <Box sx={{display: 'flex', justifyContent: 'center', mb: 2}}>
                                     <Typography
                                         variant="h4"
                                         fontWeight="bold"
@@ -331,7 +324,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                     </Typography>
                                 </Box>
 
-                                <Box sx={{ mt: 3, mb: 3 }}>
+                                <Box sx={{mt: 3, mb: 3}}>
                                     <Typography
                                         variant="subtitle2"
                                         sx={{
@@ -366,7 +359,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                         InputProps={{
                                             endAdornment: (
                                                 <IconButton onClick={handleCopy} size="small">
-                                                    <ContentCopy sx={{ color: alpha('#fff', 0.7) }} />
+                                                    <ContentCopy sx={{color: alpha('#fff', 0.7)}}/>
                                                 </IconButton>
                                             ),
                                             readOnly: true
@@ -390,7 +383,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                         variant="contained"
                                         size="large"
                                         onClick={handlePaypalClick}
-                                        startIcon={<OpenInNew />}
+                                        startIcon={<OpenInNew/>}
                                         sx={{
                                             py: 1.5,
                                             fontWeight: 'bold',
@@ -410,7 +403,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                 <Divider sx={{
                                     my: 2,
                                     borderColor: alpha('#64b5f6', 0.2)
-                                }} />
+                                }}/>
 
                                 <Typography
                                     variant="body2"
@@ -419,7 +412,8 @@ function FormConfirmation(props: FinalBookingProps) {
                                         color: alpha('#fff', 0.6)
                                     }}
                                 >
-                                    Kein PayPal? Kontaktiere bitte direkt <strong>Stephan Hauptmann</strong> für alternative
+                                    Kein PayPal? Kontaktiere bitte direkt <strong>Stephan Hauptmann</strong> für
+                                    alternative
                                     Zahlungsmöglichkeiten.
                                 </Typography>
                             </Box>
@@ -431,7 +425,7 @@ function FormConfirmation(props: FinalBookingProps) {
                             justifyContent: 'center',
                             alignItems: 'center',
                         }}>
-                            <Celebration sx={{ mr: 1, color: '#64b5f6' }} />
+                            <Celebration sx={{mr: 1, color: '#64b5f6'}}/>
                             <Typography
                                 variant="subtitle1"
                                 fontWeight="medium"
@@ -502,14 +496,14 @@ function FormConfirmation(props: FinalBookingProps) {
                         alignItems: 'center',
                         background: 'radial-gradient(circle at bottom left, #061429 0%, #071f3b 100%)',
                     }}>
-                        <CheckCircleOutline sx={{fontSize: 60, mb: 2, color: '#4caf50' }} />
+                        <CheckCircleOutline sx={{fontSize: 60, mb: 2, color: '#4caf50'}}/>
 
                         <Typography
                             variant="h6"
                             component="h2"
                             align="center"
                             fontWeight="bold"
-                            sx={{ color: alpha('#fff', 0.9) }}
+                            sx={{color: alpha('#fff', 0.9)}}
                         >
                             Betreff wurde kopiert
                         </Typography>
@@ -538,7 +532,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                         value={((5 - countdown) / 5) * 100}
                                         size={50}
                                         thickness={5}
-                                        sx={{ color: '#64b5f6' }}
+                                        sx={{color: '#64b5f6'}}
                                     />
                                     <Box sx={{
                                         top: 0, left: 0, bottom: 0, right: 0,
@@ -551,7 +545,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                             variant="h6"
                                             component="div"
                                             fontWeight="bold"
-                                            sx={{ color: alpha('#fff', 0.9) }}
+                                            sx={{color: alpha('#fff', 0.9)}}
                                         >
                                             {countdown}
                                         </Typography>
@@ -560,7 +554,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                 <Typography
                                     variant="subtitle1"
                                     fontWeight="medium"
-                                    sx={{ color: '#64b5f6' }}
+                                    sx={{color: '#64b5f6'}}
                                 >
                                     Weiterleitung zu PayPal in {countdown} Sekunden...
                                 </Typography>
@@ -595,7 +589,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                             }
                                         }}
                                     >
-                                        Manuell zu PayPal <OpenInNew sx={{ml: 1}} />
+                                        Manuell zu PayPal <OpenInNew sx={{ml: 1}}/>
                                     </Button>
                                 </a>
                             </Box>
@@ -609,7 +603,7 @@ function FormConfirmation(props: FinalBookingProps) {
     // Error State
     else if (props.bookingState.isSubmitted && !props.bookingState.isSuccessful) {
         return (
-            <Box sx={{ width: '98%', maxWidth: 600, mx: 'auto' }}>
+            <Box sx={{width: '98%', maxWidth: 600, mx: 'auto'}}>
                 <Paper
                     elevation={3}
                     sx={{
@@ -632,10 +626,10 @@ function FormConfirmation(props: FinalBookingProps) {
                         backgroundSize: '300% 100%',
                         animation: 'gradientMove 12s linear infinite',
                         '@keyframes gradientMove': {
-                            '0%': { backgroundPosition: '0% 0%' },
-                            '100%': { backgroundPosition: '300% 0%' },
+                            '0%': {backgroundPosition: '0% 0%'},
+                            '100%': {backgroundPosition: '300% 0%'},
                         }
-                    }} />
+                    }}/>
 
                     {/* Mission Briefing */}
                     <Box sx={{
@@ -644,7 +638,7 @@ function FormConfirmation(props: FinalBookingProps) {
                         backgroundColor: alpha('#000', 0.3),
                         borderLeft: '4px solid',
                         borderColor: '#1e88e5',
-                        mx: { xs: 1, sm: 2 },
+                        mx: {xs: 1, sm: 2},
                         my: 2,
                         borderRadius: '0 8px 8px 0',
                     }}>
@@ -656,11 +650,12 @@ function FormConfirmation(props: FinalBookingProps) {
                                 fontSize: '0.85rem',
                             }}
                         >
-                            <span style={{ color: '#64b5f6' }}>MISSION ALERT:</span> Wir haben ein Problem mit deiner Registrierung. Bitte versuche es erneut oder kontaktiere uns.
+                            <span style={{color: '#64b5f6'}}>MISSION ALERT:</span> Wir haben ein Problem mit deiner
+                            Registrierung. Bitte versuche es erneut oder kontaktiere uns.
                         </Typography>
                     </Box>
 
-                    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+                    <Box sx={{p: {xs: 2, sm: 3}}}>
                         <Box sx={{
                             display: 'flex',
                             flexDirection: 'column',
@@ -683,7 +678,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                     borderColor: alpha('#f44336', 0.3),
                                 }}
                             >
-                                <ErrorOutline sx={{ color: '#f44336', fontSize: 60, mb: 1 }} />
+                                <ErrorOutline sx={{color: '#f44336', fontSize: 60, mb: 1}}/>
                                 <Typography
                                     variant="h5"
                                     fontWeight="bold"
@@ -703,7 +698,8 @@ function FormConfirmation(props: FinalBookingProps) {
                                     color: alpha('#fff', 0.8),
                                 }}
                             >
-                                Leider konnte deine Buchung nicht abgeschlossen werden. Das kann verschiedene Gründe haben:
+                                Leider konnte deine Buchung nicht abgeschlossen werden. Das kann verschiedene Gründe
+                                haben:
                             </Typography>
 
                             <Paper
@@ -752,7 +748,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                 variant="contained"
                                 color="primary"
                                 onClick={handleRetry}
-                                startIcon={<Refresh />}
+                                startIcon={<Refresh/>}
                                 sx={{
                                     mt: 2,
                                     py: 1.5,
@@ -797,7 +793,7 @@ function FormConfirmation(props: FinalBookingProps) {
     // Initial Submit State
     else {
         return (
-            <Box sx={{ width: '98%', maxWidth: 600, mx: 'auto' }}>
+            <Box sx={{width: '98%', maxWidth: 600, mx: 'auto'}}>
                 <Paper
                     elevation={3}
                     sx={{
@@ -820,10 +816,10 @@ function FormConfirmation(props: FinalBookingProps) {
                         backgroundSize: '300% 100%',
                         animation: 'gradientMove 12s linear infinite',
                         '@keyframes gradientMove': {
-                            '0%': { backgroundPosition: '0% 0%' },
-                            '100%': { backgroundPosition: '300% 0%' },
+                            '0%': {backgroundPosition: '0% 0%'},
+                            '100%': {backgroundPosition: '300% 0%'},
                         }
-                    }} />
+                    }}/>
 
                     {/* Mission Briefing */}
                     <Box sx={{
@@ -832,7 +828,7 @@ function FormConfirmation(props: FinalBookingProps) {
                         backgroundColor: alpha('#000', 0.3),
                         borderLeft: '4px solid',
                         borderColor: '#1e88e5',
-                        mx: { xs: 1, sm: 2 },
+                        mx: {xs: 1, sm: 2},
                         my: 2,
                         borderRadius: '0 8px 8px 0',
                     }}>
@@ -844,11 +840,12 @@ function FormConfirmation(props: FinalBookingProps) {
                                 fontSize: '0.85rem',
                             }}
                         >
-                            <span style={{ color: '#64b5f6' }}>MISSION:</span> Bereit für den Start! Bitte bestätige deine Teilnahme durch Absenden der Buchung.
+                            <span style={{color: '#64b5f6'}}>MISSION:</span> Bereit für den Start! Bitte bestätige deine
+                            Teilnahme durch Absenden der Buchung.
                         </Typography>
                     </Box>
 
-                    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+                    <Box sx={{p: {xs: 2, sm: 3}}}>
                         <Box sx={{
                             display: 'flex',
                             flexDirection: 'column',
@@ -871,7 +868,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                     borderColor: alpha('#90caf9', 0.3),
                                 }}
                             >
-                                <RocketLaunch sx={{ color: '#64b5f6', fontSize: 60, mb: 1 }} />
+                                <RocketLaunch sx={{color: '#64b5f6', fontSize: 60, mb: 1}}/>
                                 <Typography
                                     variant="h5"
                                     align="center"
@@ -932,7 +929,7 @@ function FormConfirmation(props: FinalBookingProps) {
                             {!isOnline && (
                                 <Alert
                                     severity="warning"
-                                    icon={<SignalCellularNodata />}
+                                    icon={<SignalCellularNodata/>}
                                     sx={{
                                         mt: 3,
                                         width: '100%',
@@ -965,7 +962,8 @@ function FormConfirmation(props: FinalBookingProps) {
                                         },
                                     }}
                                 >
-                                    Es gab ein Problem beim Absenden der Buchung. Bitte versuche es erneut oder kontaktiere
+                                    Es gab ein Problem beim Absenden der Buchung. Bitte versuche es erneut oder
+                                    kontaktiere
                                     den Support.
                                 </Alert>
                             )}
@@ -993,10 +991,10 @@ function FormConfirmation(props: FinalBookingProps) {
                                         color: alpha('#fff', 0.4),
                                     }
                                 }}
-                                startIcon={props.bookingState.isSubmitting ? null : <Check />}
+                                startIcon={props.bookingState.isSubmitting ? null : <Check/>}
                             >
                                 {props.bookingState.isSubmitting ?
-                                    <CircularProgress size={24} color="inherit" /> :
+                                    <CircularProgress size={24} color="inherit"/> :
                                     "Buchung absenden"
                                 }
                             </Button>
@@ -1048,7 +1046,7 @@ function FormConfirmation(props: FinalBookingProps) {
                     <Alert
                         onClose={handleSnackbarClose}
                         severity="error"
-                        icon={<SignalCellularNodata />}
+                        icon={<SignalCellularNodata/>}
                         variant="filled"
                     >
                         Du bist gerade offline. Bitte stelle sicher, dass du mit dem Internet verbunden bist und
