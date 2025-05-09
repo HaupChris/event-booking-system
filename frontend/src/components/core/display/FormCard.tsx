@@ -1,6 +1,16 @@
 // src/components/core/display/FormCard.tsx
-import React, {ReactNode} from 'react';
-import {Paper, Box, Typography, Divider, alpha} from '@mui/material';
+import React, {ReactNode, useState} from 'react';
+import {
+    Paper,
+    Box,
+    Typography,
+    Divider,
+    alpha,
+    Tooltip,
+    IconButton,
+    ClickAwayListener
+} from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
 import {spacePalette} from '../../styles/theme';
 import {SxProps, Theme} from "@mui/material/styles";
 
@@ -13,6 +23,8 @@ interface FormCardProps {
     selected?: boolean;
     elevation?: number;
     sx?: SxProps<Theme>;
+    tooltipText?: string;
+    tooltipPlacement?: 'top' | 'right' | 'bottom' | 'left' | 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end' | 'right-start' | 'right-end' | 'left-start' | 'left-end';
 }
 
 const FormCard: React.FC<FormCardProps> = ({
@@ -23,13 +35,25 @@ const FormCard: React.FC<FormCardProps> = ({
                                                footer,
                                                selected = false,
                                                elevation = 2,
-                                               sx
+                                               sx,
+                                               tooltipText,
+                                               tooltipPlacement = 'top'
                                            }) => {
+    // State to manage tooltip open state for mobile
+    const [tooltipOpen, setTooltipOpen] = useState(false);
+
+    const handleTooltipClose = () => {
+        setTooltipOpen(false);
+    };
+
+    const handleTooltipOpen = () => {
+        setTooltipOpen(true);
+    };
+
     return (
         <Paper
             elevation={elevation}
             sx={{
-                // mb: 2,
                 backgroundColor: alpha('#020c1b', 0.7),
                 borderRadius: '10px',
                 border: selected ? '2px solid' : '1px solid',
@@ -88,17 +112,92 @@ const FormCard: React.FC<FormCardProps> = ({
                             {icon}
                         </Box>
                     )}
-                    {title && (
-                        <Typography
-                            variant="h6"
-                            sx={{
-                                color: alpha('#fff', 0.9),
-                                fontWeight: 'medium',
-                            }}
-                        >
-                            {title}
-                        </Typography>
-                    )}
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexGrow: 1
+                    }}>
+                        {title && (
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    color: alpha('#fff', 0.9),
+                                    fontWeight: 'medium',
+                                }}
+                            >
+                                {title}
+                            </Typography>
+                        )}
+
+                        {/* Info icon with tooltip */}
+                        {tooltipText && (
+                            <ClickAwayListener onClickAway={handleTooltipClose}>
+                                <div style={{display: 'inline-block', marginLeft: '8px'}}>
+                                    <Tooltip
+                                        title={
+                                            <Typography sx={{fontSize: '0.875rem', p: 0.5}}>
+                                                {tooltipText}
+                                            </Typography>
+                                        }
+                                        placement={tooltipPlacement}
+                                        arrow
+                                        open={tooltipOpen}
+                                        onClose={handleTooltipClose}
+                                        disableFocusListener
+                                        disableHoverListener
+                                        disableTouchListener
+                                        // Set a fixed position to prevent clipping issues
+                                        PopperProps={{
+                                            // Keep this false to prevent portal issues
+                                            disablePortal: false,
+                                            // Important: These styles ensure the tooltip appears on top of everything
+                                            sx: {
+                                                zIndex: 9999, // Very high z-index to ensure it's on top
+                                            },
+                                            // This modifiers object helps position the tooltip properly
+                                            modifiers: [
+                                                {
+                                                    name: 'preventOverflow',
+                                                    options: {
+                                                        boundary: document.body, // Use the entire body as boundary
+                                                    },
+                                                },
+                                            ],
+                                        }}
+                                        componentsProps={{
+                                            tooltip: {
+                                                sx: {
+                                                    bgcolor: 'background.paper',
+                                                    color: 'text.primary',
+                                                    boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                                                    border: '1px solid',
+                                                    borderColor: alpha(spacePalette.primary.main, 0.2),
+                                                    borderRadius: 1,
+                                                    p: 1.5,
+                                                    maxWidth: 250,
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <IconButton
+                                            onClick={handleTooltipOpen}
+                                            size="small"
+                                            sx={{
+                                                p: 0.5,
+                                                color: alpha(spacePalette.primary.main, 0.8),
+                                                '&:hover': {
+                                                    color: spacePalette.primary.main,
+                                                    backgroundColor: alpha(spacePalette.primary.main, 0.1),
+                                                }
+                                            }}
+                                        >
+                                            <InfoIcon fontSize="small"/>
+                                        </IconButton>
+                                    </Tooltip>
+                                </div>
+                            </ClickAwayListener>
+                        )}
+                    </Box>
                 </Box>
             )}
 
@@ -117,19 +216,20 @@ const FormCard: React.FC<FormCardProps> = ({
                 </Box>
             )}
 
-            {/* Divider if header exists */}
-            {(title || icon || description) && (
-                <Divider sx={{
-                    borderColor: alpha(spacePalette.primary.main, 0.2),
-                    position: 'relative',
-                    zIndex: 2,
-                }}/>
-            )}
+            {/*/!* Divider if header exists *!/*/}
+            {/*{(title || icon || description) && (*/}
+            {/*  <Divider sx={{*/}
+            {/*    borderColor: alpha(spacePalette.primary.main, 0.2),*/}
+            {/*    position: 'relative',*/}
+            {/*    zIndex: 2,*/}
+            {/*  }}/>*/}
+            {/*)}*/}
 
             {/* Main Content */}
             <Box sx={{
                 position: 'relative',
                 zIndex: 2,
+                marginY: 2,
             }}>
                 {children}
             </Box>
