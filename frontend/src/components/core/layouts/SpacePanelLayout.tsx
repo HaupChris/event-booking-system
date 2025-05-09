@@ -77,7 +77,7 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
 
         {/* Main content */}
         <Box
-            sx={{ p: { xs: 2, sm: 3 } }}
+            sx={{ p: { xs: 1, sm: 3 } }}
         >
           {children}
         </Box>
