@@ -12,10 +12,6 @@ import SpacePanelLayout from '../../components/core/layouts/SpacePanelLayout';
 import MissionHeading from '../../components/core/display/MissionHeading';
 import { FormProps } from "./formContainer";
 
-import CustomPngIcon from "../../components/core/display/PngIcon";
-
-import AwarenessIcon from "../../assets/icons/awareness.png";
-
 function NameAndAddressForm(props: FormProps) {
   return (
     <SpacePanelLayout
