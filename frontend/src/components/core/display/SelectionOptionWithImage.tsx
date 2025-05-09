@@ -14,7 +14,7 @@ interface IProps {
 }
 
 function SelectionOptionWithImage(props: IProps) {
-    return <FormCard selected={props.selected} sx={{marginBottom: 3}}>
+    return <FormCard selected={props.selected} sx={{marginTop: 3}}>
         {/* Futuristic scanner line animation for selected option */}
         {props.selected && (
             <Box sx={{

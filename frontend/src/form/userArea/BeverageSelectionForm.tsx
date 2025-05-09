@@ -38,16 +38,14 @@ function BeverageSelectionForm(props: FormProps) {
             return beverages_2;
         }
         return "";
-
     }
-
 
     return <SpacePanelLayout
         missionBriefing="Auf dem Festival steht eine frei zugängliche Zapfanlage, an der du dich für den gewählten Zeitraum bedienen kannst."
         footerId="WWWW-BEVERAGE-STATION // ID-2025"
     >
         <List sx={{p: {xs: 1, sm: 2}}}>
-            <FormCard selected={props.currentBooking.beverage_id === -1} sx={{marginBottom: 3}}>
+            <FormCard selected={props.currentBooking.beverage_id === -1}>
                 <ListItemButton
                     onClick={handleBeverageSelect(-1)}
                     sx={{
