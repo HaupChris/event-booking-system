@@ -40,7 +40,7 @@ interface IProps {
     formContent: FormContent;
 }
 
-function FormSummary(props: IProps) {
+function SummaryForm(props: IProps) {
     const {
         ticket_id,
         beverage_id,
@@ -903,4 +903,4 @@ function FormSummary(props: IProps) {
     );
 }
 
-export default FormSummary;
+export default SummaryForm;

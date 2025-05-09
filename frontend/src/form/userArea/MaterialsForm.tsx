@@ -17,7 +17,7 @@ import {Material} from "./interface";
 import InventoryIcon from '@mui/icons-material/Inventory';
 import BackpackIcon from '@mui/icons-material/Backpack';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import {FormProps} from "./formContainer";
+import {FormProps} from "./UserRegistrationFormContainer";
 
 
 function MaterialsForm(props: FormProps) {

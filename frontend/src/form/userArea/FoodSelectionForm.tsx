@@ -11,7 +11,7 @@ import {
     Box,
     alpha
 } from '@mui/material';
-import {FormProps} from "./formContainer";
+import {FormProps} from "./UserRegistrationFormContainer";
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 
 // Import images
@@ -25,7 +25,7 @@ import '../../css/formBeverageSelection.css'; // Reusing the same CSS for consis
 
 const index_to_image = [gyros, gyros, grillgemuese, grillgemuese, vegan_diet, vegetarian_diet];
 
-function FormFoodSelection(props: FormProps) {
+function FoodSelectionForm(props: FormProps) {
     // Function to handle food selection
     const handleFoodSelect = (id: number) => () => {
         props.updateBooking('food_id', id);
@@ -400,4 +400,4 @@ function FormFoodSelection(props: FormProps) {
     );
 }
 
-export default FormFoodSelection;
+export default FoodSelectionForm;

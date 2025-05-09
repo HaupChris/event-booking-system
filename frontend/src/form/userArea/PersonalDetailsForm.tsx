@@ -10,9 +10,9 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import FormField from '../../components/core/inputs/FormField';
 import SpacePanelLayout from '../../components/core/layouts/SpacePanelLayout';
 import MissionHeading from '../../components/core/display/MissionHeading';
-import { FormProps } from "./formContainer";
+import { FormProps } from "./UserRegistrationFormContainer";
 
-function NameAndAddressForm(props: FormProps) {
+function PersonalDetailsForm(props: FormProps) {
   return (
     <SpacePanelLayout
       missionBriefing="Bitte gib deine Kontaktinformationen für die Festival-Registrierung ein."
@@ -80,4 +80,4 @@ function NameAndAddressForm(props: FormProps) {
   );
 }
 
-export default NameAndAddressForm;
+export default PersonalDetailsForm;

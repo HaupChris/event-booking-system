@@ -9,9 +9,9 @@ import SignaturePad from "../../components/core/inputs/SignaturePad";
 import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
 import MissionHeading from "../../components/core/display/MissionHeading";
 import FormCard from "../../components/core/display/FormCard";
-import { FormProps } from "./formContainer";
+import { FormProps } from "./UserRegistrationFormContainer";
 
-function FormSignature(props: FormProps) {
+function SignatureForm(props: FormProps) {
   return (
     <SpacePanelLayout
       missionBriefing="Vor Beginn deiner interstellaren Reise bestätige bitte die Sicherheitshinweise mit deiner digitalen Signatur."
@@ -63,4 +63,4 @@ function FormSignature(props: FormProps) {
   );
 }
 
-export default FormSignature;
+export default SignatureForm;

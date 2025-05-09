@@ -19,8 +19,8 @@ import ArtistPerformanceForm from "./artistPerformance";
 import ArtistSignatureForm from "./artistSignature";
 import ArtistSummary from "./artistSummary";
 import ArtistConfirmation from "./artistConfirmation";
-import FormAwarnessCode from "../userArea/formAwarenessCode";
-import {getDummyFormContent} from "../userArea/formContainer";
+import FormAwarnessCode from "../userArea/AwarenessCodeForm";
+import {getDummyFormContent} from "../userArea/UserRegistrationFormContainer";
 import {ArtistBooking, ArtistFormContent} from "./interface";
 
 enum ArtistFormSteps {

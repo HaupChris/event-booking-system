@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {FormProps} from "./formContainer";
+import {FormProps} from "./UserRegistrationFormContainer";
 import WorkShift from "../components/workShift";
 import {
     Box,

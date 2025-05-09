@@ -1,6 +1,6 @@
 import React from "react";
 import {FormControl, RadioGroup, Typography, Paper, Box, alpha} from "@mui/material";
-import {FormProps} from './formContainer';
+import {FormProps} from './UserRegistrationFormContainer';
 import {TicketOption} from './interface';
 import TicketOptionComponent from "../../components/core/display/TicketOption";
 import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";

@@ -5,15 +5,10 @@ import {AuthContext, TokenContext} from "../../AuthContext";
 import axios from 'axios';
 
 // Import form steps
-import NameAndAddressForm from "./nameAndAddress";
-import FormSignature from "./formSignature";
-import TicketForm from "./formTicketSelection";
-import BeverageForm from "./formBeverageSelection";
-import WorkshiftForm from "./formWorkshifts";
-import MaterialsForm from "./formMaterials";
-import FormAwarnessCode from "./formAwarenessCode";
-import FormSummary from "./formSummary";
-import FormConfirmation from "./formConfirmation";
+import PersonalDetailsForm from "./PersonalDetailsForm";
+
+import SummaryForm from "./SummaryForm";
+import ConfirmationForm from "./ConfirmationForm";
 
 // Import new components
 import rocketImage from "../../img/rocket.png";
@@ -21,8 +16,13 @@ import StepNavigation from "../../components/core/navigation/StepNavigation";
 import {useFormManagement} from "../../hooks/useFormManagement";
 import {Booking, FormContent} from "./interface";
 import {spacePalette} from "../../components/styles/theme";
-import FormFoodSelection from "./formFoodSelection";
-import FormAwarenessCode from "./formAwarenessCode";
+import FoodSelectionForm from "./FoodSelectionForm";
+import AwarenessCodeForm from "./AwarenessCodeForm";
+import TicketForm from "./TicketSelectionForm";
+import BeverageSelectionForm from "./BeverageSelectionForm";
+import WorkShiftForm from "./WorkshiftsForm";
+import MaterialsForm from "./MaterialsForm";
+import SignatureForm from "./SignatureForm";
 
 // Form steps enum
 enum FormSteps {
@@ -155,7 +155,7 @@ const validationRules = {
     }
 };
 
-export function FormContainer() {
+export function UserRegistrationFormContainer() {
     // Use our new form management hook
     const {
         formState: booking,
@@ -361,7 +361,7 @@ export function FormContainer() {
 
                     {/* Render the appropriate form for each step */}
                     {activeStep === FormSteps.NameAndAddress && (
-                        <NameAndAddressForm
+                        <PersonalDetailsForm
                             updateBooking={updateBooking}
                             currentBooking={booking}
                             formValidation={formValidation}
@@ -377,7 +377,7 @@ export function FormContainer() {
                         />
                     )}
                     {activeStep === FormSteps.Beverage && (
-                        <BeverageForm
+                        <BeverageSelectionForm
                             updateBooking={updateBooking}
                             currentBooking={booking}
                             formValidation={formValidation}
@@ -385,7 +385,7 @@ export function FormContainer() {
                         />
                     )}
                     {activeStep === FormSteps.Food && (
-                        <FormFoodSelection
+                        <FoodSelectionForm
                             updateBooking={updateBooking}
                             currentBooking={booking}
                             formValidation={formValidation}
@@ -393,7 +393,7 @@ export function FormContainer() {
                         />
                     )}
                     {activeStep === FormSteps.Workshift && (
-                        <WorkshiftForm
+                        <WorkShiftForm
                             updateBooking={updateBooking}
                             currentBooking={booking}
                             formValidation={formValidation}
@@ -409,10 +409,10 @@ export function FormContainer() {
                         />
                     )}
                     {activeStep === FormSteps.AwarenessCode && (
-                        <FormAwarenessCode/>
+                        <AwarenessCodeForm/>
                     )}
                     {activeStep === FormSteps.Signature && (
-                        <FormSignature
+                        <SignatureForm
                             updateBooking={updateBooking}
                             currentBooking={booking}
                             formValidation={formValidation}
@@ -420,24 +420,19 @@ export function FormContainer() {
                         />
                     )}
                     {activeStep === FormSteps.Summary && (
-                        <FormSummary
+                        <SummaryForm
                             currentBooking={booking}
                             formContent={formContent}
                         />
                     )}
                     {activeStep === FormSteps.Confirmation && (
-                        <FormConfirmation
+                        <ConfirmationForm
                             currentBooking={booking}
                             formContent={formContent}
                             submitBooking={submitBooking}
                             bookingState={bookingState}
                         />
                     )}
-
-
-
-
-                    {/* ... remaining steps */}
                 </Box>
             </CardContent>
         </Box>

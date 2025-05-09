@@ -23,7 +23,7 @@ import {
 } from "@mui/icons-material";
 
 import '../../css/formConfirmation.css';
-import {BookingState} from "./formContainer";
+import {BookingState} from "./UserRegistrationFormContainer";
 import AnimatedRocket from "../components/animatedRocket";
 
 interface FinalBookingProps {
@@ -37,7 +37,7 @@ function findItemById<T extends { id: number }>(array: T[], id: number): T | und
     return array.find(item => item.id === id);
 }
 
-function FormConfirmation(props: FinalBookingProps) {
+function ConfirmationForm(props: FinalBookingProps) {
     const ticket = findItemById(props.formContent.ticket_options, props.currentBooking.ticket_id);
     const beverage_or_undefined = findItemById(props.formContent.beverage_options, props.currentBooking.beverage_id);
     const beverage = beverage_or_undefined ? beverage_or_undefined : {title: "Keine Bierflat"};
@@ -1058,4 +1058,4 @@ function FormConfirmation(props: FinalBookingProps) {
     }
 }
 
-export default FormConfirmation;
+export default ConfirmationForm;

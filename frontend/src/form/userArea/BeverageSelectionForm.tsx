@@ -7,7 +7,7 @@ import {
     Typography,
     alpha
 } from '@mui/material';
-import {FormProps} from "./formContainer";
+import {FormProps} from "./UserRegistrationFormContainer";
 import LocalBarIcon from '@mui/icons-material/LocalBar';
 
 // Import images
@@ -21,7 +21,7 @@ import FormCard from "../../components/core/display/FormCard";
 import SelectionOptionWithImage from "../../components/core/display/SelectionOptionWithImage";
 
 
-function BeverageForm(props: FormProps) {
+function BeverageSelectionForm(props: FormProps) {
     // Function to handle beverage selection
     const handleBeverageSelect = (id: number) => () => {
         props.updateBooking('beverage_id', id);
@@ -102,4 +102,4 @@ function BeverageForm(props: FormProps) {
 
 }
 
-export default BeverageForm;
+export default BeverageSelectionForm;

@@ -6,7 +6,7 @@ import { Box } from "@mui/material";
 import { ThemeProvider } from '@mui/material/styles';
 
 // Import components
-import { FormContainer } from "./form/userArea/formContainer";
+import { UserRegistrationFormContainer } from "./form/userArea/UserRegistrationFormContainer";
 import Dashboard from "./form/adminArea/Dashboard";
 import UserLoginPage from "./userLoginPage";
 import AdminLoginPage from "./adminLoginPage";
@@ -58,7 +58,7 @@ const App = () => {
               <Routes>
                 {/* Regular user routes */}
                 <Route path="/" element={auth ? <Navigate replace to="/form" /> : <UserLoginPage />} />
-                <Route path="/form" element={auth ? <FormContainer /> : <Navigate replace to="/" />} />
+                <Route path="/form" element={auth ? <UserRegistrationFormContainer /> : <Navigate replace to="/" />} />
 
                 {/* Artist routes */}
                 <Route path="/artist" element={auth ? <Navigate replace to="/artist-form" /> : <ArtistLoginPage />} />

@@ -18,7 +18,7 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import DiversityIcon from '@mui/icons-material/Diversity3';
 import PngIcon from "../../components/core/display/PngIcon";
 
-function FormAwarenessCode() {
+function AwarenessCodeForm() {
     const items = [
         {
             title: 'Unsere tanzfreudige Gemeinschaft',
@@ -246,4 +246,4 @@ function FormAwarenessCode() {
     );
 }
 
-export default FormAwarenessCode;
+export default AwarenessCodeForm;
