@@ -17,33 +17,45 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import DiversityIcon from '@mui/icons-material/Diversity3';
 import PngIcon from "../../components/core/display/PngIcon";
+import Awareness from "../../assets/icons/awareness.png";
+import Consent from "../../assets/icons/consent.png";
+import Fotos from "../../assets/icons/fotos.png";
+import NoRacism from "../../assets/icons/no-racism.png";
+import Partiality from "../../assets/icons/partiality.png";
+import {Balance} from "@mui/icons-material";
+
 
 function AwarenessCodeForm() {
     const items = [
         {
-            title: 'Unsere tanzfreudige Gemeinschaft',
-            text: 'Wir feiern in einer Umgebung, in der jeder Mensch frei von jeglichem Rassismus, Sexismus, Ableismus und Queerfeindlichkeit, sowie Gewalt sein kann. Jede Person, die sich nicht an diesen Grundsatz hält, können wir auf unserem Festival nicht willkommen heißen.',
-            icon: <></>
+            title: 'Achtsamkeit, Verantwortung und Fürsorge\n',
+            text: 'Alle sollen sich wohlfühlen. Sei rücksichtsvoll mit dir und anderen. Achte auf deine Bedürfnisse (Wasser, Schlaf, Essen, Ruhe) und respektiere deine Konsumgrenzen. Frage nach, ob es anderen gut geht, und gehe sorgfältig mit Dingen und der Natur um. Sollest du das Festivalgelände verlassen, informiere deine Freund*innen darüber. ',
+            icon: <PngIcon icon={Awareness} fontSize={64}/>
         },
         {
-            title: 'Gemeinsam und rücksichtsvoll feiern',
-            text: 'Wir hoffen, dass alle unsere Gäste achtsam und respektvoll miteinander umgehen. Bitte sei dir deiner eigenen (Konsum-)Grenzen bewusst und respektiere auch die Grenzen der anderen Festivalbesucher:innen.',
-            icon: <SecurityIcon sx={{color: '#64b5f6'}}/>
+            title: 'Keine Diskriminierung',
+            text: 'Sexismus, Rassismus, Queerfeindlichkeit und Gewalt führen zum Ausschluss. Wir setzen uns für Antidiskriminierung und Vielfalt ein.',
+            icon: <PngIcon icon={NoRacism} fontSize={64}/>
         },
         {
-            title: 'Unser Sound ist ein Sound der Solidarität',
-            text: 'In unserer Gemeinschaft feiern wir Diversität und stellen uns gegen Diskriminierung, indem wir eine Bühne für vielfältige Perspektiven bieten und uns solidarisch mit denen zeigen, die Diskriminierung erfahren.',
-            icon: <MusicNoteIcon sx={{color: '#64b5f6'}}/>
+            title: 'Respektiere Grenzen / Konsensprinzip',
+            text: 'Achte auf Konsens – nur „Ja heißt ja“!, „Vielleicht heißt nicht ja“ und „Nichts sagen heißt nicht ja“. Jede:r hat unterschiedliche Grenzen, daher müssen diese immer erfragt und respektiert werden.',
+            icon: <PngIcon icon={Consent} fontSize={64}/>
         },
         {
-            title: 'Einverständnis ist unerlässlich',
-            text: 'Jeder Mensch hat das Recht, seine eigenen Grenzen zu setzen. Bei uns gilt: Nur ein eindeutiges "Ja" ist ein "Ja". Alles andere bedeutet "Nein".',
-            icon: <CheckCircleIcon sx={{color: '#64b5f6'}}/>
+            title: 'Parteilichkeit bei Grenzüberschreitungen',
+            text: 'Betroffene entscheiden, was eine Grenzüberschreitung ist. Wir solidarisieren uns mit der betroffenen Person und glauben ihrer Darstellung der Situation. ',
+            icon: <PngIcon icon={Partiality} fontSize={64}/>
         },
         {
-            title: 'Fotos nur mit Herzschlag und Zustimmung',
-            text: 'Bitte denk daran, beim Fotografieren auf die Gefühle der anderen zu achten. Ohne ausdrückliche Zustimmung wird kein Foto gemacht oder geteilt. Wir bitten dich, diese Regel zu respektieren.',
-            icon: <PhotoCameraIcon sx={{color: '#64b5f6'}}/>
+            title: 'Umgang mit Bildern und Fotos\n',
+            text: 'Frag immer, bevor du Fotos machst, besonders bei sensiblen Inhalten. Teile keine sensiblen Fotos ohne Zustimmung.',
+            icon: <PngIcon icon={Fotos} fontSize={64}/>
+        },
+        {
+            title: 'Geschlechtergerechte Sprache',
+            text:'Wir möchten eine geschlechterneutrale und inklusive Sprache verwenden. Alle Menschen sollen unabhängig von ihrer Gender-Identität angesprochen werden. Frage nach den Pronomen oder benutze den Namen, statt ein Pronomen zu verwenden.',
+            icon: <Balance color={"secondary"} fontSize={"large"}/>
         }
     ];
 
@@ -165,55 +177,73 @@ function AwarenessCodeForm() {
                                 }}/>
 
                                 <ListItem
-                                    sx={{
-                                        p: {xs: 2, sm: 3},
-                                        position: 'relative',
-                                        zIndex: 1,
-                                    }}
-                                >
-                                    <ListItemAvatar>
-                                        <Avatar
-                                            sx={{
-                                                bgcolor: alpha('#1e88e5', 0.1),
-                                                border: '1px solid',
-                                                borderColor: alpha('#64b5f6', 0.5),
-                                                boxShadow: '0 0 10px rgba(100, 181, 246, 0.2)',
-                                                width: 56,
-                                                height: 56
-                                            }}
-                                        >
-                                            {item.icon}
-                                        </Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        sx={{ml: 2}}
-                                        primary={
-                                            <Typography
-                                                variant="h6"
-                                                component="div"
-                                                sx={{
-                                                    color: '#64b5f6',
-                                                    fontWeight: 'medium',
-                                                    mb: 1
-                                                }}
-                                            >
-                                                {item.title}
-                                            </Typography>
-                                        }
-                                        secondary={
-                                            <Typography
-                                                variant="body2"
-                                                component="div"
-                                                sx={{
-                                                    color: alpha('#fff', 0.8),
-                                                    lineHeight: 1.6
-                                                }}
-                                            >
-                                                {item.text}
-                                            </Typography>
-                                        }
-                                    />
-                                </ListItem>
+    sx={{
+        p: { xs: 2, sm: 3 },
+        position: 'relative',
+        zIndex: 1,
+    }}
+>
+    <ListItemText
+        sx={{ ml: 2 }}
+        primary={
+            <Typography
+                variant="h6"
+                component="div"
+                sx={{
+                    color: '#64b5f6',
+                    fontWeight: 'medium',
+                    mb: 1,
+                }}
+            >
+                {item.title}
+            </Typography>
+        }
+        secondary={
+            <Box sx={{
+                display: "flex",
+                alignItems: "center", // This aligns items vertically in the center
+                justifyContent: "flex-start",
+                flexDirection: "row",
+                gap: 2, // Add some spacing between avatar and text
+            }}>
+                {/* Modified ListItemAvatar */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center", // Vertical center alignment
+                        justifyContent: "center", // Horizontal center alignment
+                        minWidth: 120, // Give it some minimum width
+                    }}
+                >
+                    <Avatar
+                        sx={{
+                            bgcolor: alpha('#1e88e5', 0.1),
+                            border: '1px solid',
+                            borderColor: alpha('#64b5f6', 0.5),
+                            boxShadow: '0 0 10px rgba(100, 181, 246, 0.2)',
+                            width: 100,
+                            height: 100
+                        }}
+                    >
+                        {item.icon}
+                    </Avatar>
+                </Box>
+
+                <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{
+                        color: alpha('#fff', 0.8),
+                        lineHeight: 1.6,
+                        flex: 1, // This allows the text to take up remaining space
+                    }}
+                >
+                    {item.text}
+                </Typography>
+            </Box>
+        }
+    />
+</ListItem>
                             </Paper>
                         ))}
                     </List>
