@@ -11,7 +11,7 @@ const ProgressImage = styled('img')({
   position: 'absolute',
   top: '50%',
   transition: 'left 1.5s ease-in-out, transform 1.5s ease-in-out',
-  width: 30,
+  width: 50,
   animation: 'swimming 2s infinite alternate',
   '@keyframes swimming': {
     '0%': { transform: 'translateY(-50%) rotate(0deg)' },
@@ -55,7 +55,7 @@ const LinearProgressWithImage: React.FC<LinearProgressWithImageProps> = ({
       if (imgElement && imageWidth && containerWidth) {
         const verticalOffset = imageWidth / 10;
         imgElement.style.left = `calc(${percentage}% - ${imageWidth / 2}px)`;
-        imgElement.style.top = `calc(50% - ${imageWidth / 2}px + ${
+        imgElement.style.top = `calc(50% - ${imageWidth / 6}px + ${
           verticalOffset * Math.sin((percentage / 100) * 2 * Math.PI)
         }px)`;
       }
