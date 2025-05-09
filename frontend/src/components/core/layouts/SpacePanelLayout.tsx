@@ -20,7 +20,7 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
   maxWidth = 600,
 }) => {
   return (
-    <Box sx={{ width: '98%', maxWidth, mx: 'auto' }}>
+    <Box sx={{ width: '100%', maxWidth }}>
       <Paper
         elevation={3}
         sx={{
