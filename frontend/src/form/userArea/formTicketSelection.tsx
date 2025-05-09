@@ -1,16 +1,12 @@
 import React from "react";
 import {FormControl, RadioGroup, Typography, Paper, Box, alpha} from "@mui/material";
 import {FormProps} from './formContainer';
-import {FormContent, TicketOption} from './interface';
+import {TicketOption} from './interface';
 import TicketOptionComponent from "../../components/core/display/TicketOption";
 import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
 
-interface TicketFormProps extends FormProps {
-    formContent: FormContent;
-}
 
-
-function TicketForm(props: TicketFormProps) {
+function TicketForm(props: FormProps) {
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         props.updateBooking('ticket_id', Number((event.target as HTMLInputElement).value));
     };

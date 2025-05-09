@@ -27,7 +27,7 @@ import {BookingState} from "./formContainer";
 import AnimatedRocket from "../components/animatedRocket";
 
 interface FinalBookingProps {
-    booking: Booking;
+    currentBooking: Booking;
     submitBooking: () => void;
     formContent: FormContent;
     bookingState: BookingState;
@@ -38,13 +38,13 @@ function findItemById<T extends { id: number }>(array: T[], id: number): T | und
 }
 
 function FormConfirmation(props: FinalBookingProps) {
-    const ticket = findItemById(props.formContent.ticket_options, props.booking.ticket_id);
-    const beverage_or_undefined = findItemById(props.formContent.beverage_options, props.booking.beverage_id);
+    const ticket = findItemById(props.formContent.ticket_options, props.currentBooking.ticket_id);
+    const beverage_or_undefined = findItemById(props.formContent.beverage_options, props.currentBooking.beverage_id);
     const beverage = beverage_or_undefined ? beverage_or_undefined : {title: "Keine Bierflat"};
-    const food_or_undefined = findItemById(props.formContent.food_options, props.booking.food_id);
+    const food_or_undefined = findItemById(props.formContent.food_options, props.currentBooking.food_id);
     const food = food_or_undefined ? food_or_undefined : {title: "Kein Essen"};
 
-    const betreff = `WWWW: ${props.booking.last_name}, ${props.booking.first_name} - ${ticket?.title} - ${beverage?.title} - ${food?.title} - ${props.booking.total_price}€`;
+    const betreff = `WWWW: ${props.currentBooking.last_name}, ${props.currentBooking.first_name} - ${ticket?.title} - ${beverage?.title} - ${food?.title} - ${props.currentBooking.total_price}€`;
 
     const [copied, setCopied] = useState(false);
     const [open, setOpen] = useState(false);
@@ -320,7 +320,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                             color: '#64b5f6',
                                         }}
                                     >
-                                        {props.booking.total_price}€
+                                        {props.currentBooking.total_price}€
                                     </Typography>
                                 </Box>
 
@@ -922,7 +922,7 @@ function FormConfirmation(props: FinalBookingProps) {
                                         color: '#64b5f6',
                                     }}
                                 >
-                                    {props.booking.total_price}€
+                                    {props.currentBooking.total_price}€
                                 </Typography>
                             </Box>
 

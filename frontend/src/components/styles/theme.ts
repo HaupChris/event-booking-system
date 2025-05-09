@@ -212,6 +212,7 @@ export const spaceTheme = createTheme({
           backgroundColor: alpha(spacePalette.background.paper, 0.7),
         },
         elevation3: {
+          background: spacePalette.background.card,
           boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
           border: `1px solid ${alpha(spacePalette.primary.main, 0.2)}`,
           borderRadius: '14px',

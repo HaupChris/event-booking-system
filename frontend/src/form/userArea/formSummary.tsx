@@ -36,7 +36,7 @@ function getShiftAndTimeslot(work_shifts: WorkShift[], timeslot_id: number) {
 }
 
 interface IProps {
-    booking: Booking;
+    currentBooking: Booking;
     formContent: FormContent;
 }
 
@@ -56,7 +56,7 @@ function FormSummary(props: IProps) {
         last_name,
         email,
         phone
-    } = props.booking;
+    } = props.currentBooking;
 
     const ticket = findItemById(props.formContent.ticket_options, ticket_id);
     const beverage = findItemById(props.formContent.beverage_options, beverage_id);

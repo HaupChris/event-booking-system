@@ -13,30 +13,23 @@ import {
     Chip
 } from "@mui/material";
 import "../../css/formMaterials.css";
-import { Material } from "./interface";
+import {Material} from "./interface";
 import InventoryIcon from '@mui/icons-material/Inventory';
 import BackpackIcon from '@mui/icons-material/Backpack';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import {FormProps} from "./formContainer";
 
-export interface MaterialFormProps {
-    updateMaterialIds: (material_ids: Array<number>) => void;
-    currentBooking: {
-        material_ids: Array<number>;
-    };
-    formValidation: { [key: string]: string | undefined };
-    formContent: {
-        materials: Array<Material>;
-    };
-}
 
-function MaterialsForm(props: MaterialFormProps) {
+function MaterialsForm(props: FormProps) {
     function handleToggle(material_id: number) {
         if (props.currentBooking.material_ids.indexOf(material_id) === -1) {
-            props.updateMaterialIds([...props.currentBooking.material_ids, material_id]);
+            props.updateBooking("material_ids", [...props.currentBooking.material_ids, material_id])
         } else {
-            props.updateMaterialIds(props.currentBooking.material_ids.filter((id) => id !== material_id));
+            props.updateBooking("material_ids",
+                props.currentBooking.material_ids.filter((id) => id !== material_id));
         }
     }
+
 
     // Get dynamic styling for the capacity indicator
     const getCapacityColor = (numBooked: number, numNeeded: number) => {
@@ -46,7 +39,7 @@ function MaterialsForm(props: MaterialFormProps) {
     };
 
     return (
-        <Box sx={{ width: '98%', maxWidth: 700, mx: 'auto' }}>
+        <Box sx={{width: '98%', maxWidth: 700, mx: 'auto'}}>
             <Paper
                 elevation={3}
                 sx={{
@@ -69,10 +62,10 @@ function MaterialsForm(props: MaterialFormProps) {
                     backgroundSize: '300% 100%',
                     animation: 'gradientMove 12s linear infinite',
                     '@keyframes gradientMove': {
-                        '0%': { backgroundPosition: '0% 0%' },
-                        '100%': { backgroundPosition: '300% 0%' },
+                        '0%': {backgroundPosition: '0% 0%'},
+                        '100%': {backgroundPosition: '300% 0%'},
                     }
-                }} />
+                }}/>
 
                 {/* Mission Briefing */}
                 <Box sx={{
@@ -81,7 +74,7 @@ function MaterialsForm(props: MaterialFormProps) {
                     backgroundColor: alpha('#000', 0.3),
                     borderLeft: '4px solid',
                     borderColor: '#1e88e5',
-                    mx: { xs: 1, sm: 2 },
+                    mx: {xs: 1, sm: 2},
                     my: 2,
                     borderRadius: '0 8px 8px 0',
                 }}>
@@ -93,19 +86,20 @@ function MaterialsForm(props: MaterialFormProps) {
                             fontSize: '0.85rem',
                         }}
                     >
-                        <span style={{ color: '#64b5f6' }}>MISSION:</span> Wähle aus, welche Ausrüstung und Materialien du für unsere interstellare Expedition mitbringen kannst.
+                        <span style={{color: '#64b5f6'}}>MISSION:</span> Wähle aus, welche Ausrüstung und Materialien du
+                        für unsere interstellare Expedition mitbringen kannst.
                     </Typography>
                 </Box>
 
-                <Box sx={{ p: { xs: 2, sm: 3 } }}>
+                <Box sx={{p: {xs: 2, sm: 3}}}>
                     {/* Header Section */}
                     <Box sx={{
                         display: 'flex',
                         alignItems: 'center',
                         mb: 3
                     }}>
-                        <BackpackIcon sx={{ color: '#64b5f6', mr: 1, fontSize: '1.5rem' }} />
-                        <Typography variant="h6" sx={{ color: alpha('#fff', 0.9), fontWeight: 'medium' }}>
+                        <BackpackIcon sx={{color: '#64b5f6', mr: 1, fontSize: '1.5rem'}}/>
+                        <Typography variant="h6" sx={{color: alpha('#fff', 0.9), fontWeight: 'medium'}}>
                             Mitzubringende Materialien
                         </Typography>
                     </Box>
@@ -138,7 +132,7 @@ function MaterialsForm(props: MaterialFormProps) {
                                 alignItems: 'center',
                                 mb: 1.5
                             }}>
-                                <InventoryIcon sx={{ color: '#64b5f6', fontSize: '1.2rem', mr: 1 }} />
+                                <InventoryIcon sx={{color: '#64b5f6', fontSize: '1.2rem', mr: 1}}/>
                                 <Typography
                                     variant="subtitle2"
                                     sx={{
@@ -146,7 +140,8 @@ function MaterialsForm(props: MaterialFormProps) {
                                         fontWeight: 'medium'
                                     }}
                                 >
-                                    Du bringst mit ({props.currentBooking.material_ids.length} {props.currentBooking.material_ids.length === 1 ? 'Gegenstand' : 'Gegenstände'}):
+                                    Du bringst mit
+                                    ({props.currentBooking.material_ids.length} {props.currentBooking.material_ids.length === 1 ? 'Gegenstand' : 'Gegenstände'}):
                                 </Typography>
                             </Box>
 
@@ -164,11 +159,11 @@ function MaterialsForm(props: MaterialFormProps) {
                                             label={material.title}
                                             color="primary"
                                             size="small"
-                                            icon={<CheckCircleIcon />}
+                                            icon={<CheckCircleIcon/>}
                                             sx={{
                                                 fontWeight: 'medium',
                                                 bgcolor: alpha('#1e88e5', 0.2),
-                                                '& .MuiChip-label': { px: 1 }
+                                                '& .MuiChip-label': {px: 1}
                                             }}
                                             onDelete={() => handleToggle(material.id)}
                                         />
@@ -226,10 +221,10 @@ function MaterialsForm(props: MaterialFormProps) {
                                                     animation: 'scanDown 2s infinite',
                                                 },
                                                 '@keyframes scanDown': {
-                                                    '0%': { transform: 'translateY(0)' },
-                                                    '100%': { transform: 'translateY(100%)' }
+                                                    '0%': {transform: 'translateY(0)'},
+                                                    '100%': {transform: 'translateY(100%)'}
                                                 }
-                                            }} />
+                                            }}/>
                                         )}
 
                                         <ListItem
@@ -243,7 +238,7 @@ function MaterialsForm(props: MaterialFormProps) {
                                                 onClick={() => handleToggle(material.id)}
                                                 sx={{
                                                     py: 1.5,
-                                                    px: { xs: 2, sm: 2.5 },
+                                                    px: {xs: 2, sm: 2.5},
                                                     '&:hover': {
                                                         backgroundColor: alpha('#1e88e5', 0.1),
                                                     }
@@ -314,8 +309,8 @@ function MaterialsForm(props: MaterialFormProps) {
                                                         label="Ausgewählt"
                                                         color="primary"
                                                         size="small"
-                                                        icon={<CheckCircleIcon />}
-                                                        sx={{ ml: 1 }}
+                                                        icon={<CheckCircleIcon/>}
+                                                        sx={{ml: 1}}
                                                     />
                                                 ) : (
                                                     <Checkbox
