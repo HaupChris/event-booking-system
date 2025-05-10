@@ -59,6 +59,7 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
           </Box>
         )}
 
+
         {/* Title (optional) */}
         {title && (
           <Typography

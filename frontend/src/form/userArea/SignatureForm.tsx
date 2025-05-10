@@ -24,7 +24,12 @@ function SignatureForm(props: FormProps) {
 
       {/* Legal Text */}
       <FormCard
-        description="Hiermit bestätige ich, dass ich auf eigene Gefahr am 'Weiher Wald und Weltall-Wahn 2025' vom 29.08.2025 bis zum 01.09.2025 teilnehme. Der Veranstalter haftet bei Personen-, Sach- und Vermögensschäden nicht für leichte Fahrlässigkeit. Dies gilt sowohl für eigene Handlungen, als auch für Handlungen seiner Vertreter, Erfüllungsgehilfen oder Dritter, derer sich der Veranstalter im Zusammenhang mit der Durchführung der Veranstaltung bedient."
+          sx={{paddingTop:2}}
+        description="Hiermit bestätige ich, dass ich auf eigene Gefahr am 'Weiher Wald und Weltall-Wahn 2025'
+         vom 28.08.2025 bis zum 31.08.2025 teilnehme. Der Veranstalter haftet bei Personen-, Sach- und Vermögensschäden
+         nicht für leichte Fahrlässigkeit. Dies gilt sowohl für eigene Handlungen, als auch für Handlungen seiner
+          Vertreter, Erfüllungsgehilfen oder Dritter, derer sich der Veranstalter im Zusammenhang mit
+           der Durchführung der Veranstaltung bedient."
       >
           <Box/>
       </FormCard>
@@ -37,7 +42,7 @@ function SignatureForm(props: FormProps) {
           withDivider={false}
         />
 
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 2}}>
           <SignaturePad
             currentSignature={props.currentBooking.signature}
             updateCurrentSignature={(signature: string) => props.updateBooking("signature", signature)}
