@@ -1,4 +1,3 @@
-// src/form/userArea/formContainer.tsx (refactored)
 import React, {useContext, useEffect, useState} from "react";
 import {Alert, Box, CardContent, Typography} from "@mui/material";
 import {AuthContext, TokenContext} from "../../AuthContext";
@@ -6,11 +5,8 @@ import axios from 'axios';
 
 // Import form steps
 import PersonalDetailsForm from "./PersonalDetailsForm";
-
 import SummaryForm from "./SummaryForm";
-import ConfirmationForm from "./ConfirmationForm";
-
-// Import new components
+import ConfirmationForm from "./confirmation/index";
 import rocketImage from "../../img/rocket.png";
 import StepNavigation from "../../components/core/navigation/StepNavigation";
 import {useFormManagement} from "../../hooks/useFormManagement";
