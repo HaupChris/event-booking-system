@@ -18,6 +18,7 @@ import '../../css/formBeverageSelection.css';
 import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
 import FormCard from "../../components/core/display/FormCard";
 import SelectionOptionWithImage from "../../components/core/display/SelectionOptionWithImage";
+import {userAreaTexts} from "../constants/texts";
 
 
 function BeverageSelectionForm(props: FormProps) {
@@ -40,8 +41,8 @@ function BeverageSelectionForm(props: FormProps) {
     }
 
     return <SpacePanelLayout
-        missionBriefing="Auf dem Festival steht eine frei zugängliche Zapfanlage, an der du dich für den gewählten Zeitraum bedienen kannst."
-        footerId="WWWW-BEVERAGE-STATION // ID-2025"
+        missionBriefing={userAreaTexts.beverageSelectionForm.missionBriefing}
+        footerId={userAreaTexts.beverageSelectionForm.footerId}
     >
         <List sx={{p: {xs: 1, sm: 2}}}>
             <FormCard selected={props.currentBooking.beverage_id === -1}>
@@ -72,7 +73,7 @@ function BeverageSelectionForm(props: FormProps) {
                                     fontWeight: 'medium'
                                 }}
                             >
-                                Kein Bier für mich
+                                 {userAreaTexts.beverageSelectionForm.noBeverage}
                             </Typography>
                         }
                     />

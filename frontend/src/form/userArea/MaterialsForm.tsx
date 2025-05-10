@@ -19,6 +19,8 @@ import {FormProps} from "./UserRegistrationFormContainer";
 import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
 import FormCard from "../../components/core/display/FormCard";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import {userAreaTexts} from "../constants/texts";
+import {spacePalette} from "../../components/styles/theme";
 
 
 function MaterialsForm(props: FormProps) {
@@ -33,49 +35,48 @@ function MaterialsForm(props: FormProps) {
 
     // Get dynamic styling for the capacity indicator
     const getCapacityColor = (numBooked: number, numNeeded: number) => {
-        if (numBooked >= numNeeded) return '#f44336'; // error.main
-        if (numBooked / numNeeded > 0.7) return '#ff9800'; // warning.main
-        return '#4caf50'; // success.main
+        if (numBooked >= numNeeded) return spacePalette.status.error;
+        if (numBooked / numNeeded > 0.7) return spacePalette.status.warning;
+        return spacePalette.status.success; // success.main
     };
 
     return <SpacePanelLayout
-        missionBriefing={"Deine Unterstützung hilft uns, das Festival zu einem unvergesslichen Erlebnis zu machen." +
-            " Bitte wähle aus was du zu unserer interstellaren Expedition mitbringen kannst."}
-        footerId={"WWWW-CARGO-MANIFEST // ID-2025"}
+        missionBriefing={userAreaTexts.materialsForm.missionBriefing}
+        footerId={userAreaTexts.materialsForm.footerId}
     >
         <FormCard
             elevation={2}
             sx={{border: "None"}}
-            title={"Mitzubringende Materialien"}
-            icon={<BackpackIcon sx={{color: '#64b5f6', mr: 1, fontSize: '1.5rem'}}/>}
+            title={userAreaTexts.materialsForm.materialsTitle}
+            icon={<BackpackIcon sx={{color: spacePalette.primary.main, mr: 1, fontSize: '1.5rem'}}/>}
         >
             {props.currentBooking.material_ids.length > 0 && (
                 <FormCard
                     selected={true}
-                    icon={<InventoryIcon sx={{color: '#64b5f6', fontSize: '1.2rem', mr: 1}}/>}
+                    icon={<InventoryIcon sx={{color: spacePalette.primary.main, fontSize: '1.2rem', mr: 1}}/>}
                     title={"Du bringst " + props.currentBooking.material_ids.length +
                         (props.currentBooking.material_ids.length === 1 ? ' Gegenstand' : ' Gegenstände') + " mit"}
 
                 ><Box sx={{paddingX: 2}}>
                     {props.formContent.materials
-                            .filter(material => props.currentBooking.material_ids.includes(material.id))
-                            .map(material => (
-                                <Chip
-                                    key={material.id}
-                                    label={material.title}
-                                    color="primary"
-                                    size="small"
-                                    icon={<CheckCircleIcon/>}
-                                    sx={{
-                                        fontWeight: 'medium',
-                                        bgcolor: alpha('#1e88e5', 0.2),
-                                        '& .MuiChip-label': {px: 1}
-                                    }}
-                                    onDelete={() => handleToggle(material.id)}
-                                />
-                            ))
-                        }
-                        </Box>
+                        .filter(material => props.currentBooking.material_ids.includes(material.id))
+                        .map(material => (
+                            <Chip
+                                key={material.id}
+                                label={material.title}
+                                color="primary"
+                                size="small"
+                                icon={<CheckCircleIcon/>}
+                                sx={{
+                                    fontWeight: 'medium',
+                                    bgcolor: alpha('#1e88e5', 0.2),
+                                    '& .MuiChip-label': {px: 1}
+                                }}
+                                onDelete={() => handleToggle(material.id)}
+                            />
+                        ))
+                    }
+                </Box>
                 </FormCard>
             )}
 

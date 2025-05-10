@@ -8,17 +8,18 @@ import FormField from '../../components/core/inputs/FormField';
 import SpacePanelLayout from '../../components/core/layouts/SpacePanelLayout';
 import MissionHeading from '../../components/core/display/MissionHeading';
 import { FormProps } from "./UserRegistrationFormContainer";
+import {userAreaTexts} from "../constants/texts";
 
 function PersonalDetailsForm(props: FormProps) {
   return (
     <SpacePanelLayout
-      missionBriefing="Bitte gib deine Kontaktinformationen für die Festival-Registrierung ein."
-      footerId="WWWW-CREW-REGISTRATION // ID-2025"
+      missionBriefing={userAreaTexts.personalDetailsForm.missionBriefing}
+      footerId={userAreaTexts.personalDetailsForm.footerId}
     >
       {/* Event date information */}
       <MissionHeading
         title="Persönliche Daten"
-        subtitle="Do, 28.08. - So, 31.08.2025"
+        subtitle={userAreaTexts.personalDetailsForm.subtitle}
         withDivider={false}
       />
 

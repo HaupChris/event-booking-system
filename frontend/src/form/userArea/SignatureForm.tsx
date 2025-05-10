@@ -7,26 +7,23 @@ import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
 import MissionHeading from "../../components/core/display/MissionHeading";
 import FormCard from "../../components/core/display/FormCard";
 import { FormProps } from "./UserRegistrationFormContainer";
+import {userAreaTexts} from "../constants/texts";
 
 function SignatureForm(props: FormProps) {
   return (
     <SpacePanelLayout
-      missionBriefing="Vor Beginn deiner interstellaren Reise bestätige bitte die Sicherheitshinweise mit deiner digitalen Signatur."
-      footerId="WWWW-AUTHORIZATION-PROTOCOL // ID-2025"
+      missionBriefing={userAreaTexts.signatureForm.missionBriefing}
+      footerId={userAreaTexts.signatureForm.footerId}
     >
       <MissionHeading
-        title="Bestätigung der Teilnahmebedingungen"
+        title={userAreaTexts.signatureForm.legalTitle}
         icon={<GavelIcon />}
       />
 
       {/* Legal Text */}
       <FormCard
           sx={{paddingTop:2}}
-        description="Hiermit bestätige ich, dass ich auf eigene Gefahr am 'Weiher Wald und Weltall-Wahn 2025'
-         vom 28.08.2025 bis zum 31.08.2025 teilnehme. Der Veranstalter haftet bei Personen-, Sach- und Vermögensschäden
-         nicht für leichte Fahrlässigkeit. Dies gilt sowohl für eigene Handlungen, als auch für Handlungen seiner
-          Vertreter, Erfüllungsgehilfen oder Dritter, derer sich der Veranstalter im Zusammenhang mit
-           der Durchführung der Veranstaltung bedient."
+        description={userAreaTexts.signatureForm.legalText}
       >
           <Box/>
       </FormCard>
@@ -34,7 +31,7 @@ function SignatureForm(props: FormProps) {
       {/* Signature Section */}
       <Box sx={{ mt: 4 }}>
         <MissionHeading
-          title="Deine Unterschrift"
+          title={userAreaTexts.signatureForm.signatureTitle}
           icon={<DrawIcon />}
           withDivider={false}
         />

@@ -2,6 +2,7 @@ import React from 'react';
 import {Box, Typography, Button, Modal, CircularProgress, alpha} from '@mui/material';
 import {CheckCircleOutline, OpenInNew} from '@mui/icons-material';
 import {spacePalette} from '../../../components/styles/theme';
+import {userAreaTexts} from "../../constants/texts";
 
 interface RedirectModalProps {
     open: boolean;
@@ -44,7 +45,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                     fontWeight="bold"
                     sx={{color: alpha('#fff', 0.9)}}
                 >
-                    Betreff wurde kopiert
+                    {userAreaTexts.confirmationForm.redirectModal.title}
                 </Typography>
 
                 <Typography sx={{
@@ -53,8 +54,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                     textAlign: 'center',
                     color: alpha('#fff', 0.8)
                 }}>
-                    Bitte füge den Betreff in deine PayPal-Überweisung ein, damit wir deine Zahlung zuordnen
-                    können.
+                    {userAreaTexts.confirmationForm.redirectModal.subtitle}
                 </Typography>
 
                 {countdown > 0 ? (
@@ -95,7 +95,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                             fontWeight="medium"
                             sx={{color: spacePalette.primary.main}}
                         >
-                            Weiterleitung zu PayPal in {countdown} Sekunden...
+                            {userAreaTexts.confirmationForm.redirectModal.redirectText(countdown)}
                         </Typography>
                     </Box>
                 ) : (
@@ -108,7 +108,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                                 color: alpha('#fff', 0.8)
                             }}
                         >
-                            Du wurdest nicht weitergeleitet?
+                            {userAreaTexts.confirmationForm.redirectModal.manualRedirectText}
                         </Typography>
                         <a
                             href="https://www.paypal.me/StephanHau"
@@ -128,7 +128,8 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                                     }
                                 }}
                             >
-                                Manuell zu PayPal <OpenInNew sx={{ml: 1}}/>
+                                {userAreaTexts.confirmationForm.redirectModal.manualRedirectButton} <OpenInNew
+                                sx={{ml: 1}}/> <OpenInNew sx={{ml: 1}}/>
                             </Button>
                         </a>
                     </Box>

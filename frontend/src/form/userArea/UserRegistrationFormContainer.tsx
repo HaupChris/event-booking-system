@@ -19,6 +19,7 @@ import BeverageSelectionForm from "./BeverageSelectionForm";
 import WorkShiftForm from "./WorkshiftsForm";
 import MaterialsForm from "./MaterialsForm";
 import SignatureForm from "./SignatureForm";
+import {userAreaTexts} from "../constants/texts";
 
 // Form steps enum
 enum FormSteps {
@@ -182,16 +183,16 @@ export function UserRegistrationFormContainer() {
 
     // Step titles
     const stepTitles: { [key: number]: (string) } = {
-        [FormSteps.NameAndAddress]: "Herzlich Willkommen zum Weiher Wald und Weltall-Wahn!",
-        [FormSteps.Ticket]: "Wann fliegst du mit?",
-        [FormSteps.Beverage]: "Ein Spacebier gefällig?",
-        [FormSteps.Food]: "Wähle deine Astronautenkost",
-        [FormSteps.Workshift]: "Tritt der Crew bei",
-        [FormSteps.Material]: "Ich bringe folgende Ersatzteile mit",
-        [FormSteps.AwarenessCode]: "Ein paar Regeln für unsere Reise durch die Galaxis",
-        [FormSteps.Signature]: "Ein Abenteuer auf eigene Gefahr",
-        [FormSteps.Summary]: "Zusammenfassung",
-        [FormSteps.Confirmation]: "Start in T Minus Gleich"
+        [FormSteps.NameAndAddress]: userAreaTexts.personalDetailsForm.title,
+        [FormSteps.Ticket]: userAreaTexts.ticketSelectionForm.title,
+        [FormSteps.Beverage]: userAreaTexts.beverageSelectionForm.title,
+        [FormSteps.Food]: userAreaTexts.foodSelectionForm.title,
+        [FormSteps.Workshift]: userAreaTexts.workshiftsForm.title,
+        [FormSteps.Material]: userAreaTexts.materialsForm.title,
+        [FormSteps.AwarenessCode]: userAreaTexts.awarenessCodeForm.title,
+        [FormSteps.Signature]: userAreaTexts.signatureForm.title,
+        [FormSteps.Summary]: userAreaTexts.summaryForm.title,
+        [FormSteps.Confirmation]: userAreaTexts.confirmationForm.initialView.title
     };
 
     // Required fields per step

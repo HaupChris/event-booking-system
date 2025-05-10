@@ -18,7 +18,8 @@ import vegetarian_diet from '../../img/vegetarian_diet.png';
 import '../../css/formBeverageSelection.css';
 import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
 import FormCard from "../../components/core/display/FormCard";
-import SelectionOptionWithImage from "../../components/core/display/SelectionOptionWithImage"; // Reusing the same CSS for consistency
+import SelectionOptionWithImage from "../../components/core/display/SelectionOptionWithImage";
+import {userAreaTexts} from "../constants/texts"; // Reusing the same CSS for consistency
 
 const index_to_image = [gyros, gyros, grillgemuese, grillgemuese, vegan_diet, vegetarian_diet];
 
@@ -30,8 +31,8 @@ function FoodSelectionForm(props: FormProps) {
     console.log(props.currentBooking.food_id);
 
     return <SpacePanelLayout
-        missionBriefing="Bestell deine abendliche Astronautenkost bei uns vor. Wähle aus unseren galaktischen Spezialitäten!"
-        footerId="WWWW-FOOD-STATION // ID-2025"
+  missionBriefing={userAreaTexts.foodSelectionForm.missionBriefing}
+  footerId={userAreaTexts.foodSelectionForm.footerId}
     >
          <List sx={{ p: { xs: 1, sm: 2 } }}>
                      <FormCard selected={props.currentBooking.food_id === -1}>
@@ -62,7 +63,7 @@ function FoodSelectionForm(props: FormProps) {
                                              fontWeight: 'medium'
                                          }}
                                      >
-                                         Kein Essen für mich
+                                          {userAreaTexts.foodSelectionForm.noFood}
                                      </Typography>
                                  }
                              />

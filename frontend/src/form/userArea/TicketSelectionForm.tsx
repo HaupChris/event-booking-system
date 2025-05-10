@@ -4,6 +4,7 @@ import {FormProps} from './UserRegistrationFormContainer';
 import {TicketOption} from './interface';
 import TicketOptionComponent from "../../components/core/display/TicketOption";
 import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
+import {userAreaTexts} from "../constants/texts";
 
 
 function TicketForm(props: FormProps) {
@@ -44,8 +45,8 @@ function TicketForm(props: FormProps) {
     }
 
     return <SpacePanelLayout
-        missionBriefing="Wähle die Tage aus, an denen du am Festival teilnehmen möchtest. Sonntag ist Abbautag."
-        footerId="WWWW-MISSION-CONTROL // ID-2025"
+        missionBriefing={userAreaTexts.ticketSelectionForm.missionBriefing}
+        footerId={userAreaTexts.ticketSelectionForm.footerId}
     >
         <Box sx={{p: {xs: 1.5, sm: 2}}}>
             <FormControl component="fieldset" error={!!props.formValidation.ticket_id} required fullWidth>

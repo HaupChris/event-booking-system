@@ -20,6 +20,7 @@ import FormCard from "../../components/core/display/FormCard";
 import FormField from "../../components/core/inputs/FormField";
 import WWSelect from "../../components/core/inputs/WWSelect";
 import WWFAQ from "../../components/core/display/WWFAQ";
+import {userAreaTexts} from "../constants/texts";
 
 function HelpIcon() {
     return null;
@@ -125,22 +126,20 @@ function WorkShiftForm(props: FormProps) {
     }
 
     return <SpacePanelLayout
-        title={""}
-        missionBriefing={"Wähle deine bevorzugten Supportschichten, um der Raumstation zu helfen. Wähle drei Prioritäten.\n\nNeben jeder Schicht stehen zwei Zahlen. Die erste zeigt, wie viele Astronaut:innen schon dabei, die zweite wie viele wir insgesamt brauchen."}
-        footerId={"WWWW-CREW-ASSIGNMENTS // ID-2025"}
+        missionBriefing={userAreaTexts.workshiftsForm.missionBriefing}
+        footerId={userAreaTexts.workshiftsForm.footerId}
     >
         <WWFAQ
             items={faqItems}
             title=""
             description=""
             icon={<HelpIcon/>}
-            defaultExpandedIndex={0} // First item expanded by default
             sx={{mb: 3}}
         />
         <FormCard
             icon={<Engineering sx={{color: '#64b5f6', mr: 1}}/>}
-            title={"Anzahl der Schichten"}
-            tooltipText={numShiftsHelperText}
+            title={userAreaTexts.workshiftsForm.shiftsCountTitle}
+            tooltipText={userAreaTexts.workshiftsForm.shiftsCountHelperText}
             tooltipPlacement={"top-start"}
         >
             <Box display="flex" alignItems="center" justifyContent="center" sx={{paddingX: 2}}>
@@ -152,8 +151,8 @@ function WorkShiftForm(props: FormProps) {
             </Box>
         </FormCard>
         <FormCard
-            title={"Crew Partner:in"}
-            description={"Mit wem möchtest du zusammen arbeiten?"}
+            title={userAreaTexts.workshiftsForm.crewPartner}
+            description={userAreaTexts.workshiftsForm.crewPartnerDescription}
             icon={<PersonAdd sx={{color: '#64b5f6', mr: 1}}/>}
             sx={{marginTop: 3, marginBottom: 3}}
         >

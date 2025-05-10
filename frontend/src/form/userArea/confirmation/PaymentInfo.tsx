@@ -3,6 +3,7 @@ import { Box, Typography, TextField, Button, IconButton, alpha } from '@mui/mate
 import { EuroSymbol, ContentCopy, OpenInNew } from '@mui/icons-material';
 import FormCard from '../../../components/core/display/FormCard';
 import { spacePalette } from '../../../components/styles/theme';
+import {userAreaTexts} from "../../constants/texts";
 
 interface PaymentInfoProps {
   totalPrice: number;
@@ -19,7 +20,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
 }) => {
   return (
     <FormCard
-      title="Zahlungsinformationen"
+        title={userAreaTexts.confirmationForm.paymentInfo.title}
       icon={<EuroSymbol />}
       sx={{ my: 3 }}
     >
@@ -39,7 +40,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
             variant="subtitle2"
             sx={{ color: alpha('#fff', 0.7), mb: 1 }}
           >
-            Bitte verwende diesen Betreff für deine Überweisung:
+            {userAreaTexts.confirmationForm.paymentInfo.instructionsSubject}
           </Typography>
 
           <TextField
@@ -79,7 +80,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
             variant="body2"
             sx={{ mb: 3, color: alpha('#fff', 0.6) }}
           >
-            Der Betreff hilft uns, deine Zahlung korrekt zuzuordnen.
+                    {userAreaTexts.confirmationForm.paymentInfo.subjectHelp}
           </Typography>
 
           <Button
@@ -100,7 +101,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
               }
             }}
           >
-            Jetzt mit PayPal bezahlen
+                    {userAreaTexts.confirmationForm.paymentInfo.paypalButton}
           </Button>
         </Box>
 
@@ -109,8 +110,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
             variant="body2"
             sx={{ textAlign: 'center', color: alpha('#fff', 0.6) }}
           >
-            Kein PayPal? Kontaktiere bitte direkt <strong>Stephan Hauptmann</strong> für
-            alternative Zahlungsmöglichkeiten.
+                    {userAreaTexts.confirmationForm.paymentInfo.alternativePayment}
           </Typography>
         </Box>
       </Box>

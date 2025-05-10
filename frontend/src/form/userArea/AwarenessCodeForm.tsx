@@ -17,53 +17,28 @@ import Partiality from "../../assets/icons/partiality.png";
 import {Balance} from "@mui/icons-material";
 import FormCard from "../../components/core/display/FormCard";
 import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
+import {userAreaTexts} from "../constants/texts";
 
 
 function AwarenessCodeForm() {
-    const items = [
-        {
-            title: 'Achtsamkeit, Verantwortung und Fürsorge\n',
-            text: 'Alle sollen sich wohlfühlen. Sei rücksichtsvoll mit dir und anderen. Achte auf deine Bedürfnisse (Wasser, Schlaf, Essen, Ruhe) und respektiere deine Konsumgrenzen. Frage nach, ob es anderen gut geht, und gehe sorgfältig mit Dingen und der Natur um. Sollest du das Festivalgelände verlassen, informiere deine Freund*innen darüber. ',
-            icon: <PngIcon icon={Awareness} fontSize={64}/>
-        },
-        {
-            title: 'Keine Diskriminierung',
-            text: 'Sexismus, Rassismus, Queerfeindlichkeit und Gewalt führen zum Ausschluss. Wir setzen uns für Antidiskriminierung und Vielfalt ein.',
-            icon: <PngIcon icon={NoRacism} fontSize={64}/>
-        },
-        {
-            title: 'Respektiere Grenzen / Konsensprinzip',
-            text: 'Achte auf Konsens – nur „Ja heißt ja“!, „Vielleicht heißt nicht ja“ und „Nichts sagen heißt nicht ja“. Jede:r hat unterschiedliche Grenzen, daher müssen diese immer erfragt und respektiert werden.',
-            icon: <PngIcon icon={Consent} fontSize={64}/>
-        },
-        {
-            title: 'Parteilichkeit bei Grenzüberschreitungen',
-            text: 'Betroffene entscheiden, was eine Grenzüberschreitung ist. Wir solidarisieren uns mit der betroffenen Person und glauben ihrer Darstellung der Situation. ',
-            icon: <PngIcon icon={Partiality} fontSize={64}/>
-        },
-        {
-            title: 'Umgang mit Bildern und Fotos\n',
-            text: 'Frag immer, bevor du Fotos machst, besonders bei sensiblen Inhalten. Teile keine sensiblen Fotos ohne Zustimmung.',
-            icon: <PngIcon icon={Fotos} fontSize={64}/>
-        },
-        {
-            title: 'Geschlechtergerechte Sprache',
-            text: 'Wir möchten eine geschlechterneutrale und inklusive Sprache verwenden. Alle Menschen sollen unabhängig von ihrer Gender-Identität angesprochen werden. Frage nach den Pronomen oder benutze den Namen, statt ein Pronomen zu verwenden.',
-            icon: <Balance color={"secondary"} fontSize={"large"}/>
-        }
+    const icons = [
+        <PngIcon icon={Awareness} fontSize={64}/>,
+        <PngIcon icon={NoRacism} fontSize={64}/>,
+        <PngIcon icon={Consent} fontSize={64}/>,
+        <PngIcon icon={Partiality} fontSize={64}/>,
+        <PngIcon icon={Fotos} fontSize={64}/>,
+        <Balance color={"secondary"} fontSize={"large"}/>,
     ];
 
     return <SpacePanelLayout
-        missionBriefing={"UFür ein gelungenes Festival ist es wichtig, dass wir alle aufeinander achten und" +
-            " respektvoll miteinander umgehen. Unser Awareness-Code hilft uns, eine sichere und angenehme " +
-            "Atmosphäre für alle zu schaffen."}
-        footerId={" WWWW-CREW-CODEX // ID-2025"}
+        missionBriefing={userAreaTexts.awarenessCodeForm.missionBriefing}
+        footerId={userAreaTexts.awarenessCodeForm.footerId}
     >
         {/* Code Rules List */}
         <List sx={{width: '100%'}}>
-            {items.map((item) => (
+            {userAreaTexts.awarenessCodeForm.codeRules.map((item, index) => (
                 <FormCard
-                    sx={{mt:2}}
+                    sx={{mt: 2}}
                 >
                     {/* Circuit background decoration */}
                     <Box sx={{
@@ -133,7 +108,7 @@ function AwarenessCodeForm() {
                                                 height: 100
                                             }}
                                         >
-                                            {item.icon}
+                                            {icons[index]}
                                         </Avatar>
                                     </Box>
 
