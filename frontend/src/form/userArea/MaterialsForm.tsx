@@ -76,45 +76,7 @@ function MaterialsForm(props: FormProps) {
                             ))
                         }
                         </Box>
-
                 </FormCard>
-
-
-                // <Box sx={{
-                //     mb: 3,
-                //     p: 2,
-                //     borderRadius: '8px',
-                //     bgcolor: alpha('#64b5f6', 0.1),
-                //     border: '1px solid',
-                //     borderColor: alpha('#64b5f6', 0.3)
-                // }}>
-                //     <Box sx={{
-                //         display: 'flex',
-                //         alignItems: 'center',
-                //         mb: 1.5
-                //     }}>
-                //
-                //         <Typography
-                //             variant="subtitle2"
-                //             sx={{
-                //                 color: alpha('#fff', 0.9),
-                //                 fontWeight: 'medium'
-                //             }}
-                //         >
-                //             Du bringst mit
-                //             ({props.currentBooking.material_ids.length} {props.currentBooking.material_ids.length === 1 ? 'Gegenstand' : 'Gegenstände'}):
-                //         </Typography>
-                //     </Box>
-                //
-                //     <Box sx={{
-                //         display: 'flex',
-                //         flexWrap: 'wrap',
-                //         gap: 1,
-                //         pl: 3
-                //     }}>
-                //
-                //     </Box>
-                // </Box>
             )}
 
             {/* Materials List */}
@@ -246,7 +208,6 @@ function MaterialsForm(props: FormProps) {
                                                 </Typography>
                                             }
                                         />
-
                                         <Checkbox
                                             edge="end"
                                             onChange={() => handleToggle(material.id)}
@@ -259,123 +220,14 @@ function MaterialsForm(props: FormProps) {
                                                 },
                                             }}
                                         />
-
                                     </ListItemButton>
                                 </ListItem>
                             </Paper>
                         );
                     })}
             </List>
-
         </FormCard>
-
     </SpacePanelLayout>
-
-    // return (
-    //     <Box sx={{width: '98%', maxWidth: 700, mx: 'auto'}}>
-    //         <Paper
-    //             elevation={3}
-    //             sx={{
-    //                 width: '100%',
-    //                 p: 0,
-    //                 borderRadius: '14px',
-    //                 background: 'radial-gradient(circle at bottom left, #061429 0%, #071f3b 100%)',
-    //                 boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
-    //                 overflow: 'hidden',
-    //                 position: 'relative',
-    //                 border: '1px solid',
-    //                 borderColor: alpha('#64b5f6', 0.2),
-    //             }}
-    //         >
-    //             {/* Decorative top pattern */}
-    //             <Box sx={{
-    //                 width: '100%',
-    //                 height: '6px',
-    //                 background: 'linear-gradient(90deg, #1e88e5, #64b5f6, #bbdefb, #1e88e5)',
-    //                 backgroundSize: '300% 100%',
-    //                 animation: 'gradientMove 12s linear infinite',
-    //                 '@keyframes gradientMove': {
-    //                     '0%': {backgroundPosition: '0% 0%'},
-    //                     '100%': {backgroundPosition: '300% 0%'},
-    //                 }
-    //             }}/>
-    //
-    //             {/* Mission Briefing */}
-    //             <Box sx={{
-    //                 py: 1.5,
-    //                 px: 2,
-    //                 backgroundColor: alpha('#000', 0.3),
-    //                 borderLeft: '4px solid',
-    //                 borderColor: '#1e88e5',
-    //                 mx: {xs: 1, sm: 2},
-    //                 my: 2,
-    //                 borderRadius: '0 8px 8px 0',
-    //             }}>
-    //                 <Typography
-    //                     variant="body2"
-    //                     sx={{
-    //                         color: alpha('#fff', 0.9),
-    //                         fontFamily: 'monospace',
-    //                         fontSize: '0.85rem',
-    //                     }}
-    //                 >
-    //                     <span style={{color: '#64b5f6'}}>MISSION:</span> Wähle aus, welche Ausrüstung und Materialien du
-    //                     für unsere interstellare Expedition mitbringen kannst.
-    //                 </Typography>
-    //             </Box>
-    //
-    //             <Box sx={{p: {xs: 2, sm: 3}}}>
-    //                 {/* Header Section */}
-    //                 <Box sx={{
-    //                     display: 'flex',
-    //                     alignItems: 'center',
-    //                     mb: 3
-    //                 }}>
-    //                     <BackpackIcon sx={{color: '#64b5f6', mr: 1, fontSize: '1.5rem'}}/>
-    //                     <Typography variant="h6" sx={{color: alpha('#fff', 0.9), fontWeight: 'medium'}}>
-    //                         Mitzubringende Materialien
-    //                     </Typography>
-    //                 </Box>
-    //
-    //                 <Typography
-    //                     variant="body2"
-    //                     paragraph
-    //                     sx={{
-    //                         mb: 3,
-    //                         color: alpha('#fff', 0.7),
-    //                         lineHeight: 1.6
-    //                     }}
-    //                 >
-    //
-    //                 </Typography>
-    //
-
-    //
-    //             {/* Footer with space station ID */}
-    //             <Box sx={{
-    //                 p: 1.5,
-    //                 backgroundColor: '#041327',
-    //                 borderTop: '1px solid',
-    //                 borderColor: alpha('#64b5f6', 0.2),
-    //                 display: 'flex',
-    //                 justifyContent: 'center',
-    //                 alignItems: 'center',
-    //             }}>
-    //                 <Typography
-    //                     variant="caption"
-    //                     sx={{
-    //                         fontFamily: 'monospace',
-    //                         color: alpha('#fff', 0.7),
-    //                         letterSpacing: '1px',
-    //                         fontSize: '0.7rem'
-    //                     }}
-    //                 >
-    //                     WWWW-CARGO-MANIFEST // ID-2025
-    //                 </Typography>
-    //             </Box>
-    //         </Paper>
-    //     </Box>
-    // );
 }
 
 export default MaterialsForm;

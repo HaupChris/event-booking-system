@@ -1,12 +1,9 @@
-// src/form/userArea/nameAndAddress.tsx (refactored)
 import React from "react";
 import { Box } from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import SmartphoneIcon from '@mui/icons-material/Smartphone';
 import BadgeIcon from '@mui/icons-material/Badge';
-
-// Import our shared components
 import FormField from '../../components/core/inputs/FormField';
 import SpacePanelLayout from '../../components/core/layouts/SpacePanelLayout';
 import MissionHeading from '../../components/core/display/MissionHeading';

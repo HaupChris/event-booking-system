@@ -10,7 +10,6 @@ import {
 import {FormProps} from "./UserRegistrationFormContainer";
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 
-// Import images
 import gyros from '../../img/gyros.png';
 import grillgemuese from '../../img/grillgemuese.png';
 import vegan_diet from '../../img/vegan_diet.png';

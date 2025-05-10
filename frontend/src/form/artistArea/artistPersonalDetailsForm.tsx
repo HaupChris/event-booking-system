@@ -2,7 +2,7 @@ import React from "react";
 import { TextField, Typography, Paper, Box } from "@mui/material";
 import { ArtistFormProps } from "./artistFormContainer";
 
-function ArtistNameAndAddressForm(props: ArtistFormProps) {
+function ArtistPersonalDetailsForm(props: ArtistFormProps) {
     return (
         <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
             <Paper elevation={3} sx={{ p: 3 }}>
@@ -71,4 +71,4 @@ function ArtistNameAndAddressForm(props: ArtistFormProps) {
     );
 }
 
-export default ArtistNameAndAddressForm;
+export default ArtistPersonalDetailsForm;

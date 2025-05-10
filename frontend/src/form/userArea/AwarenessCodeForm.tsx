@@ -2,20 +2,12 @@ import React from "react";
 import {
     Box,
     Typography,
-    Paper,
     alpha,
     List,
     ListItem,
     Avatar,
-    ListItemAvatar,
     ListItemText
 } from "@mui/material";
-import SecurityIcon from '@mui/icons-material/Security';
-import GroupIcon from '@mui/icons-material/Group';
-import MusicNoteIcon from '@mui/icons-material/MusicNote';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import DiversityIcon from '@mui/icons-material/Diversity3';
 import PngIcon from "../../components/core/display/PngIcon";
 import Awareness from "../../assets/icons/awareness.png";
 import Consent from "../../assets/icons/consent.png";
@@ -69,7 +61,7 @@ function AwarenessCodeForm() {
     >
         {/* Code Rules List */}
         <List sx={{width: '100%'}}>
-            {items.map((item, index) => (
+            {items.map((item) => (
                 <FormCard
                     sx={{mt:2}}
                 >

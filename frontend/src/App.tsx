@@ -1,21 +1,16 @@
-// src/App.tsx (updated version)
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthContext, TokenContext } from "./AuthContext";
 import { Box } from "@mui/material";
 import { ThemeProvider } from '@mui/material/styles';
-
-// Import components
 import { UserRegistrationFormContainer } from "./form/userArea/UserRegistrationFormContainer";
 import Dashboard from "./form/adminArea/Dashboard";
-import UserLoginPage from "./userLoginPage";
 import AdminLoginPage from "./adminLoginPage";
 import ArtistLoginPage from "./artistLoginPage";
 import { ArtistFormContainer } from './form/artistArea/artistFormContainer';
-
-// Import our new theme and components
 import spaceTheme from './components/styles/theme';
 import SpaceBackground from './components/core/layouts/SpaceBackground';
+import UserLoginPage from "./form/userArea/UserLoginPage";
 
 const App = () => {
   const [auth, setAuth] = useState(false);

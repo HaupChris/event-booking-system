@@ -1,17 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext, TokenContext } from "../../AuthContext";
-import axios from "axios";
-import {
-    Alert,
-    Box,
-    Button,
-    Snackbar,
-    TextField,
-    Typography,
-    Container,
-    Paper
-} from "@mui/material";
+
+import { Box, Button, TextField, Typography, Container } from '@mui/material';
+import {AuthContext, TokenContext} from "../../AuthContext";
 
 function UserLoginPage() {
     const [password, setPassword] = useState('');
@@ -20,20 +11,31 @@ function UserLoginPage() {
     const { setToken } = useContext(TokenContext);
     const navigate = useNavigate();
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setError('');
 
-        // Post the plain-text password to the server
-        axios.post('/api/auth', { password })
-            .then(response => {
-                setToken(response.data.access_token);
+        try {
+            const response = await fetch('/api/auth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({password}),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setToken(data.access_token);
+                console.log("Auth successfull. Token: ", data.access_token);
                 setAuth(true);
                 navigate('/form');
-            })
-            .catch(error => {
+            } else {
                 setError('Falsches Passwort');
-            });
+            }
+        } catch (error) {
+            setError('Ein Fehler ist aufgetreten, bitte versuche es erneut.');
+        }
     };
 
     return (
@@ -46,43 +48,36 @@ function UserLoginPage() {
                     alignItems: 'center',
                 }}
             >
-                <Paper elevation={3} sx={{ p: 3, width: '100%', borderRadius: 2 }}>
-                    <Typography component="h1" variant="h5" sx={{ mb: 3, textAlign: 'center' }}>
-                        Weiher Wald & Weltall-Wahn
-                    </Typography>
-
-                    <Box component="form" onSubmit={handleSubmit} noValidate>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Passwort"
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                            onKeyDown={e => {
-                                if (e.key === 'Enter') {
-                                    handleSubmit(e);
-                                }
-                            }}
-                        />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            Einloggen
-                        </Button>
-                        {error && (
-                            <Alert severity="error" sx={{ mt: 2 }}>
-                                {error}
-                            </Alert>
-                        )}
-                    </Box>
-                </Paper>
+                <Typography component="h1" variant="h5">
+                    Sign in
+                </Typography>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
+                        Sign In
+                    </Button>
+                    {error && (
+                        <Typography color="error" align="center">
+                            {error}
+                        </Typography>
+                    )}
+                </Box>
             </Box>
         </Container>
     );

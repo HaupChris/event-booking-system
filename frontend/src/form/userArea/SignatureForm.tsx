@@ -1,10 +1,7 @@
-// src/form/userArea/formSignature.tsx (refactored)
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import DrawIcon from '@mui/icons-material/Draw';
 import GavelIcon from '@mui/icons-material/Gavel';
-
-// Import our shared components
 import SignaturePad from "../../components/core/inputs/SignaturePad";
 import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
 import MissionHeading from "../../components/core/display/MissionHeading";

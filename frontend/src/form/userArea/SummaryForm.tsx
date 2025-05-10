@@ -1,4 +1,3 @@
-// src/form/userArea/SummaryForm.tsx
 import React from 'react';
 import {
   Typography,

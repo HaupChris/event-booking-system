@@ -1,5 +1,5 @@
 import React from "react";
-import {FormControl, RadioGroup, Typography, Paper, Box, alpha} from "@mui/material";
+import {FormControl, RadioGroup, Box} from "@mui/material";
 import {FormProps} from './UserRegistrationFormContainer';
 import {TicketOption} from './interface';
 import TicketOptionComponent from "../../components/core/display/TicketOption";

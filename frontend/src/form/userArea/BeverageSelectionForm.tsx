@@ -10,7 +10,6 @@ import {
 import {FormProps} from "./UserRegistrationFormContainer";
 import LocalBarIcon from '@mui/icons-material/LocalBar';
 
-// Import images
 import beverages_0 from '../../img/beverages_1.jpg';
 import beverages_1 from '../../img/beverages_2.jpg';
 import beverages_2 from '../../img/beverages_3.jpg';

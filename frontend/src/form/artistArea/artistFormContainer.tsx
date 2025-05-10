@@ -9,7 +9,7 @@ import rocketImage from "../../img/rocket.png";
 import LinearProgressWithImage from "../components/linearProgressWithImage";
 
 // Import artist-specific components
-import ArtistNameAndAddressForm from "./artistNameAndAddress";
+import ArtistPersonalDetailsForm from "./artistPersonalDetailsForm";
 import ArtistTicketForm from "./artistTicketSelection";
 import ArtistBeverageForm from "./artistBeverageSelection";
 import ArtistFoodForm from "./artistFoodSelection";
@@ -432,7 +432,7 @@ export function ArtistFormContainer() {
 
                     {/* Render the appropriate form for each step */}
                     {activeStep === ArtistFormSteps.NameAndAddress && (
-                        <ArtistNameAndAddressForm
+                        <ArtistPersonalDetailsForm
                             updateBooking={updateBooking}
                             currentBooking={booking}
                             formValidation={formValidation}
