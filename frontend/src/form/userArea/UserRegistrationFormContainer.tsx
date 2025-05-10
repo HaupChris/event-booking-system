@@ -158,8 +158,9 @@ export function UserRegistrationFormContainer() {
         validation: formValidation,
         currentError,
         updateField,
-        validateStep,
-        resetForm
+        activeStep,
+        handleNext,
+        handlePrevious
     } = useFormManagement<Booking>({
         initialState: getEmptyBooking(),
         validationRules,
@@ -169,7 +170,6 @@ export function UserRegistrationFormContainer() {
     });
 
     const [formContent, setFormContent] = useState<FormContent>(getDummyFormContent());
-    const [activeStep, setActiveStep] = useState<FormSteps>(FormSteps.NameAndAddress);
     const [bookingState, setBookingState] = useState<BookingState>({
         isSubmitted: false,
         isSubmitting: false,
@@ -181,7 +181,7 @@ export function UserRegistrationFormContainer() {
     const {setAuth} = useContext(AuthContext);
 
     // Step titles
-    const stepTitles = {
+    const stepTitles: { [key: number]: (string) } = {
         [FormSteps.NameAndAddress]: "Herzlich Willkommen zum Weiher Wald und Weltall-Wahn!",
         [FormSteps.Ticket]: "Wann fliegst du mit?",
         [FormSteps.Beverage]: "Ein Spacebier gefällig?",
@@ -228,18 +228,8 @@ export function UserRegistrationFormContainer() {
             });
     }, [setAuth, setToken, token]);
 
-    // Handle navigating to next step
-    const handleNext = () => {
-        if (validateStep(requiredFields[activeStep])) {
-            setActiveStep(prevStep => prevStep + 1);
-        }
-    };
-
-    // Handle navigating to previous step
-    const handlePrevious = () => {
-        if (activeStep > 0) {
-            setActiveStep(prevStep => prevStep - 1);
-        }
+    const handleStepNext = () => {
+        handleNext(requiredFields[activeStep]);
     };
 
     // Update booking with price calculations
@@ -330,7 +320,7 @@ export function UserRegistrationFormContainer() {
                 maxSteps={maxSteps}
                 progressImage={rocketImage}
                 hideNavigation={bookingState.isSubmitted}
-                onNext={handleNext}
+                onNext={handleStepNext}
                 onPrevious={handlePrevious}
             />
             <CardContent>

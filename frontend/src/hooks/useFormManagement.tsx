@@ -1,17 +1,15 @@
 // src/hooks/useFormManagement.tsx
-import { useState, useEffect } from 'react';
+import {useState, useEffect} from 'react';
 
 /**
  * Interface for form validation errors.
  * Maps each field key to an optional error message string.
  */
 export type FormValidation<T> = {
-  [K in keyof T]?: string;
+    [K in keyof T]?: string;
 };
 
-/**
- * Options for the useFormManagement hook
- */
+// Add step management to the options interface
 interface FormManagementOptions<T> {
   /** Initial state of the form */
   initialState: T;
@@ -28,60 +26,39 @@ interface FormManagementOptions<T> {
   versionKey?: string;
   /** Current version of the form schema */
   currentVersion?: string;
+  /** Initial step value */
+  initialStep?: number;
 }
 
 /**
- * useFormManagement
- *
- * A custom hook that provides comprehensive form state management with validation,
- * error handling, and persistent storage.
- *
- * Features:
- * - Type-safe form state management
- * - Field-level validation with custom rules
- * - Persistent storage with version control
- * - Step-based validation for multi-step forms
- * - Error message tracking
- *
- * @param options Configuration options for the form management
- * @returns Object containing form state, validation functions, and utility methods
- *
- * @example
- * // Define validation rules
- * const validationRules = {
- *   email: (value) => (!value ? 'Email is required' :
- *     !/^\S+@\S+\.\S+$/.test(value) ? 'Invalid email format' : ''),
- *   name: (value) => !value ? 'Name is required' : ''
- * };
- *
- * // Use the hook in your component
- * const {
- *   formState,
- *   validation,
- *   updateField,
- *   validateStep
- * } = useFormManagement({
- *   initialState: { email: '', name: '' },
- *   validationRules,
- *   storageKey: 'myForm'
- * });
- *
- * // Handle next step validation
- * const handleNext = () => {
- *   if (validateStep(['email', 'name'])) {
- *     // Proceed to next step
- *   }
- * };
+ * Return type expanded to include step management
  */
+interface FormManagementReturn<T> {
+  formState: T;
+  validation: FormValidation<T>;
+  currentError: string;
+  updateField: <K extends keyof T>(key: K, value: T[K]) => void;
+  validateField: <K extends keyof T>(key: K, value: T[K]) => string;
+  setCurrentError: (message: string) => void;
+  activeStep: number;
+  handleNext: (requiredFields: Array<keyof T>) => void;
+  handlePrevious: () => void;
+}
+
 export function useFormManagement<T extends Record<string, any>>({
   initialState,
   validationRules = {},
   storageKey,
   versionKey,
-  currentVersion = '1.0'
-}: FormManagementOptions<T>) {
-  // Form state
+  currentVersion = '1.0',
+  initialStep = 0
+}: FormManagementOptions<T>): FormManagementReturn<T> {
+  // Add a flag to prevent overriding loaded data
+  const [isInitialized, setIsInitialized] = useState(false);
   const [formState, setFormState] = useState<T>(initialState);
+
+  // Add step state
+  const [activeStep, setActiveStep] = useState<number>(initialStep);
 
   // Validation errors for each field
   const [validation, setValidation] = useState<FormValidation<T>>({});
@@ -89,37 +66,78 @@ export function useFormManagement<T extends Record<string, any>>({
   // Current error message to display (typically the first validation error)
   const [currentError, setCurrentError] = useState<string>('');
 
-  // Load form data from localStorage on mount
+  // Load form data and active step from localStorage on mount
   useEffect(() => {
     if (storageKey) {
+      console.log("Attempting to load from localStorage with key:", storageKey);
       // Check version for data migration
       if (versionKey) {
         const storedVersion = localStorage.getItem(versionKey);
+        console.log("Stored version:", storedVersion, "Current version:", currentVersion);
         // Clear old data if version mismatch
         if (storedVersion !== currentVersion) {
+          console.log("Version mismatch, clearing stored data");
           localStorage.removeItem(storageKey);
+          localStorage.removeItem(`${storageKey}_step`);
           localStorage.setItem(versionKey, currentVersion);
         }
       }
 
+      // Load form data
       const storedData = localStorage.getItem(storageKey);
+      console.log("Data from localStorage:", storedData);
       if (storedData) {
         try {
           const parsedData = JSON.parse(storedData);
+          console.log("Parsed data:", parsedData);
           setFormState(parsedData);
+
+          // Load step
+          const storedStep = localStorage.getItem(`${storageKey}_step`);
+          if (storedStep) {
+            setActiveStep(parseInt(storedStep, 10));
+          }
+
+          setIsInitialized(true); // Mark as initialized with stored data
         } catch (e) {
           console.error('Error parsing stored form data', e);
         }
+      } else {
+        setIsInitialized(true); // Mark as initialized with initial state
       }
+    } else {
+      setIsInitialized(true); // No storage key, just use initial state
     }
-  }, [storageKey, versionKey, currentVersion]);
+  }, [storageKey, versionKey, currentVersion, initialStep]);
 
   // Save to localStorage when form state changes
   useEffect(() => {
-    if (storageKey) {
+    if (storageKey && isInitialized) { // Only save after initialization
+      console.log("save to local storage");
+      console.log(storageKey);
+      console.log(formState);
       localStorage.setItem(storageKey, JSON.stringify(formState));
     }
-  }, [formState, storageKey]);
+  }, [formState, storageKey, isInitialized]);
+
+  // Save active step to localStorage when it changes
+  useEffect(() => {
+    if (storageKey && isInitialized) {
+      localStorage.setItem(`${storageKey}_step`, activeStep.toString());
+    }
+  }, [activeStep, storageKey, isInitialized]);
+
+  // Handle next step with validation
+  const handleNext = (requiredFields: Array<keyof T>) => {
+    if (validateStep(requiredFields)) {
+      setActiveStep(prevStep => prevStep + 1);
+    }
+  };
+
+  // Handle previous step
+  const handlePrevious = () => {
+    setActiveStep(prevStep => Math.max(0, prevStep - 1));
+  };
 
   /**
    * Updates a single field in the form state
@@ -178,19 +196,6 @@ export function useFormManagement<T extends Record<string, any>>({
     return isValid;
   };
 
-  /**
-   * Resets the form to its initial state
-   * Clears validation errors and localStorage if applicable
-   */
-  const resetForm = () => {
-    setFormState(initialState);
-    setValidation({});
-    setCurrentError('');
-
-    if (storageKey) {
-      localStorage.removeItem(storageKey);
-    }
-  };
 
   return {
     formState,
@@ -198,8 +203,9 @@ export function useFormManagement<T extends Record<string, any>>({
     currentError,
     updateField,
     validateField,
-    validateStep,
-    resetForm,
-    setCurrentError
+    setCurrentError,
+    activeStep,
+    handleNext,
+    handlePrevious
   };
 }
