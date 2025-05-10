@@ -13,7 +13,7 @@ import {
     Paper
 } from "@mui/material";
 
-function PasswordPage() {
+function UserLoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const { setAuth } = useContext(AuthContext);
@@ -88,4 +88,4 @@ function PasswordPage() {
     );
 }
 
-export default PasswordPage;
+export default UserLoginPage;

@@ -3,7 +3,7 @@ import {Box, Button} from '@mui/material';
 import SignatureCanvas from 'react-signature-canvas';
 import '../../css/signature.css';
 import CustomSignaturePad from "./customSignaturePad";
-import {spaceTheme} from "../../App";
+// import {spaceTheme} from "../../App";
 
 
 interface IProps {
@@ -61,7 +61,7 @@ export function SignaturePad(props: IProps) {
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
             <CustomSignaturePad
-                penColor={spaceTheme.palette.primary.main}
+                // penColor={spaceTheme.palette.primary.main}
                 existingSignature={props.currentSignature}
                 onEnd={(signatureURL) => handleSignatureEnd(signatureURL)}
                 clearOnResize={false}

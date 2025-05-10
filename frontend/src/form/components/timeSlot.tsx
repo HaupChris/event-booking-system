@@ -19,6 +19,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import Chip from '@mui/material/Chip';
+import WWSelect from "../../components/core/inputs/WWSelect";
 
 interface TimeSlotProps {
     timeSlot: TimeSlotType;
@@ -32,10 +33,15 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
     const isFull = timeSlot.num_booked >= timeSlot.num_needed;
     const timeslotAvailablePriorities = availablePriorities.concat([selectedPriority]).filter(p => p !== "");
 
-    const handlePriorityChange = (event: SelectChangeEvent) => {
-        const newPriority = event.target.value;
+    const options = timeslotAvailablePriorities.map(priority => ({
+        value: priority,
+        label: priority
+    }));
 
-        if (newPriority === PRIORITIES.FIRST) {
+    const handlePriorityChange = (newPriority: string | number | null) => {
+        if (newPriority === null || newPriority === undefined) {
+            handleReset();
+        } else if (newPriority === PRIORITIES.FIRST) {
             updateBooking("timeslot_priority_1", timeSlot.id);
             if (currentBooking.timeslot_priority_2 === timeSlot.id) {
                 updateBooking("timeslot_priority_2", -1);
@@ -77,9 +83,9 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
     };
 
     const getPriorityIcon = () => {
-        if (selectedPriority === PRIORITIES.FIRST) return <PriorityHighIcon sx={{ fontSize: '0.8rem' }} />;
-        if (selectedPriority === PRIORITIES.SECOND) return <PriorityHighIcon sx={{ fontSize: '0.8rem' }} />;
-        if (selectedPriority === PRIORITIES.THIRD) return <PriorityHighIcon sx={{ fontSize: '0.8rem' }} />;
+        if (selectedPriority === PRIORITIES.FIRST) return <PriorityHighIcon sx={{fontSize: '0.8rem'}}/>;
+        if (selectedPriority === PRIORITIES.SECOND) return <PriorityHighIcon sx={{fontSize: '0.8rem'}}/>;
+        if (selectedPriority === PRIORITIES.THIRD) return <PriorityHighIcon sx={{fontSize: '0.8rem'}}/>;
         return <></>;
     };
 
@@ -142,18 +148,18 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                         animation: 'scanDown 2s infinite',
                     },
                     '@keyframes scanDown': {
-                        '0%': { transform: 'translateY(0)' },
-                        '100%': { transform: 'translateY(100%)' }
+                        '0%': {transform: 'translateY(0)'},
+                        '100%': {transform: 'translateY(100%)'}
                     }
-                }} />
+                }}/>
             )}
 
             <ListItem sx={{
                 display: 'flex',
                 flexDirection: {xs: 'column', sm: 'row'},
                 alignItems: {xs: 'flex-start', sm: 'center'},
-                py: { xs: 2, sm: 1.5 },
-                px: { xs: 2, sm: 2.5 },
+                py: {xs: 2, sm: 1.5},
+                px: {xs: 2, sm: 2.5},
                 position: 'relative',
                 zIndex: 2,
             }}>
@@ -252,76 +258,36 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                                         justifyContent: 'center',
                                     }}
                                 >
-                                    <Typography variant="caption" component="div" sx={{ color: alpha('#fff', 0.9) }}>
+                                    <Typography variant="caption" component="div" sx={{color: alpha('#fff', 0.9)}}>
                                         {`${timeslotNumBooked}/${timeSlot.num_needed}`}
                                     </Typography>
                                 </Box>
                             </Box>
 
                             {timeslotNumBooked >= timeSlot.num_needed ? (
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <EventBusyIcon sx={{ color: '#f44336', fontSize: '1rem', mr: 0.5 }} />
-                                    <Typography variant="body2" sx={{ color: alpha('#fff', 0.7) }}>
+                                <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                    <EventBusyIcon sx={{color: '#f44336', fontSize: '1rem', mr: 0.5}}/>
+                                    <Typography variant="body2" sx={{color: alpha('#fff', 0.7)}}>
                                         Hohe Nachfrage – Zuteilung per Los
                                     </Typography>
                                 </Box>
                             ) : (
-                                <Typography variant="body2" sx={{ color: alpha('#fff', 0.7) }}>
+                                <Typography variant="body2" sx={{color: alpha('#fff', 0.7)}}>
                                     {timeslotNumBooked === 0 ? "Keine Anmeldungen bisher" : "Interesse angemeldet"}
                                 </Typography>
                             )}
                         </Box>
 
                         <FormControl variant="outlined" size="small" sx={{width: '100%'}}>
-                            <Select
+                            <WWSelect
                                 id={`priority-select-mobile-${timeSlot.id}`}
-                                value={selectedPriority}
+                                options={options}
+                                value={selectedPriority || ''}
                                 onChange={handlePriorityChange}
-                                displayEmpty
-                                renderValue={(selected) => {
-                                    if (!selected) {
-                                        return <Typography variant="body2" sx={{ color: alpha('#fff', 0.5) }}>Priorität wählen</Typography>;
-                                    }
-                                    return selected;
-                                }}
-                                endAdornment={
-                                    selectedPriority ? (
-                                        <IconButton
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleReset();
-                                            }}
-                                            size="small"
-                                            edge="end"
-                                            sx={{marginRight: 2, color: alpha('#fff', 0.7)}}
-                                        >
-                                            <Close fontSize="small"/>
-                                        </IconButton>
-                                    ) : null
-                                }
+                                placeholder="Priorität wählen"
+                                allowClear={true}
                                 disabled={isFull && !selectedPriority}
-                                sx={{
-                                    bgcolor: alpha('#000', 0.2),
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: alpha('#64b5f6', 0.3),
-                                    },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: alpha('#64b5f6', 0.5),
-                                    },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: '#1e88e5',
-                                    },
-                                    '& .MuiSelect-select': {
-                                        color: alpha('#fff', 0.9),
-                                    }
-                                }}
-                            >
-                                {timeslotAvailablePriorities.map((priority) => (
-                                    <MenuItem key={priority} value={priority}>
-                                        {priority}
-                                    </MenuItem>
-                                ))}
-                            </Select>
+                            />
                         </FormControl>
                     </Box>
                 </Box>
@@ -357,7 +323,8 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                                 justifyContent: 'center',
                             }}
                         >
-                            <Typography variant="caption" component="div" sx={{ color: alpha('#fff', 0.9), fontWeight: 'medium' }}>
+                            <Typography variant="caption" component="div"
+                                        sx={{color: alpha('#fff', 0.9), fontWeight: 'medium'}}>
                                 {`${timeslotNumBooked}/${timeSlot.num_needed}`}
                             </Typography>
                         </Box>
@@ -394,7 +361,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                         {timeSlot.start_time.length !== 0 && timeSlot.end_time.length !== 0 ? (
                             <Box sx={{display: 'flex', alignItems: 'center', mt: 0.5}}>
                                 <AccessTimeIcon sx={{fontSize: '0.875rem', mr: 0.5, color: alpha('#fff', 0.6)}}/>
-                                <Typography variant="body2" sx={{ color: alpha('#fff', 0.6) }}>
+                                <Typography variant="body2" sx={{color: alpha('#fff', 0.6)}}>
                                     {`${timeSlot.start_time} - ${timeSlot.end_time}`}
                                 </Typography>
                             </Box>
@@ -414,7 +381,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                             border: '1px solid',
                             borderColor: alpha('#f44336', 0.3),
                         }}>
-                            <EventBusyIcon sx={{ color: '#f44336', fontSize: '0.875rem', mr: 0.5 }} />
+                            <EventBusyIcon sx={{color: '#f44336', fontSize: '0.875rem', mr: 0.5}}/>
                             <Typography
                                 variant="caption"
                                 sx={{
@@ -430,55 +397,15 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 
                     {/* Priority selection */}
                     <FormControl variant="outlined" size="small" sx={{minWidth: "150px"}}>
-                        <Select
-                            id={`priority-select-${timeSlot.id}`}
-                            value={selectedPriority}
-                            onChange={handlePriorityChange}
-                            displayEmpty
-                            renderValue={(selected) => {
-                                if (!selected) {
-                                    return <Typography variant="body2" sx={{ color: alpha('#fff', 0.5) }}>Priorität wählen</Typography>;
-                                }
-                                return selected;
-                            }}
-                            endAdornment={
-                                selectedPriority ? (
-                                    <IconButton
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleReset();
-                                        }}
-                                        size="small"
-                                        edge="end"
-                                        sx={{marginRight: 2, color: alpha('#fff', 0.7)}}
-                                    >
-                                        <Close fontSize="small"/>
-                                    </IconButton>
-                                ) : null
-                            }
-                            disabled={isFull && !selectedPriority}
-                            sx={{
-                                bgcolor: alpha('#000', 0.2),
-                                '& .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: alpha('#64b5f6', 0.3),
-                                },
-                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: alpha('#64b5f6', 0.5),
-                                },
-                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: '#1e88e5',
-                                },
-                                '& .MuiSelect-select': {
-                                    color: alpha('#fff', 0.9),
-                                }
-                            }}
-                        >
-                            {timeslotAvailablePriorities.map((priority) => (
-                                <MenuItem key={priority} value={priority}>
-                                    {priority}
-                                </MenuItem>
-                            ))}
-                        </Select>
+                        <WWSelect
+                                id={`priority-select-mobile-${timeSlot.id}`}
+                                options={options}
+                                value={selectedPriority || ''}
+                                onChange={handlePriorityChange}
+                                placeholder="Priorität wählen"
+                                allowClear={true}
+                                disabled={isFull && !selectedPriority}
+                            />
                     </FormControl>
                 </Box>
             </ListItem>
