@@ -60,6 +60,8 @@ const FormCard: React.FC<FormCardProps> = ({
                 borderColor: selected ? spacePalette.primary.main : alpha(spacePalette.primary.main, 0.3),
                 position: 'relative',
                 overflow: 'hidden',
+                paddingX: 2,
+                marginTop: 2,
                 boxShadow: selected
                     ? `0 0 12px ${alpha(spacePalette.primary.main, 0.3)}`
                     : 'none',
