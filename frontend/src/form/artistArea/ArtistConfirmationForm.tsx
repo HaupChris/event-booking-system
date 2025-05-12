@@ -10,20 +10,21 @@ import {
 import { Check, ErrorOutline, FileCopy, OpenInNew, SignalCellularNodata } from "@mui/icons-material";
 import jellyfishImage from '../../img/jellyfish.png';
 import {ArtistBooking, ArtistFormContent} from "./interface";
-import {BookingState} from "./ArtistRegistrationFormContainer;
+import {ArtistBookingState} from "./ArtistRegistrationFormContainer";
+
 
 interface ArtistConfirmationProps {
     booking: ArtistBooking;
     submitBooking: () => void;
     formContent: ArtistFormContent;
-    bookingState: BookingState;
+    bookingState: ArtistBookingState;
 }
 
 function findItemById<T extends { id: number }>(array: T[], id: number): T | undefined {
     return array.find(item => item.id === id);
 }
 
-function ArtistConfirmation(props: ArtistConfirmationProps) {
+function ArtistConfirmationForm(props: ArtistConfirmationProps) {
     const ticket = findItemById(props.formContent.ticket_options, props.booking.ticket_id);
     const beverage_or_undefined = findItemById(props.formContent.beverage_options, props.booking.beverage_id);
     const beverage = beverage_or_undefined ? beverage_or_undefined : {title: "Keine Bierflat"};
@@ -261,4 +262,4 @@ function ArtistConfirmation(props: ArtistConfirmationProps) {
     );
 }
 
-export default ArtistConfirmation;
+export default ArtistConfirmationForm;

@@ -1,14 +1,24 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Alert, Box, CardContent, Typography } from "@mui/material";
-import { AuthContext, TokenContext } from "../../AuthContext";
+import React, {useContext, useEffect, useState} from "react";
+import {Alert, Box, CardContent, Typography} from "@mui/material";
+import {AuthContext, TokenContext} from "../../AuthContext";
 import axios from 'axios';
 
 import StepNavigation from "../../components/core/navigation/StepNavigation";
-import { useFormManagement } from "../../hooks/useFormManagement";
-import { ArtistBooking, ArtistFormContent } from "./interface";
-import { spacePalette } from "../../components/styles/theme";
+import {useFormManagement} from "../../hooks/useFormManagement";
+import {ArtistBooking, ArtistFormContent} from "./interface";
+import {spacePalette} from "../../components/styles/theme";
 import rocketImage from "../../img/rocket.png";
-import { artistAreaTexts } from "../constants/texts";
+import {artistAreaTexts} from "../constants/texts";
+import ArtistPersonalDetailsForm from "./ArtistPersonalDetailsForm";
+import ArtistTicketSelectionForm from "./ArtistTicketSelectionForm";
+import ArtistBeverageSelectionForm from "./ArtistBeverageSelectionForm";
+import ArtistMaterialsForm from "./ArtistMaterialsForm";
+import ArtistEquipmentForm from "./ArtistEquipmentForm";
+import ArtistSignatureForm from "./ArtistSignatureForm";
+import ArtistSummaryForm from "./ArtistSummaryForm";
+import ArtistConfirmationForm from "./ArtistConfirmationForm";
+import ArtistPerformanceForm from "./ArtistPerformanceForm";
+import ArtistFoodSelectionForm from "./ArtistFoodSelectionForm";
 
 enum FormSteps {
     PersonalDetails = 0,
@@ -18,10 +28,9 @@ enum FormSteps {
     Food = 4,
     Materials = 5,
     TechnicalRequirements = 6,
-    SpecialRequests = 7,
-    Signature = 8,
-    Summary = 9,
-    Confirmation = 10,
+    Signature = 7,
+    Summary = 8,
+    Confirmation = 9,
 }
 
 function getEmptyArtistBooking(): ArtistBooking {
@@ -143,9 +152,9 @@ export function ArtistRegistrationFormContainer() {
         isSuccessful: false
     });
 
-    const { token, setToken } = useContext(TokenContext);
+    const {token, setToken} = useContext(TokenContext);
     const maxSteps = Object.keys(FormSteps).length / 2;
-    const { setAuth } = useContext(AuthContext);
+    const {setAuth} = useContext(AuthContext);
 
     const stepTitles: { [key: number]: string } = {
         [FormSteps.PersonalDetails]: artistAreaTexts.personalDetailsForm.title,
@@ -155,7 +164,6 @@ export function ArtistRegistrationFormContainer() {
         [FormSteps.Food]: artistAreaTexts.foodSelectionForm.title,
         [FormSteps.Materials]: artistAreaTexts.materialsForm.title,
         [FormSteps.TechnicalRequirements]: artistAreaTexts.technicalRequirementsForm.title,
-        [FormSteps.SpecialRequests]: artistAreaTexts.specialRequestsForm.title,
         [FormSteps.Signature]: artistAreaTexts.signatureForm.title,
         [FormSteps.Summary]: artistAreaTexts.summaryForm.title,
         [FormSteps.Confirmation]: artistAreaTexts.confirmationForm.initialView.title
@@ -169,7 +177,6 @@ export function ArtistRegistrationFormContainer() {
         [FormSteps.Food]: [],
         [FormSteps.Materials]: [],
         [FormSteps.TechnicalRequirements]: [],
-        [FormSteps.SpecialRequests]: [],
         [FormSteps.Signature]: ['signature'],
         [FormSteps.Summary]: [],
         [FormSteps.Confirmation]: [],
@@ -177,8 +184,8 @@ export function ArtistRegistrationFormContainer() {
 
     useEffect(() => {
         axios.get('/api/artist/formcontent', {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+                headers: {Authorization: `Bearer ${token}`}
+            })
             .then((response) => {
                 setFormContent(response.data);
             })
@@ -239,11 +246,11 @@ export function ArtistRegistrationFormContainer() {
 
     // Submit booking
     const submitBooking = () => {
-        setBookingState(prevState => ({ ...prevState, isSubmitting: true }));
+        setBookingState(prevState => ({...prevState, isSubmitting: true}));
 
         axios.post('/api/artist/submitForm', booking, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+                headers: {Authorization: `Bearer ${token}`}
+            })
             .then(() => {
                 setBookingState({
                     isSuccessful: true,
@@ -279,7 +286,7 @@ export function ArtistRegistrationFormContainer() {
     };
 
     return (
-        <Box sx={{ padding: "8px" }}>
+        <Box sx={{padding: "8px"}}>
             <StepNavigation
                 activeStep={activeStep}
                 maxSteps={maxSteps}
@@ -299,20 +306,17 @@ export function ArtistRegistrationFormContainer() {
                         color={spacePalette.text.primary}
                         align="center"
                         variant="h4"
-                        sx={{ paddingBottom: "1em" }}
+                        sx={{paddingBottom: "1em"}}
                     >
                         {stepTitles[activeStep]}
                     </Typography>
 
                     {currentError && (
-                        <Alert variant="outlined" severity="error" sx={{ my: 2 }}>
+                        <Alert variant="outlined" severity="error" sx={{my: 2}}>
                             {currentError}
                         </Alert>
                     )}
 
-                    {/* Here we'll conditionally render the form components based on activeStep */}
-                    {/* This will be implemented as we create each form component */}
-                    {/* Example:
                     {activeStep === FormSteps.PersonalDetails && (
                         <ArtistPersonalDetailsForm
                             updateBooking={updateBooking}
@@ -321,7 +325,76 @@ export function ArtistRegistrationFormContainer() {
                             formContent={formContent}
                         />
                     )}
-                    */}
+                    {activeStep === FormSteps.PerformanceDetails && (
+                        <ArtistPerformanceForm
+                            updateBooking={updateBooking}
+                            currentBooking={booking}
+                            formValidation={formValidation}
+                            formContent={formContent}
+                        />
+                    )}
+                    {activeStep === FormSteps.Ticket && (
+                        <ArtistTicketSelectionForm
+                            updateBooking={updateBooking}
+                            currentBooking={booking}
+                            formValidation={formValidation}
+                            formContent={formContent}
+                        />
+                    )}
+                    {activeStep === FormSteps.Beverage && (
+                        <ArtistBeverageSelectionForm
+                            updateBooking={updateBooking}
+                            currentBooking={booking}
+                            formValidation={formValidation}
+                            formContent={formContent}
+                        />
+                    )}
+                    {activeStep === FormSteps.Food && (
+                        <ArtistFoodSelectionForm
+                            updateBooking={updateBooking}
+                            currentBooking={booking}
+                            formValidation={formValidation}
+                            formContent={formContent}
+                        />
+                    )}
+                    {activeStep === FormSteps.Materials && (
+                        <ArtistMaterialsForm
+                            updateBooking={updateBooking}
+                            currentBooking={booking}
+                            formValidation={formValidation}
+                            formContent={formContent}
+                        />
+                    )}
+                    {activeStep === FormSteps.TechnicalRequirements && (
+                        <ArtistEquipmentForm
+                            updateBooking={updateBooking}
+                            currentBooking={booking}
+                            formValidation={formValidation}
+                            formContent={formContent}
+                        />
+                    )}
+                    {activeStep === FormSteps.Signature && (
+                        <ArtistSignatureForm
+                            updateBooking={updateBooking}
+                            currentBooking={booking}
+                            formValidation={formValidation}
+                            formContent={formContent}
+                        />
+                    )}
+                    {activeStep === FormSteps.Summary && (
+                        <ArtistSummaryForm
+                            currentBooking={booking}
+                            formContent={formContent}
+                        />
+                    )}
+                    {activeStep === FormSteps.Confirmation && (
+                        <ArtistConfirmationForm
+                            booking={booking}
+                            submitBooking={submitBooking}
+                            formContent={formContent}
+                            bookingState={bookingState}
+                        />
+                    )}
                 </Box>
             </CardContent>
         </Box>
