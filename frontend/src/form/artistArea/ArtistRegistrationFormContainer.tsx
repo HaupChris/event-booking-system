@@ -13,12 +13,12 @@ import ArtistPersonalDetailsForm from "./ArtistPersonalDetailsForm";
 import ArtistTicketSelectionForm from "./ArtistTicketSelectionForm";
 import ArtistBeverageSelectionForm from "./ArtistBeverageSelectionForm";
 import ArtistMaterialsForm from "./ArtistMaterialsForm";
-import ArtistEquipmentForm from "./ArtistEquipmentForm";
 import ArtistSignatureForm from "./ArtistSignatureForm";
 import ArtistSummaryForm from "./ArtistSummaryForm";
 import ArtistConfirmationForm from "./ArtistConfirmationForm";
 import ArtistPerformanceForm from "./ArtistPerformanceForm";
 import ArtistFoodSelectionForm from "./ArtistFoodSelectionForm";
+import ArtistEquipmentForm from "./ArtistEquipmentForm";
 
 enum FormSteps {
     PersonalDetails = 0,

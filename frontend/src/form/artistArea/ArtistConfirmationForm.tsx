@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Button,
     Box,
@@ -7,8 +7,8 @@ import {
     Snackbar, Alert, CircularProgress,
     Modal, Paper
 } from '@mui/material';
-import { Check, ErrorOutline, FileCopy, OpenInNew, SignalCellularNodata } from "@mui/icons-material";
-import jellyfishImage from '../../img/jellyfish.png';
+import {Check, ErrorOutline, FileCopy, OpenInNew, SignalCellularNodata} from "@mui/icons-material";
+import rocketBaak from "../../img/rocket_baak.png"
 import {ArtistBooking, ArtistFormContent} from "./interface";
 import {ArtistBookingState} from "./ArtistRegistrationFormContainer";
 
@@ -99,13 +99,13 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
     }
 
     return (
-        <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
-            <Paper elevation={3} sx={{ p: 3 }}>
+        <Box sx={{width: '100%', maxWidth: 600, mx: 'auto'}}>
+            <Paper elevation={3} sx={{p: 3}}>
                 {props.bookingState.isSubmitted ? (
                     props.bookingState.isSuccessful ? (
                         <Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-                                <img src={jellyfishImage} alt="jellyfish" style={{ width: '115px', height: '115px' }} />
+                            <Box sx={{display: 'flex', justifyContent: 'center', mb: 3}}>
+                                <img src={rocketBaak} alt="jellyfish" style={{width: '115px', height: '115px'}}/>
                             </Box>
 
                             <Typography variant="body1" paragraph>
@@ -114,14 +114,20 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
                             </Typography>
 
                             {props.booking.total_price > 0 ? (
-                                <Box sx={{ mt: 3, border: '2px solid', borderColor: 'primary.main', borderRadius: '5px', p: 3 }}>
+                                <Box sx={{
+                                    mt: 3,
+                                    border: '2px solid',
+                                    borderColor: 'primary.main',
+                                    borderRadius: '5px',
+                                    p: 3
+                                }}>
                                     <Typography variant="h5" gutterBottom>
                                         Dein Beitrag: <strong>{props.booking.total_price}€</strong>
                                     </Typography>
 
                                     <Typography variant="body2" paragraph>
                                         <TextField
-                                            sx={{ width: { xs: '100%', md: '100%' } }}
+                                            sx={{width: {xs: '100%', md: '100%'}}}
                                             variant="standard"
                                             value={betreff}
                                             helperText="Betreff für die Überweisung"
@@ -133,40 +139,40 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
                                         variant="outlined"
                                         color="secondary"
                                         fullWidth
-                                        sx={{ mb: 2 }}
+                                        sx={{mb: 2}}
                                         onClick={() => {
                                             handleCopy();
                                             setCopied(true);
                                         }}
                                     >
-                                        Betreff kopieren <FileCopy />
+                                        Betreff kopieren <FileCopy/>
                                     </Button>
 
                                     <Button fullWidth variant="contained" onClick={handlePaypalClick}>
-                                        Zu unserem Paypal <OpenInNew />
+                                        Zu unserem Paypal <OpenInNew/>
                                     </Button>
                                 </Box>
                             ) : (
-                                <Typography variant="h6" sx={{ mt: 2, textAlign: 'center', color: 'primary.main' }}>
+                                <Typography variant="h6" sx={{mt: 2, textAlign: 'center', color: 'primary.main'}}>
                                     Für dich als Künstler fallen keine Kosten an. Wir freuen uns auf deinen Auftritt!
                                 </Typography>
                             )}
 
-                            <Typography sx={{ pt: 3 }} variant="body2">
+                            <Typography sx={{pt: 3}} variant="body2">
                                 Weitere Informationen erhalten Künstler*innen rechtzeitig vor dem Festival.
                                 Bei Fragen wende dich bitte an unser Künstler-Team.
                             </Typography>
                         </Box>
                     ) : (
-                        <Box sx={{ textAlign: 'center' }}>
-                            <ErrorOutline color="error" style={{ fontSize: 60, marginBottom: '1rem' }} />
+                        <Box sx={{textAlign: 'center'}}>
+                            <ErrorOutline color="error" style={{fontSize: 60, marginBottom: '1rem'}}/>
                             <Typography variant="h6">
                                 Die Anmeldung ist fehlgeschlagen, bitte kontaktiere uns per Email.
                             </Typography>
                         </Box>
                     )
                 ) : (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                         <Typography variant="body1" paragraph>
                             Wir freuen uns, dich als Künstler*in beim Weiher Wald und Wiesenwahn begrüßen zu dürfen!
                         </Typography>
@@ -176,11 +182,11 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
                             variant="contained"
                             color="secondary"
                             onClick={submitBooking}
-                            sx={{ mt: 2 }}
+                            sx={{mt: 2}}
                         >
                             {props.bookingState.isSubmitting ?
-                                <CircularProgress size={24} /> :
-                                <><Check /> Anmeldung absenden</>
+                                <CircularProgress size={24}/> :
+                                <><Check/> Anmeldung absenden</>
                             }
                         </Button>
                     </Box>
@@ -192,16 +198,16 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
                 autoHideDuration={4000}
                 onClose={handleClose}
                 message="Betreff kopiert"
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                anchorOrigin={{vertical: 'top', horizontal: 'center'}}
             />
 
             <Snackbar
                 open={open}
                 autoHideDuration={6000}
                 onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                anchorOrigin={{vertical: 'top', horizontal: 'center'}}
             >
-                <Alert onClose={handleSnackbarClose} severity="error" icon={<SignalCellularNodata />}>
+                <Alert onClose={handleSnackbarClose} severity="error" icon={<SignalCellularNodata/>}>
                     Du bist gerade offline. Bitte stelle sicher, dass du mit dem Internet verbunden bist und
                     versuche es erneut.
                 </Alert>
@@ -221,13 +227,13 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
                     <Typography id="redirect-modal-title" variant="h6" component="h2">
                         Betreff wurde kopiert
                     </Typography>
-                    <Typography id="redirect-modal-description" sx={{ mt: 2 }}>
+                    <Typography id="redirect-modal-description" sx={{mt: 2}}>
                         Vergiss nicht, ihn in die Überweisung einzufügen.
                     </Typography>
                     {countdown > 0 ? (
                         <Box>
-                            <Box sx={{ position: 'relative', display: 'inline-flex', mt: 2 }}>
-                                <CircularProgress variant="determinate" value={((7 - countdown) / 7) * 100} />
+                            <Box sx={{position: 'relative', display: 'inline-flex', mt: 2}}>
+                                <CircularProgress variant="determinate" value={((7 - countdown) / 7) * 100}/>
                                 <Box sx={{
                                     top: 0, left: 0, bottom: 0, right: 0, position: 'absolute',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -237,21 +243,21 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
                                     </Typography>
                                 </Box>
                             </Box>
-                            <Typography sx={{ mt: 2 }}>
+                            <Typography sx={{mt: 2}}>
                                 Weiterleitung zu Paypal ...
                             </Typography>
                         </Box>
                     ) : (
                         <Box>
-                            <Typography sx={{ mt: 2 }}>
+                            <Typography sx={{mt: 2}}>
                                 <strong>Du wurdest nicht weiter geleitet?</strong>
                             </Typography>
                             <a href="https://www.paypal.me/StephanHau" target="_blank" rel="noreferrer">
                                 <Button
-                                    sx={countdown > 0 ? { display: 'none' } : { mt: 2 }}
+                                    sx={countdown > 0 ? {display: 'none'} : {mt: 2}}
                                     fullWidth variant="contained"
                                 >
-                                    Manuell zu Paypal <OpenInNew />
+                                    Manuell zu Paypal <OpenInNew/>
                                 </Button>
                             </a>
                         </Box>
@@ -261,5 +267,6 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
         </Box>
     );
 }
+
 
 export default ArtistConfirmationForm;
