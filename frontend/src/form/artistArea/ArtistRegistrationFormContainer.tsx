@@ -285,8 +285,7 @@ export function ArtistRegistrationFormContainer() {
             });
     };
 
-    return (
-        <Box sx={{padding: "8px"}}>
+    return <Box sx={{padding: "8px"}}>
             <StepNavigation
                 activeStep={activeStep}
                 maxSteps={maxSteps}
@@ -398,5 +397,4 @@ export function ArtistRegistrationFormContainer() {
                 </Box>
             </CardContent>
         </Box>
-    );
 }

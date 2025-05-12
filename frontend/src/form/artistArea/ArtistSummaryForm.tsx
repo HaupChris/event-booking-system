@@ -57,8 +57,7 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
         findItemById(formContent.artist_materials || [], id)
     ).filter(Boolean) as ArtistMaterial[];
 
-    return (
-        <SpacePanelLayout
+    return <SpacePanelLayout
             missionBriefing={artistAreaTexts.summaryForm.missionBriefing}
             footerId={artistAreaTexts.summaryForm.footerId}
         >
@@ -225,7 +224,6 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
                 </FormCard>
             )}
         </SpacePanelLayout>
-    );
 }
 
 export default ArtistSummaryForm;

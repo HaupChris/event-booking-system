@@ -31,7 +31,7 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
                     flexDirection: "column",
                     justifyContent: {xs: 'space-between', md: 'center'},
                 }}>
-        <Box className="navigation-progress" sx={{width: '100%', px: 2, py: 2}}>
+        <Box className="navigation-progress" sx={{px: 2, py: 2}}>
             <LinearProgressWithImage
                 activeStep={activeStep}
                 maxSteps={maxSteps}
@@ -45,7 +45,6 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
                 sx={{
                     display: 'flex',
                     justifyContent: {xs: 'space-between', md: 'center'},
-                    width: '100%',
                     px: {xs: 2, md: 0},
                 }}
             >

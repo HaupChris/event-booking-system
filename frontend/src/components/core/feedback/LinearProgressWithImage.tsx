@@ -55,9 +55,6 @@ const LinearProgressWithImage: React.FC<LinearProgressWithImageProps> = ({
       if (imgElement && imageWidth && containerWidth) {
         const verticalOffset = imageWidth / 10;
         imgElement.style.left = `calc(${percentage}% - ${imageWidth / 2}px)`;
-        imgElement.style.top = `calc(50% - ${imageWidth / 6}px + ${
-          verticalOffset * Math.sin((percentage / 100) * 2 * Math.PI)
-        }px)`;
       }
     };
 
