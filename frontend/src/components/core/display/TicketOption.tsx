@@ -1,12 +1,15 @@
-import {Booking, TicketOption} from "../../../form/userArea/interface";
+import {TicketOption} from "../../../form/userArea/interface";
 import {alpha, Box, FormControlLabel, Paper, Radio, Typography} from "@mui/material";
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
 import SignalWifiStatusbarConnectedNoInternet4Icon from "@mui/icons-material/SignalWifiStatusbarConnectedNoInternet4";
 import React from "react";
 
-function TicketOptionComponent(props: { currentBooking: Booking, option: TicketOption, soldOut: boolean }) {
+function TicketOptionComponent(props: {
+    currentBooking: { ticket_id: number },
+    option: TicketOption,
+    soldOut: boolean
+}) {
     return <Paper
-
         elevation={0}
         sx={{
             mb: 2,

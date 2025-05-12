@@ -1,0 +1,329 @@
+import React, { useContext, useEffect, useState } from "react";
+import { Alert, Box, CardContent, Typography } from "@mui/material";
+import { AuthContext, TokenContext } from "../../AuthContext";
+import axios from 'axios';
+
+import StepNavigation from "../../components/core/navigation/StepNavigation";
+import { useFormManagement } from "../../hooks/useFormManagement";
+import { ArtistBooking, ArtistFormContent } from "./interface";
+import { spacePalette } from "../../components/styles/theme";
+import rocketImage from "../../img/rocket.png";
+import { artistAreaTexts } from "../constants/texts";
+
+enum FormSteps {
+    PersonalDetails = 0,
+    PerformanceDetails = 1,
+    Ticket = 2,
+    Beverage = 3,
+    Food = 4,
+    Materials = 5,
+    TechnicalRequirements = 6,
+    SpecialRequests = 7,
+    Signature = 8,
+    Summary = 9,
+    Confirmation = 10,
+}
+
+function getEmptyArtistBooking(): ArtistBooking {
+    return {
+        last_name: "",
+        first_name: "",
+        email: "",
+        phone: "",
+        ticket_id: -1,
+        beverage_id: -1,
+        food_id: -1,
+        artist_material_ids: [],
+        total_price: 0,
+        signature: "",
+        is_paid: false,
+        paid_amount: 0,
+        payment_notes: "",
+        payment_date: "",
+        equipment: "",
+        special_requests: "",
+        performance_details: ""
+    }
+}
+
+export function getDummyArtistFormContent(): ArtistFormContent {
+    return {
+        ticket_options: [
+            {
+                id: 1,
+                title: 'Option 1',
+                price: 0,  // Often free for artists
+                amount: 10,
+                num_booked: 5,
+            },
+            {
+                id: 2,
+                title: 'Option 2',
+                price: 0,
+                amount: 5,
+                num_booked: 2,
+            },
+        ],
+        beverage_options: [],
+        food_options: [],
+        artist_materials: []
+    };
+}
+
+export interface ArtistFormProps {
+    updateBooking: (key: keyof ArtistBooking, value: any) => void;
+    currentBooking: ArtistBooking;
+    formValidation: { [key in keyof ArtistBooking]?: string };
+    formContent: ArtistFormContent;
+}
+
+export interface ArtistBookingState {
+    isSubmitted: boolean;
+    isSubmitting: boolean;
+    isSuccessful: boolean;
+}
+
+const validationRules = {
+    first_name: (value: string) => {
+        const pattern = /^[A-Za-zÄÖÜäöüß\s]+$/;
+        if (value === '') return 'Bitte gib einen Vornamen an';
+        if (!pattern.test(value)) return 'Bitte verwende nur Buchstaben für deinen Vornamen';
+        return '';
+    },
+    last_name: (value: string) => {
+        const pattern = /^[A-Za-zÄÖÜäöüß\s]+$/;
+        if (value === '') return 'Bitte gib einen Nachnamen an';
+        if (!pattern.test(value)) return 'Bitte verwende nur Buchstaben für deinen Nachnamen';
+        return '';
+    },
+    email: (value: string) => {
+        const pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+        if (value === '') return 'Bitte gib eine Email ein';
+        if (!pattern.test(value)) return 'Bitte gib eine gültige Email ein.';
+        return '';
+    },
+    phone: (value: string) => {
+        const pattern = /^\d{10,15}$/;
+        if (value === '') return 'Bitte gib eine Telefonnummer ein';
+        if (!pattern.test(value)) return 'Bitte gib eine gültige Telefonnummer ein';
+        return '';
+    },
+    ticket_id: (value: number) => {
+        return value === -1 ? 'Bitte wähle ein Ticket aus.' : '';
+    },
+    performance_details: (value: string) => {
+        return value === '' ? 'Bitte gib Details zu deinem Auftritt an.' : '';
+    },
+    signature: (value: string) => {
+        return value === '' ? 'Wir würden uns freuen, wenn du das Formular unterschreibst' : '';
+    }
+};
+
+export function ArtistRegistrationFormContainer() {
+    const {
+        formState: booking,
+        validation: formValidation,
+        currentError,
+        updateField,
+        activeStep,
+        handleNext,
+        handlePrevious
+    } = useFormManagement<ArtistBooking>({
+        initialState: getEmptyArtistBooking(),
+        validationRules,
+        storageKey: 'artistBooking',
+        versionKey: 'artistFormVersion',
+        currentVersion: '1.0'
+    });
+
+    const [formContent, setFormContent] = useState<ArtistFormContent>(getDummyArtistFormContent());
+    const [bookingState, setBookingState] = useState<ArtistBookingState>({
+        isSubmitted: false,
+        isSubmitting: false,
+        isSuccessful: false
+    });
+
+    const { token, setToken } = useContext(TokenContext);
+    const maxSteps = Object.keys(FormSteps).length / 2;
+    const { setAuth } = useContext(AuthContext);
+
+    const stepTitles: { [key: number]: string } = {
+        [FormSteps.PersonalDetails]: artistAreaTexts.personalDetailsForm.title,
+        [FormSteps.PerformanceDetails]: artistAreaTexts.performanceDetailsForm.title,
+        [FormSteps.Ticket]: artistAreaTexts.ticketSelectionForm.title,
+        [FormSteps.Beverage]: artistAreaTexts.beverageSelectionForm.title,
+        [FormSteps.Food]: artistAreaTexts.foodSelectionForm.title,
+        [FormSteps.Materials]: artistAreaTexts.materialsForm.title,
+        [FormSteps.TechnicalRequirements]: artistAreaTexts.technicalRequirementsForm.title,
+        [FormSteps.SpecialRequests]: artistAreaTexts.specialRequestsForm.title,
+        [FormSteps.Signature]: artistAreaTexts.signatureForm.title,
+        [FormSteps.Summary]: artistAreaTexts.summaryForm.title,
+        [FormSteps.Confirmation]: artistAreaTexts.confirmationForm.initialView.title
+    };
+
+    const requiredFields: { [key: number]: (keyof ArtistBooking)[] } = {
+        [FormSteps.PersonalDetails]: ['last_name', 'first_name', 'email', 'phone'],
+        [FormSteps.PerformanceDetails]: ['performance_details'],
+        [FormSteps.Ticket]: ['ticket_id'],
+        [FormSteps.Beverage]: [],
+        [FormSteps.Food]: [],
+        [FormSteps.Materials]: [],
+        [FormSteps.TechnicalRequirements]: [],
+        [FormSteps.SpecialRequests]: [],
+        [FormSteps.Signature]: ['signature'],
+        [FormSteps.Summary]: [],
+        [FormSteps.Confirmation]: [],
+    };
+
+    useEffect(() => {
+        axios.get('/api/artist/formcontent', {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+            .then((response) => {
+                setFormContent(response.data);
+            })
+            .catch((error) => {
+                console.error("API error details:", {
+                    status: error.response?.status,
+                    statusText: error.response?.statusText,
+                    data: error.response?.data,
+                    headers: error.response?.headers
+                });
+                setAuth(false);
+                setToken("");
+            });
+    }, [setAuth, setToken, token]);
+
+    const handleStepNext = () => {
+        handleNext(requiredFields[activeStep]);
+    };
+
+    const updateBooking = (key: keyof ArtistBooking, value: any) => {
+        updateField(key, value);
+
+        // Calculate total price when relevant fields change
+        if (['ticket_id', 'beverage_id', 'food_id'].includes(key)) {
+            // Calculate total price based on selections
+            let total_price = 0;
+
+            // Add ticket price if selected
+            if (key === 'ticket_id' || booking.ticket_id !== -1) {
+                const ticketId = key === 'ticket_id' ? value : booking.ticket_id;
+                const ticketOption = formContent.ticket_options.find(t => t.id === ticketId);
+                if (ticketOption) {
+                    total_price += ticketOption.price;
+                }
+            }
+
+            // Add beverage price if selected
+            if (key === 'beverage_id' || booking.beverage_id !== -1) {
+                const beverageId = key === 'beverage_id' ? value : booking.beverage_id;
+                const beverageOption = formContent.beverage_options.find(b => b.id === beverageId);
+                if (beverageOption) {
+                    total_price += beverageOption.price;
+                }
+            }
+
+            // Add food price if selected
+            if (key === 'food_id' || booking.food_id !== -1) {
+                const foodId = key === 'food_id' ? value : booking.food_id;
+                const foodOption = formContent.food_options.find(f => f.id === foodId);
+                if (foodOption) {
+                    total_price += foodOption.price;
+                }
+            }
+
+            updateField('total_price', total_price);
+        }
+    };
+
+    // Submit booking
+    const submitBooking = () => {
+        setBookingState(prevState => ({ ...prevState, isSubmitting: true }));
+
+        axios.post('/api/artist/submitForm', booking, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+            .then(() => {
+                setBookingState({
+                    isSuccessful: true,
+                    isSubmitting: false,
+                    isSubmitted: true
+                });
+
+                // Auto logout after an hour
+                setTimeout(() => {
+                    setToken("");
+                    setAuth(false);
+                }, 1000 * 60 * 60);
+            })
+            .catch((error) => {
+                console.log(error);
+
+                if (error.status === 401) {
+                    setToken("");
+                    setAuth(false);
+                } else {
+                    setBookingState({
+                        isSuccessful: false,
+                        isSubmitted: true,
+                        isSubmitting: false
+                    });
+
+                    setTimeout(() => {
+                        setToken("");
+                        setAuth(false);
+                    }, 1000 * 10);
+                }
+            });
+    };
+
+    return (
+        <Box sx={{ padding: "8px" }}>
+            <StepNavigation
+                activeStep={activeStep}
+                maxSteps={maxSteps}
+                progressImage={rocketImage}
+                hideNavigation={bookingState.isSubmitted}
+                onNext={handleStepNext}
+                onPrevious={handlePrevious}
+            />
+            <CardContent>
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                    <Typography
+                        color={spacePalette.text.primary}
+                        align="center"
+                        variant="h4"
+                        sx={{ paddingBottom: "1em" }}
+                    >
+                        {stepTitles[activeStep]}
+                    </Typography>
+
+                    {currentError && (
+                        <Alert variant="outlined" severity="error" sx={{ my: 2 }}>
+                            {currentError}
+                        </Alert>
+                    )}
+
+                    {/* Here we'll conditionally render the form components based on activeStep */}
+                    {/* This will be implemented as we create each form component */}
+                    {/* Example:
+                    {activeStep === FormSteps.PersonalDetails && (
+                        <ArtistPersonalDetailsForm
+                            updateBooking={updateBooking}
+                            currentBooking={booking}
+                            formValidation={formValidation}
+                            formContent={formContent}
+                        />
+                    )}
+                    */}
+                </Box>
+            </CardContent>
+        </Box>
+    );
+}

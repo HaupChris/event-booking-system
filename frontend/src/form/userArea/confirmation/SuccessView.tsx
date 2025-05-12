@@ -36,7 +36,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({
 
     return (
         <SpacePanelLayout
-            missionBriefing={userAreaTexts.confirmationForm.successView.missionBriefing}
+            missionBriefing={userAreaTexts.confirmationForm.successView.subtitle}
             footerId={userAreaTexts.confirmationForm.successView.footerId}
         >
             {/* Success Header */}
@@ -75,18 +75,18 @@ const SuccessView: React.FC<SuccessViewProps> = ({
                 </Box>
             )}
 
-            <Typography
-                variant="body1"
-                paragraph
-                sx={{
-                    mb: 3,
-                    fontSize: '1.1rem',
-                    color: alpha('#fff', 0.8),
-                    textAlign: 'center',
-                }}
-            >
-                {userAreaTexts.confirmationForm.successView.subtitle}
-            </Typography>
+            {/*<Typography*/}
+            {/*    variant="body1"*/}
+            {/*    paragraph*/}
+            {/*    sx={{*/}
+            {/*        mb: 3,*/}
+            {/*        fontSize: '1.1rem',*/}
+            {/*        color: alpha('#fff', 0.8),*/}
+            {/*        textAlign: 'center',*/}
+            {/*    }}*/}
+            {/*>*/}
+            {/*    */}
+            {/*</Typography>*/}
 
             {/* Payment Box */}
             <PaymentInfo

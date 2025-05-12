@@ -1,4 +1,3 @@
-// src/components/core/display/FormCard.tsx
 import React, {ReactNode, useState} from 'react';
 import {
     Paper,
@@ -97,8 +96,9 @@ const FormCard: React.FC<FormCardProps> = ({
             {/* Card Header */}
             {(title || icon) && (
                 <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
+                    display: 'inline-flex',
+                    // alignItems: 'center',
+                    justifyContent: 'center',
                     p: 2,
                     pb: description ? 1 : 2,
                     position: 'relative',
@@ -217,15 +217,6 @@ const FormCard: React.FC<FormCardProps> = ({
                     </Typography>
                 </Box>
             )}
-
-            {/*/!* Divider if header exists *!/*/}
-            {/*{(title || icon || description) && (*/}
-            {/*  <Divider sx={{*/}
-            {/*    borderColor: alpha(spacePalette.primary.main, 0.2),*/}
-            {/*    position: 'relative',*/}
-            {/*    zIndex: 2,*/}
-            {/*  }}/>*/}
-            {/*)}*/}
 
             {/* Main Content */}
             <Box sx={{

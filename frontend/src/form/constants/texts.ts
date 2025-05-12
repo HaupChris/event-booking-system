@@ -163,3 +163,152 @@ export const userAreaTexts = {
     }
   }
 };
+
+export const artistAreaTexts = {
+  personalDetailsForm: {
+    missionBriefing: "Bitte gib deine Kontaktinformationen für die Künstler-Registrierung ein.",
+    footerId: "WWWW-ARTIST-REGISTRATION // ID-2025",
+    title: "Künstler-Daten",
+    subtitle: "Do, 28.08. - So, 31.08.2025"
+  },
+
+  performanceDetailsForm: {
+    missionBriefing: "Teile uns Details zu deinem Auftritt mit, damit wir dich optimal einplanen können.",
+    footerId: "WWWW-PERFORMANCE-DETAILS // ID-2025",
+    title: "Auftrittsdetails",
+    preferredDayLabel: "Bevorzugter Auftrittstag",
+    preferredTimeLabel: "Bevorzugte Auftrittszeit",
+    durationLabel: "Dauer des Auftritts (in Minuten)",
+    genreLabel: "Genre / Stil",
+    descriptionLabel: "Beschreibung deines Acts",
+    bandMembersLabel: "Bandmitglieder (falls zutreffend)"
+  },
+
+  ticketSelectionForm: {
+    missionBriefing: "Wähle die Tage aus, an denen du als Künstler am Festival teilnehmen möchtest.",
+    footerId: "WWWW-ARTIST-SCHEDULE // ID-2025",
+    title: "Festival-Teilnahme"
+  },
+
+  beverageSelectionForm: {
+    missionBriefing: "Als Künstler hast du Zugang zur Getränkestation. Wähle deine bevorzugte Option.",
+    footerId: "WWWW-ARTIST-BEVERAGE // ID-2025",
+    title: "Getränkeauswahl",
+    noBeverage: "Kein Getränkepaket"
+  },
+
+  foodSelectionForm: {
+    missionBriefing: "Wähle deine Mahlzeiten für das Festival. Als Künstler erhältst du spezielle Konditionen.",
+    footerId: "WWWW-ARTIST-FOOD // ID-2025",
+    title: "Essensauswahl",
+    noFood: "Kein Essen"
+  },
+
+  materialsForm: {
+    missionBriefing: "Falls du spezielle Ausrüstung mitbringen kannst, hilft das bei der Organisation des Festivals.",
+    footerId: "WWWW-ARTIST-EQUIPMENT // ID-2025",
+    title: "Mitgebrachte Ausrüstung",
+    materialsTitle: "Verfügbare Materialien",
+    bringingItems: (count: number) => `Du bringst ${count} ${count === 1 ? 'Gegenstand' : 'Gegenstände'} mit`
+  },
+
+  technicalRequirementsForm: {
+    missionBriefing: "Teile uns mit, welche technische Ausrüstung du für deinen Auftritt benötigst.",
+    footerId: "WWWW-TECHNICAL-REQUIREMENTS // ID-2025",
+    title: "Technische Anforderungen",
+    equipmentLabel: "Benötigte Ausrüstung",
+    equipmentPlaceholder: "Beschreibe hier deine technischen Anforderungen (Mikrofone, Verstärker, etc.)",
+    stageSetupLabel: "Bühnenaufbau",
+    stageSetupDescription: "Beschreibe, wie dein Bühnenaufbau aussehen soll."
+  },
+
+  specialRequestsForm: {
+    missionBriefing: "Hast du besondere Wünsche oder Anforderungen für deinen Auftritt?",
+    footerId: "WWWW-SPECIAL-REQUESTS // ID-2025",
+    title: "Besondere Anfragen",
+    specialRequestsLabel: "Besondere Wünsche",
+    specialRequestsPlaceholder: "Hast du besondere Anforderungen oder Wünsche für deinen Auftritt?",
+    additionalInfoLabel: "Zusätzliche Informationen",
+    additionalInfoPlaceholder: "Gibt es sonst noch etwas, das wir wissen sollten?"
+  },
+
+  signatureForm: {
+    missionBriefing: "Bitte bestätige mit deiner Unterschrift, dass du als Künstler beim Festival teilnehmen wirst.",
+    footerId: "WWWW-ARTIST-CONFIRMATION // ID-2025",
+    title: "Teilnahmebestätigung",
+    legalTitle: "Bestätigung der Künstlerbedingungen",
+    legalText: "Hiermit bestätige ich, dass ich als Künstler am 'Weiher Wald und Weltall-Wahn 2025' teilnehmen werde. Ich verpflichte mich, zu den vereinbarten Zeiten aufzutreten und die Regeln des Festivals zu respektieren. Der Veranstalter haftet nicht für persönliche Gegenstände oder Ausrüstung.",
+    signatureTitle: "Deine Unterschrift",
+    validationError: "Bitte unterschreibe das Formular zur Bestätigung"
+  },
+
+  summaryForm: {
+    missionBriefing: "Überprüfe deine Künstler-Daten und Auftrittsdetails vor der endgültigen Bestätigung.",
+    footerId: "WWWW-ARTIST-SUMMARY // ID-2025",
+    title: "Zusammenfassung",
+    artistContribution: "Künstlerbeitrag",
+    personalData: "Persönliche Daten",
+    performanceDetails: "Auftrittsdetails",
+    participationOption: "Festivalteilnahme",
+    catering: "Verpflegung",
+    beverageTitle: "Getränkeauswahl",
+    foodTitle: "Essensauswahl",
+    equipment: "Ausrüstung",
+    technicalRequirements: "Technische Anforderungen",
+    specialRequests: "Besondere Anfragen",
+    bringingItems: "Ich bringe mit:",
+    noMaterialsSelected: "Keine Materialien ausgewählt"
+  },
+
+  confirmationForm: {
+    initialView: {
+      missionBriefing: "Bereit für den kosmischen Auftritt! Bitte bestätige deine Teilnahme als Künstler.",
+      footerId: "WWWW-ARTIST-LAUNCH-SEQUENCE // ID-2025",
+      title: "Bereit für den großen Auftritt!",
+      subtitle: "Wir freuen uns, dass du als Künstler beim Weiher Wald und Weltall-Wahn dabei sein möchtest! Mit dem Absenden der Buchung bestätigst du deine Teilnahme.",
+      totalContribution: "Dein Gesamtbeitrag:",
+      submitButton: "Anmeldung absenden",
+      offlineWarning: "Du bist momentan offline. Bitte stelle eine Internetverbindung her, bevor du deine Anmeldung absendest.",
+      errorMessage: "Es gab ein Problem beim Absenden der Anmeldung. Bitte versuche es erneut oder kontaktiere den Support.",
+      paymentNote: "Falls ein Beitrag anfällt, kannst du diesen später bezahlen."
+    },
+
+    successView: {
+      missionBriefing: "Deine Künstler-Registrierung für das Weiher Wald & Weltall-Wahn war erfolgreich!",
+      footerId: "WWWW-ARTIST-CONFIRMATION // ID-2025",
+      title: "Deine Anmeldung war erfolgreich!",
+      subtitle: "Du erhältst in Kürze eine Bestätigungsmail mit allen Details zu deiner Anmeldung. Wir werden uns vor dem Festival mit weiteren Informationen zu deinem Auftritt bei dir melden.",
+      footer: "Wir freuen uns auf deinen Auftritt beim Weiher Wald und Weltall-Wahn!"
+    },
+
+    errorView: {
+      missionBriefing: "Wir haben ein Problem mit deiner Künstler-Registrierung. Bitte versuche es erneut oder kontaktiere uns.",
+      footerId: "WWWW-ERROR-RECOVERY // ID-2025",
+      title: "Anmeldung fehlgeschlagen",
+      subtitle: "Leider konnte deine Anmeldung nicht abgeschlossen werden. Das kann verschiedene Gründe haben:",
+      reasons: [
+        "Netzwerkprobleme oder Serverüberlastung",
+        "Probleme bei der Datenverarbeitung",
+        "Technische Schwierigkeiten im System"
+      ],
+      contactInfo: "Bitte kontaktiere Christian Hauptmann per E-Mail oder Telefon, um deine Anmeldung manuell abzuschließen.",
+      retryButton: "Erneut versuchen"
+    },
+
+    paymentInfo: {
+      title: "Zahlungsinformationen (falls zutreffend)",
+      instructionsSubject: "Bitte verwende diesen Betreff für deine Überweisung:",
+      subjectHelp: "Der Betreff hilft uns, deine Zahlung korrekt zuzuordnen.",
+      paypalButton: "Jetzt mit PayPal bezahlen",
+      alternativePayment: "Kein PayPal? Kontaktiere bitte direkt Stephan Hauptmann für alternative Zahlungsmöglichkeiten."
+    },
+
+    redirectModal: {
+      title: "Betreff wurde kopiert",
+      subtitle: "Bitte füge den Betreff in deine PayPal-Überweisung ein, damit wir deine Zahlung zuordnen können.",
+      redirectText: (seconds: number) => `Weiterleitung zu PayPal in ${seconds} Sekunden...`,
+      manualRedirectText: "Du wurdest nicht weitergeleitet?",
+      manualRedirectButton: "Manuell zu PayPal"
+    }
+  }
+};

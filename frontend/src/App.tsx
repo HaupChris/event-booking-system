@@ -7,10 +7,11 @@ import { UserRegistrationFormContainer } from "./form/userArea/UserRegistrationF
 import Dashboard from "./form/adminArea/Dashboard";
 import AdminLoginPage from "./adminLoginPage";
 import ArtistLoginPage from "./artistLoginPage";
-import { ArtistFormContainer } from './form/artistArea/artistFormContainer';
+import { ArtistRegistrationFormContainer } from './form/artistArea/ArtistRegistrationFormContainer';
 import spaceTheme from './components/styles/theme';
 import SpaceBackground from './components/core/layouts/SpaceBackground';
 import UserLoginPage from "./form/userArea/UserLoginPage";
+
 
 const App = () => {
   const [auth, setAuth] = useState(false);
@@ -57,7 +58,7 @@ const App = () => {
 
                 {/* Artist routes */}
                 <Route path="/artist" element={auth ? <Navigate replace to="/artist-form" /> : <ArtistLoginPage />} />
-                <Route path="/artist-form" element={auth ? <ArtistFormContainer /> : <Navigate replace to="/artist" />} />
+                <Route path="/artist-form" element={auth ? <ArtistRegistrationFormContainer/> : <Navigate replace to="/artist" />} />
 
                 {/* Admin routes */}
                 <Route path="/admin" element={isAdmin ? <Navigate replace to="/admin/dashboard" /> : <AdminLoginPage />} />

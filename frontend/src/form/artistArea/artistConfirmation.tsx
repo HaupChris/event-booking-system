@@ -10,7 +10,7 @@ import {
 import { Check, ErrorOutline, FileCopy, OpenInNew, SignalCellularNodata } from "@mui/icons-material";
 import jellyfishImage from '../../img/jellyfish.png';
 import {ArtistBooking, ArtistFormContent} from "./interface";
-import {BookingState} from "./artistFormContainer";
+import {BookingState} from "./ArtistRegistrationFormContainer;
 
 interface ArtistConfirmationProps {
     booking: ArtistBooking;

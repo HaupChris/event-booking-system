@@ -1,39 +1,17 @@
-import React from 'react';
-import { FormControl, FormControlLabel, Radio, RadioGroup, Typography, Paper, Box } from "@mui/material";
-import { ArtistFormProps } from './artistFormContainer';
+import React from "react";
+import {ArtistFormProps} from "./ArtistRegistrationFormContainer";
+import {artistAreaTexts} from "../constants/texts";
+import TicketSelectionFormBase from "../../components/core/forms/TicketSelectionFormBase";
 
-function ArtistTicketForm(props: ArtistFormProps) {
-    const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        props.updateBooking('ticket_id', Number((event.target as HTMLInputElement).value));
-    };
-
-    return (
-        <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
-            <Paper elevation={3} sx={{ p: 3 }}>
-                <Typography variant="body1" sx={{ mb: 3 }}>
-                    Bitte wähle die Tage aus, an denen du am Festival teilnehmen wirst. Als Künstler*in ist dein Eintritt kostenlos.
-                </Typography>
-
-                <FormControl component="fieldset" error={!!props.formValidation.ticket_id} required>
-                    <RadioGroup
-                        name="ticketOptions"
-                        value={props.currentBooking.ticket_id}
-                        onChange={handleRadioChange}
-                    >
-                        {props.formContent.ticket_options.map((option) => (
-                            <FormControlLabel
-                                sx={{ padding: "0.5em 0" }}
-                                key={option.id}
-                                value={option.id}
-                                control={<Radio />}
-                                label={`${option.title}`}
-                            />
-                        ))}
-                    </RadioGroup>
-                </FormControl>
-            </Paper>
-        </Box>
-    );
+function ArtistTicketSelectionForm(props: ArtistFormProps) {
+    return <TicketSelectionFormBase
+        currentBooking={props.currentBooking}
+        updateBooking={props.updateBooking}
+        formContent={props.formContent}
+        formValidation={props.formValidation}
+        texts={artistAreaTexts.ticketSelectionForm}
+        maxNumTicketsPerDay={50}
+    />;
 }
 
-export default ArtistTicketForm;
+export default ArtistTicketSelectionForm;
