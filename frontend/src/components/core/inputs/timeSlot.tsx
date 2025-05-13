@@ -1,4 +1,4 @@
-import {Booking, TimeSlot as TimeSlotType} from '../userArea/interface';
+import {Booking, TimeSlot as TimeSlotType} from '../../../form/userArea/interface';
 import {
     Box,
     FormControl,
@@ -9,13 +9,13 @@ import {
     CircularProgress
 } from '@mui/material';
 import React from 'react';
-import {PRIORITIES} from "../userArea/constants";
+import {PRIORITIES} from "../../../form/userArea/constants";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import Chip from '@mui/material/Chip';
-import WWSelect from "../../components/core/inputs/WWSelect";
-import {spacePalette} from "../../components/styles/theme";
+import WWSelect from "./WWSelect";
+import {spacePalette} from "../../styles/theme";
 
 interface TimeSlotProps {
     timeSlot: TimeSlotType;

@@ -1,6 +1,6 @@
 import React, { useEffect} from 'react';
 // Import your rocket image
-import rocketImage from '../../img/rocket_baak.png'; // Update this path to your actual rocket image
+import rocketImage from '../../../img/rocket_baak.png'; // Update this path to your actual rocket image
 
 const AnimatedRocket: React.FC<{ onAnimationComplete: () => void }> = ({
   onAnimationComplete

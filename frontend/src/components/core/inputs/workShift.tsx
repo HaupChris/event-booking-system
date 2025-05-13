@@ -1,9 +1,9 @@
-import {Booking, WorkShift as WorkShiftType} from '../userArea/interface';
+import {Booking, WorkShift as WorkShiftType} from '../../../form/userArea/interface';
 import {Box, List, ListItem, Typography, alpha} from '@mui/material';
 import React, {useEffect, useState} from 'react';
 import TimeSlot from './timeSlot';
-import '../../css/workShift.css';
-import {PRIORITIES} from "../userArea/constants";
+import '../../../css/workShift.css';
+import {PRIORITIES} from "../../../form/userArea/constants";
 import AssignmentIcon from '@mui/icons-material/Assignment';
 
 interface WorkShiftProps {
