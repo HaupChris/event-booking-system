@@ -57,6 +57,11 @@ class TicketOption(Interface):
     num_booked: int = 0
 
 @dataclass
+class Profession(Interface):
+    id: int
+    title: str
+
+@dataclass
 class FormContent(Interface):
     ticket_options: List[TicketOption]
     beverage_options: List[BeverageOption]
@@ -64,6 +69,7 @@ class FormContent(Interface):
     work_shifts: List[WorkShift]
     materials: List[Material]
     artist_materials: List[ArtistMaterial] = field(default_factory=list)
+    professions: List[Profession] = field(default_factory=list)
 
 @dataclass
 class Booking(Interface):
@@ -87,6 +93,7 @@ class Booking(Interface):
     payment_notes: str
     payment_date: str
     artist_material_ids: List[int] = field(default_factory=list)
+    profession_ids: List[int] = field(default_factory=list)
 
 @dataclass
 class BookingWithTimestamp(Booking):
@@ -113,6 +120,7 @@ class ArtistBooking(Interface):
     equipment: str = ""
     special_requests: str = ""
     performance_details: str = ""
+    profession_ids: List[int] = field(default_factory=list)
 
 
 @dataclass
@@ -127,3 +135,4 @@ class ArtistFormContent(Interface):
     beverage_options: List[BeverageOption]
     food_options: List[FoodOption]
     artist_materials: List[ArtistMaterial]
+    professions: List[Profession] = field(default_factory=list)

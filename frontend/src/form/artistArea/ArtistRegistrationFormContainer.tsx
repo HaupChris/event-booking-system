@@ -51,7 +51,8 @@ function getEmptyArtistBooking(): ArtistBooking {
         payment_date: "",
         equipment: "",
         special_requests: "",
-        performance_details: ""
+        performance_details: "",
+        profession_ids: []
     }
 }
 
@@ -61,7 +62,7 @@ export function getDummyArtistFormContent(): ArtistFormContent {
             {
                 id: 1,
                 title: 'Option 1',
-                price: 0,  // Often free for artists
+                price: 0,
                 amount: 10,
                 num_booked: 5,
             },
@@ -75,7 +76,8 @@ export function getDummyArtistFormContent(): ArtistFormContent {
         ],
         beverage_options: [],
         food_options: [],
-        artist_materials: []
+        artist_materials: [],
+        professions: [],
     };
 }
 

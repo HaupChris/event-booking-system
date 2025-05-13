@@ -545,6 +545,41 @@ const ArtistsPage: React.FC = () => {
                                     </Box>
                                 </Grid>
 
+                                {/* Professions */}
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle1" color="primary" gutterBottom sx={{mt: 2}}>
+                                        Berufliche Qualifikationen
+                                    </Typography>
+                                    <Divider sx={{mb: 2}}/>
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Typography variant="body2" gutterBottom>
+                                        Berufliche Qualifikationen:
+                                    </Typography>
+                                    <Box sx={{pl: 2}}>
+                                        {(editedArtist.profession_ids || []).length > 0 ? (
+                                            <List dense>
+                                                {(editedArtist.profession_ids || []).map((professionId: number) => {
+                                                    const profession = artistFormContent.professions?.find(p => p.id === professionId);
+                                                    return (
+                                                        <ListItem key={professionId}>
+                                                            <ListItemText
+                                                                primary={profession ? profession.title : `Profession ID: ${professionId}`}
+                                                            />
+                                                        </ListItem>
+                                                    );
+                                                })}
+                                            </List>
+                                        ) : (
+                                            <Typography variant="body2" color="text.secondary">
+                                                Keine beruflichen Qualifikationen angegeben
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                </Grid>
+
+
                                 {/* Payment Information */}
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle1" color="primary" gutterBottom sx={{mt: 2}}>

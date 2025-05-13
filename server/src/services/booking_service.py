@@ -14,23 +14,22 @@ if IN_DOCKER:
     # Docker paths
     DB_DIR='/app/user_data'
     DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
-
     DATA_DIR='/app/data'
     REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, 'schema.sql')
-    ARTIST_SCHEMA_PATH = os.path.join(DATA_DIR, 'artist_schema.sql')
+
 else:
     # Local development paths
     DB_DIR = os.path.join(os.path.dirname(__file__), '../../db')
     DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
     DATA_DIR=os.path.join(os.path.dirname(__file__), '../../data')
     REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, 'schema.sql')
-    ARTIST_SCHEMA_PATH = os.path.join(DATA_DIR, 'artist_schema.sql')
+
 
 
 # Ensure database is initialized on import
 
 if not os.path.exists(DB_FILE_PATH):
-    init_db(DB_FILE_PATH, [REGULAR_SCHEMA_PATH, ARTIST_SCHEMA_PATH])
+    init_db(DB_FILE_PATH, [REGULAR_SCHEMA_PATH])
 
 
 def _connect_db() -> sqlite3.Connection:
@@ -148,6 +147,22 @@ def save_signature_image(booking: Booking) -> None:
         file.write(img_data)
 
 
+def assign_professions(booking_id: int, profession_ids: List[int]) -> None:
+    """
+    Inserts the chosen professions into BookingProfessions.
+    """
+    if not profession_ids:
+        return
+    with closing(_connect_db()) as conn:
+        cursor = conn.cursor()
+        for profession_id in profession_ids:
+            cursor.execute("""
+                           INSERT INTO BookingProfessions (booking_id, profession_id)
+                           VALUES (?, ?)
+                           """, (booking_id, profession_id))
+        conn.commit()
+
+
 def insert_booking(booking: Booking) -> bool:
     """
     Inserts a booking if it does not already exist. Returns True if inserted, False if duplicate.
@@ -158,7 +173,7 @@ def insert_booking(booking: Booking) -> bool:
     user_id = create_user(booking)
     booking_id = create_booking(user_id, booking)
     assign_materials(booking_id, booking.material_ids)
-
+    assign_professions(booking_id, booking.profession_ids)
     # Save signature as a file
     save_signature_image(booking)
     return True
@@ -206,6 +221,13 @@ def get_all_bookings() -> List[BookingWithTimestamp]:
                            """, (booking_id,))
             material_ids = [item[0] for item in cursor.fetchall()]
 
+            cursor.execute("""
+                           SELECT profession_id
+                           FROM BookingProfessions
+                           WHERE booking_id = ?
+                           """, (booking_id,))
+            profession_ids = [item[0] for item in cursor.fetchall()]
+
             booking = BookingWithTimestamp(
                 id=booking_id,
                 last_name=row[1],
@@ -227,7 +249,7 @@ def get_all_bookings() -> List[BookingWithTimestamp]:
                 paid_amount= row[17],
                 payment_notes=row[18],
                 payment_date=row[19],
-
+                profession_ids=profession_ids,
                 material_ids=material_ids
             )
             bookings.append(booking)

@@ -49,6 +49,13 @@ def get_all_artist_bookings() -> List[ArtistBookingWithTimestamp]:
                 """, (booking_id,))
             material_ids = [item[0] for item in cursor.fetchall()]
 
+            cursor.execute("""
+                           SELECT profession_id
+                           FROM ArtistBookingProfessions
+                           WHERE booking_id = ?
+                           """, (booking_id,))
+            profession_ids = [item[0] for item in cursor.fetchall()]
+
             booking = ArtistBookingWithTimestamp(
                 id=booking_id,
                 last_name=row[1],
@@ -68,7 +75,8 @@ def get_all_artist_bookings() -> List[ArtistBookingWithTimestamp]:
                 equipment=row[15],
                 special_requests=row[16],
                 performance_details=row[17],
-                artist_material_ids=material_ids
+                artist_material_ids=material_ids,
+                profession_ids=profession_ids
             )
             bookings.append(booking)
         return bookings
@@ -272,7 +280,7 @@ def insert_artist_booking(booking: ArtistBooking) -> bool:
     artist_id = _create_artist(booking)
     booking_id = _create_artist_booking(artist_id, booking)
     _assign_artist_materials(booking_id, booking.artist_material_ids)
-
+    _assign_artist_professions(booking_id, booking.profession_ids)  # Add this line
     # Save signature as a file
     _save_artist_signature_image(booking)
     return True
@@ -365,6 +373,21 @@ def _assign_artist_materials(booking_id: int, material_ids: List[int]) -> None:
                 """, (booking_id, material_id))
         conn.commit()
 
+
+def _assign_artist_professions(booking_id: int, profession_ids: List[int]) -> None:
+    """
+    Inserts the chosen professions into ArtistBookingProfessions.
+    """
+    if not profession_ids:
+        return
+    with closing(_connect_db()) as conn:
+        cursor = conn.cursor()
+        for profession_id in profession_ids:
+            cursor.execute("""
+                INSERT INTO ArtistBookingProfessions (booking_id, profession_id)
+                VALUES (?, ?)
+                """, (booking_id, profession_id))
+        conn.commit()
 
 def _save_artist_signature_image(booking: ArtistBooking) -> None:
     """

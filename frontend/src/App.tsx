@@ -1,15 +1,13 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthContext, TokenContext } from "./contexts/AuthContext";
 import { Box } from "@mui/material";
-import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import { UserRegistrationFormContainer } from "./form/userArea/UserRegistrationFormContainer";
 import Dashboard from "./form/adminArea/Dashboard";
 import AdminLoginPage from "./adminLoginPage";
 import ArtistLoginPage from "./artistLoginPage";
 import { ArtistRegistrationFormContainer } from './form/artistArea/ArtistRegistrationFormContainer';
 import ThemeProvider from './contexts/ThemeProvider';
-import ThemeToggle from './components/core/display/ThemeToggle';
 import SpaceBackground from './components/core/layouts/SpaceBackground';
 import UserLoginPage from "./form/userArea/UserLoginPage";
 

@@ -1,5 +1,4 @@
-// Import common types from user area
-import { TicketOption, BeverageOption, FoodOption } from '../userArea/interface';
+import {TicketOption, BeverageOption, FoodOption, Profession} from '../userArea/interface';
 
 export interface ArtistMaterial {
     id: number;
@@ -26,6 +25,7 @@ export interface ArtistBooking {
     equipment: string;
     special_requests: string;
     performance_details: string;
+    profession_ids: Array<number>;
 }
 
 export interface ArtistBookingWithTimestamp extends ArtistBooking {
@@ -39,4 +39,5 @@ export interface ArtistFormContent {
     beverage_options: Array<BeverageOption>;
     food_options: Array<FoodOption>;
     artist_materials: Array<ArtistMaterial>;
+    professions: Array<Profession>;
 }

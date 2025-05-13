@@ -3,7 +3,7 @@ import {Box, Typography, Snackbar, Alert, alpha} from '@mui/material';
 import {Celebration, CheckCircleOutline} from '@mui/icons-material';
 import SpacePanelLayout from '../../../components/core/layouts/SpacePanelLayout';
 import FormCard from '../../../components/core/display/FormCard';
-import AnimatedRocket from '../../components/animatedRocket';
+import AnimatedRocket from '../../../components/core/display/animatedRocket';
 import PaymentInfo from './PaymentInfo';
 import RedirectModal from './RedirectModal';
 import {spacePalette} from '../../../components/styles/theme';

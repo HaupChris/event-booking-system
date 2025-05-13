@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {FormProps} from "./UserRegistrationFormContainer";
-import WorkShift from "../components/workShift";
+import WorkShift from "../../components/core/inputs/workShift";
 import {WorkShift as WorkShiftType} from '../userArea/interface';
 import {
     Box,

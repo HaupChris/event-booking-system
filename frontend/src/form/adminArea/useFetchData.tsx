@@ -13,13 +13,15 @@ export const useFetchData = () => {
         beverage_options: [],
         food_options: [],
         work_shifts: [],
-        materials: []
+        materials: [],
+        professions: []
     });
     const [artistFormContent, setArtistFormContent] = useState<ArtistFormContent>({
         ticket_options: [],
         beverage_options: [],
         food_options: [],
-        artist_materials: []
+        artist_materials: [],
+        professions: []
     });
     const {token} = useContext(TokenContext);
 

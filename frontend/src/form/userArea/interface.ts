@@ -1,6 +1,3 @@
-// Generated using py-ts-interfaces.
-// See https://github.com/cs-cordero/py-ts-interfaces
-
 export interface TimeSlot {
     id: number;
     title: string;
@@ -48,12 +45,18 @@ export interface TicketOption {
     num_booked: number;
 }
 
+export interface Profession {
+    id: number;
+    title: string;
+}
+
 export interface FormContent {
     ticket_options: Array<TicketOption>;
     beverage_options: Array<BeverageOption>;
     food_options: Array<FoodOption>;
     work_shifts: Array<WorkShift>;
     materials: Array<Material>;
+    professions: Array<Profession>;
 }
 
 export interface Booking {
@@ -76,6 +79,7 @@ export interface Booking {
     paid_amount: number;
     payment_notes: string;
     payment_date: string;
+    profession_ids: Array<number>;
 }
 
 export interface BookingWithTimestamp extends Booking {

@@ -2,8 +2,6 @@ import React, {useContext, useEffect, useState} from "react";
 import {Alert, Box, CardContent, Typography} from "@mui/material";
 import {AuthContext, TokenContext} from "../../contexts/AuthContext";
 import axios from 'axios';
-
-// Import form steps
 import PersonalDetailsForm from "./PersonalDetailsForm";
 import SummaryForm from "./SummaryForm";
 import ConfirmationForm from "./confirmation/index";
@@ -56,7 +54,8 @@ function getEmptyBooking(): Booking {
         is_paid: false,
         paid_amount: 0,
         payment_date: "",
-        payment_notes: ""
+        payment_notes: "",
+        profession_ids: []
     }
 }
 
@@ -90,7 +89,8 @@ export function getDummyFormContent(): FormContent {
         ],
         materials: [
             // ...
-        ]
+        ],
+        professions: []
     };
 }
 

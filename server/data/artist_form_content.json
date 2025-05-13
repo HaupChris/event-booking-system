@@ -74,5 +74,28 @@
       "title": "Mikrofone",
       "num_needed": 5
     }
-  ]
+  ],
+  "professions": [
+  {
+    "title": "Ärzt*in"
+  },
+  {
+    "title": "Medizinische*r Fachangestellte*r"
+  },
+  {
+    "title": "Psychologisch Geschult"
+  },
+  {
+    "title": "Bühnetehniker*in"
+  },
+  {
+    "title": "Elektriker*in"
+  },
+  {
+    "title": "Ersthelfer*in"
+  },
+  {
+    "title": "Veranstaltungstechniker*in"
+  }
+]
 }

@@ -415,5 +415,31 @@
       "title": "Dekorationsmaterialien",
       "num_needed": 10
     }
-  ]
+  ],
+  "professions": [
+  {
+    "title": "Ärzt*in"
+  },
+  {
+    "title": "Medizinische Fachangestellte"
+  },
+  {
+    "title": "Psychologisch Geschult"
+  },
+  {
+    "title": "Bühnetehniker*in"
+  },
+  {
+    "title": "Übt einen handwerklichen Beruf aus"
+  },
+  {
+    "title": "Elektriker*in"
+  },
+  {
+    "title": "Ersthelfer*in"
+  },
+  {
+    "title": "Veranstaltungstechniker*in"
+  }
+]
 }

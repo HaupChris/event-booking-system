@@ -6,7 +6,8 @@ from typing import Callable
 
 from src.models.datatypes import (
     FormContent,
-    TicketOption, BeverageOption, FoodOption, WorkShift, TimeSlot, Material, ArtistMaterial, ArtistFormContent
+    TicketOption, BeverageOption, FoodOption, WorkShift, TimeSlot, Material, ArtistMaterial, ArtistFormContent,
+    Profession
 )
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), '../../data')
@@ -33,6 +34,11 @@ def get_form_content_obj() -> FormContent:
     food_options = [
         FoodOption(id=idx, **food)
         for idx, food in enumerate(data['food_options'])
+    ]
+
+    professions = [
+        Profession(id=idx, **profession)
+        for idx, profession in enumerate(data.get('professions', []))
     ]
 
     # For work_shifts, we also auto-assign shift.id and timeslot.id
@@ -76,7 +82,8 @@ def get_form_content_obj() -> FormContent:
         food_options=food_options,
         work_shifts=work_shifts,
         materials=materials,
-        artist_materials=artist_materials
+        artist_materials=artist_materials,
+        professions=professions
     )
 
 
@@ -108,17 +115,23 @@ def get_artist_form_content_obj() -> ArtistFormContent:
         for idx, am in enumerate(data['artist_materials'])
     ]
 
+    professions = [
+        Profession(id=idx, **profession)
+        for idx, profession in enumerate(data.get('professions', []))
+    ]
+
     return ArtistFormContent(
         ticket_options=ticket_options,
         beverage_options=beverage_options,
         food_options=food_options,
-        artist_materials=artist_materials
+        artist_materials=artist_materials,
+        professions=professions
     )
 
 
 def update_form_content_with_db_counts(
-    form_content_obj: FormContent,
-    db_connect_func: Callable[[], sqlite3.Connection]
+        form_content_obj: FormContent,
+        db_connect_func: Callable[[], sqlite3.Connection]
 ) -> dict:
     """
     Given a loaded FormContent object and a DB connection function,
@@ -156,29 +169,31 @@ def update_form_content_with_db_counts(
 
     # TIMESLOT: first priority
     cursor.execute("""
-        SELECT first_priority_timeslot_id, COUNT(*) 
-        FROM Bookings 
-        WHERE first_priority_timeslot_id IS NOT NULL
-        GROUP BY first_priority_timeslot_id
-    """)
+                   SELECT first_priority_timeslot_id, COUNT(*)
+                   FROM Bookings
+                   WHERE first_priority_timeslot_id IS NOT NULL
+                   GROUP BY first_priority_timeslot_id
+                   """)
     timeslot_bookings_1 = dict(cursor.fetchall())
 
     # second priority
     cursor.execute("""
-        SELECT second_priority_timeslot_id, COUNT(*) 
-        FROM Bookings
-        WHERE second_priority_timeslot_id IS NOT NULL AND amount_shifts >= 2
-        GROUP BY second_priority_timeslot_id
-    """)
+                   SELECT second_priority_timeslot_id, COUNT(*)
+                   FROM Bookings
+                   WHERE second_priority_timeslot_id IS NOT NULL
+                     AND amount_shifts >= 2
+                   GROUP BY second_priority_timeslot_id
+                   """)
     timeslot_bookings_2 = dict(cursor.fetchall())
 
     # third priority
     cursor.execute("""
-        SELECT third_priority_timeslot_id, COUNT(*) 
-        FROM Bookings
-        WHERE third_priority_timeslot_id IS NOT NULL AND amount_shifts >= 3
-        GROUP BY third_priority_timeslot_id
-    """)
+                   SELECT third_priority_timeslot_id, COUNT(*)
+                   FROM Bookings
+                   WHERE third_priority_timeslot_id IS NOT NULL
+                     AND amount_shifts >= 3
+                   GROUP BY third_priority_timeslot_id
+                   """)
     timeslot_bookings_3 = dict(cursor.fetchall())
 
     conn.close()
@@ -212,8 +227,8 @@ def update_form_content_with_db_counts(
 
 
 def update_artist_form_content_with_db_counts(
-    form_content_obj: FormContent,
-    db_connect_func: Callable[[], sqlite3.Connection]
+        form_content_obj: FormContent,
+        db_connect_func: Callable[[], sqlite3.Connection]
 ) -> dict:
     """
     Given a loaded FormContent object and a DB connection function,

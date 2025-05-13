@@ -212,6 +212,53 @@ function SummaryForm({currentBooking, formContent}: SummaryFormProps) {
                 </Grid>
             </FormCard>
 
+            <FormCard
+                title={userAreaTexts.summaryForm.professionsTitle}
+                icon={<WorkIcon/>}
+            >
+                {currentBooking.profession_ids.length > 0 ? (
+                    <Box>
+                        <Box sx={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: 1,
+                            p: 1.5,
+                            bgcolor: alpha('#000', 0.2),
+                            borderRadius: '8px',
+                            border: '1px solid',
+                            borderColor: alpha('#64b5f6', 0.2)
+                        }}>
+                            {currentBooking.profession_ids.map(id => {
+                                const profession = formContent.professions?.find(p => p.id === id);
+                                return profession ? (
+                                    <Chip
+                                        key={id}
+                                        label={profession.title}
+                                        variant="outlined"
+                                        sx={{
+                                            borderColor: alpha('#64b5f6', 0.5),
+                                            color: alpha('#fff', 0.9)
+                                        }}
+                                    />
+                                ) : null;
+                            })}
+                        </Box>
+                    </Box>
+                ) : (
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            color: alpha('#fff', 0.7),
+                            fontStyle: 'italic',
+                            pl: 1
+                        }}
+                    >
+                        {userAreaTexts.summaryForm.noProfessionsSelected}
+                    </Typography>
+                )}
+            </FormCard>
+
+
             {/* Ticket Information */}
             <FormCard
                 title={userAreaTexts.summaryForm.participationOption}
