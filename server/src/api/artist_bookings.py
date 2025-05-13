@@ -82,7 +82,7 @@ def get_artist_booking(booking_id):
 def update_artist(booking_id):
     # Check if user has admin permissions
     identity = get_jwt_identity()
-    if identity.get("role") not in ["admin"]:
+    if identity not in ["admin"]:
         return jsonify({"error": "Unauthorized"}), 403
 
     booking_data = request.json
