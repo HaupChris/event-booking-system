@@ -2,24 +2,20 @@ import {Booking, TimeSlot as TimeSlotType} from '../userArea/interface';
 import {
     Box,
     FormControl,
-    IconButton,
     ListItem,
-    MenuItem,
-    Select,
-    SelectChangeEvent,
     Typography,
     Paper,
     alpha,
     CircularProgress
 } from '@mui/material';
 import React from 'react';
-import {Close} from "@mui/icons-material";
 import {PRIORITIES} from "../userArea/constants";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import Chip from '@mui/material/Chip';
 import WWSelect from "../../components/core/inputs/WWSelect";
+import {spacePalette} from "../../components/styles/theme";
 
 interface TimeSlotProps {
     timeSlot: TimeSlotType;
@@ -69,9 +65,9 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
     };
 
     const getPriorityBorderColor = () => {
-        if (selectedPriority === PRIORITIES.FIRST) return '#4caf50'; // success.main
-        if (selectedPriority === PRIORITIES.SECOND) return '#2196f3'; // info.main
-        if (selectedPriority === PRIORITIES.THIRD) return '#ff9800'; // warning.main
+        if (selectedPriority === PRIORITIES.FIRST) return spacePalette.status.success; // success.main
+        if (selectedPriority === PRIORITIES.SECOND) return spacePalette.status.info; // info.main
+        if (selectedPriority === PRIORITIES.THIRD) return spacePalette.status.warning; // warning.main
         return 'transparent';
     };
 
@@ -103,9 +99,9 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 
     // Get dynamic styling for the capacity indicator
     const getCapacityColor = () => {
-        if (timeslotNumBooked >= timeSlot.num_needed) return '#f44336'; // error.main
-        if (timeslotNumBooked / timeSlot.num_needed > 0.7) return '#ff9800'; // warning.main
-        return '#4caf50'; // success.main
+        if (timeslotNumBooked >= timeSlot.num_needed) return spacePalette.status.error // error.main
+        if (timeslotNumBooked / timeSlot.num_needed > 0.7) return spacePalette.status.warning; // warning.main
+        return spacePalette.status.success; // success.main
     };
 
     return (

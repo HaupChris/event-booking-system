@@ -48,7 +48,7 @@ const App = () => {
         <SpaceBackground />
 
         {/* Theme toggle button */}
-        <ThemeToggle />
+        {/*<ThemeToggle />*/}
 
         <AuthContext.Provider value={{ auth, setAuth, isAdmin, setIsAdmin }}>
           <TokenContext.Provider value={{ token, setToken }}>
