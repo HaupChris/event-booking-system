@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import {Alert, Box, CardContent, Typography} from "@mui/material";
-import {AuthContext, TokenContext} from "../../AuthContext";
+import {AuthContext, TokenContext} from "../../contexts/AuthContext";
 import axios from 'axios';
 
 import StepNavigation from "../../components/core/navigation/StepNavigation";

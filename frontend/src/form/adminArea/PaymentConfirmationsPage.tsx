@@ -11,7 +11,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import {useFetchData} from './useFetchData';
-import {TokenContext} from "../../AuthContext";
+import {TokenContext} from "../../contexts/AuthContext";
 import {Booking} from "../userArea/interface";
 import {CombinedBooking} from "./interface";
 

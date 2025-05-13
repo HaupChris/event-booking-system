@@ -13,7 +13,7 @@ import {
 } from '@mui/icons-material';
 import {useFetchData} from './useFetchData';
 import axios from 'axios';
-import {TokenContext} from "../../AuthContext";
+import {TokenContext} from "../../contexts/AuthContext";
 
 const ArtistsPage: React.FC = () => {
     const {artistBookings, artistFormContent, refetch} = useFetchData();

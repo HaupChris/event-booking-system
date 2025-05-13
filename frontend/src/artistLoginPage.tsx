@@ -1,7 +1,7 @@
 // frontend/src/artistLoginPage.tsx
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext, TokenContext } from './AuthContext';
+import { AuthContext, TokenContext } from './contexts/AuthContext';
 import { Box, Button, TextField, Typography, Container, Alert } from '@mui/material';
 
 function ArtistLoginPage() {

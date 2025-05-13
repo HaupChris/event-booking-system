@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { AuthContext, TokenContext } from "./AuthContext";
+import { AuthContext, TokenContext } from "./contexts/AuthContext";
 import { Box } from "@mui/material";
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import { UserRegistrationFormContainer } from "./form/userArea/UserRegistrationFormContainer";
 import Dashboard from "./form/adminArea/Dashboard";
 import AdminLoginPage from "./adminLoginPage";
 import ArtistLoginPage from "./artistLoginPage";
 import { ArtistRegistrationFormContainer } from './form/artistArea/ArtistRegistrationFormContainer';
-import spaceTheme from './components/styles/theme';
+import ThemeProvider from './contexts/ThemeProvider';
+import ThemeToggle from './components/core/display/ThemeToggle';
 import SpaceBackground from './components/core/layouts/SpaceBackground';
 import UserLoginPage from "./form/userArea/UserLoginPage";
-
 
 const App = () => {
   const [auth, setAuth] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [token, setToken] = useState("");
 
-  useEffect(() => {
+  React.useEffect(() => {
     const storedToken = window.localStorage.getItem("token");
     if (storedToken) {
       setToken(storedToken);
@@ -26,7 +26,7 @@ const App = () => {
     }
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (token) {
       window.localStorage.setItem("token", token);
     } else {
@@ -35,11 +35,7 @@ const App = () => {
   }, [token]);
 
   return (
-    <ThemeProvider theme={spaceTheme}>
-      {/* Space background behind everything */}
-      <SpaceBackground />
-
-      {/* Content container (on top) */}
+    <ThemeProvider>
       <Box
         sx={{
           position: 'relative',
@@ -48,6 +44,12 @@ const App = () => {
           overflow: 'auto'
         }}
       >
+        {/* Space background behind everything */}
+        <SpaceBackground />
+
+        {/* Theme toggle button */}
+        <ThemeToggle />
+
         <AuthContext.Provider value={{ auth, setAuth, isAdmin, setIsAdmin }}>
           <TokenContext.Provider value={{ token, setToken }}>
             <BrowserRouter>

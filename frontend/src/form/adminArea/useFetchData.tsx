@@ -1,6 +1,6 @@
 import {useCallback, useContext, useEffect, useState} from "react";
 import axios from "axios";
-import {TokenContext} from "../../AuthContext";
+import {TokenContext} from "../../contexts/AuthContext";
 import {ArtistBookingWithTimestamp, ArtistFormContent} from "../artistArea/interface";
 import {BookingWithTimestamp, FormContent} from "../userArea/interface";
 import {CombinedBooking} from "./interface";

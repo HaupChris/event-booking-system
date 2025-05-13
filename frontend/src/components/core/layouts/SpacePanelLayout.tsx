@@ -1,7 +1,7 @@
-// src/components/core/layouts/SpacePanelLayout.tsx
 import React, { ReactNode } from 'react';
 import { Box, Typography, Paper, alpha } from '@mui/material';
-import {mixins, spacePalette} from "../../styles/theme";
+import {spacePalette} from "../../styles/theme";
+import mixins from "../../styles/mixins";
 
 
 interface SpacePanelLayoutProps {

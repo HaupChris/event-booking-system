@@ -17,7 +17,7 @@ import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import axios from 'axios';
 import { useFetchData } from "./useFetchData";
-import { TokenContext } from "../../AuthContext";
+import { TokenContext } from "../../contexts/AuthContext";
 import { Search } from "@mui/icons-material";
 
 const BookingsPage: React.FC = () => {

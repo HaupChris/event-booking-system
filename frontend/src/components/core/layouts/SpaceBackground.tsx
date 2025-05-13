@@ -1,5 +1,5 @@
-// src/components/core/layouts/SpaceBackground.tsx
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { useThemeMode } from '../../styles/theme';
 
 interface SpaceBackgroundProps {
   starsCount?: number;
@@ -11,6 +11,7 @@ const SpaceBackground: React.FC<SpaceBackgroundProps> = ({
   flyByEnabled = true,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { mode } = useThemeMode();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -66,7 +67,8 @@ const SpaceBackground: React.FC<SpaceBackgroundProps> = ({
 
         ctx.beginPath();
         ctx.arc(projX, projY, radius, 0, 2 * Math.PI);
-        ctx.fillStyle = '#FFFFFF';
+        // Different star color based on theme
+        ctx.fillStyle = mode === 'dark' ? '#FFFFFF' : '#333333';
         ctx.fill();
       }
     }
@@ -111,18 +113,25 @@ const SpaceBackground: React.FC<SpaceBackgroundProps> = ({
         const scaleFactor = this.scale / this.z;
         const baseSize = 500 * scaleFactor;
 
-        // Draw simple circle for flyby object
+        // Draw simple circle for flyby object with theme-aware colors
         ctx.beginPath();
         ctx.arc(projX, projY, baseSize/2, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(100, 181, 246, 0.3)';
+        ctx.fillStyle = mode === 'dark'
+          ? 'rgba(100, 181, 246, 0.3)'  // Blue for dark mode
+          : 'rgba(25, 118, 210, 0.3)';  // Darker blue for light mode
         ctx.fill();
 
         // Draw glow
         ctx.beginPath();
         ctx.arc(projX, projY, baseSize/1.5, 0, 2 * Math.PI);
         const gradient = ctx.createRadialGradient(projX, projY, baseSize/4, projX, projY, baseSize/1.5);
-        gradient.addColorStop(0, 'rgba(100, 181, 246, 0.3)');
-        gradient.addColorStop(1, 'rgba(100, 181, 246, 0)');
+        if (mode === 'dark') {
+          gradient.addColorStop(0, 'rgba(100, 181, 246, 0.3)');
+          gradient.addColorStop(1, 'rgba(100, 181, 246, 0)');
+        } else {
+          gradient.addColorStop(0, 'rgba(25, 118, 210, 0.3)');
+          gradient.addColorStop(1, 'rgba(25, 118, 210, 0)');
+        }
         ctx.fillStyle = gradient;
         ctx.fill();
       }
@@ -176,7 +185,7 @@ const SpaceBackground: React.FC<SpaceBackgroundProps> = ({
     return () => {
       window.removeEventListener('resize', resize);
     };
-  }, [starsCount, flyByEnabled]);
+  }, [starsCount, flyByEnabled, mode]); // Added mode as dependency
 
   return (
     <canvas
@@ -188,7 +197,7 @@ const SpaceBackground: React.FC<SpaceBackgroundProps> = ({
         zIndex: -1,
         width: '100%',
         height: '100%',
-        background: 'black',
+        background: mode === 'dark' ? 'black' : '#f0f8ff', // Theme-aware background
       }}
     />
   );
