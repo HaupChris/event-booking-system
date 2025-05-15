@@ -53,26 +53,86 @@
       "price": 0.0
     }
   ],
-  "food_options": [
+ "food_options": [
     {
       "title": "Gyros mit Zaziki, linsensalat und Brot",
-      "description": "Eine Mahlzeit kostenlos für Künstler",
-      "price": 0.0
+      "description": "Freitag Abend//vegetarisch",
+      "price": 5.50
+    },
+    {
+      "title": "Gyros mit Zaziki, linsensalat und Brot",
+      "description": "Freitag Abend//vegan",
+      "price": 5.50
+    },
+    {
+      "title": "Wraps mit Grillgemüse und Bohnendipp",
+      "description": "Samstag Abend//vegan",
+      "price": 5.50
+    },
+    {
+      "title": "Wraps mit Grillgemüse und Bohnendipp",
+      "description": "Samstag Abend//vegetarisch",
+      "price": 5.50
     },
     {
       "title": "Beide Essen",
-      "description": "Erste Mahlzeit kostenlos, zweite kostenpflichtig",
-      "price": 5.0
+      "description": "Freitag + Samstag//vegan",
+      "price": 11.0
+    },
+    {
+      "title": "Beide Essen",
+      "description": "Freitag + Samstag//vegetarisch",
+      "price": 11.0
     }
   ],
   "artist_materials": [
     {
-      "title": "PA-Anlage",
+      "title": "DJ-Equipment",
       "num_needed": 1
     },
     {
       "title": "Mikrofone",
       "num_needed": 5
+    },
+    {
+      "title": "Lichterketten für Bühne",
+      "num_needed": 5
+    },
+    {
+      "title": "Bühnenbeleuchtung",
+      "num_needed": 3
+    },
+    {
+      "title": "Gitarrenverstärker",
+      "num_needed": 2
+    },
+    {
+      "title": "Bassverstärker",
+      "num_needed": 1
+    },
+    {
+      "title": "Schlagzeug",
+      "num_needed": 1
+    },
+    {
+      "title": "Keyboard/Synthesizer",
+      "num_needed": 1
+    },
+    {
+      "title": "Monitore/Bühnenboxen",
+      "num_needed": 4
+    },
+    {
+      "title": "Mischpult",
+      "num_needed": 1
+    },
+    {
+      "title": "Verlängerungskabel/Stromkabel",
+      "num_needed": 8
+    },
+    {
+      "title": "Dekorationsmaterialien",
+      "num_needed": 10
     }
   ],
   "professions": [

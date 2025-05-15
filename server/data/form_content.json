@@ -56,33 +56,33 @@
   "food_options": [
     {
       "title": "Gyros mit Zaziki, linsensalat und Brot",
-      "description": "vegetarische Variante",
-      "price": 5.0
+      "description": "Freitag Abend//vegetarisch",
+      "price": 5.50
     },
     {
-      "title": "Gyros mit Zaziki, linsensalat und Brot (vegan)",
-      "description": "vegane Variante",
-      "price": 5.0
+      "title": "Gyros mit Zaziki, linsensalat und Brot",
+      "description": "Freitag Abend//vegan",
+      "price": 5.50
     },
     {
-      "title": "Grillgemüse mit Feta, Humus und Brot (vegan)",
-      "description": "vegane Variante",
-      "price": 5.0
+      "title": "Wraps mit Grillgemüse und Bohnendipp",
+      "description": "Samstag Abend//vegan",
+      "price": 5.50
     },
     {
-      "title": "Grillgemüse mit Feta, Humus und Brot",
-      "description": "vegetarische Variante",
-      "price": 5.0
+      "title": "Wraps mit Grillgemüse und Bohnendipp",
+      "description": "Samstag Abend//vegetarisch",
+      "price": 5.50
     },
     {
-      "title": "Beide Essen vegan",
-      "description": "",
-      "price": 10.0
+      "title": "Beide Essen",
+      "description": "Freitag + Samstag//vegan",
+      "price": 11.0
     },
     {
-      "title": "Beide Essen vegetarisch",
-      "description": "",
-      "price": 10.0
+      "title": "Beide Essen",
+      "description": "Freitag + Samstag//vegetarisch",
+      "price": 11.0
     }
   ],
   "work_shifts": [
@@ -358,64 +358,6 @@
       "num_needed": 2
     }
   ],
-  "artist_materials": [
-    {
-      "title": "PA-Anlage",
-      "num_needed": 1
-    },
-    {
-      "title": "DJ-Equipment",
-      "num_needed": 1
-    },
-    {
-      "title": "Mikrofone",
-      "num_needed": 5
-    },
-    {
-      "title": "Lichterketten für Bühne",
-      "num_needed": 5
-    },
-    {
-      "title": "Bühnenbeleuchtung",
-      "num_needed": 3
-    },
-    {
-      "title": "Gitarrenverstärker",
-      "num_needed": 2
-    },
-    {
-      "title": "Bassverstärker",
-      "num_needed": 1
-    },
-    {
-      "title": "Schlagzeug",
-      "num_needed": 1
-    },
-    {
-      "title": "Keyboard/Synthesizer",
-      "num_needed": 1
-    },
-    {
-      "title": "Monitore/Bühnenboxen",
-      "num_needed": 4
-    },
-    {
-      "title": "Mischpult",
-      "num_needed": 1
-    },
-    {
-      "title": "Verlängerungskabel/Stromkabel",
-      "num_needed": 8
-    },
-    {
-      "title": "Raumtrenner/Paravents",
-      "num_needed": 2
-    },
-    {
-      "title": "Dekorationsmaterialien",
-      "num_needed": 10
-    }
-  ],
   "professions": [
   {
     "title": "Ärzt*in"
@@ -430,7 +372,7 @@
     "title": "Bühnetehniker*in"
   },
   {
-    "title": "Übt einen handwerklichen Beruf aus"
+    "title": "handwerklich begabt"
   },
   {
     "title": "Elektriker*in"
