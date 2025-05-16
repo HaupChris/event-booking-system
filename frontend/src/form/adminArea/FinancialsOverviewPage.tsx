@@ -86,6 +86,7 @@ const FinancialsOverviewPage: React.FC = () => {
         unpaidCount++;
       }
       expectedAmount += booking.total_price;
+      console.log("expected amount", expectedAmount);
 
       // Get appropriate content based on booking type
       const content = booking.bookingType === 'artist' ? artistFormContent : formContent;

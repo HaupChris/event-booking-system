@@ -17,11 +17,11 @@ import axios from 'axios';
 import {useFetchData} from "./useFetchData";
 import {TokenContext} from "../../contexts/AuthContext";
 import {Search} from "@mui/icons-material";
-import {Booking} from "../userArea/interface";
+import {CombinedBooking} from "./interface";
 
 const BookingsPage: React.FC = () => {
     // Use the updated useFetchData hook that separates booking types
-    const {regularBookings, artistBookings, formContent, artistFormContent, refetch} = useFetchData();
+    const {bookings, formContent, artistFormContent, refetch} = useFetchData();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -44,8 +44,8 @@ const BookingsPage: React.FC = () => {
     const [viewTypeAnchorEl, setViewTypeAnchorEl] = useState<null | HTMLElement>(null);
     const viewTypeMenuOpen = Boolean(viewTypeAnchorEl);
 
-    const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
-    const [editedBooking, setEditedBooking] = useState<any | null>(null);
+    const [_, setSelectedBooking] = useState<any | null>(null);
+    const [editedBooking, setEditedBooking] = useState<CombinedBooking>();
     const [openModal, setOpenModal] = useState(false);
     const [sortCriterion, setSortCriterion] = useState('timestamp');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -68,24 +68,6 @@ const BookingsPage: React.FC = () => {
         });
     }, [isMobile]);
 
-    // Combine bookings based on the selected view type
-    const getAllBookings = () => {
-        const regularWithType = regularBookings.map(b => ({...b, bookingType: 'regular'}));
-        const artistsWithType = artistBookings.map(b => ({...b, bookingType: 'artist'}));
-
-        switch (viewType) {
-            case 'regular':
-                return regularWithType;
-            case 'artist':
-                return artistsWithType;
-            case 'all':
-            default:
-                return [...regularWithType, ...artistsWithType];
-        }
-    };
-
-    const bookings = getAllBookings();
-
     const handleOpenModal = (booking: any) => {
         setSelectedBooking(booking);
         setEditedBooking({...booking}); // Create a copy for editing
@@ -96,7 +78,7 @@ const BookingsPage: React.FC = () => {
     const handleCloseModal = () => {
         setOpenModal(false);
         setSelectedBooking(null);
-        setEditedBooking(null);
+        setEditedBooking(undefined);
         setEditMode(false);
     };
 
@@ -106,46 +88,52 @@ const BookingsPage: React.FC = () => {
 
     const handleInputChange = (field: string, value: any) => {
 
+
         let new_total_price;
         if (editedBooking) {
-            setEditedBooking((booking: Booking) => {
 
-            // recalculate total price when relevant fields change
-        if (['ticket_id', 'beverage_id', 'food_id'].includes(field)) {
-            // Calculate total price based on selections
-            let total_price = 0;
+            setEditedBooking((booking) => {
+                // const formContent =
 
-            // Add ticket price if selected
-            if (field === 'ticket_id' || booking.ticket_id !== -1) {
-                const ticketId = field === 'ticket_id' ? value : booking.ticket_id;
-                const ticketOption = formContent.ticket_options.find(t => t.id === ticketId);
-                if (ticketOption) {
-                    total_price += ticketOption.price;
+                if (!booking) {
+                    return
                 }
-            }
+                const selectedFormContent = (booking.bookingType === "regular"? formContent : artistFormContent)
+                // recalculate total price when relevant fields change
+                if (['ticket_id', 'beverage_id', 'food_id'].includes(field)) {
+                    // Calculate total price based on selections
+                    let total_price = 0;
 
-            // Add beverage price if selected
-            if (field === 'beverage_id' || booking.beverage_id !== -1) {
-                const beverageId = field === 'beverage_id' ? value : booking.beverage_id;
-                const beverageOption = formContent.beverage_options.find(b => b.id === beverageId);
-                if (beverageOption) {
-                    total_price += beverageOption.price;
+                    // Add ticket price if selected
+                    if (field === 'ticket_id' || booking.ticket_id !== -1) {
+                        const ticketId = field === 'ticket_id' ? value : booking.ticket_id;
+                        const ticketOption = selectedFormContent.ticket_options.find(t => t.id === ticketId);
+                        if (ticketOption) {
+                            total_price += ticketOption.price;
+                        }
+                    }
+
+                    // Add beverage price if selected
+                    if (field === 'beverage_id' || booking.beverage_id !== -1) {
+                        const beverageId = field === 'beverage_id' ? value : booking.beverage_id;
+                        const beverageOption = selectedFormContent.beverage_options.find(b => b.id === beverageId);
+                        if (beverageOption) {
+                            total_price += beverageOption.price;
+                        }
+                    }
+
+                    // Add food price if selected
+                    if (field === 'food_id' || booking.food_id !== -1) {
+                        const foodId = field === 'food_id' ? value : booking.food_id;
+                        const foodOption = selectedFormContent.food_options.find(f => f.id === foodId);
+                        if (foodOption) {
+                            total_price += foodOption.price;
+                        }
+                    }
+                    new_total_price = total_price;
+                } else {
+                    new_total_price = booking.total_price;
                 }
-            }
-
-            // Add food price if selected
-            if (field === 'food_id' || booking.food_id !== -1) {
-                const foodId = field === 'food_id' ? value : booking.food_id;
-                const foodOption = formContent.food_options.find(f => f.id === foodId);
-                if (foodOption) {
-                    total_price += foodOption.price;
-                }
-            }
-            new_total_price = total_price;
-        } else {
-            new_total_price = booking.total_price;
-        }
-
 
 
                 return {
@@ -225,11 +213,15 @@ const BookingsPage: React.FC = () => {
         }
     };
 
-    const filteredBookings = bookings.filter(booking =>
-        booking.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        booking.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        booking.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredBookings = bookings
+        .filter((booking) =>
+            viewType === "all" || booking.bookingType === viewType
+        )
+        .filter((booking) =>
+            booking.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            booking.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            booking.email.toLowerCase().includes(searchQuery.toLowerCase())
+        );
 
     const handleCloseSnackbar = () => {
         setShowSnackbar(false);
@@ -664,9 +656,8 @@ const BookingsPage: React.FC = () => {
                                         <Grid item xs={12}>
                                             <Typography variant="subtitle1" color={"white"} gutterBottom>Support Shift
                                                 Preferences:</Typography>
-                                            {['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3'].map((priority, index) => {
-                                                const timeslotValue = editedBooking[priority];
-                                                const timeslotInfo = getTimeslotWithWorkshift(timeslotValue);
+                                            {[editedBooking.timeslot_priority_1, editedBooking.timeslot_priority_1, editedBooking.timeslot_priority_1].map((priority, index) => {
+                                                const timeslotInfo = getTimeslotWithWorkshift(priority!);
                                                 return (
                                                     <Typography key={index} color={"white"} variant="body2">
                                                         <strong>{`Priority ${index + 1}:`}</strong> {timeslotInfo.workshiftTitle} - {timeslotInfo.timeslotTitle}
@@ -709,7 +700,7 @@ const BookingsPage: React.FC = () => {
                                                 multiline
                                                 rows={3}
                                                 label="Equipment Details"
-                                                value={editedBooking.artist_equipment || ''}
+                                                value={editedBooking.equipment || ''}
                                                 onChange={(e) => handleInputChange('artist_equipment', e.target.value)}
                                                 disabled={!editMode}
                                                 margin="normal"
