@@ -163,7 +163,7 @@ function SelectionOptionWithImage(props: IProps) {
                             <Avatar
                                 alt={props.title}
                                 src={props.imageSource}
-                                variant="rounded"  // Changed to reduce pixelation
+                                // variant="rounded"  // Changed to reduce pixelation
                                 sx={{
                                     width: 100,
                                     height: 100,

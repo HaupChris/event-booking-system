@@ -6,7 +6,7 @@ import {
     List,
     ListItem,
     Avatar,
-    ListItemText
+    ListItemText, useMediaQuery, useTheme
 } from "@mui/material";
 import PngIcon from "../../components/core/display/PngIcon";
 import Awareness from "../../assets/icons/awareness.png";
@@ -21,12 +21,14 @@ import {userAreaTexts} from "../constants/texts";
 
 
 function AwarenessCodeForm() {
+    const theme = useTheme()
+  const isXs = useMediaQuery(theme.breakpoints.down('sm'));
     const icons = [
-        <PngIcon icon={Awareness} fontSize={64}/>,
-        <PngIcon icon={NoRacism} fontSize={64}/>,
-        <PngIcon icon={Consent} fontSize={64}/>,
-        <PngIcon icon={Partiality} fontSize={64}/>,
-        <PngIcon icon={Fotos} fontSize={64}/>,
+        <PngIcon icon={Awareness} fontSize={isXs? 52: 64}/>,
+        <PngIcon icon={NoRacism} fontSize={isXs? 52: 64}/>,
+        <PngIcon icon={Consent} fontSize={isXs? 52: 64}/>,
+        <PngIcon icon={Partiality} fontSize={isXs? 52: 64}/>,
+        <PngIcon icon={Fotos} fontSize={isXs? 52: 64}/>,
         <Balance color={"secondary"} fontSize={"large"}/>,
     ];
 
@@ -38,7 +40,7 @@ function AwarenessCodeForm() {
         <List sx={{width: '100%'}}>
             {userAreaTexts.awarenessCodeForm.codeRules.map((item, index) => (
                 <FormCard
-                    sx={{mt: 2}}
+                    sx={{mt: 2, pl:0, pr: 2}}
                 >
                     {/* Circuit background decoration */}
                     <Box sx={{
@@ -61,7 +63,6 @@ function AwarenessCodeForm() {
 
                     <ListItem
                         sx={{
-                            p: {xs: 2, sm: 3},
                             position: 'relative',
                             zIndex: 1,
                         }}
@@ -87,7 +88,7 @@ function AwarenessCodeForm() {
                                     alignItems: "center", // This aligns items vertically in the center
                                     justifyContent: "flex-start",
                                     flexDirection: "row",
-                                    gap: 2, // Add some spacing between avatar and text
+                                    gap: 1, // Add some spacing between avatar and text
                                 }}>
                                     {/* Modified ListItemAvatar */}
                                     <Box
@@ -95,7 +96,7 @@ function AwarenessCodeForm() {
                                             display: "flex",
                                             alignItems: "center", // Vertical center alignment
                                             justifyContent: "center", // Horizontal center alignment
-                                            minWidth: 120, // Give it some minimum width
+                                            minWidth: {xs: 80, sm: 120}, // Give it some minimum width
                                         }}
                                     >
                                         <Avatar
@@ -104,8 +105,8 @@ function AwarenessCodeForm() {
                                                 border: '1px solid',
                                                 borderColor: alpha('#64b5f6', 0.5),
                                                 boxShadow: '0 0 10px rgba(100, 181, 246, 0.2)',
-                                                width: 100,
-                                                height: 100
+                                                width: {xs:70, sm:100},
+                                                height: {xs:70, sm:100}
                                             }}
                                         >
                                             {icons[index]}

@@ -35,7 +35,8 @@ const InfoPair: React.FC<InfoPairProps> = ({ label, value, icon }) => {
             variant="body1"
             sx={{
               color: alpha('#fff', 0.9),
-              fontWeight: 'medium'
+              fontWeight: 'medium',
+                wordBreak: 'break-word',
             }}
           >
             {value || "Nicht angegeben"}

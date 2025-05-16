@@ -1,4 +1,3 @@
-// src/styles/mixins.ts
 import { alpha } from '@mui/material';
 import { spacePalette } from './theme';
 
