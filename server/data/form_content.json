@@ -236,27 +236,27 @@
       "time_slots": [
         {
           "title": "Abholung Anlage aus Würzburg (Transporter Notwendig)",
-            "start_time": "Mittwoch",
-            "end_time": "27.08.2025",
-            "num_needed": 1
+          "start_time": "Mittwoch",
+          "end_time": "27.08.2025",
+          "num_needed": 1
         },
         {
           "title": "Zurückfahren der Anlage nach Würzburg",
-            "start_time": "Sonntag",
-            "end_time": "",
-            "num_needed": 1
+          "start_time": "Sonntag",
+          "end_time": "",
+          "num_needed": 1
         }
       ]
     },
     {
       "title": "Willkommen an Bord",
       "description": "Empfang neuer Astronaut:innen, Bändchenvergabe, Einweisung für Schichten, etc. Damit du hier eingeteilt werden kannst, solltest du den Wiesenwahn schon mindestens einmal besucht haben.",
-      "timeslots": [
+      "time_slots": [
         {
           "title": "Donnerstag",
-            "start_time": "16:00",
-            "end_time": "19:00",
-            "num_needed": 2
+          "start_time": "16:00",
+          "end_time": "19:00",
+          "num_needed": 2
         }
       ]
     },
@@ -266,9 +266,9 @@
       "time_slots": [
         {
           "title": "Donnerstag, Einkauf (Auto nötig)",
-            "start_time": "12:00",
-            "end_time": "16:00",
-            "num_needed": 2
+          "start_time": "12:00",
+          "end_time": "16:00",
+          "num_needed": 2
         },
         {
           "title": "Freitag, Vorbereitung",
@@ -362,7 +362,6 @@
       "title": "Benzin- und Dieselkanister",
       "num_needed": 3
     },
-
     {
       "title": "Alter Teppich",
       "num_needed": 6
@@ -385,29 +384,29 @@
     }
   ],
   "professions": [
-  {
-    "title": "Ärzt*in"
-  },
-  {
-    "title": "Medizinische Fachangestellte"
-  },
-  {
-    "title": "Psychologisch Geschult"
-  },
-  {
-    "title": "Bühnetehniker*in"
-  },
-  {
-    "title": "handwerklich begabt"
-  },
-  {
-    "title": "Elektriker*in"
-  },
-  {
-    "title": "Ersthelfer*in"
-  },
-  {
-    "title": "Veranstaltungstechniker*in"
-  }
-]
+    {
+      "title": "Ärzt*in"
+    },
+    {
+      "title": "Medizinische Fachangestellte"
+    },
+    {
+      "title": "Psychologisch Geschult"
+    },
+    {
+      "title": "Bühnentehniker*in"
+    },
+    {
+      "title": "Handwerklich begabt"
+    },
+    {
+      "title": "Elektriker*in"
+    },
+    {
+      "title": "Ersthelfer*in"
+    },
+    {
+      "title": "Veranstaltungstechniker*in"
+    }
+  ]
 }
