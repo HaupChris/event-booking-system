@@ -159,3 +159,15 @@ CREATE TABLE IF NOT EXISTS ArtistBookingProfessions
     FOREIGN KEY (profession_id) REFERENCES Professions (id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS ShiftAssignments (
+    id INTEGER PRIMARY KEY NOT NULL,
+    booking_id INTEGER NOT NULL,
+    timeslot_id INTEGER NOT NULL,
+    is_confirmed INTEGER DEFAULT 1,
+    assignment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    admin_notes TEXT,
+    FOREIGN KEY(booking_id) REFERENCES Bookings(id) ON DELETE CASCADE,
+    FOREIGN KEY(timeslot_id) REFERENCES TimeSlots(id) ON DELETE CASCADE,
+    UNIQUE(booking_id, timeslot_id)
+);
+

@@ -15,6 +15,7 @@ from src.utils.config import load_config
 from src.utils.logger import configure_logging
 from src.api.health import health_bp
 from src.api.artist_bookings import artist_bp
+from src.api.shift_assignments import shift_assignments_bp
 
 load_dotenv()
 
@@ -42,6 +43,7 @@ app.register_blueprint(bookings_bp, url_prefix="/api")
 app.register_blueprint(formcontent_bp, url_prefix="/api")
 app.register_blueprint(health_bp, url_prefix="/api")
 app.register_blueprint(artist_bp, url_prefix="/api")
+app.register_blueprint(shift_assignments_bp, url_prefix="/api")
 
 
 @app.errorhandler(Exception)

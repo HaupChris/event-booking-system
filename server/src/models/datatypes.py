@@ -136,3 +136,25 @@ class ArtistFormContent(Interface):
     food_options: List[FoodOption]
     artist_materials: List[ArtistMaterial]
     professions: List[Profession] = field(default_factory=list)
+
+
+@dataclass
+class ShiftAssignment(Interface):
+    booking_id: int
+    timeslot_id: int
+    is_confirmed: bool = True
+    admin_notes: str = ""
+    id: int = -1
+    assignment_date: str = ""
+
+@dataclass
+class ShiftAssignmentWithDetails(ShiftAssignment):
+    first_name: str = ""
+    last_name: str = ""
+    email: str = ""
+    phone: str = ""
+    workshift_title: str = ""
+    timeslot_title: str = ""
+    timeslot_start: str = ""
+    timeslot_end: str = ""
+    priority: int = 0  # 1, 2, 3 or 0 for manual assignment

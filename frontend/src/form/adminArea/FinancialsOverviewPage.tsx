@@ -1,57 +1,26 @@
 import React, { useState } from 'react';
 import {
-  Box, Typography, Card, CardContent, Grid, Paper, Table,
-  TableBody, TableCell, TableContainer, TableHead, TableRow,
-  useTheme, useMediaQuery, Chip, Divider, Button, Tabs, Tab,
-  IconButton, Tooltip, Menu, MenuItem
+  Box, Typography, Grid, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Chip, Button, alpha
 } from '@mui/material';
+
 import { useFetchData } from './useFetchData';
-import PaidIcon from '@mui/icons-material/Paid';
-import LocalDiningIcon from '@mui/icons-material/LocalDining';
-import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
-import SportsBarIcon from '@mui/icons-material/SportsBar';
-import PeopleIcon from '@mui/icons-material/People';
-import PersonIcon from '@mui/icons-material/Person';
-import MusicNoteIcon from '@mui/icons-material/MusicNote';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import DownloadIcon from '@mui/icons-material/Download';
-import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
+import FilterControls from './components/FilterControls';
+import StatsCard from './components/StatsCard';
+import { ViewFilterType } from './utils/optionsUtils';
+import FormCard from '../../components/core/display/FormCard';
+import { spacePalette } from '../../components/styles/theme';
+import {ConfirmationNumber, LocalDining, MusicNote, Paid, People, Person, SportsBar} from '@mui/icons-material';
 
 const FinancialsOverviewPage: React.FC = () => {
-  const {bookings, formContent, artistFormContent } = useFetchData();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  // View type state
-  const [viewType, setViewType] = useState('all'); // 'all', 'regular', 'artist'
+  const { bookings, formContent, artistFormContent } = useFetchData();
+  const [viewType, setViewType] = useState<ViewFilterType>('all');
   const [viewTypeAnchorEl, setViewTypeAnchorEl] = useState<null | HTMLElement>(null);
-  const viewTypeMenuOpen = Boolean(viewTypeAnchorEl);
-
-  // View type tabs/dropdown
-  const handleViewChange = (event: React.SyntheticEvent, newValue: string) => {
-    setViewType(newValue);
-  };
-
-  const handleViewTypeMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setViewTypeAnchorEl(event.currentTarget);
-  };
-
-  const handleViewTypeMenuClose = () => {
-    setViewTypeAnchorEl(null);
-  };
-
-  const handleViewTypeSelect = (type: string) => {
-    setViewType(type);
-    handleViewTypeMenuClose();
-  };
 
   // Get relevant bookings based on filter
   const getFilteredBookings = () => {
     if (viewType === 'all') return bookings;
-    else {
-        return bookings.filter((booking) => booking.bookingType === viewType);
-    }
+    return bookings.filter((booking) => booking.bookingType === viewType);
   };
 
   // Calculate total income by category
@@ -86,7 +55,6 @@ const FinancialsOverviewPage: React.FC = () => {
         unpaidCount++;
       }
       expectedAmount += booking.total_price;
-      console.log("expected amount", expectedAmount);
 
       // Get appropriate content based on booking type
       const content = booking.bookingType === 'artist' ? artistFormContent : formContent;
@@ -151,7 +119,6 @@ const FinancialsOverviewPage: React.FC = () => {
     artistCount,
     regularCount,
     paidCount,
-    unpaidCount,
     paidAmount,
     expectedAmount,
     allCount
@@ -163,244 +130,167 @@ const FinancialsOverviewPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 2 }}>
-      {/* Header with responsive filter */}
-      <Box sx={{
-        display: 'flex',
-        flexDirection: isMobile ? 'column' : 'row',
-        justifyContent: 'space-between',
-        alignItems: isMobile ? 'flex-start' : 'center',
-        mb: 3,
-        gap: 1
-      }}>
-        <Typography variant="h5" gutterBottom={isMobile}>
-          Financial Overview
-        </Typography>
+      <Typography variant="h5" gutterBottom>
+        Financial Overview
+      </Typography>
 
-        {/* View Type Selection - Either Tabs or Dropdown based on screen size */}
-        {isMobile ? (
-          <Box>
-            <Button
-              variant="outlined"
-              onClick={handleViewTypeMenuOpen}
-              endIcon={<FilterAltIcon />}
-              size="small"
-              fullWidth
-            >
-              {viewType === 'all' ? 'All Participants' :
-              viewType === 'regular' ? 'Regular Participants' : 'Artists'}
-            </Button>
-            <Menu
-              anchorEl={viewTypeAnchorEl}
-              open={viewTypeMenuOpen}
-              onClose={handleViewTypeMenuClose}
-            >
-              <MenuItem onClick={() => handleViewTypeSelect('all')}>All Participants</MenuItem>
-              <MenuItem onClick={() => handleViewTypeSelect('regular')}>Regular Participants</MenuItem>
-              <MenuItem onClick={() => handleViewTypeSelect('artist')}>Artists</MenuItem>
-            </Menu>
-          </Box>
-        ) : (
-          <Tabs
-            value={viewType}
-            onChange={handleViewChange}
-            sx={{ minWidth: '300px' }}
-          >
-            <Tab label="All Participants" value="all" />
-            <Tab label="Regular Participants" value="regular" />
-            <Tab label="Artists" value="artist" />
-          </Tabs>
-        )}
+      {/* View Type Controls */}
+      <Box sx={{ mb: 3 }}>
+        <FilterControls
+          viewType={viewType}
+          setViewType={setViewType}
+          anchorEl={viewTypeAnchorEl}
+          setAnchorEl={setViewTypeAnchorEl}
+        />
       </Box>
 
       {/* Key Finance Metrics */}
-      <Grid container spacing={isMobile ? 2 : 3} sx={{ mb: 3 }}>
+      <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: 'primary', color: 'white', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6">Revenue</Typography>
-                <PaidIcon fontSize="large" />
-              </Box>
-              <Typography variant="h4" sx={{ mt: 2 }}>€{grandTotal.toFixed(2)}</Typography>
+          <StatsCard
+            title="Revenue"
+            value={`€${grandTotal.toFixed(2)}`}
+            subtitle={`Expected: €${expectedAmount.toFixed(2)}`}
+            color="primary"
+            icon={<Paid fontSize="large" />}
+            progress={paymentProgress}
+            footer={
               <Box sx={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center',
-                mt: 2,
                 fontSize: '0.875rem'
               }}>
-                <Typography variant="body2">Expected</Typography>
-                <Typography variant="body2">€{expectedAmount.toFixed(2)}</Typography>
+                <Typography variant="body2">Received:</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                  €{paidAmount.toFixed(2)}
+                </Typography>
               </Box>
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                fontSize: '0.875rem'
-              }}>
-                <Typography variant="body2">Received</Typography>
-                <Typography variant="body2">€{paidAmount.toFixed(2)}</Typography>
-              </Box>
-              <Box sx={{ mt: 1, position: 'relative', pt: 1 }}>
-                <LinearProgressWithLabel value={paymentProgress} />
-              </Box>
-            </CardContent>
-          </Card>
+            }
+            fullHeight
+          />
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: 'success.light', color: 'white', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6">Participants</Typography>
-                <PeopleIcon fontSize="large" />
-              </Box>
-              <Typography variant="h4" sx={{ mt: 2 }}>{allCount}</Typography>
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                mt: 2,
-                fontSize: '0.875rem'
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <PersonIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
-                  <Typography variant="body2">Regular</Typography>
+          <StatsCard
+            title="Participants"
+            value={allCount}
+            color="success"
+            icon={<People fontSize="large" />}
+            progress={paidParticipantsProgress}
+            footer={
+              <Box>
+                <Box sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 1
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Person sx={{ mr: 0.5, fontSize: '1rem' }} />
+                    <Typography variant="body2">Regular</Typography>
+                  </Box>
+                  <Typography variant="body2">{regularCount}</Typography>
                 </Box>
-                <Typography variant="body2">{regularCount}</Typography>
+                <Box sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <MusicNote sx={{ mr: 0.5, fontSize: '1rem' }} />
+                    <Typography variant="body2">Artists</Typography>
+                  </Box>
+                  <Typography variant="body2">{artistCount}</Typography>
+                 </Box>
               </Box>
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                fontSize: '0.875rem'
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <MusicNoteIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
-                  <Typography variant="body2">Artists</Typography>
-                </Box>
-                <Typography variant="body2">{artistCount}</Typography>
-              </Box>
-              <Divider sx={{ my: 1, bgcolor: 'rgba(255,255,255,0.2)' }} />
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                fontSize: '0.875rem'
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <CheckIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
-                  <Typography variant="body2">Paid</Typography>
-                </Box>
-                <Typography variant="body2">{paidCount}</Typography>
-              </Box>
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                fontSize: '0.875rem'
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <CloseIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
-                  <Typography variant="body2">Unpaid</Typography>
-                </Box>
-                <Typography variant="body2">{unpaidCount}</Typography>
-              </Box>
-              <Box sx={{ mt: 1, position: 'relative', pt: 1 }}>
-                <LinearProgressWithLabel value={paidParticipantsProgress} />
-              </Box>
-            </CardContent>
-          </Card>
+            }
+            fullHeight
+          />
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: 'warning.light', color: 'white', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6">Tickets</Typography>
-                <ConfirmationNumberIcon fontSize="large" />
-              </Box>
-              <Typography variant="h4" sx={{ mt: 2 }}>
-                {Object.values(ticketTotals).reduce((sum, { count }) => sum + count, 0)}
-              </Typography>
-              <Typography variant="h6" sx={{ mt: 2 }}>
-                €{Object.values(ticketTotals).reduce((sum, { total }) => sum + total, 0).toFixed(2)}
-              </Typography>
-
-              {!isMobile && (
-                <Box sx={{ mt: 2 }}>
-                  {Object.entries(ticketTotals)
-                    .sort((a, b) => b[1].count - a[1].count)
-                    .slice(0, 2)
-                    .map(([key, { count, isArtist }]) => (
-                      <Box
-                        key={key}
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          mt: 0.5
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          {isArtist && <MusicNoteIcon sx={{ mr: 0.5, fontSize: '0.875rem' }} />}
-                          <Typography variant="body2" noWrap sx={{ maxWidth: 150 }}>
-                            {key.split('-')[1]}
-                          </Typography>
-                        </Box>
-                        <Typography variant="body2">{count}</Typography>
+          <StatsCard
+            title="Tickets"
+            value={Object.values(ticketTotals).reduce((sum, { count }) => sum + count, 0)}
+            subtitle={`€${Object.values(ticketTotals).reduce((sum, { total }) => sum + total, 0).toFixed(2)}`}
+            color="warning"
+            icon={<ConfirmationNumber fontSize="large" />}
+            footer={
+              <Box>
+                {Object.entries(ticketTotals)
+                  .sort((a, b) => b[1].count - a[1].count)
+                  .slice(0, 2)
+                  .map(([key, { count, isArtist }]) => (
+                    <Box
+                      key={key}
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        mt: 0.5
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {isArtist && <MusicNote sx={{ mr: 0.5, fontSize: '0.875rem' }} />}
+                        <Typography variant="body2" noWrap sx={{ maxWidth: 150 }}>
+                          {key.split('-')[1]}
+                        </Typography>
                       </Box>
-                    ))}
-                  {Object.keys(ticketTotals).length > 2 && (
-                    <Typography variant="body2" sx={{ mt: 0.5, textAlign: 'center' }}>
-                      +{Object.keys(ticketTotals).length - 2} more
-                    </Typography>
-                  )}
-                </Box>
-              )}
-            </CardContent>
-          </Card>
+                      <Typography variant="body2">{count}</Typography>
+                    </Box>
+                  ))}
+                {Object.keys(ticketTotals).length > 2 && (
+                  <Typography variant="body2" sx={{ mt: 0.5, textAlign: 'center' }}>
+                    +{Object.keys(ticketTotals).length - 2} more
+                  </Typography>
+                )}
+              </Box>
+            }
+            fullHeight
+          />
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: 'info.light', color: 'white', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6">Food & Beverages</Typography>
-                <Box sx={{ display: 'flex' }}>
-                  <LocalDiningIcon fontSize="large" sx={{ mr: 1 }} />
-                  <SportsBarIcon fontSize="large" />
-                </Box>
+          <StatsCard
+            title="Food & Beverages"
+            value={`€${(
+              Object.values(beverageTotals).reduce((sum, { total }) => sum + total, 0) +
+              Object.values(foodTotals).reduce((sum, { total }) => sum + total, 0)
+            ).toFixed(2)}`}
+            color="info"
+            icon={
+              <Box sx={{ display: 'flex' }}>
+                <LocalDining fontSize="large" sx={{ mr: 1 }} />
+                <SportsBar fontSize="large" />
               </Box>
-
-              <Box sx={{ mt: 2 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="body1">Beverages</Typography>
-                  <Typography variant="h6">
+            }
+            footer={
+              <Box>
+                <Box sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 1
+                }}>
+                  <Typography variant="body2">Beverages:</Typography>
+                  <Typography variant="body2">
                     €{Object.values(beverageTotals).reduce((sum, { total }) => sum + total, 0).toFixed(2)}
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
-                  <Typography variant="body1">Food</Typography>
-                  <Typography variant="h6">
+                <Box sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <Typography variant="body2">Food:</Typography>
+                  <Typography variant="body2">
                     €{Object.values(foodTotals).reduce((sum, { total }) => sum + total, 0).toFixed(2)}
                   </Typography>
                 </Box>
               </Box>
-
-              <Divider sx={{ my: 2, bgcolor: 'rgba(255,255,255,0.2)' }} />
-
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body1">Total</Typography>
-                <Typography variant="h5">
-                  €{(
-                    Object.values(beverageTotals).reduce((sum, { total }) => sum + total, 0) +
-                    Object.values(foodTotals).reduce((sum, { total }) => sum + total, 0)
-                  ).toFixed(2)}
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
+            }
+            fullHeight
+          />
         </Grid>
       </Grid>
 
@@ -408,16 +298,15 @@ const FinancialsOverviewPage: React.FC = () => {
       <Grid container spacing={3}>
         {/* Tickets Summary */}
         <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">Ticket Sales</Typography>
-                <ConfirmationNumberIcon color="primary" />
-              </Box>
+          <FormCard
+            title="Ticket Sales"
+            icon={<ConfirmationNumber />}
+          >
+            <Box sx={{ p: 2 }}>
               <TableContainer component={Paper} variant="outlined">
                 <Table size="small">
                   <TableHead>
-                    <TableRow>
+                    <TableRow sx={{ bgcolor: alpha(spacePalette.primary.main, 0.05) }}>
                       <TableCell>Ticket Type</TableCell>
                       <TableCell align="right">Count</TableCell>
                       <TableCell align="right">Total (€)</TableCell>
@@ -428,7 +317,7 @@ const FinancialsOverviewPage: React.FC = () => {
                       <TableRow
                         key={key}
                         sx={{
-                          bgcolor: isArtist ? 'rgba(25, 118, 210, 0.08)' : 'transparent'
+                          bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent'
                         }}
                       >
                         <TableCell>
@@ -443,7 +332,7 @@ const FinancialsOverviewPage: React.FC = () => {
                         <TableCell align="right">{total.toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
-                    <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: 'rgba(0, 0, 0, 0.04)' } }}>
+                    <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha('#000', 0.04) } }}>
                       <TableCell>Total Tickets</TableCell>
                       <TableCell align="right">
                         {Object.values(ticketTotals).reduce((sum, { count }) => sum + count, 0)}
@@ -455,22 +344,21 @@ const FinancialsOverviewPage: React.FC = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
-            </CardContent>
-          </Card>
+            </Box>
+          </FormCard>
         </Grid>
 
         {/* Beverages Summary */}
         <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">Beverage Sales</Typography>
-                <SportsBarIcon color="primary" />
-              </Box>
+          <FormCard
+            title="Beverage Sales"
+            icon={<SportsBar />}
+          >
+            <Box sx={{ p: 2 }}>
               <TableContainer component={Paper} variant="outlined">
                 <Table size="small">
                   <TableHead>
-                    <TableRow>
+                    <TableRow sx={{ bgcolor: alpha(spacePalette.primary.main, 0.05) }}>
                       <TableCell>Beverage Type</TableCell>
                       <TableCell align="right">Count</TableCell>
                       <TableCell align="right">Total (€)</TableCell>
@@ -481,7 +369,7 @@ const FinancialsOverviewPage: React.FC = () => {
                       <TableRow
                         key={key}
                         sx={{
-                          bgcolor: isArtist ? 'rgba(25, 118, 210, 0.08)' : 'transparent'
+                          bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent'
                         }}
                       >
                         <TableCell>
@@ -496,7 +384,7 @@ const FinancialsOverviewPage: React.FC = () => {
                         <TableCell align="right">{total.toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
-                    <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: 'rgba(0, 0, 0, 0.04)' } }}>
+                    <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha('#000', 0.04) } }}>
                       <TableCell>Total Beverages</TableCell>
                       <TableCell align="right">
                         {Object.values(beverageTotals).reduce((sum, { count }) => sum + count, 0)}
@@ -508,22 +396,21 @@ const FinancialsOverviewPage: React.FC = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
-            </CardContent>
-          </Card>
+            </Box>
+          </FormCard>
         </Grid>
 
         {/* Food Summary */}
         <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">Food Sales</Typography>
-                <LocalDiningIcon color="primary" />
-              </Box>
+          <FormCard
+            title="Food Sales"
+            icon={<LocalDining />}
+          >
+            <Box sx={{ p: 2 }}>
               <TableContainer component={Paper} variant="outlined">
                 <Table size="small">
                   <TableHead>
-                    <TableRow>
+                    <TableRow sx={{ bgcolor: alpha(spacePalette.primary.main, 0.05) }}>
                       <TableCell>Food Type</TableCell>
                       <TableCell align="right">Count</TableCell>
                       <TableCell align="right">Total (€)</TableCell>
@@ -534,7 +421,7 @@ const FinancialsOverviewPage: React.FC = () => {
                       <TableRow
                         key={key}
                         sx={{
-                          bgcolor: isArtist ? 'rgba(25, 118, 210, 0.08)' : 'transparent'
+                          bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent'
                         }}
                       >
                         <TableCell>
@@ -549,7 +436,7 @@ const FinancialsOverviewPage: React.FC = () => {
                         <TableCell align="right">{total.toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
-                    <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: 'rgba(0, 0, 0, 0.04)' } }}>
+                    <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha('#000', 0.04) } }}>
                       <TableCell>Total Food</TableCell>
                       <TableCell align="right">
                         {Object.values(foodTotals).reduce((sum, { count }) => sum + count, 0)}
@@ -561,96 +448,41 @@ const FinancialsOverviewPage: React.FC = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
-            </CardContent>
-          </Card>
+            </Box>
+          </FormCard>
         </Grid>
 
         {/* Grand Total */}
         <Grid item xs={12}>
-          <Card sx={{ bgcolor: 'rgba(63, 81, 181, 0.1)' }}>
-            <CardContent>
-              <Box sx={{
-                display: 'flex',
-                flexDirection: isMobile ? 'column' : 'row',
-                justifyContent: 'space-between',
-                alignItems: isMobile ? 'center' : 'center',
-                gap: 2
-              }}>
-                <Typography variant="h5">
-                  Total Revenue: €{grandTotal.toFixed(2)}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    startIcon={<PaidIcon />}
-                  >
-                    {viewType === 'all' ? 'All' : viewType === 'regular' ? 'Regular' : 'Artist'} Payments
-                  </Button>
-                  <Tooltip title="Export financial data">
-                    <IconButton color="primary">
-                      <DownloadIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
+          <Paper sx={{
+            p: 3,
+            bgcolor: alpha(spacePalette.primary.main, 0.1),
+            borderRadius: 2,
+            border: `1px solid ${alpha(spacePalette.primary.main, 0.2)}`
+          }}>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 2
+            }}>
+              <Typography variant="h5" color="primary.main" fontWeight="medium">
+                Total Revenue: €{grandTotal.toFixed(2)}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<Paid />}
+                >
+                  {viewType === 'all' ? 'All' : viewType === 'regular' ? 'Regular' : 'Artist'} Payments
+                </Button>
               </Box>
-            </CardContent>
-          </Card>
+            </Box>
+          </Paper>
         </Grid>
       </Grid>
-    </Box>
-  );
-};
-
-// Custom LinearProgress with label
-const LinearProgressWithLabel = (props: { value: number }) => {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-      <Box sx={{ width: '100%', mr: 1 }}>
-        <LinearProgress
-          variant="determinate"
-          value={Math.min(props.value, 100)}
-          sx={{
-            height: 10,
-            borderRadius: 5,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            '& .MuiLinearProgress-bar': {
-              borderRadius: 5,
-              backgroundColor: 'rgba(255, 255, 255, 0.8)',
-            }
-          }}
-        />
-      </Box>
-      <Box sx={{ minWidth: 35 }}>
-        <Typography variant="body2" color="inherit">{`${Math.round(props.value)}%`}</Typography>
-      </Box>
-    </Box>
-  );
-};
-
-const LinearProgress = ({ variant, value, sx, ...rest }: any) => {
-  const theme = useTheme();
-
-  return (
-    <Box
-      sx={{
-        height: 10,
-        width: '100%',
-        borderRadius: 5,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        position: 'relative',
-        ...sx
-      }}
-    >
-      <Box
-        sx={{
-          height: '100%',
-          width: `${Math.min(value, 100)}%`,
-          borderRadius: 5,
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          transition: 'width 0.4s ease-in-out',
-        }}
-      />
     </Box>
   );
 };

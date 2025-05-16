@@ -1,123 +1,98 @@
-import React, {useState} from 'react';
-import {
-    Box, Typography, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Paper, Modal, IconButton, Chip
-} from '@mui/material';
+// src/form/adminArea/BeveragesPage.tsx
 
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import CloseIcon from '@mui/icons-material/Close';
-import {useFetchData} from "./useFetchData";
+import React, { useState } from 'react';
+import { Box, Typography } from '@mui/material';
+import SportsBarIcon from '@mui/icons-material/SportsBar';
+import { useFetchData } from './useFetchData';
+import FormCard from '../../components/core/display/FormCard';
+import OptionsGrid from './components/OptionsGrid';
+import FilterControls from './components/FilterControls';
+import { ViewFilterType } from './utils/optionsUtils';
+import { CombinedBooking } from './interface';
 
+const BeveragesPage: React.FC = () => {
+  const { 
+    bookings, regularBookings, artistBookings, 
+    formContent, artistFormContent 
+  } = useFetchData();
+  
+  // View filter state
+  const [viewType, setViewType] = useState<ViewFilterType>('all');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-function BeveragesPage() {
-    const {bookings, formContent} = useFetchData();
-    const [selectedBeverage, setSelectedBeverage] = useState<number | null>(null);
-    const [openModal, setOpenModal] = useState(false);
+  // Convert to proper type
+  const regularBookingsWithType: CombinedBooking[] = regularBookings.map(b => ({
+    ...b,
+    bookingType: 'regular' as const
+  }));
+  
+  const artistBookingsWithType: CombinedBooking[] = artistBookings.map(b => ({
+    ...b,
+    bookingType: 'artist' as const
+  }));
 
-    const handleOpenModal = (beverageId: number) => {
-        setSelectedBeverage(beverageId);
-        setOpenModal(true);
-    };
+  // Calculate beverage counts and stats
+  const getBeverageOptions = () => {
+    const regularOptions = viewType === 'all' || viewType === 'regular'
+      ? formContent.beverage_options.map(beverage => {
+          const count = regularBookingsWithType.filter(b => b.beverage_id === beverage.id).length;
+          return {
+            id: beverage.id,
+            title: beverage.title,
+            price: beverage.price,
+            description: beverage.description,
+            count,
+            isArtist: false
+          };
+        })
+      : [];
+    
+    const artistOptions = viewType === 'all' || viewType === 'artist'
+      ? artistFormContent.beverage_options.map(beverage => {
+          const count = artistBookingsWithType.filter(b => b.beverage_id === beverage.id).length;
+          return {
+            id: beverage.id,
+            title: beverage.title,
+            price: beverage.price,
+            description: beverage.description,
+            count,
+            isArtist: true
+          };
+        })
+      : [];
+    
+    return [...regularOptions, ...artistOptions];
+  };
 
-    const handleCloseModal = () => {
-        setOpenModal(false);
-        setSelectedBeverage(null);
-    };
+  const beverageOptions = getBeverageOptions();
 
-    const getOptionTitle = (id: number, options: { id: number; title: string }[]) => {
-        const option = options.find(option => option.id === id);
-        return option ? option.title : 'Unknown';
-    };
+  return (
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h5" gutterBottom>
+        Beverages Overview
+      </Typography>
 
-    const getUsersForBeverage = (beverageId: number) => {
-        return bookings.filter(booking => booking.beverage_id === beverageId).map(booking => ({
-            first_name: booking.first_name,
-            last_name: booking.last_name,
-            bookingType: booking.bookingType
-        }));
-    };
+      {/* Filter Controls */}
+      <FilterControls
+        viewType={viewType}
+        setViewType={setViewType}
+        anchorEl={anchorEl}
+        setAnchorEl={setAnchorEl}
+      />
 
-    return (
-        <Box>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Bierflat</TableCell>
-                            <TableCell>Anzahl gebucht</TableCell>
-                            <TableCell></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {formContent.beverage_options.map((beverage) => {
-                            const users = getUsersForBeverage(beverage.id);
-                            return (
-                                <TableRow key={beverage.id}>
-                                    <TableCell>{beverage.title}</TableCell>
-                                    <TableCell>{users.length}</TableCell>
-                                    <TableCell>
-                                        <IconButton onClick={() => handleOpenModal(beverage.id)}>
-                                            <MoreHorizIcon/>
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <Modal open={openModal} onClose={handleCloseModal}>
-                <Box sx={{
-                    position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                    width: '90vw', maxWidth: 400, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 24, p: 2
-                }}>
-                    <IconButton onClick={handleCloseModal} sx={{position: 'absolute', top: 8, right: 8}}>
-                        <CloseIcon/>
-                    </IconButton>
-                    {selectedBeverage !== null && (
-                        <Box>
-                            <Typography variant="h6" gutterBottom>
-                                Users for {getOptionTitle(selectedBeverage, formContent.beverage_options)}
-                            </Typography>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Type</TableCell>
-                                        <TableCell>First Name</TableCell>
-                                        <TableCell>Last Name</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {getUsersForBeverage(selectedBeverage).map((user, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell>
-                                                {user.bookingType === 'artist' ? (
-                                                        <Chip
-                                                            label="Artist"
-                                                            color="primary"
-                                                            size="small"
-                                                            sx={{mr: 2}}
-                                                        />
-                                                    ) :
-                                                    (<Chip
-                                                        label="Regular"
-                                                        color="default"
-                                                        size="small"
-                                                        sx={{mr: 2}}
-                                                    />)
-                                                }</TableCell>
-                                            <TableCell>{user.first_name}</TableCell>
-                                            <TableCell>{user.last_name}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </Box>
-                    )}
-                </Box>
-            </Modal>
+      {/* Beverages Grid */}
+      <FormCard>
+        <Box sx={{ p: 2 }}>
+          <OptionsGrid
+            options={beverageOptions}
+            bookings={bookings}
+            optionType="beverage"
+            icon={<SportsBarIcon />}
+          />
         </Box>
-    );
-}
+      </FormCard>
+    </Box>
+  );
+};
 
 export default BeveragesPage;

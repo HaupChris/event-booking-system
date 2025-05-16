@@ -1,590 +1,371 @@
 import React, { useState } from 'react';
 import {
-    Box, Typography, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Paper, Modal, IconButton, LinearProgress,
-    List, ListItem, ListItemText, Collapse, Button, Tabs, Tab,
-    Chip, Menu, MenuItem, Card, CardContent, Grid, useTheme,
-    useMediaQuery, Badge
+  Box, Typography, Modal, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Chip
 } from '@mui/material';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import CloseIcon from '@mui/icons-material/Close';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import HandymanIcon from '@mui/icons-material/Handyman';
-import PersonIcon from '@mui/icons-material/Person';
-import ListItemButton from "@mui/material/ListItemButton";
+import {
+  Handyman as HandymanIcon,
+  Person as PersonIcon,
+  Close as CloseIcon,
+} from '@mui/icons-material';
 import { useFetchData } from './useFetchData';
+import TabSwitcher from './components/TabSwitcher';
+import ProgressList, { ProgressItem } from './components/ProgressList';
+import PeopleList, { Person } from './components/PeopleList';
+import FilterSortBar from './components/FilterSortBar';
+import FormCard from '../../components/core/display/FormCard';
+import { ViewFilterType } from './utils/optionsUtils';
 
 const MaterialsPage: React.FC = () => {
-    const { regularBookings, artistBookings, formContent, artistFormContent } = useFetchData();
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { regularBookings, artistBookings, formContent, artistFormContent } = useFetchData();
 
-    // State
-    const [selectedMaterial, setSelectedMaterial] = useState<number | null>(null);
-    const [selectedMaterialType, setSelectedMaterialType] = useState<'regular' | 'artist' | null>(null);
-    const [openMaterialModal, setOpenMaterialModal] = useState(false);
-    const [expandedPerson, setExpandedPerson] = useState<string | null>(null);
-    const [materialSortOrder, setMaterialSortOrder] = useState<'asc' | 'desc'>('asc');
-    const [peopleSortOrder, setPeopleSortOrder] = useState<'asc' | 'desc'>('asc');
-    const [tabValue, setTabValue] = useState(0);
-    const [viewType, setViewType] = useState('all'); // 'all', 'regular', 'artist'
-    const [viewTypeAnchorEl, setViewTypeAnchorEl] = useState<null | HTMLElement>(null);
-    const viewTypeMenuOpen = Boolean(viewTypeAnchorEl);
+  // State
+  const [activeTab, setActiveTab] = useState('materials');
+  const [selectedMaterial, setSelectedMaterial] = useState<any | null>(null);
+  const [selectedMaterialType, setSelectedMaterialType] = useState<'regular' | 'artist' | null>(null);
+  const [openMaterialModal, setOpenMaterialModal] = useState(false);
+  const [materialSortOrder, setMaterialSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [peopleSortOrder, setPeopleSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [viewType, setViewType] = useState<ViewFilterType>('all');
 
-    // Tab handling (Materials vs People view)
-    const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-        setTabValue(newValue);
-    };
+  // Modal handlers
+  const handleOpenMaterialModal = (material: any, materialType: 'regular' | 'artist') => {
+    setSelectedMaterial(material);
+    setSelectedMaterialType(materialType);
+    setOpenMaterialModal(true);
+  };
 
-    // Material modal handling
-    const handleOpenMaterialModal = (materialId: number, materialType: 'regular' | 'artist') => {
-        setSelectedMaterial(materialId);
-        setSelectedMaterialType(materialType);
-        setOpenMaterialModal(true);
-    };
+  const handleCloseMaterialModal = () => {
+    setOpenMaterialModal(false);
+    setSelectedMaterial(null);
+    setSelectedMaterialType(null);
+  };
 
-    const handleCloseMaterialModal = () => {
-        setOpenMaterialModal(false);
-        setSelectedMaterial(null);
-        setSelectedMaterialType(null);
-    };
+  // Toggle sort orders
+  const handleToggleMaterialSort = () => {
+    setMaterialSortOrder(materialSortOrder === 'asc' ? 'desc' : 'asc');
+  };
 
-    // View type dropdown menu
-    const handleViewTypeMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setViewTypeAnchorEl(event.currentTarget);
-    };
+  const handleTogglePeopleSort = () => {
+    setPeopleSortOrder(peopleSortOrder === 'asc' ? 'desc' : 'asc');
+  };
 
-    const handleViewTypeMenuClose = () => {
-        setViewTypeAnchorEl(null);
-    };
+  // Helper functions
 
-    const handleViewTypeSelect = (type: string) => {
-        setViewType(type);
-        handleViewTypeMenuClose();
-    };
+  // Convert materials to progress items
+  const materialsToProgressItems = (): ProgressItem[] => {
+    const regularMaterials = viewType === 'all' || viewType === 'regular'
+      ? formContent.materials.map(material => ({
+          id: `regular-${material.id}`,
+          title: material.title,
+          currentCount: getMaterialCount(material.id, 'regular'),
+          totalNeeded: material.num_needed,
+          badgeContent: getUsersForMaterial(material.id, 'regular').length,
+          badgeIcon: <PersonIcon color="action" />,
+          isRegular: true,
+          material
+        }))
+      : [];
 
-    // View type tabs
-    const handleViewChange = (event: React.SyntheticEvent, newValue: string) => {
-        setViewType(newValue);
-    };
+    const artistMaterials = viewType === 'all' || viewType === 'artist'
+      ? artistFormContent.artist_materials.map(material => ({
+          id: `artist-${material.id}`,
+          title: material.title,
+          currentCount: getMaterialCount(material.id, 'artist'),
+          totalNeeded: material.num_needed,
+          badgeContent: getUsersForMaterial(material.id, 'artist').length,
+          badgeIcon: <PersonIcon color="action" />,
+          isRegular: false,
+          material
+        }))
+      : [];
 
-    // Helper to get material title
-    const getOptionTitle = (id: number, options: { id: number; title: string }[]) => {
-        const option = options.find(option => option.id === id);
-        return option ? option.title : 'Unknown';
-    };
+    return [...regularMaterials, ...artistMaterials].map(item => ({
+      ...item,
+      children: (
+        <Box>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            {item.isRegular ?
+              "Regular material needed for the festival setup." :
+              "Special material needed for artist performances."}
+          </Typography>
 
-    // Get users for a specific material by type
-    const getUsersForMaterial = (materialId: number, materialType: 'regular' | 'artist') => {
-        if (materialType === 'regular') {
-            return regularBookings
-                .filter(booking => booking.material_ids?.includes(materialId))
-                .map(booking => ({
-                    first_name: booking.first_name,
-                    last_name: booking.last_name,
-                    is_artist: false
-                }));
-        } else {
-            return artistBookings
-                .filter(booking => booking.artist_material_ids?.includes(materialId))
-                .map(booking => ({
-                    first_name: booking.first_name,
-                    last_name: booking.last_name,
-                    is_artist: true
-                }));
-        }
-    };
-
-    // Count materials
-    const getMaterialCount = (materialId: number, materialType: 'regular' | 'artist') => {
-        if (materialType === 'regular') {
-            return regularBookings.reduce((count, booking) => {
-                return count + (booking.material_ids?.includes(materialId) ? 1 : 0);
-            }, 0);
-        } else {
-            return artistBookings.reduce((count, booking) => {
-                return count + (booking.artist_material_ids?.includes(materialId) ? 1 : 0);
-            }, 0);
-        }
-    };
-
-    // Get materials for a specific user
-    const getMaterialsForUser = (user: { first_name: string, last_name: string, is_artist?: boolean }) => {
-        if (user.is_artist) {
-            const userBookings = artistBookings.filter(
-                booking => booking.first_name === user.first_name && booking.last_name === user.last_name
-            );
-            const materialIds = userBookings.flatMap(booking => booking.artist_material_ids || []);
-            return artistFormContent.artist_materials.filter(material => materialIds.includes(material.id))
-                .map(material => ({ ...material, is_artist: true }));
-        } else {
-            const userBookings = regularBookings.filter(
-                booking => booking.first_name === user.first_name && booking.last_name === user.last_name
-            );
-            const materialIds = userBookings.flatMap(booking => booking.material_ids || []);
-            return formContent.materials.filter(material => materialIds.includes(material.id))
-                .map(material => ({ ...material, is_artist: false }));
-        }
-    };
-
-    // Toggle expanded state for person
-    const togglePersonExpanded = (personName: string) => {
-        setExpandedPerson(expandedPerson === personName ? null : personName);
-    };
-
-    // Get combined materials based on view type
-    const getCombinedMaterials = () => {
-        const regularMaterials = viewType === 'all' || viewType === 'regular'
-            ? formContent.materials.map(material => ({
-                ...material,
-                bookingType: 'regular',
-                bookedCount: getMaterialCount(material.id, 'regular')
-            }))
-            : [];
-
-        const artistMaterials = viewType === 'all' || viewType === 'artist'
-            ? artistFormContent.artist_materials.map(material => ({
-                ...material,
-                bookingType: 'artist',
-                bookedCount: getMaterialCount(material.id, 'artist')
-            }))
-            : [];
-
-        return [...regularMaterials, ...artistMaterials];
-    };
-
-    // Get combined people based on view type
-    const getCombinedPeople = () => {
-        const regularPeople = viewType === 'all' || viewType === 'regular'
-            ? regularBookings.map(booking => ({
-                first_name: booking.first_name,
-                last_name: booking.last_name,
-                is_artist: false,
-                id: booking.id
-            }))
-            : [];
-
-        const artistPeople = viewType === 'all' || viewType === 'artist'
-            ? artistBookings.map(booking => ({
-                first_name: booking.first_name,
-                last_name: booking.last_name,
-                is_artist: true,
-                id: booking.id
-            }))
-            : [];
-
-        return [...regularPeople, ...artistPeople];
-    };
-
-    // Sort materials
-    const sortedMaterials = getCombinedMaterials().sort((a, b) => {
-        const progressA = a.bookedCount / a.num_needed;
-        const progressB = b.bookedCount / b.num_needed;
-        return materialSortOrder === 'asc' ? progressA - progressB : progressB - progressA;
-    });
-
-    // Sort people
-    const sortedPeople = getCombinedPeople().sort((a, b) => {
-        if (peopleSortOrder === 'asc') {
-            return a.first_name.localeCompare(b.first_name);
-        } else {
-            return b.first_name.localeCompare(a.first_name);
-        }
-    });
-
-    return (
-        <Box sx={{ p: 2 }}>
-            {/* Header with responsive filter */}
-            <Box sx={{
-                display: 'flex',
-                flexDirection: isMobile ? 'column' : 'row',
-                justifyContent: 'space-between',
-                alignItems: isMobile ? 'flex-start' : 'center',
-                mb: 2,
-                gap: 1
-            }}>
-                <Typography variant="h5" gutterBottom={isMobile}>
-                    Materials Overview
-                </Typography>
-
-                {/* View Type Selection - Either Tabs or Dropdown based on screen size */}
-                {isMobile ? (
-                    <Box>
-                        <Button
-                            variant="outlined"
-                            onClick={handleViewTypeMenuOpen}
-                            endIcon={<FilterAltIcon />}
-                            size="small"
-                            fullWidth
-                        >
-                            {viewType === 'all' ? 'All Materials' :
-                            viewType === 'regular' ? 'Regular Materials' : 'Artist Materials'}
-                        </Button>
-                        <Menu
-                            anchorEl={viewTypeAnchorEl}
-                            open={viewTypeMenuOpen}
-                            onClose={handleViewTypeMenuClose}
-                        >
-                            <MenuItem onClick={() => handleViewTypeSelect('all')}>All Materials</MenuItem>
-                            <MenuItem onClick={() => handleViewTypeSelect('regular')}>Regular Materials</MenuItem>
-                            <MenuItem onClick={() => handleViewTypeSelect('artist')}>Artist Materials</MenuItem>
-                        </Menu>
-                    </Box>
-                ) : (
-                    <Tabs
-                        value={viewType}
-                        onChange={handleViewChange}
-                        sx={{ minWidth: '300px' }}
-                    >
-                        <Tab label="All Materials" value="all" />
-                        <Tab label="Regular Materials" value="regular" />
-                        <Tab label="Artist Materials" value="artist" />
-                    </Tabs>
-                )}
-            </Box>
-
-            {/* Main tabs (Material vs People view) */}
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-                <Tabs
-                    value={tabValue}
-                    onChange={handleTabChange}
-                    centered
-                    variant={isMobile ? "fullWidth" : "standard"}
-                >
-                    <Tab
-                        label={isMobile ? "Materials" : "Material Overview"}
-                        icon={isMobile ? <HandymanIcon /> : undefined}
-                        iconPosition="start"
-                    />
-                    <Tab
-                        label={isMobile ? "People" : "People Overview"}
-                        icon={isMobile ? <PersonIcon /> : undefined}
-                        iconPosition="start"
-                    />
-                </Tabs>
-            </Box>
-
-            {/* Material Overview Tab */}
-            {tabValue === 0 && (
-                <>
-                    <Box
-                        display="flex"
-                        justifyContent="flex-end"
-                        mb={2}
-                        sx={{ flexDirection: isMobile ? 'column' : 'row', gap: 1 }}
-                    >
-                        <Typography variant="body2" sx={{ flexGrow: 1, display: isMobile ? 'none' : 'block' }}>
-                            Showing {sortedMaterials.length} materials sorted by progress
-                        </Typography>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            size={isMobile ? "small" : "medium"}
-                            onClick={() => setMaterialSortOrder(materialSortOrder === 'asc' ? 'desc' : 'asc')}
-                            startIcon={materialSortOrder === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-                            fullWidth={isMobile}
-                        >
-                            {materialSortOrder === 'asc' ? 'Lowest First' : 'Highest First'}
-                        </Button>
-                    </Box>
-
-                    {/* Materials grid for desktop */}
-                    {!isMobile && (
-                        <Grid container spacing={2}>
-                            {sortedMaterials.map((material) => {
-                                const progress = (material.bookedCount / material.num_needed) * 100;
-                                return (
-                                    <Grid item xs={12} sm={6} md={4} key={`${material.bookingType}-${material.id}`}>
-                                        <Card
-                                            variant="outlined"
-                                            sx={{
-                                                bgcolor: material.bookingType === 'artist' ? 'rgba(25, 118, 210, 0.08)' : 'transparent'
-                                            }}
-                                        >
-                                            <CardContent>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                    <Typography variant="h6">
-                                                        {material.title}
-                                                        {material.bookingType === 'artist' && (
-                                                            <Chip label="Artist" color="primary" size="small" sx={{ ml: 1 }} />
-                                                        )}
-                                                    </Typography>
-                                                    <IconButton
-                                                        size="small"
-                                                        onClick={() => handleOpenMaterialModal(
-                                                            material.id,
-                                                            material.bookingType as 'regular' | 'artist'
-                                                        )}
-                                                    >
-                                                        <MoreHorizIcon />
-                                                    </IconButton>
-                                                </Box>
-
-                                                <Box sx={{ mt: 2 }}>
-                                                    <Box display="flex" alignItems="center" sx={{ mb: 1 }}>
-                                                        <Box width="100%" mr={1}>
-                                                            <LinearProgress
-                                                                variant="determinate"
-                                                                value={progress}
-                                                                color={progress >= 100 ? "success" : "primary"}
-                                                            />
-                                                        </Box>
-                                                        <Box minWidth={45}>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                {`${material.bookedCount}/${material.num_needed}`}
-                                                            </Typography>
-                                                        </Box>
-                                                    </Box>
-
-                                                    <Typography variant="body2" color="text.secondary">
-                                                        {progress < 100 ?
-                                                            `Need ${material.num_needed - material.bookedCount} more` :
-                                                            'Complete!'}
-                                                    </Typography>
-                                                </Box>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                );
-                            })}
-                        </Grid>
-                    )}
-
-                    {/* Materials table for mobile */}
-                    {isMobile && (
-                        <TableContainer component={Paper}>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Material</TableCell>
-                                        <TableCell>Progress</TableCell>
-                                        <TableCell></TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {sortedMaterials.map((material) => {
-                                        const progress = (material.bookedCount / material.num_needed) * 100;
-                                        return (
-                                            <TableRow
-                                                key={`${material.bookingType}-${material.id}`}
-                                                sx={{
-                                                    bgcolor: material.bookingType === 'artist' ? 'rgba(25, 118, 210, 0.08)' : 'transparent'
-                                                }}
-                                            >
-                                                <TableCell>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        {material.bookingType === 'artist' && (
-                                                            <Chip label="A" color="primary" size="small" />
-                                                        )}
-                                                        {material.title}
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        <LinearProgress
-                                                            variant="determinate"
-                                                            value={progress}
-                                                            sx={{ flexGrow: 1, minWidth: 40 }}
-                                                        />
-                                                        <Typography variant="caption">
-                                                            {`${material.bookedCount}/${material.num_needed}`}
-                                                        </Typography>
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <IconButton
-                                                        size="small"
-                                                        onClick={() => handleOpenMaterialModal(
-                                                            material.id,
-                                                            material.bookingType as 'regular' | 'artist'
-                                                        )}
-                                                    >
-                                                        <MoreHorizIcon />
-                                                    </IconButton>
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    )}
-                </>
-            )}
-
-            {/* People Overview Tab */}
-            {tabValue === 1 && (
-                <>
-                    <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        mb={2}
-                        sx={{ flexDirection: isMobile ? 'column' : 'row', gap: 1 }}
-                    >
-                        <Typography variant="body2" sx={{ display: isMobile ? 'none' : 'block' }}>
-                            Showing {sortedPeople.length} people with materials
-                        </Typography>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            size={isMobile ? "small" : "medium"}
-                            onClick={() => setPeopleSortOrder(peopleSortOrder === 'asc' ? 'desc' : 'asc')}
-                            startIcon={peopleSortOrder === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-                            fullWidth={isMobile}
-                        >
-                            {peopleSortOrder === 'asc' ? 'A-Z' : 'Z-A'}
-                        </Button>
-                    </Box>
-
-                    <Paper>
-                        <List>
-                            {sortedPeople.map((person, index) => {
-                                const personName = `${person.first_name} ${person.last_name}`;
-                                const materials = getMaterialsForUser(person);
-
-                                // Only show people who are bringing materials
-                                if (materials.length === 0) return null;
-
-                                return (
-                                    <React.Fragment key={`${person.is_artist ? 'artist' : 'regular'}-${person.id}`}>
-                                        <ListItemButton
-                                            sx={{
-                                                backgroundColor: index % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
-                                                bgcolor: person.is_artist ? 'rgba(25, 118, 210, 0.08)' : undefined
-                                            }}
-                                            onClick={() => togglePersonExpanded(personName)}
-                                        >
-                                            <ListItemText
-                                                primary={
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        {person.is_artist && (
-                                                            <Chip label="Artist" color="primary" size="small" />
-                                                        )}
-                                                        {personName}
-                                                    </Box>
-                                                }
-                                                secondary={`Bringing ${materials.length} item${materials.length !== 1 ? 's' : ''}`}
-                                            />
-                                            <Badge
-                                                badgeContent={materials.length}
-                                                color="primary"
-                                                sx={{ mr: 1 }}
-                                            >
-                                                <HandymanIcon color="action" />
-                                            </Badge>
-                                            {expandedPerson === personName ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                                        </ListItemButton>
-
-                                        <Collapse in={expandedPerson === personName} timeout="auto" unmountOnExit>
-                                            <List component="div" disablePadding>
-                                                {materials.map(material => (
-                                                    <ListItem
-                                                        key={`${material.is_artist ? 'artist' : 'regular'}-${material.id}`}
-                                                        sx={{ pl: 4 }}
-                                                    >
-                                                        <ListItemText
-                                                            primary={
-                                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                                    {material.is_artist && (
-                                                                        <Chip
-                                                                            label="A"
-                                                                            color="primary"
-                                                                            size="small"
-                                                                            sx={{ mr: 1 }}
-                                                                        />
-                                                                    )}
-                                                                    {material.title}
-                                                                </Box>
-                                                            }
-                                                        />
-                                                    </ListItem>
-                                                ))}
-                                            </List>
-                                        </Collapse>
-                                    </React.Fragment>
-                                );
-                            })}
-                        </List>
-                    </Paper>
-                </>
-            )}
-
-            {/* Material Details Modal */}
-            <Modal open={openMaterialModal} onClose={handleCloseMaterialModal}>
-                <Box sx={{
-                    position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                    width: '90vw', maxWidth: 500, bgcolor: 'background.paper',
-                    borderRadius: 2, boxShadow: 24, p: 2
-                }}>
-                    <IconButton onClick={handleCloseMaterialModal} sx={{ position: 'absolute', top: 8, right: 8 }}>
-                        <CloseIcon />
-                    </IconButton>
-
-                    {selectedMaterial !== null && selectedMaterialType !== null && (
-                        <Box>
-                            <Typography color={"text.primary"} variant="h6" gutterBottom sx={{ pr: 4 }}>
-                                {getOptionTitle(
-                                    selectedMaterial,
-                                    selectedMaterialType === 'artist' ?
-                                        artistFormContent.artist_materials :
-                                        formContent.materials
-                                )}
-                                {selectedMaterialType === 'artist' && (
-                                    <Chip label="Artist Material" color="primary" size="small" sx={{ ml: 1 }} />
-                                )}
-                            </Typography>
-
-                            {/* Show count of people */}
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                {getUsersForMaterial(selectedMaterial, selectedMaterialType).length} people
-                                are bringing this item
-                            </Typography>
-
-                            <TableContainer component={Paper} variant="outlined">
-                                <Table size="small">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Name</TableCell>
-                                            {!isMobile && <TableCell>Type</TableCell>}
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {getUsersForMaterial(selectedMaterial, selectedMaterialType)
-                                            .map((user, index) => (
-                                                <TableRow key={index}>
-                                                    <TableCell>
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                            {user.is_artist && isMobile && (
-                                                                <Chip label="A" color="primary" size="small" />
-                                                            )}
-                                                            {user.first_name} {user.last_name}
-                                                        </Box>
-                                                    </TableCell>
-                                                    {!isMobile && (
-                                                        <TableCell>
-                                                            {user.is_artist ? (
-                                                                <Chip label="Artist" color="primary" size="small" />
-                                                            ) : (
-                                                                <Chip label="Regular" size="small" />
-                                                            )}
-                                                        </TableCell>
-                                                    )}
-                                                </TableRow>
-                                            ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Box>
-                    )}
-                </Box>
-            </Modal>
+          <Box sx={{ textAlign: 'center' }}>
+            <Chip
+              label="View People"
+              color="primary"
+              onClick={() => handleOpenMaterialModal(
+                item.material,
+                item.isRegular ? 'regular' : 'artist'
+              )}
+              icon={<PersonIcon />}
+            />
+          </Box>
         </Box>
-    );
+      )
+    }));
+  };
+
+  // Get users for a specific material
+  const getUsersForMaterial = (materialId: number, materialType: 'regular' | 'artist') => {
+    if (materialType === 'regular') {
+      return regularBookings
+        .filter(booking => booking.material_ids?.includes(materialId))
+        .map(booking => ({
+          first_name: booking.first_name,
+          last_name: booking.last_name,
+          is_artist: false
+        }));
+    } else {
+      return artistBookings
+        .filter(booking => booking.artist_material_ids?.includes(materialId))
+        .map(booking => ({
+          first_name: booking.first_name,
+          last_name: booking.last_name,
+          is_artist: true
+        }));
+    }
+  };
+
+  // Count materials
+  const getMaterialCount = (materialId: number, materialType: 'regular' | 'artist') => {
+    if (materialType === 'regular') {
+      return regularBookings.reduce((count, booking) => {
+        return count + (booking.material_ids?.includes(materialId) ? 1 : 0);
+      }, 0);
+    } else {
+      return artistBookings.reduce((count, booking) => {
+        return count + (booking.artist_material_ids?.includes(materialId) ? 1 : 0);
+      }, 0);
+    }
+  };
+
+  // Convert people with materials to list items
+  const peopleToPeopleItems = (): Person[] => {
+    const regularPeople = viewType === 'all' || viewType === 'regular'
+      ? regularBookings
+          .filter(booking => booking.material_ids && booking.material_ids.length > 0)
+          .map(booking => ({
+            id: `regular-${booking.id}`,
+            name: `${booking.first_name} ${booking.last_name}`,
+            type: 'regular' as const,
+            badgeContent: booking.material_ids?.length || 0,
+            badgeIcon: <HandymanIcon color="action" />,
+            children: (
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  Materials being brought:
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                  {booking.material_ids?.map((materialId: number) => {
+                    const material = formContent.materials.find(m => m.id === materialId);
+                    return material ? (
+                      <Chip
+                        key={materialId}
+                        label={material.title}
+                        variant="outlined"
+                        size="small"
+                      />
+                    ) : null;
+                  })}
+                </Box>
+              </Box>
+            )
+          }))
+      : [];
+
+    const artistPeople = viewType === 'all' || viewType === 'artist'
+      ? artistBookings
+          .filter(booking => booking.artist_material_ids && booking.artist_material_ids.length > 0)
+          .map(booking => ({
+            id: `artist-${booking.id}`,
+            name: `${booking.first_name} ${booking.last_name}`,
+            type: 'artist' as const,
+            badgeContent: booking.artist_material_ids?.length || 0,
+            badgeIcon: <HandymanIcon color="action" />,
+            children: (
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  Materials being brought:
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                  {booking.artist_material_ids?.map((materialId: number) => {
+                    const material = artistFormContent.artist_materials.find(m => m.id === materialId);
+                    return material ? (
+                      <Chip
+                        key={materialId}
+                        label={material.title}
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                      />
+                    ) : null;
+                  })}
+                </Box>
+              </Box>
+            )
+          }))
+      : [];
+
+    return [...regularPeople, ...artistPeople];
+  };
+
+  return (
+    <Box sx={{ p: 2 }}>
+      {/* Header with title */}
+      <Typography variant="h5" gutterBottom>
+        Materials Overview
+      </Typography>
+
+      {/* Main tabs (Materials vs People view) */}
+      <TabSwitcher
+        tabs={[
+          { value: 'materials', label: 'Material Overview', icon: <HandymanIcon /> },
+          { value: 'people', label: 'People Overview', icon: <PersonIcon /> }
+        ]}
+        currentTab={activeTab}
+        onChange={setActiveTab}
+      />
+
+      {/* View Type Controls */}
+      <FormCard sx={{ mb: 3 }}>
+        <Box sx={{ p: 2 }}>
+          <TabSwitcher
+            tabs={[
+              { value: 'all', label: 'All Materials' },
+              { value: 'regular', label: 'Regular Materials' },
+              { value: 'artist', label: 'Artist Materials' }
+            ]}
+            currentTab={viewType}
+            onChange={setViewType as any}
+          />
+        </Box>
+      </FormCard>
+
+      {/* Material Overview Tab */}
+      {activeTab === 'materials' && (
+        <>
+          <FilterSortBar
+            sortOptions={[
+              { value: 'progress', label: 'Progress' },
+              { value: 'name', label: 'Name' }
+            ]}
+            sortBy="progress"
+            sortOrder={materialSortOrder}
+            onSortByChange={() => {}} // Not implemented in this example
+            onSortOrderToggle={handleToggleMaterialSort}
+          >
+            <Typography variant="body2">
+              Showing {materialsToProgressItems().length} materials sorted by progress
+            </Typography>
+          </FilterSortBar>
+
+          <ProgressList
+            items={materialsToProgressItems()}
+            sortOrder={materialSortOrder}
+          />
+        </>
+      )}
+
+      {/* People Overview Tab */}
+      {activeTab === 'people' && (
+        <>
+          <FilterSortBar
+            sortOptions={[
+              { value: 'name', label: 'Name' },
+              { value: 'materials', label: 'Materials Count' }
+            ]}
+            sortBy="name"
+            sortOrder={peopleSortOrder}
+            onSortByChange={() => {}} // Not implemented in this example
+            onSortOrderToggle={handleTogglePeopleSort}
+          >
+            <Typography variant="body2">
+              Showing {peopleToPeopleItems().length} people bringing materials
+            </Typography>
+          </FilterSortBar>
+
+          <PeopleList
+            people={peopleToPeopleItems()}
+            sortOrder={peopleSortOrder}
+          />
+        </>
+      )}
+
+      {/* Material Details Modal */}
+      <Modal open={openMaterialModal} onClose={handleCloseMaterialModal}>
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90vw',
+          maxWidth: 500,
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: 24,
+          p: 2
+        }}>
+          <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
+            <Chip
+              icon={<CloseIcon />}
+              label="Close"
+              onClick={handleCloseMaterialModal}
+              variant="outlined"
+            />
+          </Box>
+
+          {selectedMaterial && selectedMaterialType && (
+            <Box>
+              <Box sx={{ mb: 3, pr: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="h6">
+                    {selectedMaterial.title}
+                  </Typography>
+                  {selectedMaterialType === 'artist' && (
+                    <Chip label="Artist Material" color="primary" size="small" sx={{ ml: 1 }} />
+                  )}
+                </Box>
+
+                <Typography variant="body2" color="text.secondary">
+                  {getUsersForMaterial(selectedMaterial.id, selectedMaterialType).length} people
+                  are bringing this item (needed: {selectedMaterial.num_needed})
+                </Typography>
+              </Box>
+
+              <TableContainer component={Paper} variant="outlined">
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Type</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {getUsersForMaterial(selectedMaterial.id, selectedMaterialType)
+                      .map((user, index) => (
+                        <TableRow key={index}>
+                          <TableCell>
+                            {user.first_name} {user.last_name}
+                          </TableCell>
+                          <TableCell>
+                            {user.is_artist ? (
+                              <Chip label="Artist" color="primary" size="small" />
+                            ) : (
+                              <Chip label="Regular" size="small" />
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+        </Box>
+      </Modal>
+    </Box>
+  );
 };
 
 export default MaterialsPage;
