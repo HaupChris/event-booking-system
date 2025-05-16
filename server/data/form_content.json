@@ -231,6 +231,36 @@
       ]
     },
     {
+      "title": "Schwerer Transport",
+      "description": "Abholung und Rücklieferung der großen Musikanlage",
+      "time_slots": [
+        {
+          "title": "Abholung Anlage aus Würzburg (Transporter Notwendig)",
+            "start_time": "Mittwoch",
+            "end_time": "27.08.2025",
+            "num_needed": 1
+        },
+        {
+          "title": "Zurückfahren der Anlage nach Würzburg",
+            "start_time": "Sonntag",
+            "end_time": "",
+            "num_needed": 1
+        }
+      ]
+    },
+    {
+      "title": "Willkommen an Bord",
+      "description": "Empfang neuer Astronaut:innen, Bändchenvergabe, Einweisung für Schichten, etc. Damit du hier eingeteilt werden kannst, solltest du den Wiesenwahn schon mindestens einmal besucht haben.",
+      "timeslots": [
+        {
+          "title": "Donnerstag",
+            "start_time": "16:00",
+            "end_time": "19:00",
+            "num_needed": 2
+        }
+      ]
+    },
+    {
       "title": "Astronaut:innen Kost pressen",
       "description": "Vorbereitung und Ausgabe der Festival-Mahlzeiten in der Food-Station.",
       "time_slots": [
@@ -275,10 +305,6 @@
     {
       "title": "Lichterketten (kein Glas, egal welche)",
       "num_needed": 5
-    },
-    {
-      "title": "Windspiele",
-      "num_needed": 2
     },
     {
       "title": "Solarlichter",
