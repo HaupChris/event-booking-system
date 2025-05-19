@@ -53,7 +53,7 @@
       "price": 0.0
     }
   ],
- "food_options": [
+  "food_options": [
     {
       "title": "Gyros mit Zaziki, linsensalat und Brot",
       "description": "Freitag Abend//vegetarisch",
@@ -87,11 +87,15 @@
   ],
   "artist_materials": [
     {
-      "title": "DJ-Equipment",
-      "num_needed": 1
+      "title": "Mikrofone zum Abnehmen der Instrumente (z.B. SM57)",
+      "num_needed": 5
     },
     {
-      "title": "Mikrofone",
+      "title": "Ein paar XLR Kabel (gerne auch mehrere)",
+      "num_needed": 5
+    },
+    {
+      "title": "Gesangsmikrofone (z.B. SM58)",
       "num_needed": 5
     },
     {
@@ -108,15 +112,15 @@
     },
     {
       "title": "Bassverstärker",
-      "num_needed": 1
+      "num_needed": 2
     },
     {
       "title": "Schlagzeug",
-      "num_needed": 1
+      "num_needed": 2
     },
     {
       "title": "Keyboard/Synthesizer",
-      "num_needed": 1
+      "num_needed": 2
     },
     {
       "title": "Monitore/Bühnenboxen",
@@ -124,7 +128,7 @@
     },
     {
       "title": "Mischpult",
-      "num_needed": 1
+      "num_needed": 2
     },
     {
       "title": "Verlängerungskabel/Stromkabel",
@@ -136,26 +140,26 @@
     }
   ],
   "professions": [
-  {
-    "title": "Ärzt*in"
-  },
-  {
-    "title": "Medizinische*r Fachangestellte*r"
-  },
-  {
-    "title": "Psychologisch Geschult"
-  },
-  {
-    "title": "Bühnetehniker*in"
-  },
-  {
-    "title": "Elektriker*in"
-  },
-  {
-    "title": "Ersthelfer*in"
-  },
-  {
-    "title": "Veranstaltungstechniker*in"
-  }
-]
+    {
+      "title": "Ärzt*in"
+    },
+    {
+      "title": "Medizinische*r Fachangestellte*r"
+    },
+    {
+      "title": "Psychologisch Geschult"
+    },
+    {
+      "title": "Bühnetehniker*in"
+    },
+    {
+      "title": "Elektriker*in"
+    },
+    {
+      "title": "Ersthelfer*in"
+    },
+    {
+      "title": "Veranstaltungstechniker*in"
+    }
+  ]
 }
