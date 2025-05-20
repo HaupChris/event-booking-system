@@ -37,7 +37,7 @@ export const userAreaTexts = {
         crewPartner: "Crew Partner:in",
         crewPartnerDescription: "Mit wem möchtest du zusammen arbeiten?",
         shiftsCountTitle: "Anzahl der Schichten",
-        shiftsCountHelperText: "Wähle, ob du eine, zwei oder drei Schichten übernehmen möchtest. Anhand deiner Prioritäten bekommst du dann mehrere Schichten zugeteilt.",
+        shiftsCountHelperText: "Wähle, ob du eine, zwei oder drei Schichten übernehmen möchtest. Bei mehr als einer Schicht, bekommst du als kleine Belohnung für jede weitere ein Abendessen spendiert.",
         availableShifts: "Verfügbare Schichten"
     },
 
