@@ -18,6 +18,7 @@ import WorkShiftForm from "./WorkshiftsForm";
 import MaterialsForm from "./MaterialsForm";
 import SignatureForm from "./SignatureForm";
 import {userAreaTexts} from "../constants/texts";
+import {calculateTotalPriceUser} from "../../components/core/utils/Pricing";
 
 // Form steps enum
 enum FormSteps {
@@ -240,35 +241,7 @@ export function UserRegistrationFormContainer() {
         // Calculate total price when relevant fields change
         if (['ticket_id', 'beverage_id', 'food_id'].includes(key)) {
             // Calculate total price based on selections
-            let total_price = 0;
-
-            // Add ticket price if selected
-            if (key === 'ticket_id' || booking.ticket_id !== -1) {
-                const ticketId = key === 'ticket_id' ? value : booking.ticket_id;
-                const ticketOption = formContent.ticket_options.find(t => t.id === ticketId);
-                if (ticketOption) {
-                    total_price += ticketOption.price;
-                }
-            }
-
-            // Add beverage price if selected
-            if (key === 'beverage_id' || booking.beverage_id !== -1) {
-                const beverageId = key === 'beverage_id' ? value : booking.beverage_id;
-                const beverageOption = formContent.beverage_options.find(b => b.id === beverageId);
-                if (beverageOption) {
-                    total_price += beverageOption.price;
-                }
-            }
-
-            // Add food price if selected
-            if (key === 'food_id' || booking.food_id !== -1) {
-                const foodId = key === 'food_id' ? value : booking.food_id;
-                const foodOption = formContent.food_options.find(f => f.id === foodId);
-                if (foodOption) {
-                    total_price += foodOption.price;
-                }
-            }
-
+            const total_price = calculateTotalPriceUser(booking, formContent);
             updateField('total_price', total_price);
         }
     };

@@ -15,6 +15,7 @@ export interface CombinedBooking {
     paid_amount: number;
     payment_date: string;
     payment_notes: string;
+    profession_ids: number[];
     // Common fields above
 
     // Type discriminator
