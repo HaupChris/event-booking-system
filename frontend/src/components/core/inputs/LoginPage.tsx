@@ -1,14 +1,25 @@
-// frontend/src/artistLoginPage.tsx
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext, TokenContext } from './contexts/AuthContext';
-import { Box, Button, TextField, Typography, Container, Alert } from '@mui/material';
+import React, {useState, useContext} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {AuthContext, TokenContext} from '../../../contexts/AuthContext';
+import {Box, Button, TextField, Typography, Container, Alert} from '@mui/material';
 
-function ArtistLoginPage() {
+interface LoginPageProps {
+    title: string;
+    endpoint: string;
+    redirectPath: string;
+    setIsAdmin?: (value: boolean) => void;
+}
+
+const LoginPage: React.FC<LoginPageProps> = ({
+                                                 title,
+                                                 endpoint,
+                                                 redirectPath,
+                                                 setIsAdmin
+                                             }) => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { setAuth } = useContext(AuthContext);
-    const { setToken } = useContext(TokenContext);
+    const {setAuth} = useContext(AuthContext);
+    const {setToken} = useContext(TokenContext);
     const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -16,7 +27,7 @@ function ArtistLoginPage() {
         setError('');
 
         try {
-            const response = await fetch('/api/auth/artist', {
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -27,9 +38,14 @@ function ArtistLoginPage() {
             if (response.ok) {
                 const data = await response.json();
                 setToken(data.access_token);
-                console.log("Artist auth successful. Token: ", data.access_token);
                 setAuth(true);
-                navigate('/artist-form');
+
+                // Set admin flag if needed
+                if (setIsAdmin) {
+                    setIsAdmin(true);
+                }
+
+                navigate(redirectPath);
             } else {
                 setError('Falsches Passwort');
             }
@@ -48,13 +64,10 @@ function ArtistLoginPage() {
                     alignItems: 'center',
                 }}
             >
-                <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-                    Künstler Login
-                </Typography>
-
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
                     <TextField
                         margin="normal"
+                        autoFocus
                         required
                         fullWidth
                         name="password"
@@ -69,12 +82,12 @@ function ArtistLoginPage() {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
+                        sx={{mt: 3, mb: 2}}
                     >
-                        Anmelden
+                        Startklar!
                     </Button>
                     {error && (
-                        <Alert severity="error" sx={{ mt: 2 }}>
+                        <Alert severity="error" sx={{mt: 2}}>
                             {error}
                         </Alert>
                     )}
@@ -82,6 +95,6 @@ function ArtistLoginPage() {
             </Box>
         </Container>
     );
-}
+};
 
-export default ArtistLoginPage;
+export default LoginPage;
