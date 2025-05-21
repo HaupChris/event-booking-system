@@ -1,7 +1,18 @@
 import React, {useState, useContext} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {AuthContext, TokenContext} from '../../../contexts/AuthContext';
-import {Box, Button, TextField, Typography, Container, Alert} from '@mui/material';
+import {
+    Box,
+    Button,
+    TextField,
+    Typography,
+    Container,
+    Alert,
+    InputAdornment,
+    IconButton,
+    FormControl, InputLabel, Input, OutlinedInput
+} from '@mui/material';
+import {Visibility, VisibilityOff} from "@mui/icons-material";
 
 interface LoginPageProps {
     title: string;
@@ -17,6 +28,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
                                                  setIsAdmin
                                              }) => {
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const {setAuth} = useContext(AuthContext);
     const {setToken} = useContext(TokenContext);
@@ -54,6 +66,12 @@ const LoginPage: React.FC<LoginPageProps> = ({
         }
     };
 
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+    };
+
     return (
         <Container component="main" maxWidth="xs">
             <Box
@@ -65,19 +83,29 @@ const LoginPage: React.FC<LoginPageProps> = ({
                 }}
             >
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
-                    <TextField
-                        margin="normal"
-                        autoFocus
-                        required
-                        fullWidth
-                        name="password"
-                        label="Passwort"
-                        type="password"
-                        id="password"
-                        autoComplete="current-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
+                    <FormControl sx={{width: "100%"}} variant="standard">
+                        {/*<InputLabel htmlFor="standard-adornment-password">Passwort</InputLabel>*/}
+                        <OutlinedInput
+                            id="standard-adornment-password"
+                            placeholder={"Passwort"}
+                            type={showPassword ? 'text' : 'password'}
+                            value={password}
+                            autoFocus
+                            required
+                            onChange={(e) => setPassword(e.target.value)}
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                    >
+                                        {showPassword ? <VisibilityOff/> : <Visibility/>}
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                        />
+                    </FormControl>
                     <Button
                         type="submit"
                         fullWidth
@@ -94,7 +122,8 @@ const LoginPage: React.FC<LoginPageProps> = ({
                 </Box>
             </Box>
         </Container>
-    );
+    )
+        ;
 };
 
 export default LoginPage;
