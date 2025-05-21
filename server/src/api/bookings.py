@@ -1,6 +1,6 @@
 import dataclasses
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from datetime import datetime
@@ -44,10 +44,10 @@ def submit_form():
 @limiter_bookings.limit("200/minute")
 @jwt_required()
 def get_bookings():
-    # optional: check_jwt_identity to ensure user or admin role
-    # identity = get_jwt_identity()
-    # if identity.get("role") not in ["admin", "user"]:
-    #    return jsonify({"error": "Unauthorized role"}), 403
+    # Check if user has admin permissions
+    identity = get_jwt_identity()
+    if identity not in ["admin"]:
+        return jsonify({"error": "Unauthorized"}), 403
 
     all_bookings = get_all_bookings()
     return jsonify([dataclasses.asdict(b) for b in all_bookings]), 200
@@ -57,6 +57,11 @@ def get_bookings():
 @limiter_bookings.limit("60/minute")
 @jwt_required()
 def update_booking(booking_id):
+    # Check if user has admin permissions
+    identity = get_jwt_identity()
+    if identity not in ["admin"]:
+        return jsonify({"error": "Unauthorized"}), 403
+
     booking_data = request.json
 
     # Validate input data
@@ -81,6 +86,10 @@ def update_booking(booking_id):
 @limiter_bookings.limit("60/minute")
 @jwt_required()
 def update_payment_status(booking_id):
+    # Check if user has admin permissions
+    identity = get_jwt_identity()
+    if identity not in ["admin"]:
+        return jsonify({"error": "Unauthorized"}), 403
     payment_data = request.json
 
     # Validate input data
