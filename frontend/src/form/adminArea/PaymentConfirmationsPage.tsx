@@ -16,7 +16,6 @@ import {Booking} from "../userArea/interface";
 import {CombinedBooking} from "./interface";
 
 
-
 const PaymentConfirmationsPage: React.FC = () => {
     const {bookings, formContent, refetch} = useFetchData();
     const [selectedBooking, setSelectedBooking] = useState<CombinedBooking | null>(null);
@@ -214,6 +213,7 @@ const PaymentConfirmationsPage: React.FC = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
+                            <TableCell>Type</TableCell>
                             <TableCell>Name</TableCell>
                             <TableCell>Ticket</TableCell>
                             <TableCell>Expected Amount</TableCell>
@@ -233,6 +233,13 @@ const PaymentConfirmationsPage: React.FC = () => {
                                         : 'rgba(255, 152, 0, 0.1)' // Light orange for unpaid
                                 }}
                             >
+                                <TableCell>
+                                    {booking.bookingType === 'artist' ? (
+                                        <Chip label="Artist" color="primary" size="small"/>
+                                    ) : (
+                                        <Chip label="Regular" size="small"/>
+                                    )}
+                                </TableCell>
                                 <TableCell>{booking.last_name}, {booking.first_name}</TableCell>
                                 <TableCell>{getTicketTitle(booking.ticket_id)}</TableCell>
                                 <TableCell>€{booking.total_price.toFixed(2)}</TableCell>
@@ -288,7 +295,8 @@ const PaymentConfirmationsPage: React.FC = () => {
                                                 color={editedBooking.is_paid ? "success" : "error"}
                                             />
                                         }
-                                        label={<Typography color={editedBooking.is_paid ? "success.light" : "error"}>{editedBooking.is_paid ? 'Ist bezahlt' : 'Noch nicht bezahlt'}</Typography>}
+                                        label={<Typography
+                                            color={editedBooking.is_paid ? "success.light" : "error"}>{editedBooking.is_paid ? 'Ist bezahlt' : 'Noch nicht bezahlt'}</Typography>}
                                     />
                                 </Grid>
 

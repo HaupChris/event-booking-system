@@ -1,5 +1,3 @@
-// src/form/adminArea/BookingsPage.tsx
-
 import React, { useState, useEffect, useContext } from 'react';
 import {
   Box, Typography, FormControl, InputLabel, Select, MenuItem,
