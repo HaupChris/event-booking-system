@@ -7,7 +7,7 @@ from datetime import datetime
 
 from src.models.datatypes import Booking, ArtistBooking
 from src.services.artist_service import insert_artist_booking, get_up_to_date_artist_form_content
-from src.services.booking_service import insert_booking, get_all_bookings, get_up_to_date_form_content
+from src.services.booking_service import insert_booking, get_all_bookings, get_up_to_date_form_content, delete_booking
 from src.services.mail_service import send_confirmation_mail, send_artist_confirmation_mail
 
 from src.services.booking_service import update_booking_db, update_booking_payment
@@ -78,6 +78,23 @@ def update_booking(booking_id):
         return jsonify({"message": "Booking updated successfully"}), 200
     else:
         return jsonify({"error": "Failed to update booking"}), 404
+
+
+@bookings_bp.route("/booking/<int:booking_id>", methods=["DELETE"])
+@limiter_bookings.limit("60/minute")
+@jwt_required()
+def delete_booking_endpoint(booking_id):
+    # Check if user has admin permissions
+    identity = get_jwt_identity()
+    if identity != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    success = delete_booking(booking_id)
+
+    if success:
+        return jsonify({"message": "Booking deleted successfully"}), 200
+    else:
+        return jsonify({"error": "Failed to delete booking"}), 404
 
 
 # Add to server/src/api/bookings.py

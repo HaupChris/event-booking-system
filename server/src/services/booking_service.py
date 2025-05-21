@@ -393,3 +393,50 @@ def update_booking_payment(booking_id: int, payment_data: dict) -> bool:
         except Exception as e:
             print(f"Error updating payment: {e}")
             return False
+
+
+def delete_booking(booking_id: int) -> bool:
+    """
+    Deletes a booking and all related data.
+    Returns True if successful, False otherwise.
+    """
+    with closing(_connect_db()) as conn:
+        cursor = conn.cursor()
+
+        try:
+            # Start a transaction
+            conn.execute("BEGIN TRANSACTION")
+
+            # Delete related records first
+            cursor.execute("DELETE FROM BookingMaterials WHERE booking_id = ?", (booking_id,))
+            cursor.execute("DELETE FROM BookingProfessions WHERE booking_id = ?", (booking_id,))
+            cursor.execute("DELETE FROM ShiftAssignments WHERE booking_id = ?", (booking_id,))
+
+            # Get user_id to delete if this is the only booking for this user
+            cursor.execute("SELECT user_id FROM Bookings WHERE id = ?", (booking_id,))
+            result = cursor.fetchone()
+
+            if not result:
+                # Booking not found
+                conn.rollback()
+                return False
+
+            user_id = result[0]
+
+            # Delete the booking
+            cursor.execute("DELETE FROM Bookings WHERE id = ?", (booking_id,))
+
+            # Check if user has other bookings, if not, delete the user
+            cursor.execute("SELECT COUNT(*) FROM Bookings WHERE user_id = ?", (user_id,))
+            if cursor.fetchone()[0] == 0:
+                cursor.execute("DELETE FROM Users WHERE id = ?", (user_id,))
+
+            # Commit transaction
+            conn.commit()
+            return True
+
+        except Exception as e:
+            # Rollback in case of error
+            conn.rollback()
+            print(f"Error deleting booking: {e}")
+            return False

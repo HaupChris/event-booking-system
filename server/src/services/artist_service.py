@@ -294,6 +294,51 @@ def get_up_to_date_artist_form_content() -> dict:
     return update_artist_form_content_with_db_counts(form_content_obj, _connect_db)
 
 
+def delete_artist_booking(booking_id: int) -> bool:
+    """
+    Deletes an artist booking and all related data.
+    Returns True if successful, False otherwise.
+    """
+    with closing(_connect_db()) as conn:
+        cursor = conn.cursor()
+
+        try:
+            # Start a transaction
+            conn.execute("BEGIN TRANSACTION")
+
+            # Delete related records first
+            cursor.execute("DELETE FROM ArtistBookingMaterials WHERE booking_id = ?", (booking_id,))
+            cursor.execute("DELETE FROM ArtistBookingProfessions WHERE booking_id = ?", (booking_id,))
+
+            # Get artist_id to delete if this is the only booking for this artist
+            cursor.execute("SELECT artist_id FROM ArtistBookings WHERE id = ?", (booking_id,))
+            result = cursor.fetchone()
+
+            if not result:
+                # Booking not found
+                conn.rollback()
+                return False
+
+            artist_id = result[0]
+
+            # Delete the booking
+            cursor.execute("DELETE FROM ArtistBookings WHERE id = ?", (booking_id,))
+
+            # Check if artist has other bookings, if not, delete the artist
+            cursor.execute("SELECT COUNT(*) FROM ArtistBookings WHERE artist_id = ?", (artist_id,))
+            if cursor.fetchone()[0] == 0:
+                cursor.execute("DELETE FROM Artists WHERE id = ?", (artist_id,))
+
+            # Commit transaction
+            conn.commit()
+            return True
+
+        except Exception as e:
+            # Rollback in case of error
+            conn.rollback()
+            print(f"Error deleting artist booking: {e}")
+            return False
+
 
 
 ################## helper methods
