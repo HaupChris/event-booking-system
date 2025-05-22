@@ -18,13 +18,8 @@ import SpacePanelLayout from "../layouts/SpacePanelLayout";
 import FormCard from "../display/FormCard";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {spacePalette} from "../../styles/theme";
+import {Material} from "../../../form/userArea/interface";
 
-interface Material {
-    id: number;
-    title: string;
-    num_needed: number;
-    num_booked: number;
-}
 
 interface MaterialsTextProps {
     missionBriefing: string;

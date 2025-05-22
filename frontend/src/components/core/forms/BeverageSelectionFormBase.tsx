@@ -11,13 +11,8 @@ import LocalBarIcon from '@mui/icons-material/LocalBar';
 import SpacePanelLayout from "../layouts/SpacePanelLayout";
 import FormCard from "../display/FormCard";
 import SelectionOptionWithImage from "../display/SelectionOptionWithImage";
+import {BeverageOption} from "../../../form/userArea/interface";
 
-interface BeverageOption {
-    id: number;
-    title: string;
-    price: number;
-    description: string;
-}
 
 interface BeverageSelectionTextProps {
     missionBriefing: string;

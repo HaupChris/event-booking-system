@@ -2,14 +2,8 @@ import React from "react";
 import {FormControl, RadioGroup, Box} from "@mui/material";
 import SpacePanelLayout from "../layouts/SpacePanelLayout";
 import TicketOptionComponent from "../display/TicketOption";
+import {TicketOption} from "../../../form/userArea/interface";
 
-interface TicketOption {
-    id: number;
-    title: string;
-    price: number;
-    amount: number;
-    num_booked: number;
-}
 
 interface TicketSelectionTextProps {
     missionBriefing: string;
@@ -42,13 +36,13 @@ function TicketSelectionFormBase(props: TicketSelectionFormBaseProps) {
     let visitorsSaturday = 0;
 
     props.formContent.ticket_options.forEach((option: TicketOption) => {
-        if (option.title.includes('Donnerstag')) {
+        if (option.title.includes('Do')) {
             visitorsThursday += option.num_booked;
         }
-        if (option.title.includes('Freitag')) {
+        if (option.title.includes('Fr')) {
             visitorsFriday += option.num_booked;
         }
-        if (option.title.includes('Samstag')) {
+        if (option.title.includes('Sa')) {
             visitorsSaturday += option.num_booked;
         }
     });
