@@ -21,11 +21,11 @@ interface TicketSelectionFormBaseProps {
     };
     formValidation: { [key: string]: string | undefined };
     texts: TicketSelectionTextProps;
-    maxNumTicketsPerDay?: number;
 }
 
 function TicketSelectionFormBase(props: TicketSelectionFormBaseProps) {
-    const { texts, maxNumTicketsPerDay = 120 } = props;
+    const { texts,  } = props;
+    const maxNumTicketsPerDay = Math.max(...props.formContent.ticket_options.map((ticketOption) => ticketOption.amount))
 
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         props.updateBooking('ticket_id', Number((event.target as HTMLInputElement).value));

@@ -3,37 +3,37 @@
     {
       "title": "Interstellarer Flug (Do, Fr, Sa)",
       "price": 0.0,
-      "amount": 100
+      "amount": 25
     },
     {
       "title": "Wochenend-Orbit (Fr, Sa)",
       "price": 0.0,
-      "amount": 20
+      "amount": 0
     },
     {
       "title": "Früher Start (Do, Fr)",
       "price": 0.0,
-      "amount": 20
+      "amount": 0
     },
     {
       "title": "Zwei-Phasen-Flug (Do, Sa)",
       "price": 0.0,
-      "amount": 15
+      "amount": 0
     },
     {
       "title": "Starttag (Nur Do)",
       "price": 0.0,
-      "amount": 15
+      "amount": 0
     },
     {
       "title": "Zwischenstopp (Nur Fr)",
       "price": 0.0,
-      "amount": 15
+      "amount": 0
     },
     {
       "title": "Landetag (Nur Sa)",
       "price": 0.0,
-      "amount": 15
+      "amount": 0
     }
   ],
   "beverage_options": [
