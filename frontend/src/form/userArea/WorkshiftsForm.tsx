@@ -205,8 +205,9 @@ function WorkShiftForm(props: FormProps) {
 
         {/* Work Shifts List */}
         <List>
-            {props.formContent.work_shifts
+            {props.formContent.work_shifts.filter((workshift) => workshift.title.toLowerCase() !== "already employed")
                 .sort(compareWorkshiftsByNumBooked)
+                .concat(props.formContent.work_shifts.filter((workshift) => workshift.title.toLowerCase() === "already employed"))
                 .map((workShift, index) => (
                     <React.Fragment key={workShift.id}>
                         <WorkShift
