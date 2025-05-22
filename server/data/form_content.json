@@ -184,13 +184,13 @@
           "title": "Freitag",
           "start_time": "10:00",
           "end_time": "12:00",
-          "num_needed": 4
+          "num_needed": 3
         },
         {
           "title": "Samstag",
           "start_time": "10:00",
           "end_time": "12:00",
-          "num_needed": 4
+          "num_needed": 3
         }
       ]
     },
@@ -255,8 +255,32 @@
         {
           "title": "Donnerstag",
           "start_time": "16:00",
-          "end_time": "19:00",
+          "end_time": "20:00",
+          "num_needed": 4
+        },
+        {
+          "title": "Freitag",
+          "start_time": "14:00",
+          "end_time": "20:00",
+          "num_needed": 6
+        },
+        {
+          "title": "Samstag",
+          "start_time": "14:00",
+          "end_time": "20:00",
           "num_needed": 2
+        }
+      ]
+    },
+    {
+      "title": "Bunte Vögel",
+      "description": "Du unterstützt das Deko Team beim Aufbau (Basteln, Kleben, Aufhängen, etc. )",
+      "time_slots": [
+        {
+          "title": "Mittwoch, 27.08.2025",
+          "start_time": "12:00",
+          "end_time": "18:00",
+          "num_needed": 3
         }
       ]
     },
@@ -277,12 +301,6 @@
       "description": "Vorbereitung und Ausgabe der Festival-Mahlzeiten in der Food-Station.",
       "time_slots": [
         {
-          "title": "Donnerstag, Einkauf (Auto nötig)",
-          "start_time": "12:00",
-          "end_time": "16:00",
-          "num_needed": 2
-        },
-        {
           "title": "Freitag, Vorbereitung",
           "start_time": "14:00",
           "end_time": "17:30",
@@ -292,6 +310,12 @@
           "title": "Freitag, Kochen, Ausgabe",
           "start_time": "17:30",
           "end_time": "20:00",
+          "num_needed": 2
+        },
+        {
+          "title": "Samstag, Cleaning",
+          "start_time": "10:00",
+          "end_time": "13:00",
           "num_needed": 2
         },
         {
@@ -305,22 +329,96 @@
           "start_time": "17:30",
           "end_time": "20:00",
           "num_needed": 2
+        },
+        {
+          "title": "Sonntag, Cleaning",
+          "start_time": "10:00",
+          "end_time": "13:00",
+          "num_needed": 2
         }
       ]
     }
   ],
   "materials": [
     {
-      "title": "Lichterketten für draußen geeignet",
+      "title": "Werkzeugkoffer zum Aufbau",
+      "num_needed": 2
+    },
+    {
+      "title": "Feuerlöscher",
+      "num_needed": 3
+    },
+    {
+      "title": "Kabeltrommel",
+      "num_needed": 3
+    },
+    {
+      "title": "Kabeltrommel 50m",
+      "num_needed": 3
+    },
+    {
+      "title": "Mehrfachstecker",
       "num_needed": 4
     },
     {
-      "title": "Lichterketten (kein Glas, egal welche)",
+      "title": "Pavillon",
+      "num_needed": 4
+    },
+    {
+      "title": "Kühlbox/schrank",
+      "num_needed": 2
+    },
+    {
+      "title": "Benzin- und Dieselkanister",
+      "num_needed": 3
+    },
+    {
+      "title": "Lange Seile (min. 10m)",
+      "num_needed": 4
+    },
+    {
+      "title": "Kleiderstrange",
+      "num_needed": 3
+    },
+    {
+      "title": "Kleiderbügel",
+      "num_needed": 50
+    },
+    {
+      "title": "alte Decken zum draußen chillen",
+      "num_needed": 4
+    },
+    {
+      "title": "Regal (kostenlos ebay)",
+      "num_needed": 1
+    },
+    {
+      "title": "Großes Whiteboard/ Schieferbrett",
+      "num_needed": 1
+    },
+    {
+      "title": "Outdoor Lichterkette",
+      "num_needed": 7
+    },
+    {
+      "title": "Lange Lichterkette",
       "num_needed": 5
     },
     {
-      "title": "Solarlichter",
+      "title": "Schwarzlicht",
       "num_needed": 4
+    },
+    {
+      "title": "Mandalatücher",
+      "num_needed": 6
+    },
+    {
+      "title": "alte Teppiche",
+      "num_needed": 8
+    },
+    {
+      "title": "alte Elektronik, Kabel, Tastaturen etc",
+      "num_needed": 7
     },
     {
       "title": "Volleyballfeld",
@@ -331,68 +429,12 @@
       "num_needed": 2
     },
     {
-      "title": "Bierpong-Tisch",
-      "num_needed": 2
+      "title": "Federball",
+      "num_needed": 1
     },
     {
-      "title": "Goa-Tücher / bunte Tücher",
-      "num_needed": 8
-    },
-    {
-      "title": "Seile (mindestens 10m)",
-      "num_needed": 5
-    },
-    {
-      "title": "Pavillon (z.B. 3x3m, gerne mit Seitenwänden)",
-      "num_needed": 3
-    },
-    {
-      "title": "Mehrfachstecker",
-      "num_needed": 8
-    },
-    {
-      "title": "Kabeltrommel",
-      "num_needed": 4
-    },
-    {
-      "title": "Verlängerungskabel (mindestens 5m)",
-      "num_needed": 4
-    },
-    {
-      "title": "Werkzeugkoffer",
-      "num_needed": 2
-    },
-    {
-      "title": "Schwarzlicht",
-      "num_needed": 4
-    },
-    {
-      "title": "Feuerlöscher",
-      "num_needed": 3
-    },
-    {
-      "title": "Benzin- und Dieselkanister",
-      "num_needed": 3
-    },
-    {
-      "title": "Alter Teppich",
-      "num_needed": 6
-    },
-    {
-      "title": "Kühlbox",
-      "num_needed": 2
-    },
-    {
-      "title": "Kühlakkus",
-      "num_needed": 4
-    },
-    {
-      "title": "Teleskopstangen / alte Wischmop-Stangen (für Quallen)",
-      "num_needed": 5
-    },
-    {
-      "title": "Beamer",
-      "num_needed": 2
+      "title": "Bierpong",
+      "num_needed": 1
     }
   ],
   "professions": [
@@ -406,7 +448,7 @@
       "title": "Psychologisch Geschult"
     },
     {
-      "title": "Bühnentehniker*in"
+      "title": "Bühnentechniker*in"
     },
     {
       "title": "Handwerklich begabt"
