@@ -10,6 +10,8 @@ from typing import Dict
 
 load_dotenv()
 
+PAYPAL_LINK = "https://www.paypal.me/Wiesenwahn"
+
 def get_booking_details(booking: Booking, form_content: Dict) -> str:
     """
     Returns a human-readable textual summary of the booking in German.
@@ -224,7 +226,7 @@ def send_confirmation_mail(booking: Booking, form_content: Dict) -> None:
 
           <p>Für den Start deiner Mission ist noch ein Treibstofftransfer erforderlich:</p>
 
-          <a href="https://www.paypal.me/StephanHau" class="btn">TREIBSTOFFTRANSFER STARTEN</a>
+          <a href="{PAYPAL_LINK}" class="btn">TREIBSTOFFTRANSFER STARTEN</a>
 
           <p>Betreff für den Transfer:<br>
           <strong>WW26 - {booking.first_name}, {booking.last_name} - {ticket_title} - {beverage_title} - {food_title}</strong></p>
@@ -426,7 +428,7 @@ def send_artist_confirmation_mail(booking: ArtistBooking, form_content: Dict) ->
           {booking.total_price > 0 and f'''
           <p>Für deine Buchung ist noch ein Beitrag erforderlich:</p>
 
-          <a href="https://www.paypal.me/StephanHau" class="btn">BEITRAG JETZT ÜBERWEISEN</a>
+          <a href="{PAYPAL_LINK}" class="btn">BEITRAG JETZT ÜBERWEISEN</a>
 
           <p>Betreff für die Überweisung:<br>
           <strong>WWWW ARTIST - {booking.first_name}, {booking.last_name} - {ticket_title} - {beverage_title} - {food_title}</strong></p>

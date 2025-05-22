@@ -7,6 +7,7 @@ import { BookingState } from "../UserRegistrationFormContainer";
 import InitialView from './InitialView';
 import SuccessView from './SuccessView';
 import ErrorView from './ErrorView';
+import {generalConstants} from "../../constants/texts";
 
 interface ConfirmationFormProps {
   currentBooking: Booking;
@@ -60,7 +61,7 @@ function ConfirmationForm(props: ConfirmationFormProps) {
         setCountdown((prevCountdown) => {
           if (prevCountdown === 1) {
             clearInterval(timer);
-            window.open("https://www.paypal.me/StephanHau", "_blank");
+            window.open(generalConstants.paymentLink, "_blank");
           }
           return prevCountdown - 1;
         });

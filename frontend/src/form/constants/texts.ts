@@ -320,3 +320,8 @@ export const artistAreaTexts = {
         }
     }
 };
+
+
+export const generalConstants = {
+    paymentLink: "https://www.paypal.me/Wiesenwahn"
+}

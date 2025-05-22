@@ -111,7 +111,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                             {userAreaTexts.confirmationForm.redirectModal.manualRedirectText}
                         </Typography>
                         <a
-                            href="https://www.paypal.me/StephanHau"
+                            href={generalConstants.paymentLink}
                             target="_blank"
                             rel="noreferrer"
                             style={{textDecoration: 'none', width: '100%', display: 'block'}}

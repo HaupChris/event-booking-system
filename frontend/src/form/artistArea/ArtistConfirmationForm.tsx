@@ -11,6 +11,7 @@ import {Check, ErrorOutline, FileCopy, OpenInNew, SignalCellularNodata} from "@m
 import rocketBaak from "../../img/rocket_baak.png"
 import {ArtistBooking, ArtistFormContent} from "./interface";
 import {ArtistBookingState} from "./ArtistRegistrationFormContainer";
+import {generalConstants} from "../constants/texts";
 
 
 interface ArtistConfirmationProps {
@@ -59,7 +60,7 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
                 setCountdown((prevCountdown) => {
                     if (prevCountdown === 1) {
                         clearInterval(timer);
-                        window.open("https://www.paypal.me/StephanHau", "_blank");
+                        window.open(generalConstants.paymentLink, "_blank");
                     }
                     return prevCountdown - 1;
                 });
@@ -252,7 +253,7 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
                             <Typography sx={{mt: 2}}>
                                 <strong>Du wurdest nicht weiter geleitet?</strong>
                             </Typography>
-                            <a href="https://www.paypal.me/StephanHau" target="_blank" rel="noreferrer">
+                            <a href={generalConstants.paymentLink} target="_blank" rel="noreferrer">
                                 <Button
                                     sx={countdown > 0 ? {display: 'none'} : {mt: 2}}
                                     fullWidth variant="contained"

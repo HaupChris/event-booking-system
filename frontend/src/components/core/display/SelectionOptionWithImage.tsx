@@ -1,5 +1,5 @@
 import FormCard from "./FormCard";
-import {alpha, Avatar, Box, ListItem, ListItemButton, Typography, Chip} from "@mui/material";
+import {alpha, Avatar, Box, ListItem, ListItemButton, Typography} from "@mui/material";
 import portholeImage from "../../../img/rocket_porthole.png";
 import React from "react";
 import SpaIcon from '@mui/icons-material/Spa';
