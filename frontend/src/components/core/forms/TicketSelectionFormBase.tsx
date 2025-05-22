@@ -1,5 +1,5 @@
 import React from "react";
-import {FormControl, RadioGroup, Box} from "@mui/material";
+import {FormControl, RadioGroup, Box, Typography, alpha} from "@mui/material";
 import SpacePanelLayout from "../layouts/SpacePanelLayout";
 import TicketOptionComponent from "../display/TicketOption";
 import {TicketOption} from "../../../form/userArea/interface";
@@ -24,43 +24,70 @@ interface TicketSelectionFormBaseProps {
 }
 
 function TicketSelectionFormBase(props: TicketSelectionFormBaseProps) {
-    const { texts,  } = props;
-    const maxNumTicketsPerDay = Math.max(...props.formContent.ticket_options.map((ticketOption) => ticketOption.amount))
+    const { texts } = props;
 
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         props.updateBooking('ticket_id', Number((event.target as HTMLInputElement).value));
     };
 
-    let visitorsThursday = 0;
-    let visitorsFriday = 0;
-    let visitorsSaturday = 0;
+    // Find the maximum capacity per day from the ticket with amount > 0
+    const maxCapacityPerDay = Math.max(...props.formContent.ticket_options.map(option => option.amount));
 
-    props.formContent.ticket_options.forEach((option: TicketOption) => {
-        if (option.title.includes('Do')) {
-            visitorsThursday += option.num_booked;
-        }
-        if (option.title.includes('Fr')) {
-            visitorsFriday += option.num_booked;
-        }
-        if (option.title.includes('Sa')) {
-            visitorsSaturday += option.num_booked;
-        }
-    });
+    // Calculate current visitors per day (including all bookings)
+    const calculateDayVisitors = () => {
+        let visitorsThursday = 0;
+        let visitorsFriday = 0;
+        let visitorsSaturday = 0;
 
-    function dayIsSoldOut(ticketTitle: string) {
-        let isSoldOut = false;
+        props.formContent.ticket_options.forEach((option: TicketOption) => {
+            const title = option.title.toLowerCase();
+            if (title.includes('do')) {
+                visitorsThursday += option.num_booked;
+            }
+            if (title.includes('fr')) {
+                visitorsFriday += option.num_booked;
+            }
+            if (title.includes('sa')) {
+                visitorsSaturday += option.num_booked;
+            }
+        });
 
-        if (ticketTitle.includes('Donnerstag')) {
-            isSoldOut = isSoldOut || visitorsThursday >= maxNumTicketsPerDay;
+        return { visitorsThursday, visitorsFriday, visitorsSaturday };
+    };
+
+    const { visitorsThursday, visitorsFriday, visitorsSaturday } = calculateDayVisitors();
+
+    // Calculate remaining capacity per day
+    const remainingThursday = Math.max(0, maxCapacityPerDay - visitorsThursday);
+    const remainingFriday = Math.max(0, maxCapacityPerDay - visitorsFriday);
+    const remainingSaturday = Math.max(0, maxCapacityPerDay - visitorsSaturday);
+
+    // Calculate availability for each ticket option
+    const getTicketAvailability = (option: TicketOption) => {
+        const title = option.title.toLowerCase();
+        let maxPossible = maxCapacityPerDay; // Start with max possible
+
+        // Limit by each day this ticket includes
+        if (title.includes('do')) {
+            maxPossible = Math.min(maxPossible, remainingThursday);
         }
-        if (ticketTitle.includes('Freitag')) {
-            isSoldOut = isSoldOut || visitorsFriday >= maxNumTicketsPerDay;
+        if (title.includes('fr')) {
+            maxPossible = Math.min(maxPossible, remainingFriday);
         }
-        if (ticketTitle.includes('Samstag')) {
-            isSoldOut = isSoldOut || visitorsSaturday >= maxNumTicketsPerDay;
+        if (title.includes('sa')) {
+            maxPossible = Math.min(maxPossible, remainingSaturday);
         }
-        return isSoldOut;
-    }
+
+        const remaining = Math.max(0, maxPossible);
+        const isSoldOut = remaining === 0;
+        const isLowStock = remaining <= 15 && remaining > 0;
+
+        return {
+            remaining,
+            isSoldOut,
+            isLowStock
+        };
+    };
 
     return <SpacePanelLayout
         missionBriefing={texts.missionBriefing}
@@ -74,12 +101,18 @@ function TicketSelectionFormBase(props: TicketSelectionFormBaseProps) {
                     onChange={handleRadioChange}
                 >
                     {props.formContent.ticket_options.map((option: TicketOption) => {
-                        const isSoldOut = dayIsSoldOut(option.title);
+                        const availability = getTicketAvailability(option);
+
                         return (
-                            <TicketOptionComponent key={option.id}
-                                                   currentBooking={props.currentBooking}
-                                                   option={option}
-                                                   soldOut={isSoldOut}/>
+                            <TicketOptionComponent
+                                key={option.id}
+                                currentBooking={props.currentBooking}
+                                option={option}
+                                soldOut={availability.isSoldOut}
+                                remaining={availability.remaining}
+                                isLowStock={availability.isLowStock}
+                                maxCapacity={maxCapacityPerDay}
+                            />
                         );
                     })}
                 </RadioGroup>
