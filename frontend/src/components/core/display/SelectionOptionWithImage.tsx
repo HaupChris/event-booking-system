@@ -197,7 +197,7 @@ function SelectionOptionWithImage(props: IProps) {
 
                         </Box>
 
-                        <DietBadge/>
+                        {(isVegan || isVegetarian) ? <DietBadge/> : ""}
                     </Box>
                 </Box>
 
