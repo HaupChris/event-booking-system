@@ -2,7 +2,7 @@ import React from 'react';
 import {Box, Typography, Button, Modal, CircularProgress, alpha} from '@mui/material';
 import {CheckCircleOutline, OpenInNew} from '@mui/icons-material';
 import {spacePalette} from '../../../components/styles/theme';
-import {userAreaTexts} from "../../constants/texts";
+import {generalConstants, userAreaTexts} from "../../constants/texts";
 
 interface RedirectModalProps {
     open: boolean;
@@ -111,7 +111,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                             {userAreaTexts.confirmationForm.redirectModal.manualRedirectText}
                         </Typography>
                         <a
-                            href="https://www.paypal.me/StephanHau"
+                            href={generalConstants.paymentLink}
                             target="_blank"
                             rel="noreferrer"
                             style={{textDecoration: 'none', width: '100%', display: 'block'}}

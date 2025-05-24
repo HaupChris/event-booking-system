@@ -10,11 +10,8 @@ import SpacePanelLayout from '../layouts/SpacePanelLayout';
 import MissionHeading from '../display/MissionHeading';
 import FormCard from '../display/FormCard';
 import { spacePalette } from '../../styles/theme';
+import {Profession} from "../../../form/userArea/interface";
 
-interface Profession {
-  id: number;
-  title: string;
-}
 
 interface PersonalDetailsTextProps {
   missionBriefing: string;

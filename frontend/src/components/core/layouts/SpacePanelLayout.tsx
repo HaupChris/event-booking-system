@@ -17,7 +17,7 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
   title,
   missionBriefing,
   footerId = 'WWWW-COMPONENT',
-  maxWidth = 600,
+  maxWidth = 1200,
 }) => {
   return (
     <Box sx={{ width: '100%', maxWidth }}>

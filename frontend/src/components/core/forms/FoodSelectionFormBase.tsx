@@ -11,13 +11,8 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import SpacePanelLayout from "../layouts/SpacePanelLayout";
 import FormCard from "../display/FormCard";
 import SelectionOptionWithImage from "../display/SelectionOptionWithImage";
+import {FoodOption} from "../../../form/userArea/interface";
 
-interface FoodOption {
-    id: number;
-    title: string;
-    price: number;
-    description: string;
-}
 
 interface FoodSelectionTextProps {
     missionBriefing: string;

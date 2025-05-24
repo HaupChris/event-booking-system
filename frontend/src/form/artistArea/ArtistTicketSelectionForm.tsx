@@ -10,7 +10,6 @@ function ArtistTicketSelectionForm(props: ArtistFormProps) {
         formContent={props.formContent}
         formValidation={props.formValidation}
         texts={artistAreaTexts.ticketSelectionForm}
-        maxNumTicketsPerDay={50}
     />;
 }
 

@@ -9,7 +9,7 @@ from src.services.artist_service import (
     get_all_artist_bookings,
     get_artist_booking_by_id,
     update_artist_booking,
-    update_artist_payment, get_up_to_date_artist_form_content
+    update_artist_payment, get_up_to_date_artist_form_content, delete_artist_booking
 )
 from src.services.mail_service import send_artist_confirmation_mail
 
@@ -93,6 +93,22 @@ def update_artist(booking_id):
     else:
         return jsonify({"error": "Failed to update artist booking"}), 404
 
+
+@artist_bp.route("/artist/booking/<int:booking_id>", methods=["DELETE"])
+@limiter_artist.limit("60/minute")
+@jwt_required()
+def delete_artist_booking_endpoint(booking_id):
+    # Check if user has admin permissions
+    identity = get_jwt_identity()
+    if identity != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    success = delete_artist_booking(booking_id)
+
+    if success:
+        return jsonify({"message": "Artist booking deleted successfully"}), 200
+    else:
+        return jsonify({"error": "Failed to delete artist booking"}), 404
 
 @artist_bp.route("/artist/booking/<int:booking_id>/payment", methods=["PUT"])
 @limiter_artist.limit("60/minute")

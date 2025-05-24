@@ -1,13 +1,13 @@
 import dataclasses
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from datetime import datetime
 
 from src.models.datatypes import Booking, ArtistBooking
 from src.services.artist_service import insert_artist_booking, get_up_to_date_artist_form_content
-from src.services.booking_service import insert_booking, get_all_bookings, get_up_to_date_form_content
+from src.services.booking_service import insert_booking, get_all_bookings, get_up_to_date_form_content, delete_booking
 from src.services.mail_service import send_confirmation_mail, send_artist_confirmation_mail
 
 from src.services.booking_service import update_booking_db, update_booking_payment
@@ -44,10 +44,10 @@ def submit_form():
 @limiter_bookings.limit("200/minute")
 @jwt_required()
 def get_bookings():
-    # optional: check_jwt_identity to ensure user or admin role
-    # identity = get_jwt_identity()
-    # if identity.get("role") not in ["admin", "user"]:
-    #    return jsonify({"error": "Unauthorized role"}), 403
+    # Check if user has admin permissions
+    identity = get_jwt_identity()
+    if identity not in ["admin"]:
+        return jsonify({"error": "Unauthorized"}), 403
 
     all_bookings = get_all_bookings()
     return jsonify([dataclasses.asdict(b) for b in all_bookings]), 200
@@ -57,6 +57,11 @@ def get_bookings():
 @limiter_bookings.limit("60/minute")
 @jwt_required()
 def update_booking(booking_id):
+    # Check if user has admin permissions
+    identity = get_jwt_identity()
+    if identity not in ["admin"]:
+        return jsonify({"error": "Unauthorized"}), 403
+
     booking_data = request.json
 
     # Validate input data
@@ -75,12 +80,33 @@ def update_booking(booking_id):
         return jsonify({"error": "Failed to update booking"}), 404
 
 
+@bookings_bp.route("/booking/<int:booking_id>", methods=["DELETE"])
+@limiter_bookings.limit("60/minute")
+@jwt_required()
+def delete_booking_endpoint(booking_id):
+    # Check if user has admin permissions
+    identity = get_jwt_identity()
+    if identity != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    success = delete_booking(booking_id)
+
+    if success:
+        return jsonify({"message": "Booking deleted successfully"}), 200
+    else:
+        return jsonify({"error": "Failed to delete booking"}), 404
+
+
 # Add to server/src/api/bookings.py
 
 @bookings_bp.route("/booking/<int:booking_id>/payment", methods=["PUT"])
 @limiter_bookings.limit("60/minute")
 @jwt_required()
 def update_payment_status(booking_id):
+    # Check if user has admin permissions
+    identity = get_jwt_identity()
+    if identity not in ["admin"]:
+        return jsonify({"error": "Unauthorized"}), 403
     payment_data = request.json
 
     # Validate input data

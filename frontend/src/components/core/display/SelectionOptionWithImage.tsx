@@ -1,5 +1,5 @@
 import FormCard from "./FormCard";
-import {alpha, Avatar, Box, ListItem, ListItemButton, Typography, Chip} from "@mui/material";
+import {alpha, Avatar, Box, ListItem, ListItemButton, Typography} from "@mui/material";
 import portholeImage from "../../../img/rocket_porthole.png";
 import React from "react";
 import SpaIcon from '@mui/icons-material/Spa';
@@ -48,40 +48,6 @@ function SelectionOptionWithImage(props: IProps) {
         </Box>
 
     }
-
-    // Badge component that can be reused
-    // const DietBadge = () => {
-    //     if (isVegan) {
-    //         return (
-    //             <Chip
-    //                 icon={<SpaIcon/>}
-    //                 label="Vegan"
-    //                 size="small"
-    //                 color="success"
-    //                 sx={{
-    //                     zIndex: 10,
-    //                     fontWeight: "bold",
-    //                     fontSize: "0.7rem",
-    //                 }}
-    //             />
-    //         );
-    //     } else if (isVegetarian) {
-    //         return (
-    //             <Chip
-    //                 icon={<Park/>}
-    //                 label="Vegetarisch"
-    //                 size="small"
-    //                 color="primary"
-    //                 sx={{
-    //                     // position: "absolute",
-    //                     fontWeight: "bold",
-    //                     fontSize: "0.7rem",
-    //                 }}
-    //             />
-    //         );
-    //     }
-    //     return null;
-    // };
 
     return <FormCard selected={props.selected} sx={{marginTop: 3}}>
         {/* Futuristic scanner line animation for selected option */}
@@ -169,7 +135,7 @@ function SelectionOptionWithImage(props: IProps) {
                                     height: 100,
                                     border: "2px solid",
                                     borderColor: alpha("#1e88e5", 0.3),
-                                    objectFit: "cover", // Added to improve image display
+                                    // objectFit: "cover", // Added to improve image display
                                 }}
                             />
                             <img
@@ -231,7 +197,7 @@ function SelectionOptionWithImage(props: IProps) {
 
                         </Box>
 
-                        <DietBadge/>
+                        {(isVegan || isVegetarian) ? <DietBadge/> : ""}
                     </Box>
                 </Box>
 
@@ -246,7 +212,6 @@ function SelectionOptionWithImage(props: IProps) {
                         <Avatar
                             alt={props.title}
                             src={props.imageSource}
-                            variant="rounded"  // Changed to reduce pixelation
                             sx={{
                                 width: 80,
                                 height: 80,
