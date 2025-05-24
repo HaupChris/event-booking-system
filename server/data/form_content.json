@@ -195,24 +195,6 @@
       ]
     },
     {
-      "title": "Interstellare Tankmission",
-      "description": "Kontrolle der Treibstoffbestände und Einkauf von neuem Sprit. Wichtig: Führerschein, ein Auto und Nüchternheit",
-      "time_slots": [
-        {
-          "title": "Freitag",
-          "start_time": "14:00",
-          "end_time": "18:00",
-          "num_needed": 2
-        },
-        {
-          "title": "Samstag",
-          "start_time": "14:00",
-          "end_time": "18:00",
-          "num_needed": 2
-        }
-      ]
-    },
-    {
       "title": "Ab damit ins Schwarze Loch",
       "description": "Regelmäßige Kontrolle der WCs auf Klopapier, Seife und Sauberkeit. Reinigung der Toilette wenn nötig.",
       "time_slots": [
