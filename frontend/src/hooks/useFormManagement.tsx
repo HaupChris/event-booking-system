@@ -69,14 +69,11 @@ export function useFormManagement<T extends Record<string, any>>({
   // Load form data and active step from localStorage on mount
   useEffect(() => {
     if (storageKey) {
-      console.log("Attempting to load from localStorage with key:", storageKey);
       // Check version for data migration
       if (versionKey) {
         const storedVersion = localStorage.getItem(versionKey);
-        console.log("Stored version:", storedVersion, "Current version:", currentVersion);
         // Clear old data if version mismatch
         if (storedVersion !== currentVersion) {
-          console.log("Version mismatch, clearing stored data");
           localStorage.removeItem(storageKey);
           localStorage.removeItem(`${storageKey}_step`);
           localStorage.setItem(versionKey, currentVersion);
@@ -85,11 +82,9 @@ export function useFormManagement<T extends Record<string, any>>({
 
       // Load form data
       const storedData = localStorage.getItem(storageKey);
-      console.log("Data from localStorage:", storedData);
       if (storedData) {
         try {
           const parsedData = JSON.parse(storedData);
-          console.log("Parsed data:", parsedData);
           setFormState(parsedData);
 
           // Load step
@@ -100,7 +95,6 @@ export function useFormManagement<T extends Record<string, any>>({
 
           setIsInitialized(true); // Mark as initialized with stored data
         } catch (e) {
-          console.error('Error parsing stored form data', e);
         }
       } else {
         setIsInitialized(true); // Mark as initialized with initial state
@@ -113,9 +107,6 @@ export function useFormManagement<T extends Record<string, any>>({
   // Save to localStorage when form state changes
   useEffect(() => {
     if (storageKey && isInitialized) { // Only save after initialization
-      console.log("save to local storage");
-      console.log(storageKey);
-      console.log(formState);
       localStorage.setItem(storageKey, JSON.stringify(formState));
     }
   }, [formState, storageKey, isInitialized]);

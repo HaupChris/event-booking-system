@@ -193,16 +193,25 @@ export function ArtistRegistrationFormContainer() {
                 setFormContent(response.data);
             })
             .catch((error) => {
-                console.error("API error details:", {
-                    status: error.response?.status,
-                    statusText: error.response?.statusText,
-                    data: error.response?.data,
-                    headers: error.response?.headers
-                });
+                // console.error("API error details:", {
+                //     status: error.response?.status,
+                //     statusText: error.response?.statusText,
+                //     data: error.response?.data,
+                //     headers: error.response?.headers
+                // });
                 setAuth(false);
                 setToken("");
             });
     }, [setAuth, setToken, token]);
+
+
+    useEffect(() => {
+        // Calculate total price based on selections
+        const total_price = calculateTotalPriceArtist(booking, formContent);
+        console.log(total_price);
+        updateField('total_price', total_price);
+
+    }, [booking.beverage_id, booking.food_id, booking.ticket_id])
 
     const handleStepNext = () => {
         handleNext(requiredFields[activeStep]);
@@ -210,14 +219,6 @@ export function ArtistRegistrationFormContainer() {
 
     const updateBooking = (key: keyof ArtistBooking, value: any) => {
         updateField(key, value);
-
-        // Calculate total price when relevant fields change
-        if (['ticket_id', 'beverage_id', 'food_id'].includes(key)) {
-            // Calculate total price based on selections
-            const total_price = calculateTotalPriceArtist(booking, formContent);
-
-            updateField('total_price', total_price);
-        }
     };
 
     // Submit booking
@@ -241,8 +242,6 @@ export function ArtistRegistrationFormContainer() {
                 }, 1000 * 60 * 60);
             })
             .catch((error) => {
-                console.log(error);
-
                 if (error.status === 401) {
                     setToken("");
                     setAuth(false);
@@ -262,115 +261,115 @@ export function ArtistRegistrationFormContainer() {
     };
 
     return <Box sx={{padding: "8px"}}>
-            <StepNavigation
-                activeStep={activeStep}
-                maxSteps={maxSteps}
-                progressImage={rocketImage}
-                hideNavigation={bookingState.isSubmitted}
-                onNext={handleStepNext}
-                onPrevious={handlePrevious}
-            />
-            <CardContent>
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <Typography
-                        color={spacePalette.text.primary}
-                        align="center"
-                        variant="h4"
-                        sx={{paddingBottom: "1em"}}
-                    >
-                        {stepTitles[activeStep]}
-                    </Typography>
+        <StepNavigation
+            activeStep={activeStep}
+            maxSteps={maxSteps}
+            progressImage={rocketImage}
+            hideNavigation={bookingState.isSubmitted}
+            onNext={handleStepNext}
+            onPrevious={handlePrevious}
+        />
+        <CardContent>
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <Typography
+                    color={spacePalette.text.primary}
+                    align="center"
+                    variant="h4"
+                    sx={{paddingBottom: "1em"}}
+                >
+                    {stepTitles[activeStep]}
+                </Typography>
 
-                    {currentError && (
-                        <Alert variant="outlined" severity="error" sx={{my: 2}}>
-                            {currentError}
-                        </Alert>
-                    )}
+                {currentError && (
+                    <Alert variant="outlined" severity="error" sx={{my: 2}}>
+                        {currentError}
+                    </Alert>
+                )}
 
-                    {activeStep === FormSteps.PersonalDetails && (
-                        <ArtistPersonalDetailsForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.PerformanceDetails && (
-                        <ArtistPerformanceForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Ticket && (
-                        <ArtistTicketSelectionForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Beverage && (
-                        <ArtistBeverageSelectionForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Food && (
-                        <ArtistFoodSelectionForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Materials && (
-                        <ArtistMaterialsForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.TechnicalRequirements && (
-                        <ArtistEquipmentForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Signature && (
-                        <ArtistSignatureForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Summary && (
-                        <ArtistSummaryForm
-                            currentBooking={booking}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Confirmation && (
-                        <ArtistConfirmationForm
-                            booking={booking}
-                            submitBooking={submitBooking}
-                            formContent={formContent}
-                            bookingState={bookingState}
-                        />
-                    )}
-                </Box>
-            </CardContent>
-        </Box>
+                {activeStep === FormSteps.PersonalDetails && (
+                    <ArtistPersonalDetailsForm
+                        updateBooking={updateBooking}
+                        currentBooking={booking}
+                        formValidation={formValidation}
+                        formContent={formContent}
+                    />
+                )}
+                {activeStep === FormSteps.PerformanceDetails && (
+                    <ArtistPerformanceForm
+                        updateBooking={updateBooking}
+                        currentBooking={booking}
+                        formValidation={formValidation}
+                        formContent={formContent}
+                    />
+                )}
+                {activeStep === FormSteps.Ticket && (
+                    <ArtistTicketSelectionForm
+                        updateBooking={updateBooking}
+                        currentBooking={booking}
+                        formValidation={formValidation}
+                        formContent={formContent}
+                    />
+                )}
+                {activeStep === FormSteps.Beverage && (
+                    <ArtistBeverageSelectionForm
+                        updateBooking={updateBooking}
+                        currentBooking={booking}
+                        formValidation={formValidation}
+                        formContent={formContent}
+                    />
+                )}
+                {activeStep === FormSteps.Food && (
+                    <ArtistFoodSelectionForm
+                        updateBooking={updateBooking}
+                        currentBooking={booking}
+                        formValidation={formValidation}
+                        formContent={formContent}
+                    />
+                )}
+                {activeStep === FormSteps.Materials && (
+                    <ArtistMaterialsForm
+                        updateBooking={updateBooking}
+                        currentBooking={booking}
+                        formValidation={formValidation}
+                        formContent={formContent}
+                    />
+                )}
+                {activeStep === FormSteps.TechnicalRequirements && (
+                    <ArtistEquipmentForm
+                        updateBooking={updateBooking}
+                        currentBooking={booking}
+                        formValidation={formValidation}
+                        formContent={formContent}
+                    />
+                )}
+                {activeStep === FormSteps.Signature && (
+                    <ArtistSignatureForm
+                        updateBooking={updateBooking}
+                        currentBooking={booking}
+                        formValidation={formValidation}
+                        formContent={formContent}
+                    />
+                )}
+                {activeStep === FormSteps.Summary && (
+                    <ArtistSummaryForm
+                        currentBooking={booking}
+                        formContent={formContent}
+                    />
+                )}
+                {activeStep === FormSteps.Confirmation && (
+                    <ArtistConfirmationForm
+                        booking={booking}
+                        submitBooking={submitBooking}
+                        formContent={formContent}
+                        bookingState={bookingState}
+                    />
+                )}
+            </Box>
+        </CardContent>
+    </Box>
 }

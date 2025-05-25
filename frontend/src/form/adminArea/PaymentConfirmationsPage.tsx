@@ -106,10 +106,9 @@ const PaymentConfirmationsPage: React.FC = () => {
             setSnackbarMessage('Payment status updated successfully');
             setSnackbarSeverity('success');
             setShowSnackbar(true);
-            refetch();
+            refetch().then();
             handleCloseModal();
         } catch (error) {
-            console.error('Error updating payment status:', error);
             setSnackbarMessage('Failed to update payment status');
             setSnackbarSeverity('error');
             setShowSnackbar(true);

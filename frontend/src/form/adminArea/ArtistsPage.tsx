@@ -81,7 +81,6 @@ const ArtistsPage: React.FC = () => {
             refetch(); // Refresh data
             setEditMode(false);
         } catch (error) {
-            console.error('Error updating artist:', error);
             setSnackbarMessage('Failed to update artist information');
             setSnackbarSeverity('error');
             setShowSnackbar(true);

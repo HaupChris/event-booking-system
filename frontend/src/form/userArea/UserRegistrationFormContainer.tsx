@@ -20,6 +20,7 @@ import SignatureForm from "./SignatureForm";
 import {userAreaTexts} from "../constants/texts";
 import {calculateTotalPriceUser} from "../../components/core/utils/Pricing";
 
+
 // Form steps enum
 enum FormSteps {
     NameAndAddress = 0,
@@ -219,16 +220,24 @@ export function UserRegistrationFormContainer() {
                 setFormContent(response.data);
             })
             .catch((error) => {
-                console.error("API error details:", {
-                    status: error.response?.status,
-                    statusText: error.response?.statusText,
-                    data: error.response?.data,
-                    headers: error.response?.headers
-                });
+                // console.error("API error details:", {
+                //     status: error.response?.status,
+                //     statusText: error.response?.statusText,
+                //     data: error.response?.data,
+                //     headers: error.response?.headers
+                // });
                 setAuth(false);
                 setToken("");
             });
     }, [setAuth, setToken, token]);
+
+    useEffect(() => {
+        // Calculate total price based on selections
+        const total_price = calculateTotalPriceUser(booking, formContent);
+        console.log(total_price);
+        updateField('total_price', total_price);
+
+    }, [booking.beverage_id, booking.food_id, booking.ticket_id, booking.amount_shifts])
 
     const handleStepNext = () => {
         handleNext(requiredFields[activeStep]);
@@ -237,13 +246,6 @@ export function UserRegistrationFormContainer() {
     // Update booking with price calculations
     const updateBooking = (key: keyof Booking, value: any) => {
         updateField(key, value);
-
-        // Calculate total price when relevant fields change
-        if (['ticket_id', 'beverage_id', 'food_id'].includes(key)) {
-            // Calculate total price based on selections
-            const total_price = calculateTotalPriceUser(booking, formContent);
-            updateField('total_price', total_price);
-        }
     };
 
     // Submit booking
@@ -267,8 +269,6 @@ export function UserRegistrationFormContainer() {
                 }, 1000 * 60 * 60);
             })
             .catch((error) => {
-                console.log(error);
-
                 if (error.status === 401) {
                     setToken("");
                     setAuth(false);

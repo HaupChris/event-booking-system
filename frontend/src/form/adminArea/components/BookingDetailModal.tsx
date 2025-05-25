@@ -121,7 +121,6 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
             onSuccess();
             setEditMode(false);
         } catch (error) {
-            console.error('Error updating booking:', error);
             onError('Failed to update booking');
         }
     };

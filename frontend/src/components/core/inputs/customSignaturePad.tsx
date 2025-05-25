@@ -37,11 +37,9 @@ function CustomSignaturePad(props: SignaturePadProps) {
 
 
 	const handleEnd = () => {
-		console.log("handleEnd");
 		drawing.current = false;
 		if (!ctx || !canvasRef.current || typeof props.onEnd !== 'function') return;
 		const dataURL = canvasRef.current.toDataURL();
-		console.log(dataURL);
 		props.onEnd(dataURL);
 	};
 

@@ -52,7 +52,6 @@ export const useFetchData = () => {
             setArtistBookings(artistBookingsResponse.data);
             setArtistFormContent(artistFormContentResponse.data);
         } catch (error) {
-            console.error('Error fetching data:', error);
         }
     }, [token]);
 

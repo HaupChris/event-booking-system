@@ -181,7 +181,6 @@ const BookingsPage: React.FC = () => {
             // Close the modal
             handleCloseModal();
         } catch (error) {
-            console.error('Error deleting booking:', error);
             setSnackbarState({
                 open: true,
                 message: 'Failed to delete booking',

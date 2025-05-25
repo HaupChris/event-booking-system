@@ -51,7 +51,7 @@ function ArtistSummaryForm({currentBooking, formContent}: ArtistSummaryProps) {
             parsedPerformanceDetails = JSON.parse(performance_details);
         }
     } catch (e) {
-        console.error("Failed to parse performance details:", e);
+        // console.error("Failed to parse performance details:", e);
     }
 
     const artistMaterials = artist_material_ids?.map(id =>
