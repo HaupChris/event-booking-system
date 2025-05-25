@@ -89,10 +89,10 @@ function WorkShiftForm(props: FormProps) {
         {
             question: "Was hat es hiermit auf sich?",
             answer: "Der Wiesenwahn ist ein nicht kommerzielles Event, das wir ohne eure Mithilfe weder stemmen, " +
-                "noch genießen können. Aus diesem Grund ist das Festival so organisiert, das jede Teilnehmende Person " +
-                "mind. eine kleine Schicht mitarbeitet. Damit nicht die ersten Buchungen die besten Schichten abbekommen, " +
+                "noch genießen können. Aus diesem Grund sind wir so organisiert, das jede teilnehmende Person " +
+                "mindestens eine kleine Schicht mitarbeitet. Damit nicht die ersten Registrierungen die besten Schichten abbekommen, " +
                 "vergibst du Prioritäten und wir teilen nach der Anmeldephase alles zu." +
-                "Bei Überbuchungen einer Schicht entscheidet das Los.",
+                "Bei Überbelegung einer Schicht entscheidet das Los.",
         }]
 
     const numShiftsHelperText = "Wähle, ob du eine, zwei oder drei Schichten übernehmen möchtest. Anhand deiner Prioritäten bekommst du dann mehrere Schichten zugeteilt."

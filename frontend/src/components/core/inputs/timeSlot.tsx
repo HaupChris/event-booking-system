@@ -16,6 +16,7 @@ import EventBusyIcon from '@mui/icons-material/EventBusy';
 import Chip from '@mui/material/Chip';
 import WWSelect from "./WWSelect";
 import {spacePalette} from "../../styles/theme";
+import {ArrowCircleDown, ArrowCircleLeft, ArrowCircleUp} from "@mui/icons-material";
 
 interface TimeSlotProps {
     timeSlot: TimeSlotType;
@@ -79,9 +80,9 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
     };
 
     const getPriorityIcon = () => {
-        if (selectedPriority === PRIORITIES.FIRST) return <PriorityHighIcon sx={{fontSize: '0.8rem'}}/>;
-        if (selectedPriority === PRIORITIES.SECOND) return <PriorityHighIcon sx={{fontSize: '0.8rem'}}/>;
-        if (selectedPriority === PRIORITIES.THIRD) return <PriorityHighIcon sx={{fontSize: '0.8rem'}}/>;
+        if (selectedPriority === PRIORITIES.FIRST) return <ArrowCircleUp sx={{fontSize: '0.8rem'}}/>;
+        if (selectedPriority === PRIORITIES.SECOND) return <ArrowCircleLeft sx={{fontSize: '0.8rem'}}/>;
+        if (selectedPriority === PRIORITIES.THIRD) return <ArrowCircleDown sx={{fontSize: '0.8rem'}}/>;
         return <></>;
     };
 
@@ -114,7 +115,6 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                 border: selectedPriority ? `2px solid ${getPriorityBorderColor()}` : '1px solid',
                 borderColor: selectedPriority ? getPriorityBorderColor() : alpha('#90caf9', 0.3),
                 borderRadius: '8px',
-                opacity: isFull && !selectedPriority ? 0.6 : 1,
                 transition: 'all 0.3s ease',
                 background: alpha('#020c1b', 0.7),
                 position: 'relative',
@@ -162,7 +162,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                 {/* Mobile layout - stacked */}
                 <Box sx={{
                     width: '100%',
-                    display: {xs: 'flex', sm: 'none'},
+                    display: "flex",
                     flexDirection: 'column',
                 }}>
                     {/* Priority Chip - if selected */}
@@ -218,7 +218,6 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        // width: '100%',
                         bgcolor: alpha('#000', 0.2),
                         borderRadius: 1,
                         p: 1.5,
@@ -234,8 +233,8 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                                 <CircularProgress
                                     variant="determinate"
                                     value={timeslotNumBooked > 0 ? (timeslotNumBooked / timeSlot.num_needed) * 100 : 0}
-                                    size={40}
-                                    thickness={4}
+                                    size={45}
+                                    thickness={3}
                                     sx={{
                                         color: getCapacityColor(),
                                         backgroundColor: alpha('#000', 0.3),
@@ -282,128 +281,13 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                                 onChange={handlePriorityChange}
                                 placeholder="Priorität wählen"
                                 allowClear={true}
-                                disabled={isFull && !selectedPriority}
+                                // disabled={isFull && !selectedPriority}
                             />
                         </FormControl>
                     </Box>
                 </Box>
 
-                {/* Desktop layout - improved */}
-                <Box sx={{
-                    width: '100%',
-                    display: {xs: 'none', sm: 'flex'},
-                    alignItems: 'center'
-                }}>
-                    {/* Capacity progress */}
-                    <Box sx={{position: 'relative', mr: 3, ml: 1}}>
-                        <CircularProgress
-                            variant="determinate"
-                            value={timeslotNumBooked > 0 ? (timeslotNumBooked / timeSlot.num_needed) * 100 : 0}
-                            size={46}
-                            thickness={4}
-                            sx={{
-                                color: getCapacityColor(),
-                                backgroundColor: alpha('#000', 0.3),
-                                borderRadius: '50%'
-                            }}
-                        />
-                        <Box
-                            sx={{
-                                top: 0,
-                                left: 0,
-                                bottom: 0,
-                                right: 0,
-                                position: 'absolute',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <Typography variant="caption" component="div"
-                                        sx={{color: alpha('#fff', 0.9), fontWeight: 'medium'}}>
-                                {`${timeslotNumBooked}/${timeSlot.num_needed}`}
-                            </Typography>
-                        </Box>
-                    </Box>
 
-                    {/* Slot information */}
-                    <Box sx={{flexGrow: 1}}>
-                        {selectedPriority && (
-                            <Chip
-                                icon={getPriorityIcon()}
-                                label={selectedPriority}
-                                color={getPriorityColor()}
-                                size="small"
-                                sx={{
-                                    mb: 0.5,
-                                    fontWeight: 'medium',
-                                    '& .MuiChip-label': {
-                                        px: 1
-                                    }
-                                }}
-                            />
-                        )}
-
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                color: alpha('#fff', 0.9),
-                                fontWeight: 'medium'
-                            }}
-                        >
-                            {timeSlot.title}
-                        </Typography>
-
-                        {timeSlot.start_time.length !== 0 && timeSlot.end_time.length !== 0 ? (
-                            <Box sx={{display: 'flex', alignItems: 'center', mt: 0.5}}>
-                                <AccessTimeIcon sx={{fontSize: '0.875rem', mr: 0.5, color: alpha('#fff', 0.6)}}/>
-                                <Typography variant="body2" sx={{color: alpha('#fff', 0.6)}}>
-                                    {`${timeSlot.start_time} - ${timeSlot.end_time}`}
-                                </Typography>
-                            </Box>
-                        ) : null}
-                    </Box>
-
-                    {/* Status indicator for desktop */}
-                    {timeslotNumBooked >= timeSlot.num_needed && (
-                        <Box sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            mr: 2,
-                            p: 0.75,
-                            px: 1.5,
-                            borderRadius: '4px',
-                            bgcolor: alpha('#f44336', 0.1),
-                            border: '1px solid',
-                            borderColor: alpha('#f44336', 0.3),
-                        }}>
-                            <EventBusyIcon sx={{color: '#f44336', fontSize: '0.875rem', mr: 0.5}}/>
-                            <Typography
-                                variant="caption"
-                                sx={{
-                                    color: '#f44336',
-                                    fontWeight: 'medium',
-                                    letterSpacing: '0.5px',
-                                }}
-                            >
-                                Hohe Nachfrage
-                            </Typography>
-                        </Box>
-                    )}
-
-                    {/* Priority selection */}
-                    <FormControl variant="outlined" size="small" sx={{minWidth: "150px"}}>
-                        <WWSelect
-                                id={`priority-select-mobile-${timeSlot.id}`}
-                                options={options}
-                                value={selectedPriority || ''}
-                                onChange={handlePriorityChange}
-                                placeholder="Priorität wählen"
-                                allowClear={true}
-                                disabled={isFull && !selectedPriority}
-                            />
-                    </FormControl>
-                </Box>
             </ListItem>
         </Paper>
     );

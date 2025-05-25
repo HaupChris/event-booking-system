@@ -268,13 +268,25 @@
     },
     {
       "title": "Already Employed",
-      "description": "Bitte nur auswählen, wenn mit das Orga-Team bereits eine Absprache mit dir getroffen hat.",
+      "description": "Bitte nur auswählen, wenn das Orga-Team bereits eine Absprache mit dir getroffen hat.",
       "time_slots": [
         {
           "title": "",
           "start_time": "00:00",
           "end_time": "12:00",
-          "num_needed": 24
+          "num_needed": 10
+        },
+        {
+          "title": "",
+          "start_time": "00:00",
+          "end_time": "12:00",
+          "num_needed": 10
+        },
+        {
+          "title": "",
+          "start_time": "00:00",
+          "end_time": "12:00",
+          "num_needed": 10
         }
       ]
     },
