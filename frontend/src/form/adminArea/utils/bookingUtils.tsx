@@ -61,7 +61,6 @@ export function calculateTotalPrice(
     if (booking.bookingType === "regular") {
         return calculateTotalPriceUser(booking as Booking, formContent);
     }
-
     return -1;
 
 };

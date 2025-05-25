@@ -75,8 +75,24 @@ export function getDummyArtistFormContent(): ArtistFormContent {
                 num_booked: 2,
             },
         ],
-        beverage_options: [],
-        food_options: [],
+        beverage_options: [
+            {
+                id: 1,
+                title: 'Option 1',
+                description: "",
+                price: 100,
+                num_booked: 5,
+            },
+        ],
+        food_options: [
+            {
+                id: 1,
+                title: 'Option 1',
+                description: "",
+                price: 100,
+                num_booked: 5,
+            },
+        ],
         artist_materials: [],
         professions: [],
     };

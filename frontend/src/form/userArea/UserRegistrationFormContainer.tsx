@@ -81,10 +81,22 @@ export function getDummyFormContent(): FormContent {
             },
         ],
         beverage_options: [
-            // ...
+            {
+                id: 1,
+                title: 'Option 1',
+                description: "",
+                price: 100,
+                num_booked: 5,
+            },
         ],
         food_options: [
-            // ...
+            {
+                id: 1,
+                title: 'Option 1',
+                description: "",
+                price: 100,
+                num_booked: 5,
+            },
         ],
         work_shifts: [
             // ...
