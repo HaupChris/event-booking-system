@@ -68,14 +68,14 @@ export function getDummyFormContent(): FormContent {
             {
                 id: 1,
                 title: 'Option 1',
-                price: 100,
+                price: -1,
                 amount: 10,
                 num_booked: 5,
             },
             {
                 id: 2,
                 title: 'Option 2',
-                price: 200,
+                price: -1,
                 amount: 5,
                 num_booked: 2,
             },
@@ -85,7 +85,7 @@ export function getDummyFormContent(): FormContent {
                 id: 1,
                 title: 'Option 1',
                 description: "",
-                price: 100,
+                price: -1,
                 num_booked: 5,
             },
         ],
@@ -94,7 +94,7 @@ export function getDummyFormContent(): FormContent {
                 id: 1,
                 title: 'Option 1',
                 description: "",
-                price: 100,
+                price: -1,
                 num_booked: 5,
             },
         ],
@@ -249,7 +249,7 @@ export function UserRegistrationFormContainer() {
         console.log(total_price);
         updateField('total_price', total_price);
 
-    }, [booking.beverage_id, booking.food_id, booking.ticket_id, booking.amount_shifts])
+    }, [booking.beverage_id, booking.food_id, booking.ticket_id, booking.amount_shifts, formContent])
 
     const handleStepNext = () => {
         handleNext(requiredFields[activeStep]);
