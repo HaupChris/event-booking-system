@@ -39,8 +39,8 @@ function WorkShiftForm(props: FormProps) {
 
     const numberOfShiftsOptions = [
         {value: 1, label: "1 Schicht"},
-        {value: 2, label: "2 Schichten"},
-        {value: 3, label: "3 Schichten"}
+        {value: 2, label: "2 Schichten (1 Essen gratis)"},
+        {value: 3, label: "3 Schichten (2 Essen gratis)"}
     ]
 
 
@@ -95,8 +95,6 @@ function WorkShiftForm(props: FormProps) {
                 "Bei Überbelegung einer Schicht entscheidet das Los.",
         }]
 
-    const numShiftsHelperText = "Wähle, ob du eine, zwei oder drei Schichten übernehmen möchtest. Anhand deiner Prioritäten bekommst du dann mehrere Schichten zugeteilt."
-
     function updateAmountShifts(newValue: string | number | null) {
         if (newValue === null || newValue === undefined) {
             return
@@ -139,7 +137,8 @@ function WorkShiftForm(props: FormProps) {
         <FormCard
             icon={<Engineering sx={{color: '#64b5f6', mr: 1}}/>}
             title={userAreaTexts.workshiftsForm.shiftsCountTitle}
-            tooltipText={userAreaTexts.workshiftsForm.shiftsCountHelperText}
+            description={userAreaTexts.workshiftsForm.shiftsCountHelperText}
+            // tooltipText={userAreaTexts.workshiftsForm.shiftsCountHelperText}
             tooltipPlacement={"top-start"}
         >
             <Box display="flex" alignItems="center" justifyContent="center" sx={{paddingX: 2}}>
