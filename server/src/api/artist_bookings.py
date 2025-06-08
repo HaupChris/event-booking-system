@@ -116,7 +116,7 @@ def delete_artist_booking_endpoint(booking_id):
 def update_artist_payment_status(booking_id):
     # Check if user has admin permissions
     identity = get_jwt_identity()
-    if identity.get("role") not in ["admin"]:
+    if identity not in ["admin"]:
         return jsonify({"error": "Unauthorized"}), 403
 
     payment_data = request.json
