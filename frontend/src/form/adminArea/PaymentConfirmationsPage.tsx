@@ -30,6 +30,8 @@ const PaymentConfirmationsPage: React.FC = () => {
     const {token} = useContext(TokenContext);
 
 
+
+
     // Filter bookings based on payment status
     const filteredBookings: Array<CombinedBooking> = bookings.filter(booking => {
         if (filterPaid === 'all') return true;
@@ -37,6 +39,8 @@ const PaymentConfirmationsPage: React.FC = () => {
         if (filterPaid === 'unpaid') return !booking.is_paid;
         return true;
     });
+
+    console.log(filteredBookings.map(booking => booking.id))
 
     // Sort bookings
     const sortedBookings = [...filteredBookings].sort((a, b) => {
@@ -54,6 +58,8 @@ const PaymentConfirmationsPage: React.FC = () => {
             return sortOrder === 'asc' ? amountA - amountB : amountB - amountA;
         }
     });
+
+    console.log(sortedBookings.map(booking => booking.last_name));
 
     const handleOpenModal = (booking: CombinedBooking) => {
         setSelectedBooking(booking);
@@ -135,31 +141,31 @@ const PaymentConfirmationsPage: React.FC = () => {
 
     return (
         <Box sx={{p: 2}}>
-            <Typography variant="h4" gutterBottom>Payment Confirmations</Typography>
+            <Typography variant="h4" gutterBottom>Zahlungen</Typography>
 
             {/* Statistics Cards */}
             <Grid container spacing={2} sx={{mb: 3}}>
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper sx={{p: 2, bgcolor: 'primary', color: 'white'}}>
-                        <Typography variant="h6">Total Expected</Typography>
+                        <Typography variant="h6">Erwarteter Gesamtbetrag</Typography>
                         <Typography variant="h4">€{totalExpected.toFixed(2)}</Typography>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper sx={{p: 2, bgcolor: 'success.light', color: 'white'}}>
-                        <Typography variant="h6">Total Received</Typography>
+                        <Typography variant="h6">Empfangener Gesamtbetrag</Typography>
                         <Typography variant="h4">€{totalReceived.toFixed(2)}</Typography>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper sx={{p: 2, bgcolor: 'info.light', color: 'white'}}>
-                        <Typography variant="h6">Paid Bookings</Typography>
+                        <Typography variant="h6">Bezahlte Buchungen</Typography>
                         <Typography variant="h4">{paidBookings} / {bookings.length}</Typography>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                     <Paper sx={{p: 2, bgcolor: unpaidBookings > 0 ? 'warning.light' : 'success.light', color: 'white'}}>
-                        <Typography variant="h6">Unpaid Bookings</Typography>
+                        <Typography variant="h6">Unbezahlte Buchungen</Typography>
                         <Typography variant="h4">{unpaidBookings}</Typography>
                     </Paper>
                 </Grid>
@@ -168,31 +174,31 @@ const PaymentConfirmationsPage: React.FC = () => {
             {/* Filters and Sorting */}
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <FormControl sx={{minWidth: 150}}>
-                    <InputLabel>Payment Status</InputLabel>
+                    <InputLabel>Bezahlstatus</InputLabel>
                     <Select
                         value={filterPaid}
                         onChange={(e) => setFilterPaid(e.target.value as 'all' | 'paid' | 'unpaid')}
                         label="Payment Status"
                         size="small"
                     >
-                        <MenuItem value="all">All Bookings</MenuItem>
-                        <MenuItem value="paid">Paid Only</MenuItem>
-                        <MenuItem value="unpaid">Unpaid Only</MenuItem>
+                        <MenuItem value="all">Alle</MenuItem>
+                        <MenuItem value="paid">Bezahlt</MenuItem>
+                        <MenuItem value="unpaid">Unbezahlt</MenuItem>
                     </Select>
                 </FormControl>
 
                 <Box display="flex" alignItems="center">
                     <FormControl sx={{minWidth: 120, mr: 1}}>
-                        <InputLabel>Sort By</InputLabel>
+                        <InputLabel>Sortieren</InputLabel>
                         <Select
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value as 'name' | 'date' | 'amount')}
                             label="Sort By"
                             size="small"
                         >
-                            <MenuItem value="name">Name</MenuItem>
-                            <MenuItem value="date">Payment Date</MenuItem>
-                            <MenuItem value="amount">Amount Paid</MenuItem>
+                            <MenuItem value="name">Nachname</MenuItem>
+                            <MenuItem value="date">Bezahldatum</MenuItem>
+                            <MenuItem value="amount">Gezahlter Betrag</MenuItem>
                         </Select>
                     </FormControl>
 
@@ -202,7 +208,7 @@ const PaymentConfirmationsPage: React.FC = () => {
                         onClick={toggleSortOrder}
                         startIcon={sortOrder === 'asc' ? <ArrowUpward/> : <ArrowDownward/>}
                     >
-                        {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+
                     </Button>
                 </Box>
             </Box>
@@ -223,9 +229,9 @@ const PaymentConfirmationsPage: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {sortedBookings.map((booking) => (
+                        {sortedBookings.map((booking, idx) => (
                             <TableRow
-                                key={booking.id}
+                                key={idx}
                                 sx={{
                                     bgcolor: booking.is_paid
                                         ? 'rgba(76, 175, 80, 0.1)' // Light green for paid
