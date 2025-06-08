@@ -23,7 +23,7 @@ import {
     Download,
     EuroSymbol,
     PointOfSale,
-    MusicNote
+    MusicNote, School
 } from '@mui/icons-material';
 import ListItemButton from "@mui/material/ListItemButton";
 import {CSVLink} from "react-csv";
@@ -41,7 +41,7 @@ import ArtistMaterialsPage from './ArtistMaterialsPage';
 import FinancialsOverviewPage from './FinancialsOverviewPage';
 import PaymentConfirmationsPage from './PaymentConfirmationsPage';
 import {useFetchData} from './useFetchData';
-
+import ProfessionsPage from "./ProfessionsPage";
 
 
 // Define all possible dashboard tabs
@@ -61,6 +61,7 @@ const dashboardTabs: DashboardTab[] = [
     {id: 'materials', label: 'Material', icon: <Handyman/>, permissions: ['read']},
     {id: 'workShifts', label: 'Support', icon: <Work/>, permissions: ['read']},
     {id: 'artists', label: 'Artists', icon: <MusicNote/>, permissions: ['read']},
+    {id: 'professions', label: 'Professions', icon: <School/>, permissions: ['read']},
     {id: 'financials', label: 'Financials', icon: <EuroSymbol/>, permissions: ['financial']},
     {id: 'payments', label: 'Payments', icon: <PointOfSale/>, permissions: ['financial']}
 ];
@@ -118,6 +119,8 @@ function Dashboard() {
                 return <FinancialsOverviewPage/>;
             case 'payments':
                 return <PaymentConfirmationsPage/>;
+            case 'professions':
+                return <ProfessionsPage/>;
             default:
                 return <HomePage/>;
         }
@@ -317,64 +320,64 @@ function Dashboard() {
     };
 
     return (
-            <Box sx={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
-                <AppBar position="fixed">
-                    <Toolbar>
-                        <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerToggle}>
-                            <MenuIcon/>
-                        </IconButton>
-                        <Box display="flex" flexGrow={1} justifyContent="center">
-                            <Typography variant="h6" display="flex" alignItems="center">
-                                {/* Display the active tab icon */}
-                                {authorizedTabs.find(tab => tab.id === activeTab)?.icon}
-                                <span style={{marginLeft: '8px'}}>
+        <Box sx={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
+            <AppBar position="fixed">
+                <Toolbar>
+                    <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerToggle}>
+                        <MenuIcon/>
+                    </IconButton>
+                    <Box display="flex" flexGrow={1} justifyContent="center">
+                        <Typography variant="h6" display="flex" alignItems="center">
+                            {/* Display the active tab icon */}
+                            {authorizedTabs.find(tab => tab.id === activeTab)?.icon}
+                            <span style={{marginLeft: '8px'}}>
                                     {authorizedTabs.find(tab => tab.id === activeTab)?.label}
                                 </span>
-                            </Typography>
-                        </Box>
+                        </Typography>
+                    </Box>
 
-                        {/* Export button - only show for tabs with data */}
-                        {activeTab !== 'home' && (
-                            <CSVLink
-                                data={getExportData()}
-                                filename={`${activeTab}_data.csv`}
-                                style={{textDecoration: 'none'}}
-                            >
-                                <IconButton edge="end" color="inherit">
-                                    <Download/>
-                                </IconButton>
-                            </CSVLink>
-                        )}
-                    </Toolbar>
-                </AppBar>
+                    {/* Export button - only show for tabs with data */}
+                    {activeTab !== 'home' && (
+                        <CSVLink
+                            data={getExportData()}
+                            filename={`${activeTab}_data.csv`}
+                            style={{textDecoration: 'none'}}
+                        >
+                            <IconButton edge="end" color="inherit">
+                                <Download/>
+                            </IconButton>
+                        </CSVLink>
+                    )}
+                </Toolbar>
+            </AppBar>
 
-                <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
-                    <List>
-                        {authorizedTabs.map((tab) => (
-                            <ListItemButton
-                                onClick={() => handleMenuClick(tab.id)}
-                                key={tab.id}
-                                selected={activeTab === tab.id}
-                            >
-                                <ListItemIcon>{tab.icon}</ListItemIcon>
-                                <ListItemText primary={tab.label}/>
-                            </ListItemButton>
-                        ))}
-                    </List>
-                </Drawer>
+            <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
+                <List>
+                    {authorizedTabs.map((tab) => (
+                        <ListItemButton
+                            onClick={() => handleMenuClick(tab.id)}
+                            key={tab.id}
+                            selected={activeTab === tab.id}
+                        >
+                            <ListItemIcon>{tab.icon}</ListItemIcon>
+                            <ListItemText primary={tab.label}/>
+                        </ListItemButton>
+                    ))}
+                </List>
+            </Drawer>
 
-                <Box component="main"
-                     sx={{
-                         flexGrow: 1,
-                         paddingTop: {xs: '4em', sm: '5em', lg: '6em'},
-                         overflowY: 'auto',
-                         paddingX: {sm: "0", md: "2em"}
-                     }}>
-                    <Paper elevation={3} sx={{p: 3}}>
-                        {renderPage()}
-                    </Paper>
-                </Box>
+            <Box component="main"
+                 sx={{
+                     flexGrow: 1,
+                     paddingTop: {xs: '4em', sm: '5em', lg: '6em'},
+                     overflowY: 'auto',
+                     paddingX: {sm: "0", md: "2em"}
+                 }}>
+                <Paper elevation={3} sx={{p: 3}}>
+                    {renderPage()}
+                </Paper>
             </Box>
+        </Box>
     );
 }
 

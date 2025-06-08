@@ -19,7 +19,7 @@ interface OptionsGridProps {
     isArtist: boolean;
   }[];
   bookings: CombinedBooking[];
-  optionType: 'ticket' | 'beverage' | 'food';
+  optionType: 'ticket' | 'beverage' | 'food' | 'professions';
   icon?: React.ReactNode;
 }
 

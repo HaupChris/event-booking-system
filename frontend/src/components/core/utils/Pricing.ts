@@ -1,6 +1,16 @@
 import {Booking, FormContent} from "../../../form/userArea/interface";
 import {ArtistBooking, ArtistFormContent} from "../../../form/artistArea/interface";
 
+export function getDiscountUser(booking: Booking, formContent: FormContent): number {
+    if (booking.amount_shifts > 1) {
+        const priceOneMeal = formContent.food_options[0].price;
+        const discount = priceOneMeal * (booking.amount_shifts - 1);
+        return discount
+    }
+    return 0;
+}
+
+
 export function calculateTotalPriceUser(booking: Booking, formContent: FormContent): number {
     let total_price = 0;
 
@@ -19,11 +29,8 @@ export function calculateTotalPriceUser(booking: Booking, formContent: FormConte
         total_price += foodOption.price;
     }
 
-    if (booking.amount_shifts > 1) {
-        const priceOneMeal = formContent.food_options[0].price;
-        const discount = priceOneMeal * (booking.amount_shifts - 1);
-        total_price -= discount;
-    }
+    total_price -= getDiscountUser(booking, formContent);
+
 
     return total_price;
 }

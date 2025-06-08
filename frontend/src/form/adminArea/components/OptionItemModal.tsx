@@ -55,7 +55,7 @@ const OptionItemModal: React.FC<OptionItemModalProps> = ({
 
         <Box sx={{ mb: 3, pr: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <Typography variant="h6" component="h2">
+            <Typography variant="h6" color={"text.primary"} component="h2">
               {title}
             </Typography>
             {isArtist && (
@@ -83,7 +83,7 @@ const OptionItemModal: React.FC<OptionItemModalProps> = ({
           )}
         </Box>
 
-        <Typography variant="subtitle2" gutterBottom>
+        <Typography variant="subtitle2" color={"text.secondary"} gutterBottom>
           {users.length} participants selected this option
         </Typography>
 

@@ -335,7 +335,7 @@ const MaterialsPage: React.FC = () => {
                         <Box>
                             <Box sx={{mb: 3, pr: 4}}>
                                 <Box sx={{display: 'flex', alignItems: 'center', mb: 1}}>
-                                    <Typography variant="h6">
+                                    <Typography variant="h6" color="text.primary">
                                         {selectedMaterial.title}
                                     </Typography>
                                     {selectedMaterialType === 'artist' && (

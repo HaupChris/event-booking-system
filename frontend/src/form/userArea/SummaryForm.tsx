@@ -24,6 +24,7 @@ import PriorityTimeSlot from "../../components/core/display/PriorityTimeSlot";
 import InfoPair from "../../components/core/display/InfoPair";
 import FormCard from "../../components/core/display/FormCard";
 import {userAreaTexts} from "../constants/texts";
+import {getDiscountUser} from "../../components/core/utils/Pricing";
 
 function findItemById<T extends { id: number }>(array: T[], id: number): T | undefined {
     return array.find(item => item.id === id);
@@ -65,6 +66,7 @@ function SummaryForm({currentBooking, formContent}: SummaryFormProps) {
     const shift_slot_2 = getShiftAndTimeslot(formContent.work_shifts, timeslot_priority_2);
     const shift_slot_3 = getShiftAndTimeslot(formContent.work_shifts, timeslot_priority_3);
     const materials = material_ids.map(id => findItemById(formContent.materials, id)).filter(Boolean);
+    const discount = getDiscountUser(currentBooking, formContent);
 
     // Helper to render an item with price
     const renderPriceItem = (item: any) => {
@@ -312,6 +314,7 @@ function SummaryForm({currentBooking, formContent}: SummaryFormProps) {
                         </Typography>
                     </Box>
                     {renderPriceItem(food)}
+                    {discount > 0 ? renderPriceItem({title: "Essensrabatt durch Arbeitsschichten", price: -discount}): ""}
                 </Box>
             </FormCard>
 
