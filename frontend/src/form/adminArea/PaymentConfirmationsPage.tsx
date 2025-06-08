@@ -40,8 +40,6 @@ const PaymentConfirmationsPage: React.FC = () => {
         return true;
     });
 
-    console.log(filteredBookings.map(booking => booking.id))
-
     // Sort bookings
     const sortedBookings = [...filteredBookings].sort((a, b) => {
         if (sortBy === 'name') {
@@ -58,8 +56,6 @@ const PaymentConfirmationsPage: React.FC = () => {
             return sortOrder === 'asc' ? amountA - amountB : amountB - amountA;
         }
     });
-
-    console.log(sortedBookings.map(booking => booking.last_name));
 
     const handleOpenModal = (booking: CombinedBooking) => {
         setSelectedBooking(booking);
