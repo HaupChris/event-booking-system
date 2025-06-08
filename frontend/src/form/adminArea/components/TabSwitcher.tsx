@@ -1,5 +1,3 @@
-// src/form/adminArea/components/TabSwitcher.tsx
-
 import React from 'react';
 import { Box, Tab, Tabs, useMediaQuery, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
@@ -8,7 +6,7 @@ import { spacePalette } from '../../../components/styles/theme';
 interface TabOption {
   value: string;
   label: string;
-  icon?: React.ReactElement; // Changed from React.ReactNode to React.ReactElement
+  icon?: React.ReactElement;
 }
 
 interface TabSwitcherProps {

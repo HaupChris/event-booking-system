@@ -26,6 +26,8 @@ const WorkshiftsPage: React.FC = () => {
     const [openTimeslotModal, setOpenTimeslotModal] = useState(false);
     const [workshiftSortOrder, setWorkshiftSortOrder] = useState<'asc' | 'desc'>('asc');
     const [peopleSortOrder, setPeopleSortOrder] = useState<'asc' | 'desc'>('asc');
+    const [workshiftSortBy, setWorkshiftSortBy] = useState<'progress' | 'name'>('progress');
+    const [peopleSortBy, setPeopleSortBy] = useState<'name' | 'shifts'>('name');
 
     // Modal handlers
     const handleOpenTimeslotModal = (timeslot: TimeSlot) => {
@@ -38,9 +40,8 @@ const WorkshiftsPage: React.FC = () => {
         setSelectedTimeslot(null);
     };
 
-    // Helper function to convert workshifts to progress items
     const workshiftsToProgressItems = (): ProgressItem[] => {
-        return formContent.work_shifts.map(workshift => {
+        const items = formContent.work_shifts.map(workshift => {
             const totalNeeded = workshift.time_slots.reduce((acc, ts) => acc + ts.num_needed, 0);
             const totalBooked = workshift.time_slots.reduce((acc, ts) => {
                 const timeslotCount = getTimeslotCount(ts.id);
@@ -123,18 +124,29 @@ const WorkshiftsPage: React.FC = () => {
                 )
             };
         });
+
+        return items.sort((a, b) => {
+            if (workshiftSortBy === 'name') {
+                const compare = a.title.localeCompare(b.title);
+                return workshiftSortOrder === 'asc' ? compare : -compare;
+            } else {
+                const progressA = a.totalNeeded > 0 ? (a.currentCount / a.totalNeeded) * 100 : 0;
+                const progressB = b.totalNeeded > 0 ? (b.currentCount / b.totalNeeded) * 100 : 0;
+                const compare = progressA - progressB;
+                return workshiftSortOrder === 'asc' ? compare : -compare;
+            }
+        });
     };
 
-    // Convert bookings to people items
-    const bookingsToPeopleItems = (): Person[] => {
-        return regularBookings.map(booking => {
-            const timeslots = getTimeslotsForUser(booking);
 
+    const bookingsToPeopleItems = (): Person[] => {
+        const items = regularBookings.map(booking => {
+            const timeslots = getTimeslotsForUser(booking);
             return {
                 id: booking.id,
                 name: `${booking.first_name} ${booking.last_name}`,
                 subtitle: `Shifts: ${booking.amount_shifts || 0}`,
-                badgeContent: timeslots.length,
+                badgeContent: booking.amount_shifts,
                 badgeIcon: <WorkIcon color="action"/>,
                 children: (
                     <Box>
@@ -190,6 +202,19 @@ const WorkshiftsPage: React.FC = () => {
                     </Box>
                 )
             };
+        });
+
+
+        return items.sort((a, b) => {
+            console.log(peopleSortBy);
+            if (peopleSortBy === 'shifts') {
+
+                const compare = a.badgeContent - b.badgeContent;
+                return peopleSortOrder === 'asc' ? compare : -compare;
+            } else {
+                const compare = a.name.localeCompare(b.name);
+                return peopleSortOrder === 'asc' ? compare : -compare;
+            }
         });
     };
 
@@ -275,6 +300,14 @@ const WorkshiftsPage: React.FC = () => {
         setPeopleSortOrder(peopleSortOrder === 'asc' ? 'desc' : 'asc');
     };
 
+    const handleWorkshiftSortByChange = (value: string) => {
+        setWorkshiftSortBy(value as 'progress' | 'name');
+    };
+
+    const handlePeopleSortByChange = (value: string) => {
+        setPeopleSortBy(value as 'name' | 'shifts');
+    };
+
     return (
         <Box sx={{p: 2}}>
             {/* Header with title */}
@@ -300,14 +333,13 @@ const WorkshiftsPage: React.FC = () => {
                             {value: 'progress', label: 'Progress'},
                             {value: 'name', label: 'Name'}
                         ]}
-                        sortBy="progress"
+                        sortBy={workshiftSortBy}
                         sortOrder={workshiftSortOrder}
-                        onSortByChange={() => {
-                        }} // Not implemented in this example
+                        onSortByChange={handleWorkshiftSortByChange}
                         onSortOrderToggle={handleToggleWorkshiftSort}
                     >
                         <Typography variant="body2">
-                            Showing {formContent.work_shifts.length} workshifts sorted by progress
+                            Showing {formContent.work_shifts.length} workshifts sorted by {workshiftSortBy}
                         </Typography>
                     </FilterSortBar>
 
@@ -324,22 +356,20 @@ const WorkshiftsPage: React.FC = () => {
                     <FilterSortBar
                         sortOptions={[
                             {value: 'name', label: 'Name'},
-                            {value: 'shifts', label: 'Shifts'}
+                            {value: 'shifts', label: 'Amount Shifts'}
                         ]}
-                        sortBy="name"
+                        sortBy={peopleSortBy}
                         sortOrder={peopleSortOrder}
-                        onSortByChange={() => {
-                        }} // Not implemented in this example
+                        onSortByChange={handlePeopleSortByChange}
                         onSortOrderToggle={handleTogglePeopleSort}
                     >
                         <Typography variant="body2">
-                            Showing {regularBookings.length} people with assigned shifts
+                            Showing {regularBookings.length} people sorted by {peopleSortBy}
                         </Typography>
                     </FilterSortBar>
 
                     <PeopleList
                         people={bookingsToPeopleItems()}
-                        sortOrder={peopleSortOrder}
                     />
                 </>
             )}

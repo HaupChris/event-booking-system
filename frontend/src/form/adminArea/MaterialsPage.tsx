@@ -4,9 +4,9 @@ import {
   TableHead, TableRow, Paper, Chip
 } from '@mui/material';
 import {
-  Handyman as HandymanIcon,
-  Person as PersonIcon,
-  Close as CloseIcon,
+    Person as PersonIcon,
+    Handyman as HandymanIcon,
+    Close as CloseIcon, People, AllInbox, Mic,
 } from '@mui/icons-material';
 import { useFetchData } from './useFetchData';
 import TabSwitcher from './components/TabSwitcher';
@@ -50,7 +50,6 @@ const MaterialsPage: React.FC = () => {
     setPeopleSortOrder(peopleSortOrder === 'asc' ? 'desc' : 'asc');
   };
 
-  // Helper functions
 
   // Convert materials to progress items
   const materialsToProgressItems = (): ProgressItem[] => {
@@ -221,7 +220,7 @@ const MaterialsPage: React.FC = () => {
       <TabSwitcher
         tabs={[
           { value: 'materials', label: 'Material Overview', icon: <HandymanIcon /> },
-          { value: 'people', label: 'People Overview', icon: <PersonIcon /> }
+          { value: 'people', label: 'People Overview', icon: <People /> }
         ]}
         currentTab={activeTab}
         onChange={setActiveTab}
@@ -229,12 +228,12 @@ const MaterialsPage: React.FC = () => {
 
       {/* View Type Controls */}
       <FormCard sx={{ mb: 3 }}>
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ p: 1 }}>
           <TabSwitcher
             tabs={[
-              { value: 'all', label: 'All Materials' },
-              { value: 'regular', label: 'Regular Materials' },
-              { value: 'artist', label: 'Artist Materials' }
+              { value: 'all', label: 'All', icon:<People/>},
+              { value: 'regular', label: 'Regular', icon:<PersonIcon/> },
+              { value: 'artist', label: 'Artist', icon: <Mic/> }
             ]}
             currentTab={viewType}
             onChange={setViewType as any}
@@ -262,7 +261,6 @@ const MaterialsPage: React.FC = () => {
 
           <ProgressList
             items={materialsToProgressItems()}
-            sortOrder={materialSortOrder}
           />
         </>
       )}
@@ -287,7 +285,6 @@ const MaterialsPage: React.FC = () => {
 
           <PeopleList
             people={peopleToPeopleItems()}
-            sortOrder={peopleSortOrder}
           />
         </>
       )}

@@ -25,13 +25,11 @@ export interface Person {
 interface PeopleListProps {
   people: Person[];
   onPersonDetails?: (person: Person) => void;
-  sortOrder?: 'asc' | 'desc';
 }
 
 const PeopleList: React.FC<PeopleListProps> = ({
   people,
   onPersonDetails,
-  sortOrder = 'asc'
 }) => {
   const [expanded, setExpanded] = useState<string | number | null>(null);
 
@@ -39,17 +37,9 @@ const PeopleList: React.FC<PeopleListProps> = ({
     setExpanded(expanded === id ? null : id);
   };
 
-  const sortedPeople = [...people].sort((a, b) => {
-    const nameA = a.name.toLowerCase();
-    const nameB = b.name.toLowerCase();
-    return sortOrder === 'asc'
-      ? nameA.localeCompare(nameB)
-      : nameB.localeCompare(nameA);
-  });
-
   return (
     <List>
-      {sortedPeople.map((person) => (
+      {people.map((person) => (
         <Box key={person.id} sx={{ mb: 1 }}>
           <ListItemButton
             onClick={() => toggleExpanded(person.id)}

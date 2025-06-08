@@ -34,7 +34,6 @@ interface ProgressListProps {
 const ProgressList: React.FC<ProgressListProps> = ({
   items,
   onItemDetails,
-  sortOrder = 'asc',
   subtitle
 }) => {
   const [expanded, setExpanded] = useState<number | string | null>(null);
@@ -55,15 +54,9 @@ const ProgressList: React.FC<ProgressListProps> = ({
     return spacePalette.status.error;
   };
 
-  const sortedItems = [...items].sort((a, b) => {
-    const progressA = calculateProgress(a.currentCount, a.totalNeeded);
-    const progressB = calculateProgress(b.currentCount, b.totalNeeded);
-    return sortOrder === 'asc' ? progressA - progressB : progressB - progressA;
-  });
-
   return (
     <List>
-      {sortedItems.map((item) => {
+      {items.map((item) => {
         const progress = calculateProgress(item.currentCount, item.totalNeeded);
         const progressColor = getProgressColor(item.currentCount, item.totalNeeded);
 
