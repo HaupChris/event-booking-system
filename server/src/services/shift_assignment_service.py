@@ -1,10 +1,8 @@
 import sqlite3
 from contextlib import closing
-from typing import List, Dict, Optional, Tuple
-from datetime import datetime
-
+from typing import List, Dict
 from src.models.datatypes import ShiftAssignment, ShiftAssignmentWithDetails
-from src.services.booking_service import DB_FILE_PATH, _connect_db
+from src.services.booking_service import _connect_db
 
 
 def get_all_shift_assignments() -> List[ShiftAssignmentWithDetails]:
