@@ -189,7 +189,6 @@ def auto_assign_shifts():
 
     data = request.json
     strategy = data.get('strategy', 'priority')
-    reset = data.get('reset', False)
 
     if strategy not in ['priority', 'fill']:
         return jsonify({"error": "Invalid strategy"}), 400
@@ -200,3 +199,71 @@ def auto_assign_shifts():
         return jsonify({"error": result['error']}), 500
 
     return jsonify(result), 200
+
+
+@shift_assignments_bp.route("/shifts/bulk-assign", methods=["POST"])
+@limiter_assignments.limit("20/minute")
+@jwt_required()
+def bulk_assign_shifts():
+    """Assign multiple users to multiple timeslots"""
+    identity = get_jwt_identity()
+    if identity != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    data = request.json
+    user_ids = data.get('user_ids', [])
+    timeslot_ids = data.get('timeslot_ids', [])
+
+    if not user_ids or not timeslot_ids:
+        return jsonify({"error": "Missing user_ids or timeslot_ids"}), 400
+
+    successful = 0
+    failed = []
+
+    for user_id in user_ids:
+        for timeslot_id in timeslot_ids:
+            # Check if user can be assigned
+            current_shifts = get_booking_shift_count(user_id)
+            max_shifts = get_booking_max_shifts(user_id)
+
+            if current_shifts >= max_shifts:
+                failed.append({
+                    'user_id': user_id,
+                    'timeslot_id': timeslot_id,
+                    'reason': 'User at maximum shifts'
+                })
+                continue
+
+            # Check timeslot capacity
+            current_assigned = get_timeslot_assignment_count(timeslot_id)
+            capacity = get_timeslot_capacity(timeslot_id)
+
+            if current_assigned >= capacity:
+                failed.append({
+                    'user_id': user_id,
+                    'timeslot_id': timeslot_id,
+                    'reason': 'Timeslot at capacity'
+                })
+                continue
+
+            # Create assignment
+            assignment = ShiftAssignment(
+                booking_id=user_id,
+                timeslot_id=timeslot_id,
+                is_confirmed=True
+            )
+
+            assignment_id = create_assignment(assignment)
+            if assignment_id > 0:
+                successful += 1
+            else:
+                failed.append({
+                    'user_id': user_id,
+                    'timeslot_id': timeslot_id,
+                    'reason': 'Assignment already exists or creation failed'
+                })
+
+    return jsonify({
+        'successful_assignments': successful,
+        'failed_assignments': failed
+    }), 200

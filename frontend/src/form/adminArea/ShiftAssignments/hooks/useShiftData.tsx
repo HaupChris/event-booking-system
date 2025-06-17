@@ -1,6 +1,4 @@
-// frontend/src/form/adminArea/ShiftAssignments/hooks/useShiftData.tsx
-
-import { useState, useEffect, useCallback, useContext } from 'react';
+import {useState, useEffect, useCallback, useContext, useMemo} from 'react';
 import axios from 'axios';
 import { TokenContext } from '../../../../contexts/AuthContext';
 import {
@@ -41,6 +39,7 @@ interface UseShiftDataReturn {
   canAssignUserToTimeslot: (bookingId: number, timeslotId: number) => { canAssign: boolean; reason?: string };
 }
 
+// Replace the entire useShiftData hook with this corrected version:
 export const useShiftData = (): UseShiftDataReturn => {
   const { token } = useContext(TokenContext);
 
@@ -53,10 +52,10 @@ export const useShiftData = (): UseShiftDataReturn => {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // API configuration
-  const apiConfig = {
+  // Memoize API config to prevent continuous re-renders
+  const apiConfig = useMemo(() => ({
     headers: { Authorization: `Bearer ${token}` }
-  };
+  }), [token]);
 
   // Transform timeslot summary into workshift structure
   const transformToWorkshifts = useCallback((timeslots: TimeslotSummary[]): WorkshiftWithTimeslots[] => {
@@ -66,10 +65,16 @@ export const useShiftData = (): UseShiftDataReturn => {
       const workshiftTitle = timeslot.workshift_title;
 
       if (!workshiftMap.has(workshiftTitle)) {
+        // Use a hash of the title as ID since we don't have real workshift IDs
+        const workshiftId = workshiftTitle.split('').reduce((a, b) => {
+          a = ((a << 5) - a) + b.charCodeAt(0);
+          return a & a;
+        }, 0);
+
         workshiftMap.set(workshiftTitle, {
-          id: timeslot.timeslot_id, // We'll use the first timeslot ID as workshift ID
+          id: Math.abs(workshiftId),
           title: workshiftTitle,
-          description: '', // We don't have description in summary
+          description: '',
           timeslots: []
         });
       }
@@ -103,7 +108,7 @@ export const useShiftData = (): UseShiftDataReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [token, apiConfig, transformToWorkshifts]);
+  }, [apiConfig, transformToWorkshifts]);
 
   // Create single assignment
   const createAssignment = useCallback(async (request: AssignmentRequest): Promise<boolean> => {
@@ -112,7 +117,7 @@ export const useShiftData = (): UseShiftDataReturn => {
 
     try {
       await axios.post('/api/shifts/assignments', request, apiConfig);
-      await refreshData(); // Refresh to get updated data
+      await refreshData();
       return true;
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to create assignment');
@@ -120,7 +125,7 @@ export const useShiftData = (): UseShiftDataReturn => {
     } finally {
       setIsSaving(false);
     }
-  }, [token, apiConfig, refreshData]);
+  }, [apiConfig, refreshData]);
 
   // Update assignment
   const updateAssignment = useCallback(async (
@@ -140,7 +145,7 @@ export const useShiftData = (): UseShiftDataReturn => {
     } finally {
       setIsSaving(false);
     }
-  }, [token, apiConfig, refreshData]);
+  }, [apiConfig, refreshData]);
 
   // Delete assignment
   const deleteAssignment = useCallback(async (assignmentId: number): Promise<boolean> => {
@@ -157,17 +162,40 @@ export const useShiftData = (): UseShiftDataReturn => {
     } finally {
       setIsSaving(false);
     }
-  }, [token, apiConfig, refreshData]);
+  }, [apiConfig, refreshData]);
 
-  // Bulk assign shifts
+  // Simplified bulk assign (using existing endpoint multiple times)
   const bulkAssignShifts = useCallback(async (request: BulkAssignmentRequest): Promise<BulkAssignmentResult> => {
     setIsSaving(true);
     setError(null);
 
+    const result: BulkAssignmentResult = {
+      successful_assignments: 0,
+      failed_assignments: []
+    };
+
     try {
-      const response = await axios.post('/api/shifts/bulk-assign', request, apiConfig);
+      for (const userId of request.user_ids) {
+        for (const timeslotId of request.timeslot_ids) {
+          try {
+            await axios.post('/api/shifts/assignments', {
+              booking_id: userId,
+              timeslot_id: timeslotId,
+              is_confirmed: true
+            }, apiConfig);
+            result.successful_assignments++;
+          } catch (err: any) {
+            result.failed_assignments.push({
+              user_id: userId,
+              timeslot_id: timeslotId,
+              reason: err.response?.data?.error || 'Assignment failed'
+            });
+          }
+        }
+      }
+
       await refreshData();
-      return response.data;
+      return result;
     } catch (err: any) {
       const error = err.response?.data?.error || 'Failed to bulk assign shifts';
       setError(error);
@@ -175,7 +203,7 @@ export const useShiftData = (): UseShiftDataReturn => {
     } finally {
       setIsSaving(false);
     }
-  }, [token, apiConfig, refreshData]);
+  }, [apiConfig, refreshData]);
 
   // Run auto assignment
   const runAutoAssignment = useCallback(async (config: AutoAssignmentConfig): Promise<AutoAssignmentResult> => {
@@ -193,21 +221,18 @@ export const useShiftData = (): UseShiftDataReturn => {
     } finally {
       setIsSaving(false);
     }
-  }, [token, apiConfig, refreshData]);
+  }, [apiConfig, refreshData]);
 
-  // Helper: Get assignments for a specific user
+  // Helper functions remain the same...
   const getUserAssignments = useCallback((bookingId: number): ShiftAssignmentWithDetails[] => {
     return assignments.filter(assignment => assignment.booking_id === bookingId);
   }, [assignments]);
 
-  // Helper: Get assignments for a specific timeslot
   const getTimeslotAssignments = useCallback((timeslotId: number): ShiftAssignmentWithDetails[] => {
     return assignments.filter(assignment => assignment.timeslot_id === timeslotId);
   }, [assignments]);
 
-  // Helper: Check if user can be assigned to timeslot
   const canAssignUserToTimeslot = useCallback((bookingId: number, timeslotId: number) => {
-    // Check if user already assigned to this timeslot
     const existingAssignment = assignments.find(
       a => a.booking_id === bookingId && a.timeslot_id === timeslotId
     );
@@ -215,13 +240,11 @@ export const useShiftData = (): UseShiftDataReturn => {
       return { canAssign: false, reason: 'User already assigned to this timeslot' };
     }
 
-    // Check user's max shifts
     const userSummary = bookingSummary.find(u => u.booking_id === bookingId);
     if (userSummary && userSummary.assigned_shifts >= userSummary.max_shifts) {
       return { canAssign: false, reason: 'User has reached maximum shifts' };
     }
 
-    // Check timeslot capacity
     const timeslotSummaryItem = timeslotSummary.find(t => t.timeslot_id === timeslotId);
     if (timeslotSummaryItem && timeslotSummaryItem.assigned_count >= timeslotSummaryItem.capacity) {
       return { canAssign: false, reason: 'Timeslot is at capacity' };
@@ -230,12 +253,12 @@ export const useShiftData = (): UseShiftDataReturn => {
     return { canAssign: true };
   }, [assignments, bookingSummary, timeslotSummary]);
 
-  // Initial data fetch
+  // Initial data fetch - only depend on token
   useEffect(() => {
     if (token) {
       refreshData().then();
     }
-  }, [token, refreshData]);
+  }, [token]); // Remove refreshData from dependencies
 
   return {
     assignments,
