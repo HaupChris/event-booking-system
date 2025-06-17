@@ -318,7 +318,7 @@ const ShiftAssignmentsPage: React.FC = () => {
   const handleCloseError = () => setErrorMessage('');
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
         <Typography variant="h4" gutterBottom>
@@ -360,14 +360,14 @@ const ShiftAssignmentsPage: React.FC = () => {
         flex: 1,
         minHeight: 0 // Important for proper grid sizing
       }}>
-        {/* Assignment Summary - spans top row */}
-        {/*<Box sx={{ gridColumn: '1 / -1' }}>*/}
-        {/*  <AssignmentSummary*/}
-        {/*    bookingSummary={bookingSummary}*/}
-        {/*    timeslotSummary={timeslotSummary}*/}
-        {/*    assignments={assignments}*/}
-        {/*  />*/}
-        {/*</Box>*/}
+         Assignment Summary - spans top row
+        <Box sx={{ gridColumn: '1 / -1' }}>
+          <AssignmentSummary
+            bookingSummary={bookingSummary}
+            timeslotSummary={timeslotSummary}
+            assignments={assignments}
+          />
+        </Box>
 
         {/* User List - left column */}
         <Box sx={{ gridColumn: 1, overflow: 'scroll' }}>

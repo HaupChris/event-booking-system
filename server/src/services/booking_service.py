@@ -27,9 +27,7 @@ else:
 
 
 # Ensure database is initialized on import
-
-if not os.path.exists(DB_FILE_PATH):
-    init_db(DB_FILE_PATH, [REGULAR_SCHEMA_PATH], get_form_content_obj())
+init_db(DB_FILE_PATH, [REGULAR_SCHEMA_PATH], get_form_content_obj())
 
 
 def _connect_db() -> sqlite3.Connection:
