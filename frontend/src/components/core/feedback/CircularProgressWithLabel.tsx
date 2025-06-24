@@ -26,7 +26,7 @@ const CircularProgressWithLabel: React.FC<CircularProgressWithLabelProps> = ({
             <CircularProgress
                 variant="determinate"
                 value={frac * 100}
-                thickness={6}
+                thickness={4}
                 size={46}
                 sx={{
                     color: getProgressColor(),
