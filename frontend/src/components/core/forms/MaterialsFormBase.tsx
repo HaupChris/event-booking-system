@@ -19,6 +19,7 @@ import FormCard from "../display/FormCard";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {spacePalette} from "../../styles/theme";
 import {Material} from "../../../form/userArea/interface";
+import CircularProgressWithLabel from "../feedback/CircularProgressWithLabel";
 
 
 interface MaterialsTextProps {
@@ -43,7 +44,7 @@ interface MaterialsFormBaseProps {
 }
 
 function MaterialsFormBase(props: MaterialsFormBaseProps) {
-    const { texts, materialsPropName = "material_ids" } = props;
+    const {texts, materialsPropName = "material_ids"} = props;
 
     function handleToggle(material_id: number) {
         if (props.currentBooking[materialsPropName].indexOf(material_id) === -1) {
@@ -175,49 +176,12 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
                                         }}
                                     >
                                         {/* Progress Circle */}
-                                        <Box sx={{
-                                            position: 'relative',
-                                            mr: 2,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}>
-                                            <CircularProgress
-                                                variant="determinate"
-                                                value={num_booked > 0 ? (num_booked / material.num_needed) * 100 : 0}
-                                                size={46}
-                                                thickness={4}
-                                                sx={{
-                                                    color: capacityColor,
-                                                    backgroundColor: alpha('#000', 0.3),
-                                                    borderRadius: '50%'
-                                                }}
+                                        <Box sx={{paddingRight: '1em'}}>
+                                            <CircularProgressWithLabel
+                                                valueCurrent={num_booked}
+                                                valueMax={material.num_needed}
                                             />
-                                            <Box
-                                                sx={{
-                                                    top: 0,
-                                                    left: 0,
-                                                    bottom: 0,
-                                                    right: 0,
-                                                    position: 'absolute',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                }}
-                                            >
-                                                <Typography
-                                                    variant="caption"
-                                                    component="div"
-                                                    sx={{
-                                                        color: alpha('#fff', 0.9),
-                                                        fontWeight: 'medium'
-                                                    }}
-                                                >
-                                                    {`${num_booked}/${material.num_needed}`}
-                                                </Typography>
-                                            </Box>
                                         </Box>
-
                                         <ListItemText
                                             id={labelId}
                                             primary={

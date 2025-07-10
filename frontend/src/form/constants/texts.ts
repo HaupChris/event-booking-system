@@ -239,17 +239,17 @@ export const artistAreaTexts = {
     },
 
     signatureForm: {
-        missionBriefing: "Bitte bestätige mit deiner Unterschrift, dass du als Künstler beim Festival teilnehmen wirst.",
+        missionBriefing: "Bitte bestätige mit deiner Unterschrift, deine Teilnahme als Künstler*in.",
         footerId: "WWWW-ARTIST-CONFIRMATION // ID-2025",
         title: "Bestätigung",
-        legalTitle: "Bestätigung der Künstlerbedingungen",
-        legalText: "Hiermit bestätige ich, dass ich als Künstler am 'Weiher Wald und Weltall-Wahn 2025' teilnehmen werde. Ich verpflichte mich, zu den vereinbarten Zeiten aufzutreten und die Regeln des Festivals zu respektieren. Der Veranstalter haftet nicht für persönliche Gegenstände oder Ausrüstung.",
+        legalTitle: "Bestätigung der Bedingungen",
+        legalText: "Hiermit bestätige ich, dass ich als Künstler*in am 'Weiher Wald und Weltall-Wahn 2025' teilnehmen werde. Ich verpflichte mich, zu den vereinbarten Zeiten aufzutreten und die Regeln des Festivals zu respektieren. Der Veranstalter haftet nicht für persönliche Gegenstände oder Ausrüstung.",
         signatureTitle: "Deine Unterschrift",
         validationError: "Bitte unterschreibe das Formular zur Bestätigung"
     },
 
     summaryForm: {
-        missionBriefing: "Überprüfe deine Künstler-Daten und Auftrittsdetails vor der endgültigen Bestätigung.",
+        missionBriefing: "Überprüfe deine Künstler*innen-Daten und Auftrittsdetails vor der endgültigen Bestätigung.",
         footerId: "WWWW-ARTIST-SUMMARY // ID-2025",
         title: "Zusammenfassung",
         artistContribution: "Dein Beitrag",

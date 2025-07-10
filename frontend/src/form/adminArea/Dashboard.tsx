@@ -24,7 +24,7 @@ import {
     EuroSymbol,
     PointOfSale,
     School,
-    MusicNote, AssignmentInd
+    AssignmentInd
 } from '@mui/icons-material';
 import ListItemButton from "@mui/material/ListItemButton";
 import {CSVLink} from "react-csv";
@@ -37,7 +37,6 @@ import BeveragesPage from './BeveragesPage';
 import FoodPage from './FoodPage';
 import MaterialsPage from './MaterialsPage';
 import WorkshiftsPage from './WorkshiftsPage';
-import ArtistsPage from './ArtistsPage';
 import ArtistMaterialsPage from './ArtistMaterialsPage';
 import FinancialsOverviewPage from './FinancialsOverviewPage';
 import PaymentConfirmationsPage from './PaymentConfirmationsPage';
@@ -63,7 +62,6 @@ const dashboardTabs: DashboardTab[] = [
     {id: 'food', label: 'Food', icon: <LunchDining/>, permissions: ['read']},
     {id: 'materials', label: 'Material', icon: <Handyman/>, permissions: ['read']},
     {id: 'workShifts', label: 'Support', icon: <Work/>, permissions: ['read']},
-    {id: 'artists', label: 'Artists', icon: <MusicNote/>, permissions: ['read']},
     {id: 'professions', label: 'Professions', icon: <School/>, permissions: ['read']},
     {id: 'financials', label: 'Financials', icon: <EuroSymbol/>, permissions: ['financial']},
     {id: 'payments', label: 'Payments', icon: <PointOfSale/>, permissions: ['financial']},
@@ -115,8 +113,6 @@ function Dashboard() {
                 return <MaterialsPage/>;
             case 'workShifts':
                 return <WorkshiftsPage/>;
-            case 'artists':
-                return <ArtistsPage/>;
             case 'artistMaterials':
                 return <ArtistMaterialsPage/>;
             case 'financials':

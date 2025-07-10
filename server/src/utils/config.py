@@ -12,7 +12,8 @@ def load_config(app: Flask) -> None:
     # JWT settings
     app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "super-secret")
     # e.g. 24h token
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 
     # Example for any additional config you want
     # app.config["SOME_OTHER_KEY"] = os.environ.get("SOME_OTHER_KEY", "default_value")

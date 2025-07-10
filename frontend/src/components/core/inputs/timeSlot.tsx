@@ -5,18 +5,17 @@ import {
     ListItem,
     Typography,
     Paper,
-    alpha,
-    CircularProgress
+    alpha
 } from '@mui/material';
 import React from 'react';
 import {PRIORITIES} from "../../../form/userArea/constants";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import Chip from '@mui/material/Chip';
 import WWSelect from "./WWSelect";
 import {spacePalette} from "../../styles/theme";
-import {ArrowCircleDown, ArrowCircleLeft, ArrowCircleUp} from "@mui/icons-material";
+import {ArrowCircleDown, ArrowCircleLeft, ArrowCircleUp, EventAvailable} from "@mui/icons-material";
+import CircularProgressWithLabel from "../feedback/CircularProgressWithLabel";
 
 interface TimeSlotProps {
     timeSlot: TimeSlotType;
@@ -27,7 +26,6 @@ interface TimeSlotProps {
 }
 
 function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePriorities, currentBooking}: TimeSlotProps) {
-    const isFull = timeSlot.num_booked >= timeSlot.num_needed;
     const timeslotAvailablePriorities = availablePriorities.concat([selectedPriority]).filter(p => p !== "");
 
     const options = timeslotAvailablePriorities.map(priority => ({
@@ -97,13 +95,6 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
     };
 
     const timeslotNumBooked = timeSlot.num_booked + (currentBooking.timeslot_priority_1 === timeSlot.id ? 1 : 0);
-
-    // Get dynamic styling for the capacity indicator
-    const getCapacityColor = () => {
-        if (timeslotNumBooked >= timeSlot.num_needed) return spacePalette.status.error // error.main
-        if (timeslotNumBooked / timeSlot.num_needed > 0.7) return spacePalette.status.warning; // warning.main
-        return spacePalette.status.success; // success.main
-    };
 
     return (
         <Paper
@@ -230,47 +221,33 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                             mb: 2
                         }}>
                             <Box sx={{position: 'relative', mr: 2}}>
-                                <CircularProgress
-                                    variant="determinate"
-                                    value={timeslotNumBooked > 0 ? (timeslotNumBooked / timeSlot.num_needed) * 100 : 0}
-                                    size={45}
-                                    thickness={3}
-                                    sx={{
-                                        color: getCapacityColor(),
-                                        backgroundColor: alpha('#000', 0.3),
-                                        borderRadius: '50%'
-                                    }}
+                                <CircularProgressWithLabel
+                                    valueCurrent={timeslotNumBooked}
+                                    valueMax={timeSlot.num_needed}
                                 />
-                                <Box
-                                    sx={{
-                                        top: 0,
-                                        left: 0,
-                                        bottom: 0,
-                                        right: 0,
-                                        position: 'absolute',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                    }}
-                                >
-                                    <Typography variant="caption" component="div" sx={{color: alpha('#fff', 0.9)}}>
-                                        {`${timeslotNumBooked}/${timeSlot.num_needed}`}
-                                    </Typography>
-                                </Box>
                             </Box>
 
-                            {timeslotNumBooked >= timeSlot.num_needed ? (
+                            {timeslotNumBooked > timeSlot.num_needed ? (
                                 <Box sx={{display: 'flex', alignItems: 'center'}}>
                                     <EventBusyIcon sx={{color: '#f44336', fontSize: '1rem', mr: 0.5}}/>
                                     <Typography variant="body2" sx={{color: alpha('#fff', 0.7)}}>
                                         Hohe Nachfrage – Zuteilung per Los
                                     </Typography>
                                 </Box>
-                            ) : (
-                                <Typography variant="body2" sx={{color: alpha('#fff', 0.7)}}>
-                                    {timeslotNumBooked === 0 ? "Keine Anmeldungen bisher" : "Interesse angemeldet"}
-                                </Typography>
-                            )}
+                            ) : timeslotNumBooked == timeSlot.num_needed ? (
+                                    <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                        <EventAvailable sx={{color: '#f44336', fontSize: '1rem', mr: 0.5}}/>
+                                        <Typography variant="body2" sx={{color: alpha('#fff', 0.7)}}>
+                                            Anzahl erreicht
+                                        </Typography>
+                                    </Box>
+                                ) :
+                                <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                    <Typography variant="body2" sx={{color: alpha('#fff', 0.7)}}>
+                                        {timeslotNumBooked === 0 ? "Dringend gesucht" : "Interesse angemeldet"}
+                                    </Typography>
+                                </Box>
+                            }
                         </Box>
 
                         <FormControl variant="outlined" size="small" sx={{width: '100%'}}>
@@ -281,13 +258,10 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                                 onChange={handlePriorityChange}
                                 placeholder="Priorität wählen"
                                 allowClear={true}
-                                // disabled={isFull && !selectedPriority}
                             />
                         </FormControl>
                     </Box>
                 </Box>
-
-
             </ListItem>
         </Paper>
     );
