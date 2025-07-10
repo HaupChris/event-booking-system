@@ -37,7 +37,6 @@ import BeveragesPage from './BeveragesPage';
 import FoodPage from './FoodPage';
 import MaterialsPage from './MaterialsPage';
 import WorkshiftsPage from './WorkshiftsPage';
-import ArtistsPage from './ArtistsPage';
 import ArtistMaterialsPage from './ArtistMaterialsPage';
 import FinancialsOverviewPage from './FinancialsOverviewPage';
 import PaymentConfirmationsPage from './PaymentConfirmationsPage';
@@ -115,8 +114,6 @@ function Dashboard() {
                 return <MaterialsPage/>;
             case 'workShifts':
                 return <WorkshiftsPage/>;
-            case 'artists':
-                return <ArtistsPage/>;
             case 'artistMaterials':
                 return <ArtistMaterialsPage/>;
             case 'financials':
