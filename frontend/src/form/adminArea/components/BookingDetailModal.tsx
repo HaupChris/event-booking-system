@@ -291,6 +291,22 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                             />
                         </Grid>
 
+                        <FormCard
+                            title={"Professions"}
+                            sx={{ml: 2, width: "100%"}}
+                        >
+                            {editedBooking.profession_ids.length === 0 ?
+                                "Keine Professions angegeben." :
+
+                                editedBooking.profession_ids.map((profession_id) => {
+                                    const fC = editedBooking.bookingType === "regular" ? formContent : artistFormContent;
+                                    const profession_title = fC.professions.find(profession => profession.id === profession_id)!.title;
+
+                                    return <Chip label={profession_title} color="primary" size="small"/>
+                                })
+                            }
+                        </FormCard>
+
                         {/* Booking type specific fields */}
                         {editedBooking.bookingType === 'regular' && (
                             <>
