@@ -19,6 +19,7 @@ from src.api.health import health_bp
 from src.api.artist_bookings import artist_bp
 from src.api.shift_assignments import shift_assignments_bp
 
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -62,7 +63,7 @@ app.register_blueprint(shift_assignments_bp, url_prefix="/api")
 @app.errorhandler(Exception)
 def handle_all_errors(e):
     logger.error(f"Unhandled Exception: {str(e)}", exc_info=True)
-    return {"message": "Internal server error", "details": str(e)}, 500
+    return {"message": "Internal server error"}, 500
 
 
 @app.errorhandler(404)
