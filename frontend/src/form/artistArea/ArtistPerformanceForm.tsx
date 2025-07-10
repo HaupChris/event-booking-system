@@ -56,35 +56,35 @@ function ArtistPerformanceForm(props: ArtistFormProps) {
             />
 
             <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                    <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                            {artistAreaTexts.performanceDetailsForm.preferredDayLabel}
-                        </Typography>
-                        <WWSelect
-                            options={dayOptions}
-                            value={performanceDetails.preferredDay}
-                            onChange={(value) => updatePerformanceDetail('preferredDay', value as string)}
-                            placeholder="Tag wählen"
-                            isFullWidth
-                        />
-                    </Box>
-                </Grid>
+                {/*<Grid item xs={12} sm={6}>*/}
+                {/*    <Box sx={{ mb: 3 }}>*/}
+                {/*        <Typography variant="subtitle1" sx={{ mb: 1 }}>*/}
+                {/*            {artistAreaTexts.performanceDetailsForm.preferredDayLabel}*/}
+                {/*        </Typography>*/}
+                {/*        <WWSelect*/}
+                {/*            options={dayOptions}*/}
+                {/*            value={performanceDetails.preferredDay}*/}
+                {/*            onChange={(value) => updatePerformanceDetail('preferredDay', value as string)}*/}
+                {/*            placeholder="Tag wählen"*/}
+                {/*            isFullWidth*/}
+                {/*        />*/}
+                {/*    </Box>*/}
+                {/*</Grid>*/}
 
-                <Grid item xs={12} sm={6}>
-                    <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                            {artistAreaTexts.performanceDetailsForm.preferredTimeLabel}
-                        </Typography>
-                        <WWSelect
-                            options={timeOptions}
-                            value={performanceDetails.preferredTime}
-                            onChange={(value) => updatePerformanceDetail('preferredTime', value as string)}
-                            placeholder="Zeit wählen"
-                            isFullWidth
-                        />
-                    </Box>
-                </Grid>
+                {/*<Grid item xs={12} sm={6}>*/}
+                {/*    <Box sx={{ mb: 3 }}>*/}
+                {/*        <Typography variant="subtitle1" sx={{ mb: 1 }}>*/}
+                {/*            {artistAreaTexts.performanceDetailsForm.preferredTimeLabel}*/}
+                {/*        </Typography>*/}
+                {/*        <WWSelect*/}
+                {/*            options={timeOptions}*/}
+                {/*            value={performanceDetails.preferredTime}*/}
+                {/*            onChange={(value) => updatePerformanceDetail('preferredTime', value as string)}*/}
+                {/*            placeholder="Zeit wählen"*/}
+                {/*            isFullWidth*/}
+                {/*        />*/}
+                {/*    </Box>*/}
+                {/*</Grid>*/}
 
                 <Grid item xs={12} sm={6}>
                     <Box sx={{ mb: 3 }}>
