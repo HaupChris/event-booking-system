@@ -24,7 +24,7 @@ import {
     EuroSymbol,
     PointOfSale,
     School,
-    MusicNote, AssignmentInd
+    AssignmentInd
 } from '@mui/icons-material';
 import ListItemButton from "@mui/material/ListItemButton";
 import {CSVLink} from "react-csv";
@@ -62,7 +62,6 @@ const dashboardTabs: DashboardTab[] = [
     {id: 'food', label: 'Food', icon: <LunchDining/>, permissions: ['read']},
     {id: 'materials', label: 'Material', icon: <Handyman/>, permissions: ['read']},
     {id: 'workShifts', label: 'Support', icon: <Work/>, permissions: ['read']},
-    {id: 'artists', label: 'Artists', icon: <MusicNote/>, permissions: ['read']},
     {id: 'professions', label: 'Professions', icon: <School/>, permissions: ['read']},
     {id: 'financials', label: 'Financials', icon: <EuroSymbol/>, permissions: ['financial']},
     {id: 'payments', label: 'Payments', icon: <PointOfSale/>, permissions: ['financial']},
