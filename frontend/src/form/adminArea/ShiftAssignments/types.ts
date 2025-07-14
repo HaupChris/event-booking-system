@@ -22,7 +22,6 @@ export interface ShiftAssignmentWithDetails extends ShiftAssignment {
   priority: number; // 1, 2, 3 or 0 for manual assignment
 }
 
-// Enhanced booking summary for assignment UI
 export interface BookingSummary {
   booking_id: number;
   first_name: string;
@@ -32,11 +31,15 @@ export interface BookingSummary {
   max_shifts: number;
   assigned_shifts: number;
   is_fully_assigned: boolean;
-  // User's timeslot preferences
-  priority_timeslots: {
+  // User's timeslot preferences - make optional with default
+  priority_timeslots?: {
     [priority: number]: number; // priority -> timeslot_id
   };
   supporter_buddy?: string;
+  // Add these fields that might be missing from backend
+  first_priority_timeslot_id?: number;
+  second_priority_timeslot_id?: number;
+  third_priority_timeslot_id?: number;
 }
 
 // Timeslot summary for capacity management

@@ -10,38 +10,29 @@ import {
   Checkbox,
   IconButton,
   List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  ListItemIcon,
-  Chip,
-  LinearProgress,
   InputAdornment,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Tooltip,
-  Badge,
   alpha
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Person as PersonIcon,
-  CheckBox as CheckBoxIcon,
-  CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
   Sort as SortIcon,
-  Assignment as AssignmentIcon,
-  PriorityHigh as PriorityIcon
 } from '@mui/icons-material';
 import { spacePalette } from '../../../../components/styles/theme';
 import { BookingSummary, ShiftAssignmentWithDetails } from '../types';
+import UserItem from './UserItem';
 
 interface UserListProps {
   users: BookingSummary[];
   assignments: ShiftAssignmentWithDetails[];
   selectedUsers: Set<number>;
   selectedUserForDetails: number | null;
+  selectedTimeslotForDetails?: number | null;
   searchTerm: string;
   showOnlyUnassigned: boolean;
   sortBy: string;
@@ -58,6 +49,7 @@ const UserList: React.FC<UserListProps> = ({
   users,
   selectedUsers,
   selectedUserForDetails,
+  selectedTimeslotForDetails,
   searchTerm,
   showOnlyUnassigned,
   sortBy,
@@ -83,23 +75,6 @@ const UserList: React.FC<UserListProps> = ({
     const newSortOrder = sortBy === newSortBy && sortOrder === 'asc' ? 'desc' : 'asc';
     onSortChange(newSortBy, newSortOrder);
     handleSortClose();
-  };
-
-  const getProgressColor = (assigned: number, max: number) => {
-    const percentage = (assigned / max) * 100;
-    if (percentage >= 100) return spacePalette.status.success;
-    if (percentage >= 75) return spacePalette.primary.main;
-    if (percentage >= 50) return spacePalette.status.warning;
-    return spacePalette.status.error;
-  };
-
-  const getUserPriorityForTimeslot = (user: BookingSummary, timeslotId: number): number => {
-    for (const [priority, userTimeslotId] of Object.entries(user.priority_timeslots)) {
-      if (userTimeslotId === timeslotId) {
-        return parseInt(priority);
-      }
-    }
-    return 0; // No priority
   };
 
   return (
@@ -165,6 +140,21 @@ const UserList: React.FC<UserListProps> = ({
             </Select>
           </FormControl>
         </Box>
+
+        {/* Show selected timeslot info if any */}
+        {selectedTimeslotForDetails && (
+          <Box sx={{
+            mt: 1,
+            p: 1,
+            bgcolor: alpha(spacePalette.primary.main, 0.1),
+            borderRadius: 1,
+            border: `1px solid ${alpha(spacePalette.primary.main, 0.3)}`
+          }}>
+            <Typography variant="caption" color="primary" sx={{ fontWeight: 'bold' }}>
+              Viewing preferences for selected timeslot
+            </Typography>
+          </Box>
+        )}
       </Box>
 
       {/* User List */}
@@ -174,150 +164,18 @@ const UserList: React.FC<UserListProps> = ({
             const userAssignments = getUserAssignments(user.booking_id);
             const isSelected = selectedUsers.has(user.booking_id);
             const isDetailSelected = selectedUserForDetails === user.booking_id;
-            const progressColor = getProgressColor(user.assigned_shifts, user.max_shifts);
-            const completionPercentage = (user.assigned_shifts / user.max_shifts) * 100;
 
             return (
-              <ListItem
+              <UserItem
                 key={user.booking_id}
-                disablePadding
-                sx={{
-                  borderBottom: 1,
-                  borderColor: alpha(spacePalette.primary.main, 0.1),
-                  backgroundColor: isDetailSelected
-                    ? alpha(spacePalette.primary.main, 0.1)
-                    : 'transparent'
-                }}
-              >
-                <ListItemButton
-                  onClick={() => onUserDetails(user.booking_id)}
-                  sx={{
-                    py: 1,
-                    '&:hover': {
-                      backgroundColor: alpha(spacePalette.primary.main, 0.05)
-                    }
-                  }}
-                >
-                  {/* Selection checkbox */}
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onUserSelect(user.booking_id);
-                      }}
-                    >
-                      {isSelected ? (
-                        <CheckBoxIcon color="primary" />
-                      ) : (
-                        <CheckBoxOutlineBlankIcon />
-                      )}
-                    </IconButton>
-                  </ListItemIcon>
-
-                  <ListItemText
-                    primary={
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 'medium' }}>
-                          {user.first_name} {user.last_name}
-                        </Typography>
-
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          {/* Assignment count badge */}
-                          <Badge
-                            badgeContent={user.assigned_shifts}
-                            color={user.is_fully_assigned ? 'success' : 'primary'}
-                            max={user.max_shifts}
-                          >
-                            <AssignmentIcon
-                              fontSize="small"
-                              color={user.is_fully_assigned ? 'success' : 'action'}
-                            />
-                          </Badge>
-
-                          {/* Priority indicator if viewing specific timeslot */}
-                          {selectedUserForDetails && (
-                            <Tooltip title="Priority for selected timeslot">
-                              <PriorityIcon
-                                fontSize="small"
-                                color="action"
-                              />
-                            </Tooltip>
-                          )}
-                        </Box>
-                      </Box>
-                    }
-                    secondary={
-                      <Box sx={{ mt: 0.5 }}>
-                        {/* Email */}
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                          {user.email}
-                        </Typography>
-
-                        {/* Progress bar */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                          <Box sx={{ width: '100%', mr: 1 }}>
-                            <LinearProgress
-                              variant="determinate"
-                              value={Math.min(completionPercentage, 100)}
-                              sx={{
-                                height: 6,
-                                borderRadius: 3,
-                                backgroundColor: alpha(progressColor, 0.2),
-                                '& .MuiLinearProgress-bar': {
-                                  backgroundColor: progressColor,
-                                  borderRadius: 3,
-                                }
-                              }}
-                            />
-                          </Box>
-                          <Typography variant="caption" color="text.secondary" sx={{ minWidth: 'fit-content' }}>
-                            {user.assigned_shifts}/{user.max_shifts}
-                          </Typography>
-                        </Box>
-
-                        {/* Status chips */}
-                        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
-                          {user.is_fully_assigned && (
-                            <Chip
-                              label="Complete"
-                              size="small"
-                              color="success"
-                              sx={{ height: 20, fontSize: '0.7rem' }}
-                            />
-                          )}
-
-                          {user.supporter_buddy && (
-                            <Chip
-                              label="Has Buddy"
-                              size="small"
-                              variant="outlined"
-                              sx={{ height: 20, fontSize: '0.7rem' }}
-                            />
-                          )}
-
-                          {userAssignments.length > 0 && (
-                            <Chip
-                              label={`${userAssignments.length} assigned`}
-                              size="small"
-                              variant="outlined"
-                              color="primary"
-                              sx={{ height: 20, fontSize: '0.7rem' }}
-                            />
-                          )}
-                        </Box>
-
-                        {/* Buddy information */}
-                        {user.supporter_buddy && (
-                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                            Buddy: {user.supporter_buddy}
-                          </Typography>
-                        )}
-                      </Box>
-                    }
-                  />
-                </ListItemButton>
-              </ListItem>
+                user={user}
+                isSelected={isSelected}
+                isDetailSelected={isDetailSelected}
+                selectedTimeslotId={selectedTimeslotForDetails}
+                assignments={userAssignments}
+                onSelect={onUserSelect}
+                onDetails={onUserDetails}
+              />
             );
           })}
         </List>
@@ -340,7 +198,12 @@ const UserList: React.FC<UserListProps> = ({
 
       {/* Selection summary */}
       {selectedUsers.size > 0 && (
-        <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider', backgroundColor: alpha(spacePalette.primary.main, 0.05) }}>
+        <Box sx={{
+          p: 1,
+          borderTop: 1,
+          borderColor: 'divider',
+          backgroundColor: alpha(spacePalette.primary.main, 0.05)
+        }}>
           <Typography variant="caption" color="primary">
             {selectedUsers.size} participant{selectedUsers.size !== 1 ? 's' : ''} selected
           </Typography>
