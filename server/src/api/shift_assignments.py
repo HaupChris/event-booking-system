@@ -16,8 +16,7 @@ from src.services.shift_assignment_service import (
     get_timeslot_capacity,
     get_timeslot_assignment_count,
     get_booking_assignments_summary,
-    get_timeslot_summary,
-    run_auto_assignment
+    get_timeslot_summary
 )
 
 shift_assignments_bp = Blueprint("shift_assignments", __name__)
@@ -176,29 +175,6 @@ def get_timeslots_summary():
 
     summary = get_timeslot_summary()
     return jsonify(summary), 200
-
-
-@shift_assignments_bp.route("/shifts/autoassign", methods=["POST"])
-@limiter_assignments.limit("20/minute")
-@jwt_required()
-def auto_assign_shifts():
-    # Check if user has admin permissions
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-
-    data = request.json
-    strategy = data.get('strategy', 'priority')
-
-    if strategy not in ['priority', 'fill']:
-        return jsonify({"error": "Invalid strategy"}), 400
-
-    result = run_auto_assignment(strategy)
-
-    if 'error' in result:
-        return jsonify({"error": result['error']}), 500
-
-    return jsonify(result), 200
 
 
 @shift_assignments_bp.route("/shifts/bulk-assign", methods=["POST"])
