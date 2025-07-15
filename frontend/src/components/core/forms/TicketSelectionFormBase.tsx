@@ -1,8 +1,9 @@
 import React from "react";
-import {FormControl, RadioGroup, Box, Typography, alpha} from "@mui/material";
+import {FormControl, RadioGroup, Box} from "@mui/material";
 import SpacePanelLayout from "../layouts/SpacePanelLayout";
 import TicketOptionComponent from "../display/TicketOption";
 import {TicketOption} from "../../../form/userArea/interface";
+import {calculateDayVisitors, getMaxCapacityPerDay} from "../utils/CalculateNumberOfVisitors";
 
 
 interface TicketSelectionTextProps {
@@ -30,32 +31,8 @@ function TicketSelectionFormBase(props: TicketSelectionFormBaseProps) {
         props.updateBooking('ticket_id', Number((event.target as HTMLInputElement).value));
     };
 
-    // Find the maximum capacity per day from the ticket with amount > 0
-    const maxCapacityPerDay = Math.max(...props.formContent.ticket_options.map(option => option.amount));
-
-    // Calculate current visitors per day (including all bookings)
-    const calculateDayVisitors = () => {
-        let visitorsThursday = 0;
-        let visitorsFriday = 0;
-        let visitorsSaturday = 0;
-
-        props.formContent.ticket_options.forEach((option: TicketOption) => {
-            const title = option.title.toLowerCase();
-            if (title.includes('do')) {
-                visitorsThursday += option.num_booked;
-            }
-            if (title.includes('fr')) {
-                visitorsFriday += option.num_booked;
-            }
-            if (title.includes('sa')) {
-                visitorsSaturday += option.num_booked;
-            }
-        });
-
-        return { visitorsThursday, visitorsFriday, visitorsSaturday };
-    };
-
-    const { visitorsThursday, visitorsFriday, visitorsSaturday } = calculateDayVisitors();
+    const { visitorsThursday, visitorsFriday, visitorsSaturday } = calculateDayVisitors(props.formContent);
+    const maxCapacityPerDay = getMaxCapacityPerDay(props.formContent);
 
     // Calculate remaining capacity per day
     const remainingThursday = Math.max(0, maxCapacityPerDay - visitorsThursday);
