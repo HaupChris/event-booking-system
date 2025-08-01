@@ -1,5 +1,3 @@
-// frontend/src/form/adminArea/ShiftAssignments/index.tsx
-
 import React, {useState, useEffect} from 'react';
 import {Box, Grid, Typography, Paper, Alert, CircularProgress} from '@mui/material';
 import {useContext} from 'react';
@@ -18,6 +16,8 @@ import {
     CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
 
+import {download, generateCsv, mkConfig} from "export-to-csv";
+
 function ShiftAssignmentsPage() {
     const {token} = useContext(TokenContext);
     const {regularBookings, formContent} = useFetchData();
@@ -32,7 +32,7 @@ function ShiftAssignmentsPage() {
 
     // Fetch assignments on component mount
     useEffect(() => {
-        fetchAssignments();
+        fetchAssignments().then();
     }, [token]);
 
     const fetchAssignments = async () => {
@@ -63,6 +63,52 @@ function ShiftAssignmentsPage() {
         sum + ws.time_slots.reduce((tsSum, ts) => tsSum + ts.num_needed, 0), 0
     );
 
+const handleExportShiftAssignments = () => {
+   // First export - by name (sorted by lastname, lastname first)
+   const filename_1 = "Assignment_by_name.csv";
+   const csvConfig1 = mkConfig({filename: filename_1, useKeysAsHeaders: true});
+
+   const data1 = assignments
+       .sort((a, b) => a.last_name.localeCompare(b.last_name))
+       .map(assignment => ({
+           LastName: assignment.last_name,
+           FirstName: assignment.first_name,
+           Dienst: assignment.workshift_title,
+           Schicht: assignment.timeslot_title,
+           Start: assignment.timeslot_start,
+           Ende: assignment.timeslot_end
+       }));
+
+   const csv1 = generateCsv(csvConfig1)(data1);
+   download(csvConfig1)(csv1);
+
+   // Second export - by shift (sorted by Dienst, then Schicht, then Start)
+   const filename_2 = "Assignment_by_shift.csv";
+   const csvConfig2 = mkConfig({filename: filename_2, useKeysAsHeaders: true});
+
+   const data2 = assignments
+       .sort((a, b) => {
+           if (a.workshift_title !== b.workshift_title) {
+               return a.workshift_title.localeCompare(b.workshift_title);
+           }
+           if (a.timeslot_title !== b.timeslot_title) {
+               return a.timeslot_title.localeCompare(b.timeslot_title);
+           }
+           return a.timeslot_start.localeCompare(b.timeslot_start);
+       })
+       .map(assignment => ({
+           Dienst: assignment.workshift_title,
+           Schicht: assignment.timeslot_title,
+           Start: assignment.timeslot_start,
+           Ende: assignment.timeslot_end,
+           FirstName: assignment.first_name,
+           LastName: assignment.last_name
+       }));
+
+   const csv2 = generateCsv(csvConfig2)(data2);
+   download(csvConfig2)(csv2);
+}
+
     // User selection handlers
     const handleUserSelect = (userId: number) => {
         setSelectedUsers(prev => {
@@ -77,12 +123,13 @@ function ShiftAssignmentsPage() {
     };
 
     const handleTimeslotSelect = (timeslotId: number) => {
-        setSelectedTimeslot(timeslotId === selectedTimeslot ? null : timeslotId);
+        setSelectedTimeslot((prevSelectedTimeslot) => timeslotId === prevSelectedTimeslot ? null : timeslotId);
+
     };
 
     // Assignment actions
     const handleAssignUsers = async () => {
-        if (!selectedTimeslot || selectedUsers.size === 0) return;
+        if (selectedTimeslot === null || selectedUsers.size === 0) return;
 
         setLoading(true);
         setError(null);
@@ -167,10 +214,9 @@ function ShiftAssignmentsPage() {
         }
     };
 
-    const handleSwapUsers = async () => {
-        // TODO: Implement swap functionality
-        setError('Swap functionality not yet implemented');
-    };
+    const handleClearUserSelection = () => {
+        setSelectedUsers(() => new Set())
+    }
 
     if (loading && assignments.length === 0) {
         return (
@@ -270,7 +316,7 @@ function ShiftAssignmentsPage() {
                                 onUserSelect={handleUserSelect}
                                 selectedUsers={selectedUsers}
                                 formContent={formContent}
-                                token={token}
+                                assignments={assignments}
                             />
                         </Paper>
                     </Grid>
@@ -291,8 +337,9 @@ function ShiftAssignmentsPage() {
                                 selectedTimeslot={selectedTimeslot}
                                 onAssignUsers={handleAssignUsers}
                                 onUnassignUsers={handleUnassignUsers}
-                                onSwapUsers={handleSwapUsers}
                                 loading={loading}
+                                onClearUserSelection={handleClearUserSelection}
+                                onExportShiftAssignments={handleExportShiftAssignments}
                             />
                         </Paper>
                     </Grid>
@@ -312,7 +359,8 @@ function ShiftAssignmentsPage() {
                                 formContent={formContent}
                                 selectedTimeslot={selectedTimeslot}
                                 onTimeslotSelect={handleTimeslotSelect}
-                                token={token}
+                                assignments={assignments}
+                                bookings={regularBookings}
                             />
                         </Paper>
                     </Grid>
