@@ -209,7 +209,7 @@ def update_artist(booking_id):
 @artist_bp.route("/artist/booking/<int:booking_id>/payment", methods=["PUT"])
 @limiter_artist.limit("60/minute")
 @jwt_required()
-def update_artist_payment(booking_id):
+def update_artist_payment_route(booking_id):
     """Update artist payment status with admin authorization."""
     try:
         # Check if user has admin permissions
