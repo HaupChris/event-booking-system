@@ -86,7 +86,6 @@ def _init_db_data(connection: Connection, form_content: FormContent):
 
             # Insert TimeSlots for this WorkShift
             for ts_idx, timeslot in enumerate(workshift.time_slots):
-                global_ts_idx = int(f"{ws_idx}{ts_idx}")  # Create a unique ID
                 cursor.execute(
                     """
                     INSERT INTO TimeSlots
@@ -94,7 +93,7 @@ def _init_db_data(connection: Connection, form_content: FormContent):
                     VALUES (?, ?, ?, ?, ?, ?)
                     """,
                     (
-                        global_ts_idx,
+                        timeslot.id,
                         timeslot.title,
                         timeslot.start_time,
                         timeslot.end_time,

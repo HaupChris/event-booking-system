@@ -238,6 +238,9 @@ def update_form_content_with_db_counts(
         conn = db_connect_func()
         cursor = conn.cursor()
 
+        # timeslot ids in database may differ from ids in the formcontent json file. we need to use the db ones.
+        # _update_timeslot_ids_from_db(form_content_obj, cursor)
+
         # TICKETS
         logger.debug("Querying ticket booking counts")
         cursor.execute("SELECT ticket_option_id, COUNT(*) FROM Bookings GROUP BY ticket_option_id")
@@ -391,6 +394,43 @@ def update_form_content_with_db_counts(
         except:
             pass
         return asdict(form_content_obj)
+
+
+# def _update_timeslot_ids_from_db(form_content_obj: FormContent, cursor) -> None:
+#     """
+#     Update timeslot IDs in the FormContent object to match database IDs.
+#     """
+#     try:
+#         logger.debug("Updating timeslot IDs from database")
+#
+#         # Get database mapping of (workshift_title, timeslot_title) -> timeslot_id
+#         cursor.execute("""
+#                        SELECT ts.id, ts.title, ws.title as workshift_title
+#                        FROM TimeSlots ts
+#                                 JOIN WorkShifts ws ON ts.workshift_id = ws.id
+#                        """)
+#
+#         db_mapping = {}
+#         for row in cursor.fetchall():
+#             ts_id, ts_title, ws_title = row
+#             db_mapping[(ws_title, ts_title)] = ts_id
+#
+#         # Update timeslot IDs in the FormContent object
+#         for workshift in form_content_obj.work_shifts:
+#             for timeslot in workshift.time_slots:
+#                 mapping_key = (workshift.title, timeslot.title)
+#                 db_id = db_mapping.get(mapping_key)
+#
+#                 if db_id is not None:
+#                     timeslot.id = db_id
+#                 else:
+#                     logger.warning(f"No database ID found for timeslot: {mapping_key}")
+#
+#         logger.debug("Timeslot IDs updated successfully")
+#
+#     except Exception as e:
+#         logger.error(f"Failed to update timeslot IDs: {str(e)}", exc_info=True)
+#         # Continue with original IDs if update fails
 
 
 def update_artist_form_content_with_db_counts(
