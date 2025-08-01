@@ -29,9 +29,6 @@ const PaymentConfirmationsPage: React.FC = () => {
     const [sortBy, setSortBy] = useState<'name' | 'date' | 'amount'>('date');
     const {token} = useContext(TokenContext);
 
-
-
-
     // Filter bookings based on payment status
     const filteredBookings: Array<CombinedBooking> = bookings.filter(booking => {
         if (filterPaid === 'all') return true;
@@ -306,7 +303,8 @@ const PaymentConfirmationsPage: React.FC = () => {
                                         fullWidth
                                         label="Paid Amount"
                                         type="number"
-                                        value={editedBooking.paid_amount || ''}
+                                        value={editedBooking.paid_amount === 0 ? '' : (editedBooking.paid_amount || '')}
+                                        placeholder="0"
                                         onChange={(e) => handleInputChange('paid_amount', parseFloat(e.target.value) || 0)}
                                         InputProps={{
                                             startAdornment: <InputAdornment position="start">€</InputAdornment>,
