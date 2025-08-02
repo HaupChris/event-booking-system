@@ -73,6 +73,7 @@ const handleExportShiftAssignments = () => {
        .map(assignment => ({
            LastName: assignment.last_name,
            FirstName: assignment.first_name,
+           Phone: assignment.phone,
            Dienst: assignment.workshift_title,
            Schicht: assignment.timeslot_title,
            Start: assignment.timeslot_start,
@@ -102,7 +103,8 @@ const handleExportShiftAssignments = () => {
            Start: assignment.timeslot_start,
            Ende: assignment.timeslot_end,
            FirstName: assignment.first_name,
-           LastName: assignment.last_name
+           LastName: assignment.last_name,
+           Phone: assignment.phone
        }));
 
    const csv2 = generateCsv(csvConfig2)(data2);
