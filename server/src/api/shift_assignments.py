@@ -199,28 +199,6 @@ def bulk_assign_shifts():
     for user_id in user_ids:
         for timeslot_id in timeslot_ids:
             # Check if user can be assigned
-            current_shifts = get_booking_shift_count(user_id)
-            max_shifts = get_booking_max_shifts(user_id)
-
-            if current_shifts >= max_shifts:
-                failed.append({
-                    'user_id': user_id,
-                    'timeslot_id': timeslot_id,
-                    'reason': 'User at maximum shifts'
-                })
-                continue
-
-            # Check timeslot capacity
-            current_assigned = get_timeslot_assignment_count(timeslot_id)
-            capacity = get_timeslot_capacity(timeslot_id)
-
-            if current_assigned >= capacity:
-                failed.append({
-                    'user_id': user_id,
-                    'timeslot_id': timeslot_id,
-                    'reason': 'Timeslot at capacity'
-                })
-                continue
 
             # Create assignment
             assignment = ShiftAssignment(
