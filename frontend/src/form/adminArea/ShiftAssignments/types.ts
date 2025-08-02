@@ -20,6 +20,7 @@ export interface UserWithAssignments {
   booking_id: number;
   first_name: string;
   last_name: string;
+  ticket_days: string;
   email: string;
   supporter_buddy: string;
   amount_shifts: number;

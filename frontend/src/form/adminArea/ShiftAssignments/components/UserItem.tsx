@@ -30,8 +30,8 @@ const UserItem: React.FC<UserItemProps> = ({
                                                shiftAssignments
                                            }) => {
     // Get workshift and timeslot details for a given timeslot ID
-    console.log(shiftAssignments);
     const isAssignedToSelectedTimeslot = shiftAssignments.find((shift) => shift.timeslot_id === selectedTimeslot) !== undefined
+
 
     const getTimeslotDetails = (timeslotId: number) => {
         if (timeslotId === -1) return null;
@@ -126,7 +126,7 @@ const UserItem: React.FC<UserItemProps> = ({
                 <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1}}>
                     <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
                         <Typography variant="subtitle2" fontWeight="bold">
-                            {user.first_name} {user.last_name}
+                            {user.first_name} {user.last_name} ({user.ticket_days})
                         </Typography>
 
                         {/* Priority badge if timeslot is selected and matches */}

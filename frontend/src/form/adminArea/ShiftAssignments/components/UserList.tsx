@@ -38,12 +38,14 @@ const UserList: React.FC<UserListProps> = ({
     const usersWithAssignments = useMemo((): UserWithAssignments[] => {
         return regularBookings.map(booking => {
             const userAssignments = assignments.filter(a => a.booking_id === booking.id);
-
+            const ticketTitle = formContent.ticket_options.find((to) => to.id === booking.ticket_id)!.title;
+            const ticket_days = ticketTitle.match(/\(([^)]+)\)/)?.[1] || '';
             return {
                 booking_id: booking.id,
                 first_name: booking.first_name,
                 last_name: booking.last_name,
                 email: booking.email,
+                ticket_days: ticket_days,
                 supporter_buddy: booking.supporter_buddy || '',
                 amount_shifts: booking.amount_shifts,
                 timeslot_priority_1: booking.timeslot_priority_1,
@@ -167,7 +169,7 @@ const UserList: React.FC<UserListProps> = ({
                         startAdornment={<SortIcon sx={{mr: 1}}/>}
                     >
                         <MenuItem value="priority"
-                                  // disabled={selectedTimeslot === null}
+                            // disabled={selectedTimeslot === null}
                         >
                             Priority (select timeslot first)
                         </MenuItem>
