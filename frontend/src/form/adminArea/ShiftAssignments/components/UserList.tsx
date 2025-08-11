@@ -1,7 +1,7 @@
 import React, {useState, useMemo} from 'react';
 import {
     Box, TextField, Button, ButtonGroup, List,
-    InputAdornment, FormControl, InputLabel, Select, MenuItem
+    InputAdornment, FormControl, InputLabel, Select, MenuItem, Grid
 } from '@mui/material';
 import {Search as SearchIcon, Sort as SortIcon} from '@mui/icons-material';
 import {BookingWithTimestamp, FormContent} from '../../../userArea/interface';
@@ -29,10 +29,12 @@ const UserList: React.FC<UserListProps> = ({
                                            }) => {
     const [filters, setFilters] = useState<UserListFilters>({
         searchTerm: '',
-        assignmentFilter: 'all'
+        assignmentFilter: 'all',
+        ticketDayFilter: 'all',
+        shiftCountFilter: 'all',
+        daysCountFilter: 'all'
     });
     const [sortBy, setSortBy] = useState<SortOption>('firstName');
-
 
     // Merge booking data with assignments
     const usersWithAssignments = useMemo((): UserWithAssignments[] => {
@@ -40,12 +42,14 @@ const UserList: React.FC<UserListProps> = ({
             const userAssignments = assignments.filter(a => a.booking_id === booking.id);
             const ticketTitle = formContent.ticket_options.find((to) => to.id === booking.ticket_id)!.title;
             const ticket_days = ticketTitle.match(/\(([^)]+)\)/)?.[1] || '';
+            const days_count = ticket_days.split(',').length; // Count days by splitting on comma
             return {
                 booking_id: booking.id,
                 first_name: booking.first_name,
                 last_name: booking.last_name,
                 email: booking.email,
                 ticket_days: ticket_days,
+                days_count: days_count,
                 supporter_buddy: booking.supporter_buddy || '',
                 amount_shifts: booking.amount_shifts,
                 timeslot_priority_1: booking.timeslot_priority_1,
@@ -68,10 +72,8 @@ const UserList: React.FC<UserListProps> = ({
                     return a.last_name.localeCompare(b.last_name);
                 case 'priority':
                     if (selectedTimeslot === null) {
-                        console.log("kein timeslot ausgewählt. Timeslotid: ", selectedTimeslot);
                         return 0;
                     }
-
 
                     const getPriority = (user: UserWithAssignments) => {
                         if (user.timeslot_priority_1 === selectedTimeslot) return 1;
@@ -101,9 +103,22 @@ const UserList: React.FC<UserListProps> = ({
             // Assignment filter
             const matchesAssignment = filters.assignmentFilter === 'all' ||
                 (filters.assignmentFilter === 'completed' && user.is_fully_assigned) ||
-                (filters.assignmentFilter === 'incomplete' && !user.is_fully_assigned);
+                (filters.assignmentFilter === 'incomplete' && !user.is_fully_assigned) ||
+                (filters.assignmentFilter === 'unassigned' && user.assigned_count === 0);
 
-            return matchesSearch && matchesAssignment;
+            // Ticket day filter
+            const matchesTicketDay = filters.ticketDayFilter === 'all' ||
+                user.ticket_days.includes(filters.ticketDayFilter);
+
+            // Shift count filter
+            const matchesShiftCount = filters.shiftCountFilter === 'all' ||
+                user.amount_shifts.toString() === filters.shiftCountFilter;
+
+            // Days count filter
+            const matchesDaysCount = filters.daysCountFilter === 'all' ||
+                user.days_count.toString() === filters.daysCountFilter;
+
+            return matchesSearch && matchesAssignment && matchesTicketDay && matchesShiftCount && matchesDaysCount;
         });
     }, [sortedUsers, filters]);
 
@@ -122,6 +137,7 @@ const UserList: React.FC<UserListProps> = ({
                 flexShrink: 0,
                 bgcolor: 'background.paper'
             }}>
+                {/* Search */}
                 <TextField
                     fullWidth
                     size="small"
@@ -135,49 +151,87 @@ const UserList: React.FC<UserListProps> = ({
                             </InputAdornment>
                         )
                     }}
-                    sx={{mb: 2}}
+                    sx={{mb: 1.5}}
                 />
 
-                <ButtonGroup size="small" fullWidth sx={{mb: 2}}>
-                    <Button
-                        variant={filters.assignmentFilter === 'all' ? 'contained' : 'outlined'}
-                        onClick={() => setFilters(prev => ({...prev, assignmentFilter: 'all'}))}
-                    >
-                        All ({usersWithAssignments.length})
-                    </Button>
-                    <Button
-                        variant={filters.assignmentFilter === 'incomplete' ? 'contained' : 'outlined'}
-                        onClick={() => setFilters(prev => ({...prev, assignmentFilter: 'incomplete'}))}
-                    >
-                        Incomplete ({usersWithAssignments.filter(u => !u.is_fully_assigned).length})
-                    </Button>
-                    <Button
-                        variant={filters.assignmentFilter === 'completed' ? 'contained' : 'outlined'}
-                        onClick={() => setFilters(prev => ({...prev, assignmentFilter: 'completed'}))}
-                    >
-                        Completed ({usersWithAssignments.filter(u => u.is_fully_assigned).length})
-                    </Button>
-                </ButtonGroup>
-
-                {/* Sort Control */}
-                <FormControl fullWidth size="small">
-                    <InputLabel>Sort by</InputLabel>
-                    <Select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as SortOption)}
-                        label="Sort by"
-                        startAdornment={<SortIcon sx={{mr: 1}}/>}
-                    >
-                        <MenuItem value="priority"
-                            // disabled={selectedTimeslot === null}
-                        >
-                            Priority (select timeslot first)
-                        </MenuItem>
-                        <MenuItem value="firstName">First Name</MenuItem>
-                        <MenuItem value="lastName">Last Name</MenuItem>
-                        <MenuItem value="wantedShifts">Wanted Shifts</MenuItem>
-                    </Select>
-                </FormControl>
+                {/* Compact Filter Grid */}
+                <Grid container spacing={1} sx={{mb: 1.5}}>
+                    <Grid item xs={6}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel>Status</InputLabel>
+                            <Select
+                                value={filters.assignmentFilter}
+                                onChange={(e) => setFilters(prev => ({...prev, assignmentFilter: e.target.value as any}))}
+                                label="Status"
+                            >
+                                <MenuItem value="all">All</MenuItem>
+                                <MenuItem value="unassigned">Unassigned</MenuItem>
+                                <MenuItem value="incomplete">Incomplete</MenuItem>
+                                <MenuItem value="completed">Complete</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel>Sort</InputLabel>
+                            <Select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                                label="Sort"
+                            >
+                                <MenuItem value="priority">Priority</MenuItem>
+                                <MenuItem value="firstName">First Name</MenuItem>
+                                <MenuItem value="lastName">Last Name</MenuItem>
+                                <MenuItem value="wantedShifts">Shifts Wanted</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel>Day</InputLabel>
+                            <Select
+                                value={filters.ticketDayFilter}
+                                onChange={(e) => setFilters(prev => ({...prev, ticketDayFilter: e.target.value as any}))}
+                                label="Day"
+                            >
+                                <MenuItem value="all">All</MenuItem>
+                                <MenuItem value="Do">Thu</MenuItem>
+                                <MenuItem value="Fr">Fri</MenuItem>
+                                <MenuItem value="Sa">Sat</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel>Days #</InputLabel>
+                            <Select
+                                value={filters.daysCountFilter}
+                                onChange={(e) => setFilters(prev => ({...prev, daysCountFilter: e.target.value as any}))}
+                                label="Days #"
+                            >
+                                <MenuItem value="all">All</MenuItem>
+                                <MenuItem value="1">1</MenuItem>
+                                <MenuItem value="2">2</MenuItem>
+                                <MenuItem value="3">3</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel>Shifts</InputLabel>
+                            <Select
+                                value={filters.shiftCountFilter}
+                                onChange={(e) => setFilters(prev => ({...prev, shiftCountFilter: e.target.value as any}))}
+                                label="Shifts"
+                            >
+                                <MenuItem value="all">All</MenuItem>
+                                <MenuItem value="1">1</MenuItem>
+                                <MenuItem value="2">2</MenuItem>
+                                <MenuItem value="3">3</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                </Grid>
             </Box>
 
             {/* Scrollable User List */}
