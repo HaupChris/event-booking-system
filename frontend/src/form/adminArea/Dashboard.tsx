@@ -190,6 +190,7 @@ function Dashboard() {
                         FirstName: b.first_name,
                         LastName: b.last_name,
                         Beverage: artistFormContent.beverage_options.find(bev => bev.id === b.beverage_id)?.title || 'None',
+                        Description: artistFormContent.beverage_options.find(bev => bev.id === b.beverage_id)?.title || 'None',
                         BeveragePrice: artistFormContent.beverage_options.find(bev => bev.id === b.beverage_id)?.price || 0
                     }))
                 ];
@@ -200,6 +201,7 @@ function Dashboard() {
                         FirstName: b.first_name,
                         LastName: b.last_name,
                         Food: formContent.food_options.find(f => f.id === b.food_id)?.title || 'None',
+                        Description: formContent.food_options.find(f => f.id === b.food_id)?.description || 'None',
                         FoodPrice: formContent.food_options.find(f => f.id === b.food_id)?.price || 0
                     })),
                     ...artistBookings.map(b => ({
@@ -207,6 +209,7 @@ function Dashboard() {
                         FirstName: b.first_name,
                         LastName: b.last_name,
                         Food: artistFormContent.food_options.find(f => f.id === b.food_id)?.title || 'None',
+                        Description: artistFormContent.food_options.find(f => f.id === b.food_id)?.description || 'None',
                         FoodPrice: artistFormContent.food_options.find(f => f.id === b.food_id)?.price || 0
                     }))
                 ];
