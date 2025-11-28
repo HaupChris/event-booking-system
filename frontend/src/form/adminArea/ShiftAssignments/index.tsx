@@ -74,6 +74,7 @@ const handleExportShiftAssignments = () => {
            LastName: assignment.last_name,
            FirstName: assignment.first_name,
            Phone: assignment.phone,
+           // Ticket: assignment
            Dienst: assignment.workshift_title,
            Schicht: assignment.timeslot_title,
            Start: assignment.timeslot_start,
