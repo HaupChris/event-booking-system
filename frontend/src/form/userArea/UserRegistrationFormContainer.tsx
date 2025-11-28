@@ -1,22 +1,5 @@
-import React, {useContext, useEffect, useState} from "react";
-import {Alert, Box, CardContent, Typography} from "@mui/material";
-import {AuthContext, TokenContext} from "../../contexts/AuthContext";
-import axios from 'axios';
-import PersonalDetailsForm from "./PersonalDetailsForm";
-import SummaryForm from "./SummaryForm";
-import ConfirmationForm from "./confirmation/index";
-import rocketImage from "../../img/rocket.png";
-import StepNavigation from "../../components/core/navigation/StepNavigation";
-import {useFormManagement} from "../../hooks/useFormManagement";
+import React from "react";
 import {Booking, FormContent} from "./interface";
-import {spacePalette} from "../../components/styles/theme";
-import FoodSelectionForm from "./FoodSelectionForm";
-import AwarenessCodeForm from "./AwarenessCodeForm";
-import TicketForm from "./TicketSelectionForm";
-import BeverageSelectionForm from "./BeverageSelectionForm";
-import WorkShiftForm from "./WorkshiftsForm";
-import MaterialsForm from "./MaterialsForm";
-import SignatureForm from "./SignatureForm";
 import {userAreaTexts} from "../constants/texts";
 import {calculateTotalPriceUser} from "../../components/core/utils/Pricing";
 import {
@@ -27,7 +10,17 @@ import {
     validateSignature,
     validateTimeslotPriority
 } from "../../utils/validationRules";
-
+import {RegistrationFormContainer} from "../../components/core/forms/RegistrationFormContainer";
+import PersonalDetailsForm from "./PersonalDetailsForm";
+import SummaryForm from "./SummaryForm";
+import ConfirmationForm from "./confirmation/index";
+import FoodSelectionForm from "./FoodSelectionForm";
+import AwarenessCodeForm from "./AwarenessCodeForm";
+import TicketForm from "./TicketSelectionForm";
+import BeverageSelectionForm from "./BeverageSelectionForm";
+import WorkShiftForm from "./WorkshiftsForm";
+import MaterialsForm from "./MaterialsForm";
+import SignatureForm from "./SignatureForm";
 
 // Form steps enum
 enum FormSteps {
@@ -145,246 +138,74 @@ const validationRules = {
 };
 
 export function UserRegistrationFormContainer() {
-    // Use our new form management hook
-    const {
-        formState: booking,
-        validation: formValidation,
-        currentError,
-        updateField,
-        activeStep,
-        handleNext,
-        handlePrevious
-    } = useFormManagement<Booking>({
-        initialState: getEmptyBooking(),
-        validationRules,
-        storageKey: 'booking',
-        versionKey: 'formVersion',
-        currentVersion: '1.2'
-    });
-
-    const [formContent, setFormContent] = useState<FormContent>(getDummyFormContent());
-    const [bookingState, setBookingState] = useState<BookingState>({
-        isSubmitted: false,
-        isSubmitting: false,
-        isSuccessful: false
-    });
-
-    const {token, setToken} = useContext(TokenContext);
-    const maxSteps = Object.keys(FormSteps).length / 2;
-    const {setAuth} = useContext(AuthContext);
-
-    // Step titles
-    const stepTitles: { [key: number]: (string) } = {
-        [FormSteps.NameAndAddress]: userAreaTexts.personalDetailsForm.title,
-        [FormSteps.Ticket]: userAreaTexts.ticketSelectionForm.title,
-        [FormSteps.Beverage]: userAreaTexts.beverageSelectionForm.title,
-        [FormSteps.Food]: userAreaTexts.foodSelectionForm.title,
-        [FormSteps.Workshift]: userAreaTexts.workshiftsForm.title,
-        [FormSteps.Material]: userAreaTexts.materialsForm.title,
-        [FormSteps.AwarenessCode]: userAreaTexts.awarenessCodeForm.title,
-        [FormSteps.Signature]: userAreaTexts.signatureForm.title,
-        [FormSteps.Summary]: userAreaTexts.summaryForm.title,
-        [FormSteps.Confirmation]: userAreaTexts.confirmationForm.initialView.title
-    };
-
-    // Required fields per step
-    const requiredFields: { [key: number]: (keyof Booking)[] } = {
-        [FormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone'],
-        [FormSteps.Ticket]: ['ticket_id'],
-        [FormSteps.Beverage]: [],
-        [FormSteps.Food]: [],
-        [FormSteps.Workshift]: ['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3', 'amount_shifts'],
-        [FormSteps.Material]: [],
-        [FormSteps.Signature]: ['signature'],
-        [FormSteps.AwarenessCode]: [],
-        [FormSteps.Summary]: [],
-        [FormSteps.Confirmation]: [],
-    };
-
-    // Fetch form content from API
-    useEffect(() => {
-        axios.get('/api/formcontent', {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            .then((response) => {
-                setFormContent(response.data);
-            })
-            .catch((error) => {
-                // console.error("API error details:", {
-                //     status: error.response?.status,
-                //     statusText: error.response?.statusText,
-                //     data: error.response?.data,
-                //     headers: error.response?.headers
-                // });
-                setAuth(false);
-                setToken("");
-            });
-    }, [setAuth, setToken, token]);
-
-    useEffect(() => {
-        // Calculate total price based on selections
-        const total_price = calculateTotalPriceUser(booking, formContent);
-        console.log(total_price);
-        updateField('total_price', total_price);
-
-    }, [booking.beverage_id, booking.food_id, booking.ticket_id, booking.amount_shifts, formContent])
-
-    const handleStepNext = () => {
-        handleNext(requiredFields[activeStep]);
-    };
-
-    // Update booking with price calculations
-    const updateBooking = (key: keyof Booking, value: any) => {
-        updateField(key, value);
-    };
-
-    // Submit booking
-    const submitBooking = () => {
-        setBookingState(prevState => ({...prevState, isSubmitting: true}));
-
-        axios.post('/api/submitForm', booking, {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            .then(() => {
-                setBookingState({
-                    isSuccessful: true,
-                    isSubmitting: false,
-                    isSubmitted: true
-                });
-
-                // Auto logout after an hour
-                setTimeout(() => {
-                    setToken("");
-                    setAuth(false);
-                }, 1000 * 60 * 60);
-            })
-            .catch((error) => {
-                if (error.status === 401) {
-                    setToken("");
-                    setAuth(false);
-                } else {
-                    setBookingState({
-                        isSuccessful: false,
-                        isSubmitted: true,
-                        isSubmitting: false
-                    });
-
-                    setTimeout(() => {
-                        setToken("");
-                        setAuth(false);
-                    }, 1000 * 10);
-                }
-            });
-    };
-
     return (
-        <Box sx={{padding: "8px"}}>
-            <StepNavigation
-                activeStep={activeStep}
-                maxSteps={maxSteps}
-                progressImage={rocketImage}
-                hideNavigation={bookingState.isSubmitted}
-                onNext={handleStepNext}
-                onPrevious={handlePrevious}
-            />
-            <CardContent>
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <Typography
-                        color={spacePalette.text.primary}
-                        align="center"
-                        variant="h4"
-                        sx={{paddingBottom: "1em"}}
-                    >
-                        {stepTitles[activeStep]}
-                    </Typography>
+        <RegistrationFormContainer
+            config={{
+                // Type factories
+                getEmptyBooking,
+                getDummyFormContent,
 
-                    {currentError && (
-                        <Alert variant="outlined" severity="error" sx={{my: 2}}>
-                            {currentError}
-                        </Alert>
-                    )}
+                // API configuration
+                apiEndpoints: {
+                    formContent: '/api/formcontent',
+                    submitForm: '/api/submitForm'
+                },
 
-                    {/* Render the appropriate form for each step */}
-                    {activeStep === FormSteps.NameAndAddress && (
-                        <PersonalDetailsForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Ticket && (
-                        <TicketForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Beverage && (
-                        <BeverageSelectionForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Food && (
-                        <FoodSelectionForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Workshift && (
-                        <WorkShiftForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Material && (
-                        <MaterialsForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.AwarenessCode && (
-                        <AwarenessCodeForm/>
-                    )}
-                    {activeStep === FormSteps.Signature && (
-                        <SignatureForm
-                            updateBooking={updateBooking}
-                            currentBooking={booking}
-                            formValidation={formValidation}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Summary && (
-                        <SummaryForm
-                            currentBooking={booking}
-                            formContent={formContent}
-                        />
-                    )}
-                    {activeStep === FormSteps.Confirmation && (
-                        <ConfirmationForm
-                            currentBooking={booking}
-                            formContent={formContent}
-                            submitBooking={submitBooking}
-                            bookingState={bookingState}
-                        />
-                    )}
-                </Box>
-            </CardContent>
-        </Box>
+                // Storage configuration
+                storageConfig: {
+                    storageKey: 'booking',
+                    versionKey: 'formVersion',
+                    currentVersion: '1.2'
+                },
+
+                // Validation and form configuration
+                validationRules,
+                stepTitles: {
+                    [FormSteps.NameAndAddress]: userAreaTexts.personalDetailsForm.title,
+                    [FormSteps.Ticket]: userAreaTexts.ticketSelectionForm.title,
+                    [FormSteps.Beverage]: userAreaTexts.beverageSelectionForm.title,
+                    [FormSteps.Food]: userAreaTexts.foodSelectionForm.title,
+                    [FormSteps.Workshift]: userAreaTexts.workshiftsForm.title,
+                    [FormSteps.Material]: userAreaTexts.materialsForm.title,
+                    [FormSteps.AwarenessCode]: userAreaTexts.awarenessCodeForm.title,
+                    [FormSteps.Signature]: userAreaTexts.signatureForm.title,
+                    [FormSteps.Summary]: userAreaTexts.summaryForm.title,
+                    [FormSteps.Confirmation]: userAreaTexts.confirmationForm.initialView.title
+                },
+                requiredFields: {
+                    [FormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone'],
+                    [FormSteps.Ticket]: ['ticket_id'],
+                    [FormSteps.Beverage]: [],
+                    [FormSteps.Food]: [],
+                    [FormSteps.Workshift]: ['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3', 'amount_shifts'],
+                    [FormSteps.Material]: [],
+                    [FormSteps.Signature]: ['signature'],
+                    [FormSteps.AwarenessCode]: [],
+                    [FormSteps.Summary]: [],
+                    [FormSteps.Confirmation]: [],
+                },
+
+                // Step components mapping
+                stepComponents: {
+                    [FormSteps.NameAndAddress]: PersonalDetailsForm,
+                    [FormSteps.Ticket]: TicketForm,
+                    [FormSteps.Beverage]: BeverageSelectionForm,
+                    [FormSteps.Food]: FoodSelectionForm,
+                    [FormSteps.Workshift]: WorkShiftForm,
+                    [FormSteps.Material]: MaterialsForm,
+                    [FormSteps.AwarenessCode]: AwarenessCodeForm,
+                    [FormSteps.Signature]: SignatureForm,
+                    [FormSteps.Summary]: SummaryForm,
+                    [FormSteps.Confirmation]: ConfirmationForm
+                },
+
+                // Pricing configuration
+                calculateTotalPrice: calculateTotalPriceUser,
+                priceDependencies: ['beverage_id', 'food_id', 'ticket_id', 'amount_shifts'],
+
+                // Metadata
+                maxSteps: Object.keys(FormSteps).length / 2
+            }}
+        />
     );
 }

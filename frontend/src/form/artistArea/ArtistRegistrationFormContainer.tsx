@@ -1,14 +1,16 @@
-import React, {useContext, useEffect, useState} from "react";
-import {Alert, Box, CardContent, Typography} from "@mui/material";
-import {AuthContext, TokenContext} from "../../contexts/AuthContext";
-import axios from 'axios';
-
-import StepNavigation from "../../components/core/navigation/StepNavigation";
-import {useFormManagement} from "../../hooks/useFormManagement";
+import React from "react";
 import {ArtistBooking, ArtistFormContent} from "./interface";
-import {spacePalette} from "../../components/styles/theme";
-import rocketImage from "../../img/rocket.png";
 import {artistAreaTexts} from "../constants/texts";
+import {calculateTotalPriceArtist} from "../../components/core/utils/Pricing";
+import {
+    validateName,
+    validateEmail,
+    validatePhone,
+    validateRequiredSelect,
+    validateRequiredText,
+    validateSignature
+} from "../../utils/validationRules";
+import {RegistrationFormContainer} from "../../components/core/forms/RegistrationFormContainer";
 import ArtistPersonalDetailsForm from "./ArtistPersonalDetailsForm";
 import ArtistTicketSelectionForm from "./ArtistTicketSelectionForm";
 import ArtistBeverageSelectionForm from "./ArtistBeverageSelectionForm";
@@ -19,15 +21,6 @@ import ArtistConfirmationForm from "./ArtistConfirmationForm";
 import ArtistPerformanceForm from "./ArtistPerformanceForm";
 import ArtistFoodSelectionForm from "./ArtistFoodSelectionForm";
 import ArtistEquipmentForm from "./ArtistEquipmentForm";
-import {calculateTotalPriceArtist} from "../../components/core/utils/Pricing";
-import {
-    validateName,
-    validateEmail,
-    validatePhone,
-    validateRequiredSelect,
-    validateRequiredText,
-    validateSignature
-} from "../../utils/validationRules";
 
 enum FormSteps {
     PersonalDetails = 0,
@@ -131,244 +124,74 @@ const validationRules = {
 };
 
 export function ArtistRegistrationFormContainer() {
-    const {
-        formState: booking,
-        validation: formValidation,
-        currentError,
-        updateField,
-        activeStep,
-        handleNext,
-        handlePrevious
-    } = useFormManagement<ArtistBooking>({
-        initialState: getEmptyArtistBooking(),
-        validationRules,
-        storageKey: 'artistBooking',
-        versionKey: 'artistFormVersion',
-        currentVersion: '1.0'
-    });
+    return (
+        <RegistrationFormContainer
+            config={{
+                // Type factories
+                getEmptyBooking: getEmptyArtistBooking,
+                getDummyFormContent: getDummyArtistFormContent,
 
-    const [formContent, setFormContent] = useState<ArtistFormContent>(getDummyArtistFormContent());
-    const [bookingState, setBookingState] = useState<ArtistBookingState>({
-        isSubmitted: false,
-        isSubmitting: false,
-        isSuccessful: false
-    });
+                // API configuration
+                apiEndpoints: {
+                    formContent: '/api/artist/formcontent',
+                    submitForm: '/api/artist/submitForm'
+                },
 
-    const {token, setToken} = useContext(TokenContext);
-    const maxSteps = Object.keys(FormSteps).length / 2;
-    const {setAuth} = useContext(AuthContext);
+                // Storage configuration
+                storageConfig: {
+                    storageKey: 'artistBooking',
+                    versionKey: 'artistFormVersion',
+                    currentVersion: '1.0'
+                },
 
-    const stepTitles: { [key: number]: string } = {
-        [FormSteps.PersonalDetails]: artistAreaTexts.personalDetailsForm.title,
-        [FormSteps.PerformanceDetails]: artistAreaTexts.performanceDetailsForm.title,
-        [FormSteps.Ticket]: artistAreaTexts.ticketSelectionForm.title,
-        [FormSteps.Beverage]: artistAreaTexts.beverageSelectionForm.title,
-        [FormSteps.Food]: artistAreaTexts.foodSelectionForm.title,
-        [FormSteps.Materials]: artistAreaTexts.materialsForm.title,
-        [FormSteps.TechnicalRequirements]: artistAreaTexts.technicalRequirementsForm.title,
-        [FormSteps.Signature]: artistAreaTexts.signatureForm.title,
-        [FormSteps.Summary]: artistAreaTexts.summaryForm.title,
-        [FormSteps.Confirmation]: artistAreaTexts.confirmationForm.initialView.title
-    };
+                // Validation and form configuration
+                validationRules,
+                stepTitles: {
+                    [FormSteps.PersonalDetails]: artistAreaTexts.personalDetailsForm.title,
+                    [FormSteps.PerformanceDetails]: artistAreaTexts.performanceDetailsForm.title,
+                    [FormSteps.Ticket]: artistAreaTexts.ticketSelectionForm.title,
+                    [FormSteps.Beverage]: artistAreaTexts.beverageSelectionForm.title,
+                    [FormSteps.Food]: artistAreaTexts.foodSelectionForm.title,
+                    [FormSteps.Materials]: artistAreaTexts.materialsForm.title,
+                    [FormSteps.TechnicalRequirements]: artistAreaTexts.technicalRequirementsForm.title,
+                    [FormSteps.Signature]: artistAreaTexts.signatureForm.title,
+                    [FormSteps.Summary]: artistAreaTexts.summaryForm.title,
+                    [FormSteps.Confirmation]: artistAreaTexts.confirmationForm.initialView.title
+                },
+                requiredFields: {
+                    [FormSteps.PersonalDetails]: ['last_name', 'first_name', 'email', 'phone'],
+                    [FormSteps.PerformanceDetails]: ['performance_details'],
+                    [FormSteps.Ticket]: ['ticket_id'],
+                    [FormSteps.Beverage]: [],
+                    [FormSteps.Food]: [],
+                    [FormSteps.Materials]: [],
+                    [FormSteps.TechnicalRequirements]: [],
+                    [FormSteps.Signature]: ['signature'],
+                    [FormSteps.Summary]: [],
+                    [FormSteps.Confirmation]: [],
+                },
 
-    const requiredFields: { [key: number]: (keyof ArtistBooking)[] } = {
-        [FormSteps.PersonalDetails]: ['last_name', 'first_name', 'email', 'phone'],
-        [FormSteps.PerformanceDetails]: ['performance_details'],
-        [FormSteps.Ticket]: ['ticket_id'],
-        [FormSteps.Beverage]: [],
-        [FormSteps.Food]: [],
-        [FormSteps.Materials]: [],
-        [FormSteps.TechnicalRequirements]: [],
-        [FormSteps.Signature]: ['signature'],
-        [FormSteps.Summary]: [],
-        [FormSteps.Confirmation]: [],
-    };
+                // Step components mapping
+                stepComponents: {
+                    [FormSteps.PersonalDetails]: ArtistPersonalDetailsForm,
+                    [FormSteps.PerformanceDetails]: ArtistPerformanceForm,
+                    [FormSteps.Ticket]: ArtistTicketSelectionForm,
+                    [FormSteps.Beverage]: ArtistBeverageSelectionForm,
+                    [FormSteps.Food]: ArtistFoodSelectionForm,
+                    [FormSteps.Materials]: ArtistMaterialsForm,
+                    [FormSteps.TechnicalRequirements]: ArtistEquipmentForm,
+                    [FormSteps.Signature]: ArtistSignatureForm,
+                    [FormSteps.Summary]: ArtistSummaryForm,
+                    [FormSteps.Confirmation]: ArtistConfirmationForm
+                },
 
-    useEffect(() => {
-        axios.get('/api/artist/formcontent', {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            .then((response) => {
-                setFormContent(response.data);
-            })
-            .catch((error) => {
-                // console.error("API error details:", {
-                //     status: error.response?.status,
-                //     statusText: error.response?.statusText,
-                //     data: error.response?.data,
-                //     headers: error.response?.headers
-                // });
-                setAuth(false);
-                setToken("");
-            });
-    }, [setAuth, setToken, token]);
+                // Pricing configuration
+                calculateTotalPrice: calculateTotalPriceArtist,
+                priceDependencies: ['beverage_id', 'food_id', 'ticket_id'],
 
-
-    useEffect(() => {
-        // Calculate total price based on selections
-        const total_price = calculateTotalPriceArtist(booking, formContent);
-        console.log(total_price);
-        updateField('total_price', total_price);
-
-    }, [booking.beverage_id, booking.food_id, booking.ticket_id, formContent])
-
-    const handleStepNext = () => {
-        handleNext(requiredFields[activeStep]);
-    };
-
-    const updateBooking = (key: keyof ArtistBooking, value: any) => {
-        updateField(key, value);
-    };
-
-    // Submit booking
-    const submitBooking = () => {
-        setBookingState(prevState => ({...prevState, isSubmitting: true}));
-
-        axios.post('/api/artist/submitForm', booking, {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            .then(() => {
-                setBookingState({
-                    isSuccessful: true,
-                    isSubmitting: false,
-                    isSubmitted: true
-                });
-
-                // Auto logout after an hour
-                setTimeout(() => {
-                    setToken("");
-                    setAuth(false);
-                }, 1000 * 60 * 60);
-            })
-            .catch((error) => {
-                if (error.status === 401) {
-                    setToken("");
-                    setAuth(false);
-                } else {
-                    setBookingState({
-                        isSuccessful: false,
-                        isSubmitted: true,
-                        isSubmitting: false
-                    });
-
-                    setTimeout(() => {
-                        setToken("");
-                        setAuth(false);
-                    }, 1000 * 10);
-                }
-            });
-    };
-
-    return <Box sx={{padding: "8px"}}>
-        <StepNavigation
-            activeStep={activeStep}
-            maxSteps={maxSteps}
-            progressImage={rocketImage}
-            hideNavigation={bookingState.isSubmitted}
-            onNext={handleStepNext}
-            onPrevious={handlePrevious}
+                // Metadata
+                maxSteps: Object.keys(FormSteps).length / 2
+            }}
         />
-        <CardContent>
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <Typography
-                    color={spacePalette.text.primary}
-                    align="center"
-                    variant="h4"
-                    sx={{paddingBottom: "1em"}}
-                >
-                    {stepTitles[activeStep]}
-                </Typography>
-
-                {currentError && (
-                    <Alert variant="outlined" severity="error" sx={{my: 2}}>
-                        {currentError}
-                    </Alert>
-                )}
-
-                {activeStep === FormSteps.PersonalDetails && (
-                    <ArtistPersonalDetailsForm
-                        updateBooking={updateBooking}
-                        currentBooking={booking}
-                        formValidation={formValidation}
-                        formContent={formContent}
-                    />
-                )}
-                {activeStep === FormSteps.PerformanceDetails && (
-                    <ArtistPerformanceForm
-                        updateBooking={updateBooking}
-                        currentBooking={booking}
-                        formValidation={formValidation}
-                        formContent={formContent}
-                    />
-                )}
-                {activeStep === FormSteps.Ticket && (
-                    <ArtistTicketSelectionForm
-                        updateBooking={updateBooking}
-                        currentBooking={booking}
-                        formValidation={formValidation}
-                        formContent={formContent}
-                    />
-                )}
-                {activeStep === FormSteps.Beverage && (
-                    <ArtistBeverageSelectionForm
-                        updateBooking={updateBooking}
-                        currentBooking={booking}
-                        formValidation={formValidation}
-                        formContent={formContent}
-                    />
-                )}
-                {activeStep === FormSteps.Food && (
-                    <ArtistFoodSelectionForm
-                        updateBooking={updateBooking}
-                        currentBooking={booking}
-                        formValidation={formValidation}
-                        formContent={formContent}
-                    />
-                )}
-                {activeStep === FormSteps.Materials && (
-                    <ArtistMaterialsForm
-                        updateBooking={updateBooking}
-                        currentBooking={booking}
-                        formValidation={formValidation}
-                        formContent={formContent}
-                    />
-                )}
-                {activeStep === FormSteps.TechnicalRequirements && (
-                    <ArtistEquipmentForm
-                        updateBooking={updateBooking}
-                        currentBooking={booking}
-                        formValidation={formValidation}
-                        formContent={formContent}
-                    />
-                )}
-                {activeStep === FormSteps.Signature && (
-                    <ArtistSignatureForm
-                        updateBooking={updateBooking}
-                        currentBooking={booking}
-                        formValidation={formValidation}
-                        formContent={formContent}
-                    />
-                )}
-                {activeStep === FormSteps.Summary && (
-                    <ArtistSummaryForm
-                        currentBooking={booking}
-                        formContent={formContent}
-                    />
-                )}
-                {activeStep === FormSteps.Confirmation && (
-                    <ArtistConfirmationForm
-                        booking={booking}
-                        submitBooking={submitBooking}
-                        formContent={formContent}
-                        bookingState={bookingState}
-                    />
-                )}
-            </Box>
-        </CardContent>
-    </Box>
+    );
 }

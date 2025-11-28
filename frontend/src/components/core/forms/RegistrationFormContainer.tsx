@@ -1,0 +1,262 @@
+/**
+ * Generic registration form container that handles multi-step form flow.
+ * Consolidates logic from UserRegistrationFormContainer and ArtistRegistrationFormContainer.
+ */
+
+import React, {useContext, useEffect, useState} from "react";
+import {Alert, Box, CardContent, Typography} from "@mui/material";
+import {AuthContext, TokenContext} from "../../../contexts/AuthContext";
+import axios from 'axios';
+import StepNavigation from "../navigation/StepNavigation";
+import {useFormManagement} from "../../../hooks/useFormManagement";
+import {spacePalette} from "../../styles/theme";
+import rocketImage from "../../../img/rocket.png";
+
+/**
+ * Configuration for the registration form container
+ */
+export interface RegistrationFormConfig<
+    TBooking extends Record<string, any>,
+    TFormContent extends Record<string, any>,
+    TFormSteps extends number
+> {
+    // Type factories
+    getEmptyBooking: () => TBooking;
+    getDummyFormContent: () => TFormContent;
+
+    // API configuration
+    apiEndpoints: {
+        formContent: string;
+        submitForm: string;
+    };
+
+    // Storage configuration
+    storageConfig: {
+        storageKey: string;
+        versionKey: string;
+        currentVersion: string;
+    };
+
+    // Validation and form configuration
+    validationRules: { [K in keyof Partial<TBooking>]: (value: any) => string };
+    stepTitles: { [key: number]: string };
+    requiredFields: { [key: number]: (keyof TBooking)[] };
+
+    // Step components mapping
+    stepComponents: {
+        [key: number]: React.ComponentType<{
+            updateBooking: (key: keyof TBooking, value: any) => void;
+            currentBooking: TBooking;
+            formValidation: { [key in keyof TBooking]?: string };
+            formContent: TFormContent;
+        }> | React.ComponentType<any>;
+    };
+
+    // Pricing configuration
+    calculateTotalPrice: (booking: TBooking, formContent: TFormContent) => number;
+    priceDependencies: (keyof TBooking)[];
+
+    // Metadata
+    maxSteps: number;
+}
+
+/**
+ * Booking state interface
+ */
+export interface BookingState {
+    isSubmitted: boolean;
+    isSubmitting: boolean;
+    isSuccessful: boolean;
+}
+
+/**
+ * Generic registration form container props
+ */
+interface RegistrationFormContainerProps<
+    TBooking extends Record<string, any>,
+    TFormContent extends Record<string, any>,
+    TFormSteps extends number
+> {
+    config: RegistrationFormConfig<TBooking, TFormContent, TFormSteps>;
+}
+
+/**
+ * Generic registration form container component
+ */
+export function RegistrationFormContainer<
+    TBooking extends Record<string, any>,
+    TFormContent extends Record<string, any>,
+    TFormSteps extends number
+>({
+    config
+}: RegistrationFormContainerProps<TBooking, TFormContent, TFormSteps>) {
+    // Use form management hook
+    const {
+        formState: booking,
+        validation: formValidation,
+        currentError,
+        updateField,
+        activeStep,
+        handleNext,
+        handlePrevious
+    } = useFormManagement<TBooking>({
+        initialState: config.getEmptyBooking(),
+        validationRules: config.validationRules,
+        storageKey: config.storageConfig.storageKey,
+        versionKey: config.storageConfig.versionKey,
+        currentVersion: config.storageConfig.currentVersion
+    });
+
+    const [formContent, setFormContent] = useState<TFormContent>(config.getDummyFormContent());
+    const [bookingState, setBookingState] = useState<BookingState>({
+        isSubmitted: false,
+        isSubmitting: false,
+        isSuccessful: false
+    });
+
+    const {token, setToken} = useContext(TokenContext);
+    const {setAuth} = useContext(AuthContext);
+
+    // Fetch form content from API
+    useEffect(() => {
+        axios.get(config.apiEndpoints.formContent, {
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            .then((response) => {
+                setFormContent(response.data);
+            })
+            .catch((error) => {
+                setAuth(false);
+                setToken("");
+            });
+    }, [setAuth, setToken, token]);
+
+    // Calculate total price when dependencies change
+    useEffect(() => {
+        const total_price = config.calculateTotalPrice(booking, formContent);
+        console.log(total_price);
+        updateField('total_price' as keyof TBooking, total_price as any);
+    }, [...config.priceDependencies.map(dep => booking[dep]), formContent]);
+
+    const handleStepNext = () => {
+        handleNext(config.requiredFields[activeStep]);
+    };
+
+    const updateBooking = (key: keyof TBooking, value: any) => {
+        updateField(key, value);
+    };
+
+    // Submit booking
+    const submitBooking = () => {
+        setBookingState(prevState => ({...prevState, isSubmitting: true}));
+
+        axios.post(config.apiEndpoints.submitForm, booking, {
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            .then(() => {
+                setBookingState({
+                    isSuccessful: true,
+                    isSubmitting: false,
+                    isSubmitted: true
+                });
+
+                // Auto logout after an hour
+                setTimeout(() => {
+                    setToken("");
+                    setAuth(false);
+                }, 1000 * 60 * 60);
+            })
+            .catch((error) => {
+                if (error.status === 401) {
+                    setToken("");
+                    setAuth(false);
+                } else {
+                    setBookingState({
+                        isSuccessful: false,
+                        isSubmitted: true,
+                        isSubmitting: false
+                    });
+
+                    setTimeout(() => {
+                        setToken("");
+                        setAuth(false);
+                    }, 1000 * 10);
+                }
+            });
+    };
+
+    // Render the current step's component
+    const renderCurrentStep = () => {
+        const StepComponent = config.stepComponents[activeStep];
+
+        if (!StepComponent) {
+            return null;
+        }
+
+        // Check if component needs form props
+        const componentName = StepComponent.displayName || StepComponent.name;
+        const needsFormProps = !componentName?.includes('Confirmation') && !componentName?.includes('Summary') && !componentName?.includes('AwarenessCode');
+
+        if (needsFormProps) {
+            return (
+                <StepComponent
+                    updateBooking={updateBooking}
+                    currentBooking={booking}
+                    formValidation={formValidation}
+                    formContent={formContent}
+                />
+            );
+        } else {
+            // Special handling for confirmation, summary, and awareness code forms
+            // Pass all possible props and let the component use what it needs
+            const SpecialComponent = StepComponent as any;
+            return (
+                <SpecialComponent
+                    currentBooking={booking}
+                    booking={booking}
+                    formContent={formContent}
+                    submitBooking={submitBooking}
+                    bookingState={bookingState}
+                />
+            );
+        }
+    };
+
+    return (
+        <Box sx={{padding: "8px"}}>
+            <StepNavigation
+                activeStep={activeStep}
+                maxSteps={config.maxSteps}
+                progressImage={rocketImage}
+                hideNavigation={bookingState.isSubmitted}
+                onNext={handleStepNext}
+                onPrevious={handlePrevious}
+            />
+            <CardContent>
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                    <Typography
+                        color={spacePalette.text.primary}
+                        align="center"
+                        variant="h4"
+                        sx={{paddingBottom: "1em"}}
+                    >
+                        {config.stepTitles[activeStep]}
+                    </Typography>
+
+                    {currentError && (
+                        <Alert variant="outlined" severity="error" sx={{my: 2}}>
+                            {currentError}
+                        </Alert>
+                    )}
+
+                    {renderCurrentStep()}
+                </Box>
+            </CardContent>
+        </Box>
+    );
+}
