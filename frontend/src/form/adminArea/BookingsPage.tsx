@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState} from 'react';
 import {
     Box, Typography, FormControl, InputLabel, Select, MenuItem,
     Tooltip, IconButton, Button, TextField, Snackbar, Alert,
@@ -19,9 +19,16 @@ import FormCard from "../../components/core/display/FormCard";
 import BookingTable from "./components/BookingTable";
 import BookingDetailModal from "./components/BookingDetailModal";
 import {filterBookings, sortBookings} from './utils/bookingUtils';
-import axios from "axios";
+import {useColumnVisibility} from "../../hooks/useColumnVisibility";
+import {useSnackbar} from "../../hooks/useSnackbar";
+import {useBookingActions} from "../../hooks/useBookingActions";
+import {useModal} from "../../hooks/useModal";
+import {useSort} from "../../hooks/useSort";
+import {useAdminPageFilters} from "../../hooks/useAdminPageFilters";
+import {useContext} from "react";
 
 interface ColumnVisibility {
+    [key: string]: boolean;
     type: boolean;
     name: boolean;
     email: boolean;
@@ -36,46 +43,53 @@ const BookingsPage: React.FC = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const {token} = useContext(TokenContext);
 
-    // State for table columns
-    const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
-        type: true,
-        name: true,
-        email: !isMobile,
-        ticket: !isMobile,
-        price: !isMobile,
-        actions: true,
-    });
-    const [columnFilterAnchorEl, setColumnFilterAnchorEl] = useState<null | HTMLElement>(null);
-
-    // State for filtering and viewing
-    const [viewType, setViewType] = useState<'all' | 'regular' | 'artist'>('all');
-    const [viewTypeAnchorEl, setViewTypeAnchorEl] = useState<null | HTMLElement>(null);
+    // Search state
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Sorting state
-    const [sortCriterion, setSortCriterion] = useState<'first_name' | 'last_name' | 'timestamp'>('timestamp');
-    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-
-    // Modal state
-    const [selectedBooking, setSelectedBooking] = useState<CombinedBooking | null>(null);
-    const [openModal, setOpenModal] = useState(false);
-
-    // Notification state
-    const [snackbarState, setSnackbarState] = useState({
-        open: false,
-        message: '',
-        severity: 'success' as 'success' | 'error'
-    });
-
-    // Update column visibility based on screen size
-    useEffect(() => {
-        setColumnVisibility(prev => ({
-            ...prev,
+    // Custom hooks for state management
+    const {
+        columnVisibility,
+        anchorEl: columnFilterAnchorEl,
+        handleOpen: handleColumnFilterOpen,
+        handleClose: handleColumnFilterClose,
+        toggleColumn: handleColumnVisibilityChange
+    } = useColumnVisibility<ColumnVisibility>({
+        initialVisibility: {
+            type: true,
+            name: true,
             email: !isMobile,
             ticket: !isMobile,
             price: !isMobile,
-        }));
-    }, [isMobile]);
+            actions: true,
+        },
+        mobileHiddenColumns: ['email', 'ticket', 'price'],
+        isMobile
+    });
+
+    const {viewType, setViewType, anchorEl: viewTypeAnchorEl, setAnchorEl: setViewTypeAnchorEl} = useAdminPageFilters();
+
+    const {
+        sortBy: sortCriterion,
+        setSortBy: setSortCriterion,
+        sortOrder,
+        toggleOrder: toggleSortOrder
+    } = useSort<'first_name' | 'last_name' | 'timestamp'>('timestamp', 'desc');
+
+    const {
+        selectedItem: selectedBooking,
+        isOpen: openModal,
+        open: handleOpenModal,
+        close: handleCloseModal
+    } = useModal<CombinedBooking>();
+
+    const {
+        snackbarState,
+        showSuccess,
+        showError,
+        hideSnackbar
+    } = useSnackbar();
+
+    const {deleteBooking} = useBookingActions();
 
     // Process bookings
     const processedBookings = sortBookings(
@@ -84,23 +98,7 @@ const BookingsPage: React.FC = () => {
         sortOrder
     );
 
-    // Handlers for column visibility
-    const handleColumnFilterOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setColumnFilterAnchorEl(event.currentTarget);
-    };
-
-    const handleColumnFilterClose = () => {
-        setColumnFilterAnchorEl(null);
-    };
-
-    const handleColumnVisibilityChange = (column: keyof ColumnVisibility) => {
-        setColumnVisibility(prev => ({
-            ...prev,
-            [column]: !prev[column]
-        }));
-    };
-
-    // Handlers for view type
+    // Handlers for view type menu
     const handleViewTypeMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setViewTypeAnchorEl(event.currentTarget);
     };
@@ -118,74 +116,25 @@ const BookingsPage: React.FC = () => {
         setViewType(newValue);
     };
 
-    // Handlers for sorting
-    const toggleSortOrder = () => {
-        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    };
-
-    // Handlers for modal
-    const handleOpenModal = (booking: CombinedBooking) => {
-        setSelectedBooking(booking);
-        setOpenModal(true);
-    };
-
-    const handleCloseModal = () => {
-        setOpenModal(false);
-        setSelectedBooking(null);
-    };
-
-    // Handlers for snackbar
-    const handleCloseSnackbar = () => {
-        setSnackbarState({...snackbarState, open: false});
-    };
-
+    // Handlers for modal actions
     const handleModalSuccess = () => {
-        setSnackbarState({
-            open: true,
-            message: 'Booking updated successfully',
-            severity: 'success'
-        });
+        showSuccess('Booking updated successfully');
         refetch().then();
         handleCloseModal();
     };
 
     const handleModalError = (message: string) => {
-        setSnackbarState({
-            open: true,
-            message,
-            severity: 'error'
-        });
+        showError(message);
     };
 
     const handleDeleteBooking = async (bookingId: number, bookingType: 'regular' | 'artist') => {
         try {
-            // Determine endpoint based on booking type
-            const endpoint = bookingType === 'artist'
-                ? `/api/artist/booking/${bookingId}`
-                : `/api/booking/${bookingId}`;
-
-            await axios.delete(endpoint, {
-                headers: {Authorization: `Bearer ${token}`}
-            });
-
-            // Show success notification
-            setSnackbarState({
-                open: true,
-                message: 'Booking deleted successfully',
-                severity: 'success'
-            });
-
-            // Refresh the data
+            await deleteBooking(bookingId, bookingType);
+            showSuccess('Booking deleted successfully');
             refetch().then();
-
-            // Close the modal
             handleCloseModal();
         } catch (error) {
-            setSnackbarState({
-                open: true,
-                message: 'Failed to delete booking',
-                severity: 'error'
-            });
+            showError('Failed to delete booking');
         }
     };
 
@@ -366,10 +315,10 @@ const BookingsPage: React.FC = () => {
             <Snackbar
                 open={snackbarState.open}
                 autoHideDuration={6000}
-                onClose={handleCloseSnackbar}
+                onClose={hideSnackbar}
                 anchorOrigin={{vertical: 'top', horizontal: 'center'}}
             >
-                <Alert onClose={handleCloseSnackbar} severity={snackbarState.severity}>
+                <Alert onClose={hideSnackbar} severity={snackbarState.severity}>
                     {snackbarState.message}
                 </Alert>
             </Snackbar>
