@@ -20,6 +20,14 @@ import ArtistPerformanceForm from "./ArtistPerformanceForm";
 import ArtistFoodSelectionForm from "./ArtistFoodSelectionForm";
 import ArtistEquipmentForm from "./ArtistEquipmentForm";
 import {calculateTotalPriceArtist} from "../../components/core/utils/Pricing";
+import {
+    validateName,
+    validateEmail,
+    validatePhone,
+    validateRequiredSelect,
+    validateRequiredText,
+    validateSignature
+} from "../../utils/validationRules";
 
 enum FormSteps {
     PersonalDetails = 0,
@@ -111,40 +119,15 @@ export interface ArtistBookingState {
     isSuccessful: boolean;
 }
 
+// Define validation rules using shared validators
 const validationRules = {
-    first_name: (value: string) => {
-        const pattern = /^[A-Za-zÄÖÜäöüß\s]+$/;
-        if (value === '') return 'Bitte gib einen Vornamen an';
-        if (!pattern.test(value)) return 'Bitte verwende nur Buchstaben für deinen Vornamen';
-        return '';
-    },
-    last_name: (value: string) => {
-        const pattern = /^[A-Za-zÄÖÜäöüß\s]+$/;
-        if (value === '') return 'Bitte gib einen Nachnamen an';
-        if (!pattern.test(value)) return 'Bitte verwende nur Buchstaben für deinen Nachnamen';
-        return '';
-    },
-    email: (value: string) => {
-        const pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-        if (value === '') return 'Bitte gib eine Email ein';
-        if (!pattern.test(value)) return 'Bitte gib eine gültige Email ein.';
-        return '';
-    },
-    phone: (value: string) => {
-        const pattern = /^\d{10,15}$/;
-        if (value === '') return 'Bitte gib eine Telefonnummer ein';
-        if (!pattern.test(value)) return 'Bitte gib eine gültige Telefonnummer ein';
-        return '';
-    },
-    ticket_id: (value: number) => {
-        return value === -1 ? 'Bitte wähle ein Ticket aus.' : '';
-    },
-    performance_details: (value: string) => {
-        return value === '' ? 'Bitte gib Details zu deinem Auftritt an.' : '';
-    },
-    signature: (value: string) => {
-        return value === '' ? 'Wir würden uns freuen, wenn du das Formular unterschreibst' : '';
-    }
+    first_name: (value: string) => validateName(value, 'first_name'),
+    last_name: (value: string) => validateName(value, 'last_name'),
+    email: validateEmail,
+    phone: validatePhone,
+    ticket_id: (value: number) => validateRequiredSelect(value, 'ein Ticket'),
+    performance_details: (value: string) => validateRequiredText(value, 'Details zu deinem Auftritt'),
+    signature: validateSignature
 };
 
 export function ArtistRegistrationFormContainer() {

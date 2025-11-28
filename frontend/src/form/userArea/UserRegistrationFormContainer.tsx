@@ -19,6 +19,14 @@ import MaterialsForm from "./MaterialsForm";
 import SignatureForm from "./SignatureForm";
 import {userAreaTexts} from "../constants/texts";
 import {calculateTotalPriceUser} from "../../components/core/utils/Pricing";
+import {
+    validateName,
+    validateEmail,
+    validatePhone,
+    validateRequiredSelect,
+    validateSignature,
+    validateTimeslotPriority
+} from "../../utils/validationRules";
 
 
 // Form steps enum
@@ -123,47 +131,17 @@ export interface BookingState {
     isSuccessful: boolean;
 }
 
-// Define validation rules
+// Define validation rules using shared validators
 const validationRules = {
-    first_name: (value: string) => {
-        const pattern = /^[A-Za-zÄÖÜöüß\s]+$/;
-        if (value === '') return 'Bitte gib einen Vornamen an';
-        if (!pattern.test(value)) return 'Bitte verwende nur Buchstaben für deinen Vornamen';
-        return '';
-    },
-    last_name: (value: string) => {
-        const pattern = /^[A-Za-zÄÖÜöüß\s]+$/;
-        if (value === '') return 'Bitte gib einen Nachnamen an';
-        if (!pattern.test(value)) return 'Bitte verwende nur Buchstaben für deinen Nachnamen';
-        return '';
-    },
-    email: (value: string) => {
-        const pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-        if (value === '') return 'Bitte gib eine Email ein';
-        if (!pattern.test(value)) return 'Bitte gib eine gültige Email ein.';
-        return '';
-    },
-    phone: (value: string) => {
-        const pattern = /^\d{10,15}$/;
-        if (value === '') return 'Bitte gib eine Telefonnummer ein';
-        if (!pattern.test(value)) return 'Bitte gib eine gültige Telefonnummer ein';
-        return '';
-    },
-    ticket_id: (value: number) => {
-        return value === -1 ? 'Bitte wähle ein Ticket aus.' : '';
-    },
-    timeslot_priority_1: (value: number) => {
-        return value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
-    },
-    timeslot_priority_2: (value: number) => {
-        return value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
-    },
-    timeslot_priority_3: (value: number) => {
-        return value === -1 ? 'Bitte gib drei Prioritäten an.' : '';
-    },
-    signature: (value: string) => {
-        return value === '' ? 'Wir würden uns freuen, wenn du das Formular unterschreibst' : '';
-    }
+    first_name: (value: string) => validateName(value, 'first_name'),
+    last_name: (value: string) => validateName(value, 'last_name'),
+    email: validateEmail,
+    phone: validatePhone,
+    ticket_id: (value: number) => validateRequiredSelect(value, 'ein Ticket'),
+    timeslot_priority_1: validateTimeslotPriority,
+    timeslot_priority_2: validateTimeslotPriority,
+    timeslot_priority_3: validateTimeslotPriority,
+    signature: validateSignature
 };
 
 export function UserRegistrationFormContainer() {

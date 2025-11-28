@@ -9,11 +9,11 @@ import {
 } from '@mui/icons-material';
 import { useFetchData } from './useFetchData';
 import TabSwitcher from './components/TabSwitcher';
-import OptionsGrid from './components/OptionsGrid';
 import PeopleList, { Person } from './components/PeopleList';
 import FilterControls from './components/FilterControls';
 import FormCard from '../../components/core/display/FormCard';
 import { ViewFilterType } from './utils/optionsUtils';
+import OptionsTable from "./components/OptionsTable";
 
 const ProfessionsPage: React.FC = () => {
   const { regularBookings, artistBookings, formContent, artistFormContent } = useFetchData();
@@ -25,28 +25,6 @@ const ProfessionsPage: React.FC = () => {
   const [viewTypeAnchorEl, setViewTypeAnchorEl] = useState<null | HTMLElement>(null);
 
 
-  // Get users for a specific profession
-  const getUsersForProfession = (professionId: number, professionType: 'regular' | 'artist') => {
-    if (professionType === 'regular') {
-      return regularBookings
-        .filter(booking => booking.profession_ids?.includes(professionId))
-        .map(booking => ({
-          first_name: booking.first_name,
-          last_name: booking.last_name,
-          email: booking.email,
-          is_artist: false
-        }));
-    } else {
-      return artistBookings
-        .filter(booking => booking.profession_ids?.includes(professionId))
-        .map(booking => ({
-          first_name: booking.first_name,
-          last_name: booking.last_name,
-          email: booking.email,
-          is_artist: true
-        }));
-    }
-  };
 
   // Count professions
   const getProfessionCount = (professionId: number, professionType: 'regular' | 'artist') => {
@@ -209,12 +187,7 @@ const ProfessionsPage: React.FC = () => {
           {/* Professions Grid */}
           <FormCard>
             <Box sx={{ p: 2 }}>
-              <OptionsGrid
-                options={professionOptions}
-                bookings={allBookings}
-                optionType="professions"
-                icon={<School/>}
-              />
+                <OptionsTable options={professionOptions} bookings={allBookings} optionType={'professions'}/>
             </Box>
           </FormCard>
         </>
