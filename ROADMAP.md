@@ -20,11 +20,11 @@
 - [x] Register service worker in React app
 - [x] Add update notification when new version available
 
-### Phase 3: Offline Functionality
-- [ ] Cache profile page for offline viewing
-- [ ] Store booking details in IndexedDB for offline access
-- [ ] Implement offline indicator in UI
-- [ ] Queue profile updates when offline (sync when online)
+### Phase 3: Offline Functionality ✅ COMPLETED
+- [x] Cache profile page for offline viewing
+- [x] Store booking details in IndexedDB for offline access
+- [x] Implement offline indicator in UI
+- [x] Queue profile updates when offline (sync when online)
 
 ### Phase 4: Push Notifications
 - [ ] Set up push notification backend (Firebase Cloud Messaging or web-push)
@@ -55,13 +55,11 @@
   - Payment status indicator
 
 - [ ] **Editable Booking Details**
-  - Allow editing until specified deadline
-  - Lock editing after payment received
+  - Allow editing of certain booking details. This option can be turned off for all users in the admin frontend
   - Fields that can be edited:
-    - Work shift preferences and material contributions
-  - Fields that cannot be edited after payment:
+    - Work shift preferences, material contributions, beverages, food option, ticket option
+  - Fields that cannot be edited after payment has been received:
     - Tickets, food, beverages
-  - Consider: Allow ticket/food/beverage changes before payment?
 
 - [ ] **News Feed**
   - Admin-posted updates visible on profile
@@ -76,13 +74,14 @@
     - Reason selection (not available that day, preference for different shift, etc.)
     - Alternative preferences
   - Confirmation status tracking
+  - Notifications when user receives new content (like a shift assignment is available)
 
 - [ ] **Shift Exchange System (Tauschbörse)**
-  - View available shift swaps (anonymized or with names?)
-  - Post shift swap offers (24-hour validity)
+  - View available shift swaps (with names)
+  - Post shift swap offers (48-hour validity)
   - For users with multiple shifts: select specific shift to swap
   - Notification when swap match found
-  - Admin approval workflow for swaps?
+  - For swaps, no admin approval is needed
 
 - [ ] **FAQ Page**
   - Static FAQ content managed by admin
@@ -100,6 +99,7 @@
   - Auto-send cancellation confirmation email
   - Refund information based on cancellation policy
   - Auto-reminder: Email after 2 weeks if payment not received
+    - Push Notification 
     - Warning that booking will be cancelled
     - Follow-up auto-cancellation if no payment
 

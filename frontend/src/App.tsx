@@ -10,6 +10,8 @@ import SpaceBackground from './components/core/layouts/SpaceBackground';
 import LoginPage from './components/core/inputs/LoginPage';
 import PWAInstallPrompt from './components/core/pwa/PWAInstallPrompt';
 import PWAUpdatePrompt from './components/core/pwa/PWAUpdatePrompt';
+import OfflineIndicator from './components/core/pwa/OfflineIndicator';
+import SyncQueueManager from './components/core/pwa/SyncQueueManager';
 
 
 const App = () => {
@@ -49,6 +51,8 @@ const App = () => {
                 {/* PWA Components */}
                 <PWAInstallPrompt />
                 <PWAUpdatePrompt />
+                <OfflineIndicator />
+                <SyncQueueManager />
 
                 {/* Theme toggle button */}
                 {/*<ThemeToggle />*/}

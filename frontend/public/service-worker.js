@@ -1,8 +1,9 @@
 /* eslint-disable no-restricted-globals */
 
 // Service Worker for Wiesenwahn PWA
-const CACHE_NAME = 'wiesenwahn-v1';
-const API_CACHE = 'wiesenwahn-api-v1';
+const CACHE_NAME = 'wiesenwahn-v2';
+const API_CACHE = 'wiesenwahn-api-v2';
+const PROFILE_CACHE = 'wiesenwahn-profile-v2';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache on install
@@ -37,7 +38,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME && cacheName !== API_CACHE) {
+          if (cacheName !== CACHE_NAME && cacheName !== API_CACHE && cacheName !== PROFILE_CACHE) {
             console.log('[Service Worker] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
@@ -59,6 +60,34 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Profile page routes - Cache with network fallback
+  if (url.pathname.startsWith('/profile/')) {
+    event.respondWith(
+      caches.open(PROFILE_CACHE).then((cache) => {
+        return fetch(request)
+          .then((response) => {
+            // Cache the successful response
+            if (response && response.status === 200) {
+              cache.put(request, response.clone());
+            }
+            return response;
+          })
+          .catch(() => {
+            // If network fails, try cache
+            return cache.match(request).then((cachedResponse) => {
+              if (cachedResponse) {
+                console.log('[Service Worker] Serving cached profile page');
+                return cachedResponse;
+              }
+              // No cached version, show offline page
+              return caches.match(OFFLINE_URL);
+            });
+          });
+      })
+    );
+    return;
+  }
+
   // API requests - Network first, fall back to cache
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
@@ -66,15 +95,25 @@ self.addEventListener('fetch', (event) => {
         .then((response) => {
           // Clone the response before caching
           const responseClone = response.clone();
-          caches.open(API_CACHE).then((cache) => {
-            cache.put(request, responseClone);
-          });
+
+          // Cache profile, booking, and news endpoints longer
+          if (
+            url.pathname.includes('/profile/') ||
+            url.pathname.includes('/bookings/') ||
+            url.pathname.includes('/news')
+          ) {
+            caches.open(API_CACHE).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+
           return response;
         })
         .catch(() => {
           // If network fails, try cache
           return caches.match(request).then((cachedResponse) => {
             if (cachedResponse) {
+              console.log('[Service Worker] Serving cached API response');
               return cachedResponse;
             }
             // If no cache, return offline response
