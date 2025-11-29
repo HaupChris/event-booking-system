@@ -1,8 +1,9 @@
 import base64
 import os
 import sqlite3
+import uuid
 from contextlib import closing
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from src.models.datatypes import ArtistBooking, ArtistBookingWithTimestamp
 from src.services.booking_service import DB_FILE_PATH, DB_DIR
@@ -270,20 +271,23 @@ def update_artist_payment(booking_id: int, payment_data: dict) -> bool:
             return False
 
 
-def insert_artist_booking(booking: ArtistBooking) -> bool:
+def insert_artist_booking(booking: ArtistBooking) -> Tuple[bool, Optional[str]]:
     """
-    Inserts an artist booking if it does not already exist. Returns True if inserted, False if duplicate.
+    Inserts an artist booking if it does not already exist.
+
+    Returns:
+        Tuple of (success: bool, profile_uuid: Optional[str])
     """
     if _artist_booking_exists(booking):
-        return False
+        return False, None
 
     artist_id = _create_artist(booking)
-    booking_id = _create_artist_booking(artist_id, booking)
+    booking_id, profile_uuid = _create_artist_booking(artist_id, booking)
     _assign_artist_materials(booking_id, booking.artist_material_ids)
     _assign_artist_professions(booking_id, booking.profession_ids)  # Add this line
     # Save signature as a file
     _save_artist_signature_image(booking)
-    return True
+    return True, profile_uuid
 
 
 def get_up_to_date_artist_form_content() -> dict:
@@ -380,27 +384,31 @@ def _create_artist(booking: ArtistBooking) -> int:
         return cursor.lastrowid
 
 
-def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> int:
+def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> Tuple[int, Optional[str]]:
     """
-    Creates an artist booking in the ArtistBookings table and returns the booking_id.
+    Creates an artist booking in the ArtistBookings table and returns (booking_id, profile_uuid).
     """
+    # Generate unique profile UUID
+    profile_uuid = str(uuid.uuid4())
+
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO ArtistBookings (
                 artist_id, ticket_option_id, beverage_option_id, food_option_id,
                 signature, total_price, is_paid, paid_amount, payment_notes, payment_date,
-                equipment, special_requests, performance_details
+                equipment, special_requests, performance_details, profile_uuid
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 artist_id, booking.ticket_id, booking.beverage_id, booking.food_id,
                 booking.signature, booking.total_price, booking.is_paid,
                 booking.paid_amount, booking.payment_notes, booking.payment_date,
-                booking.equipment, booking.special_requests, booking.performance_details
+                booking.equipment, booking.special_requests, booking.performance_details,
+                profile_uuid
             ))
         conn.commit()
-        return cursor.lastrowid
+        return cursor.lastrowid, profile_uuid
 
 
 def _assign_artist_materials(booking_id: int, material_ids: List[int]) -> None:

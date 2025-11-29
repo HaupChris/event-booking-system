@@ -43,13 +43,13 @@ def submit_form():
         logger.info(f"Booking submission from {booking.first_name} {booking.last_name} ({booking.email})")
 
         # Attempt to insert booking
-        success = insert_booking(booking)
+        success, profile_uuid = insert_booking(booking)
 
         if success:
             # Send email
             try:
                 form_content_dict = get_up_to_date_form_content()
-                send_confirmation_mail(booking, form_content_dict)
+                send_confirmation_mail(booking, form_content_dict, profile_uuid)
                 logger.info(f"Booking and confirmation email successful for {booking.first_name} {booking.last_name}")
             except Exception as email_error:
                 logger.error(

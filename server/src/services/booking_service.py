@@ -2,9 +2,10 @@ import base64
 import os
 import sqlite3
 import time
+import uuid
 
 from contextlib import closing
-from typing import List
+from typing import List, Tuple, Optional
 
 from src.models.datatypes import Booking, BookingWithTimestamp
 from src.services.formcontent_service import get_form_content_obj, update_form_content_with_db_counts
@@ -92,12 +93,16 @@ def create_user(booking: Booking) -> int:
         return -1
 
 
-def create_booking(user_id: int, booking: Booking) -> int:
+def create_booking(user_id: int, booking: Booking) -> Tuple[int, Optional[str]]:
     """
-    Creates a booking in the Bookings table and returns the booking_id.
+    Creates a booking in the Bookings table and returns (booking_id, profile_uuid).
     """
     try:
         logger.debug(f"Creating booking for user {user_id}")
+
+        # Generate unique profile UUID
+        profile_uuid = str(uuid.uuid4())
+
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
             cursor.execute("""
@@ -105,8 +110,8 @@ def create_booking(user_id: int, booking: Booking) -> int:
                                                  first_priority_timeslot_id, second_priority_timeslot_id,
                                                  third_priority_timeslot_id,
                                                  amount_shifts, supporter_buddy, signature, total_price, is_paid,
-                                                 paid_amount, payment_notes, payment_date)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                                 paid_amount, payment_notes, payment_date, profile_uuid)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                            """, (
                                user_id,
                                booking.ticket_id,
@@ -122,15 +127,16 @@ def create_booking(user_id: int, booking: Booking) -> int:
                                booking.is_paid,
                                booking.paid_amount,
                                booking.payment_notes,
-                               booking.payment_date
+                               booking.payment_date,
+                               profile_uuid
                            ))
             conn.commit()
             booking_id = cursor.lastrowid
-            logger.info(f"Booking created successfully with ID {booking_id} for user {user_id}")
-            return booking_id
+            logger.info(f"Booking created successfully with ID {booking_id} (UUID: {profile_uuid[:8]}...) for user {user_id}")
+            return booking_id, profile_uuid
     except sqlite3.Error as e:
         logger.error(f"Database error creating booking for user {user_id}: {e}", exc_info=True)
-        return -1
+        return -1, None
 
 
 def assign_materials(booking_id: int, material_ids: List[int]) -> None:
@@ -199,8 +205,13 @@ def assign_professions(booking_id: int, profession_ids: List[int]) -> None:
         logger.error(f"Unexpected Error assingin profession ids: {profession_ids} to booking id {booking_id}: {e}", exc_info=True)
 
 
-def insert_booking(booking: Booking) -> bool:
-    """Inserts a booking with comprehensive logging."""
+def insert_booking(booking: Booking) -> Tuple[bool, Optional[str]]:
+    """
+    Inserts a booking with comprehensive logging.
+
+    Returns:
+        Tuple of (success: bool, profile_uuid: Optional[str])
+    """
     start_time = time.time()
 
     try:
@@ -208,33 +219,33 @@ def insert_booking(booking: Booking) -> bool:
 
         if booking_exists(booking):
             logger.warning(f"Duplicate booking attempt for {booking.first_name} {booking.last_name} ({booking.email})")
-            return False
+            return False, None
 
         user_id = create_user(booking)
         if user_id == -1:
             logger.error(f"Failed to create user for booking: {booking.first_name} {booking.last_name}")
-            return False
+            return False, None
 
-        booking_id = create_booking(user_id, booking)
+        booking_id, profile_uuid = create_booking(user_id, booking)
         if booking_id == -1:
             logger.error(f"Failed to create booking for user {user_id}")
-            return False
+            return False, None
 
         duration = time.time() - start_time
         logger.info(
-            f"Booking insertion completed in {duration:.3f}s for {booking.first_name} {booking.last_name} (ID: {booking_id})")
+            f"Booking insertion completed in {duration:.3f}s for {booking.first_name} {booking.last_name} (ID: {booking_id}, UUID: {profile_uuid[:8] if profile_uuid else 'None'}...)")
 
         if duration > 1.0:
             logger.warning(f"Slow booking insertion: {duration:.3f}s for booking {booking_id}")
 
-        return True
+        return True, profile_uuid
 
     except Exception as e:
         duration = time.time() - start_time
         logger.error(
             f"Booking insertion failed after {duration:.3f}s for {booking.first_name} {booking.last_name}: {str(e)}",
             exc_info=True)
-        return False
+        return False, None
 
 
 def get_all_bookings() -> List[BookingWithTimestamp]:

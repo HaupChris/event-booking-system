@@ -12,6 +12,8 @@ import PWAInstallPrompt from './components/core/pwa/PWAInstallPrompt';
 import PWAUpdatePrompt from './components/core/pwa/PWAUpdatePrompt';
 import OfflineIndicator from './components/core/pwa/OfflineIndicator';
 import SyncQueueManager from './components/core/pwa/SyncQueueManager';
+import ProfilePage from './pages/ProfilePage';
+import ProfileRecovery from './components/profile/ProfileRecovery';
 
 
 const App = () => {
@@ -91,6 +93,10 @@ const App = () => {
                                     />}/>
                                 <Route path="/admin/dashboard"
                                        element={isAdmin ? <Dashboard/> : <Navigate replace to="/admin"/>}/>
+
+                                {/* Profile routes (public - no auth required, UUID is the auth) */}
+                                <Route path="/profile/:profileUuid" element={<ProfilePage />} />
+                                <Route path="/profile/recover" element={<ProfileRecovery />} />
                             </Routes>
                         </BrowserRouter>
                     </TokenContext.Provider>

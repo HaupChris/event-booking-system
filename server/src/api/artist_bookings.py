@@ -47,13 +47,13 @@ def submit_artist_form():
         artist_name = getattr(booking, 'artist_name', 'Unknown Artist')
         logger.info(f"Artist booking submission from {artist_name}")
 
-        success = insert_artist_booking(booking)
+        success, profile_uuid = insert_artist_booking(booking)
 
         if success:
             try:
                 # Send email
                 form_content_dict = get_up_to_date_artist_form_content()
-                send_artist_confirmation_mail(booking, form_content_dict)
+                send_artist_confirmation_mail(booking, form_content_dict, profile_uuid)
                 logger.info(f"Artist booking and confirmation email successful for {artist_name}")
             except Exception as email_error:
                 logger.error(f"Artist booking successful but email failed for {artist_name}: {str(email_error)}",
