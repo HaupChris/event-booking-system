@@ -1,9 +1,14 @@
 import React from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead,
-  TableRow, Paper, IconButton, Chip, alpha
+  TableRow, Paper, IconButton, Chip, alpha, Tooltip, Typography, Box
 } from '@mui/material';
-import { MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
+import {
+  MoreHoriz as MoreHorizIcon,
+  ContentCopy as CopyIcon,
+  Visibility as VisibilityIcon,
+  Link as LinkIcon
+} from '@mui/icons-material';
 import { CombinedBooking } from "../interface";
 import { FormContent } from "../../userArea/interface";
 import { spacePalette } from '../../../components/styles/theme';
@@ -16,6 +21,7 @@ interface ColumnVisibility {
   email: boolean;
   ticket: boolean;
   price: boolean;
+  profileLink: boolean;
   actions: boolean;
 }
 
@@ -34,6 +40,15 @@ const BookingTable: React.FC<BookingTableProps> = ({
   artistFormContent,
   onOpenDetails
 }) => {
+  const handleCopyLink = (profileUuid: string) => {
+    const url = `${window.location.origin}/profile/${profileUuid}`;
+    navigator.clipboard.writeText(url);
+  };
+
+  const handleViewProfile = (profileUuid: string) => {
+    window.open(`/profile/${profileUuid}`, '_blank');
+  };
+
   return (
     <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 1 }}>
       <Table size="medium">
@@ -44,6 +59,7 @@ const BookingTable: React.FC<BookingTableProps> = ({
             {columnVisibility.email && <TableCell>Email</TableCell>}
             {columnVisibility.ticket && <TableCell>Ticket</TableCell>}
             {columnVisibility.price && <TableCell>Price</TableCell>}
+            {columnVisibility.profileLink && <TableCell>Profile Link</TableCell>}
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -87,6 +103,37 @@ const BookingTable: React.FC<BookingTableProps> = ({
               )}
               {columnVisibility.price && (
                 <TableCell>€{booking.total_price.toFixed(2)}</TableCell>
+              )}
+              {columnVisibility.profileLink && (
+                <TableCell>
+                  {booking.profile_uuid ? (
+                    <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                      <Tooltip title="Copy profile link">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleCopyLink(booking.profile_uuid!)}
+                        >
+                          <CopyIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="View profile">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleViewProfile(booking.profile_uuid!)}
+                        >
+                          <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Typography variant="caption" sx={{ fontFamily: 'monospace', ml: 0.5 }}>
+                        {booking.profile_uuid.substring(0, 8)}...
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Typography variant="caption" color="text.secondary">
+                      No UUID
+                    </Typography>
+                  )}
+                </TableCell>
               )}
               <TableCell>
                 <IconButton

@@ -15,6 +15,7 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 
 from src.utils.logger import get_logger
+from src.utils.email_sender import send_email
 
 logger = get_logger(__name__)
 
@@ -482,3 +483,148 @@ def get_profile_uuids_by_email(email: str) -> List[Dict[str, str]]:
     except sqlite3.Error as e:
         logger.error(f"Database error searching profiles for email {email}: {e}", exc_info=True)
         raise
+
+
+def get_profile_stats() -> List[Dict[str, Any]]:
+    """
+    Get profile access statistics for all bookings.
+    Returns list of profiles with access information.
+    """
+    try:
+        logger.debug("Fetching profile statistics for all bookings")
+
+        with closing(_connect_db()) as conn:
+            cursor = conn.cursor()
+
+            profiles = []
+
+            # Get regular bookings
+            cursor.execute("""
+                SELECT
+                    b.id as booking_id,
+                    'regular' as booking_type,
+                    u.first_name,
+                    u.last_name,
+                    u.email,
+                    b.profile_uuid,
+                    b.profile_last_accessed,
+                    b.profile_access_count,
+                    b.timestamp as registration_date
+                FROM Bookings b
+                JOIN Users u ON b.user_id = u.id
+                WHERE b.profile_uuid IS NOT NULL
+                ORDER BY u.last_name, u.first_name
+            """)
+
+            for row in cursor.fetchall():
+                profiles.append({
+                    'booking_id': row['booking_id'],
+                    'booking_type': row['booking_type'],
+                    'first_name': row['first_name'],
+                    'last_name': row['last_name'],
+                    'email': row['email'],
+                    'profile_uuid': row['profile_uuid'],
+                    'last_accessed': row['profile_last_accessed'],
+                    'access_count': row['profile_access_count'] or 0,
+                    'registration_date': row['registration_date']
+                })
+
+            # Get artist bookings
+            cursor.execute("""
+                SELECT
+                    ab.id as booking_id,
+                    'artist' as booking_type,
+                    a.first_name,
+                    a.last_name,
+                    a.email,
+                    ab.profile_uuid,
+                    ab.profile_last_accessed,
+                    ab.profile_access_count,
+                    ab.timestamp as registration_date
+                FROM ArtistBookings ab
+                JOIN Artists a ON ab.artist_id = a.id
+                WHERE ab.profile_uuid IS NOT NULL
+                ORDER BY a.last_name, a.first_name
+            """)
+
+            for row in cursor.fetchall():
+                profiles.append({
+                    'booking_id': row['booking_id'],
+                    'booking_type': row['booking_type'],
+                    'first_name': row['first_name'],
+                    'last_name': row['last_name'],
+                    'email': row['email'],
+                    'profile_uuid': row['profile_uuid'],
+                    'last_accessed': row['profile_last_accessed'],
+                    'access_count': row['profile_access_count'] or 0,
+                    'registration_date': row['registration_date']
+                })
+
+            logger.info(f"Retrieved profile stats for {len(profiles)} profiles")
+            return profiles
+
+    except sqlite3.Error as e:
+        logger.error(f"Database error fetching profile stats: {e}", exc_info=True)
+        raise
+
+
+def send_profile_link_email(profile_uuid: str, email: str, first_name: str) -> bool:
+    """
+    Send profile link to user via email.
+
+    Args:
+        profile_uuid: The profile UUID
+        email: Recipient email address
+        first_name: Recipient's first name for personalization
+
+    Returns:
+        True if email was sent successfully, False otherwise
+    """
+    try:
+        logger.debug(f"Sending profile link email to {email} for profile {profile_uuid}")
+
+        # Get the base URL from environment (default to localhost for development)
+        base_url = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+        profile_url = f"{base_url}/profile/{profile_uuid}"
+
+        subject = "Dein Wiesenwahn Festival Profil-Link"
+
+        body = f"""
+Hallo {first_name},
+
+hier ist dein persönlicher Profil-Link für das Wiesenwahn Festival:
+
+{profile_url}
+
+Über diesen Link kannst du:
+• Deine Buchungsdetails einsehen
+• Schichtzuweisungen annehmen oder ablehnen
+• Aktuelle Neuigkeiten zum Festival lesen
+
+WICHTIG: Bewahre diesen Link sicher auf! Er ist dein persönlicher Zugang zu deinem Festival-Profil.
+
+Tipp: Du kannst die Profil-Seite zu deinem Homescreen hinzufügen, um schnellen Zugriff zu haben.
+
+Bei Fragen oder Problemen wende dich gerne an das Orga-Team.
+
+Wir freuen uns auf dich beim Wiesenwahn Festival!
+
+Dein Wiesenwahn-Team
+"""
+
+        success = send_email(
+            recipient=email,
+            subject=subject,
+            body=body
+        )
+
+        if success:
+            logger.info(f"Profile link email sent successfully to {email}")
+        else:
+            logger.error(f"Failed to send profile link email to {email}")
+
+        return success
+
+    except Exception as e:
+        logger.error(f"Error sending profile link email to {email}: {e}", exc_info=True)
+        return False

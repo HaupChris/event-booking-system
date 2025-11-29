@@ -24,7 +24,9 @@ import {
     EuroSymbol,
     PointOfSale,
     School,
-    AssignmentInd
+    AssignmentInd,
+    AccountBox,
+    Newspaper
 } from '@mui/icons-material';
 import ListItemButton from "@mui/material/ListItemButton";
 import {CSVLink} from "react-csv";
@@ -44,6 +46,8 @@ import PaymentConfirmationsPage from './PaymentConfirmationsPage';
 import {useFetchData} from './useFetchData';
 import ProfessionsPage from "./ProfessionsPage";
 import ShiftAssignmentsPage from "./ShiftAssignments";
+import ProfileManagementPage from "./ProfileManagementPage";
+import NewsManagementPage from "./NewsManagementPage";
 // import {TokenContext} from "../../contexts/AuthContext";
 // import {ShiftAssignment} from "./ShiftAssignments/types";
 
@@ -67,7 +71,9 @@ const dashboardTabs: DashboardTab[] = [
     {id: 'professions', label: 'Professions', icon: <School/>, permissions: ['read']},
     {id: 'financials', label: 'Financials', icon: <EuroSymbol/>, permissions: ['financial']},
     {id: 'payments', label: 'Payments', icon: <PointOfSale/>, permissions: ['financial']},
-    {id: 'shiftAssignments', label: 'Shift Assignments', icon: <AssignmentInd/>, permissions: ['read']}
+    {id: 'shiftAssignments', label: 'Shift Assignments', icon: <AssignmentInd/>, permissions: ['read']},
+    {id: 'profiles', label: 'Profile Management', icon: <AccountBox/>, permissions: ['read']},
+    {id: 'news', label: 'News Management', icon: <Newspaper/>, permissions: ['read']}
 ];
 
 function Dashboard() {
@@ -126,6 +132,10 @@ function Dashboard() {
                 return <ShiftAssignmentsPage/>;
             case 'professions':
                 return <ProfessionsPage/>;
+            case 'profiles':
+                return <ProfileManagementPage/>;
+            case 'news':
+                return <NewsManagementPage/>;
             default:
                 return <HomePage/>;
         }

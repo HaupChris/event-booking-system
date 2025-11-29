@@ -34,6 +34,7 @@ interface ColumnVisibility {
     email: boolean;
     ticket: boolean;
     price: boolean;
+    profileLink: boolean;
     actions: boolean;
 }
 
@@ -60,9 +61,10 @@ const BookingsPage: React.FC = () => {
             email: !isMobile,
             ticket: !isMobile,
             price: !isMobile,
+            profileLink: !isMobile,
             actions: true,
         },
-        mobileHiddenColumns: ['email', 'ticket', 'price'],
+        mobileHiddenColumns: ['email', 'ticket', 'price', 'profileLink'],
         isMobile
     });
 
