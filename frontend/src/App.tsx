@@ -8,6 +8,8 @@ import {ArtistRegistrationFormContainer} from './form/artistArea/ArtistRegistrat
 import ThemeProvider from './contexts/ThemeProvider';
 import SpaceBackground from './components/core/layouts/SpaceBackground';
 import LoginPage from './components/core/inputs/LoginPage';
+import PWAInstallPrompt from './components/core/pwa/PWAInstallPrompt';
+import PWAUpdatePrompt from './components/core/pwa/PWAUpdatePrompt';
 
 
 const App = () => {
@@ -43,6 +45,10 @@ const App = () => {
             >
                 {/* Space background behind everything */}
                 <SpaceBackground/>
+
+                {/* PWA Components */}
+                <PWAInstallPrompt />
+                <PWAUpdatePrompt />
 
                 {/* Theme toggle button */}
                 {/*<ThemeToggle />*/}
