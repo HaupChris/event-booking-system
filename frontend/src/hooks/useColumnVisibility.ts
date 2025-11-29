@@ -3,7 +3,7 @@
  * Handles responsive column hiding and user column selection
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export interface ColumnVisibilityState {
     [key: string]: boolean;

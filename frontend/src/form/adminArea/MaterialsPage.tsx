@@ -1,229 +1,95 @@
 import React, {useState} from 'react';
 import {
     Box, Typography, Modal, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Paper, Chip, useStepContext
+    TableHead, TableRow, Paper, Chip
 } from '@mui/material';
 import {
     Person as PersonIcon,
     Handyman as HandymanIcon,
-    Close as CloseIcon, People, AllInbox, Mic,
+    Close as CloseIcon,
+    People,
+    Mic,
 } from '@mui/icons-material';
 import {useFetchData} from './useFetchData';
 import TabSwitcher from './components/TabSwitcher';
-import ProgressList, {ProgressItem} from './components/ProgressList';
-import PeopleList, {Person} from './components/PeopleList';
+import ProgressList from './components/ProgressList';
+import PeopleList from './components/PeopleList';
 import FilterSortBar from './components/FilterSortBar';
 import FormCard from '../../components/core/display/FormCard';
 import {ViewFilterType} from './utils/optionsUtils';
+import {useModal} from '../../hooks/useModal';
+import {useSort} from '../../hooks/useSort';
+import {transformMaterialsToProgressItems, transformBookingsToPeopleItems} from './transformers/materialTransformers';
+import {getUsersForMaterial} from './utils/materialUtils';
+
+interface MaterialModalData {
+    material: any;
+    materialType: 'regular' | 'artist';
+}
 
 const MaterialsPage: React.FC = () => {
     const {regularBookings, artistBookings, formContent, artistFormContent} = useFetchData();
 
-    // State
+    // Tab state
     const [activeTab, setActiveTab] = useState('materials');
-    const [selectedMaterial, setSelectedMaterial] = useState<any | null>(null);
-    const [selectedMaterialType, setSelectedMaterialType] = useState<'regular' | 'artist' | null>(null);
-    const [openMaterialModal, setOpenMaterialModal] = useState(false);
-    const [materialSortOrder, setMaterialSortOrder] = useState<'asc' | 'desc'>('asc');
-    const [materialSortBy, setMaterialSortBy] = useState<string>('name');
-    const [peopleSortOrder, setPeopleSortOrder] = useState<'asc' | 'desc'>('asc');
-    const [peopleSortBy, setPeopleSortBy] = useState<string>('name');
     const [viewType, setViewType] = useState<ViewFilterType>('all');
 
-    // Modal handlers
+    // Custom hooks for state management
+    const {
+        selectedItem: selectedMaterialData,
+        isOpen: openMaterialModal,
+        open: openModal,
+        close: handleCloseMaterialModal
+    } = useModal<MaterialModalData>();
+
+    const {
+        sortBy: materialSortBy,
+        setSortBy: setMaterialSortBy,
+        sortOrder: materialSortOrder,
+        toggleOrder: handleToggleMaterialSort
+    } = useSort<'progress' | 'name'>('name', 'asc');
+
+    const {
+        sortBy: peopleSortBy,
+        setSortBy: setPeopleSortBy,
+        sortOrder: peopleSortOrder,
+        toggleOrder: handleTogglePeopleSort
+    } = useSort<'name' | 'materials'>('name', 'asc');
+
+    // Modal handler
     const handleOpenMaterialModal = (material: any, materialType: 'regular' | 'artist') => {
-        setSelectedMaterial(material);
-        setSelectedMaterialType(materialType);
-        setOpenMaterialModal(true);
+        openModal({material, materialType});
     };
 
-    const handleCloseMaterialModal = () => {
-        setOpenMaterialModal(false);
-        setSelectedMaterial(null);
-        setSelectedMaterialType(null);
+    // Transform data using transformers
+    const materialsToProgressItems = () => transformMaterialsToProgressItems({
+        regularBookings,
+        artistBookings,
+        formContent,
+        artistFormContent,
+        viewType,
+        sortBy: materialSortBy,
+        sortOrder: materialSortOrder,
+        onMaterialClick: handleOpenMaterialModal
+    });
+
+    const bookingsToPeopleItems = () => transformBookingsToPeopleItems({
+        regularBookings,
+        artistBookings,
+        formContent,
+        artistFormContent,
+        viewType,
+        sortBy: peopleSortBy,
+        sortOrder: peopleSortOrder
+    });
+
+    // Sort handlers
+    const handleMaterialSortByChange = (value: string) => {
+        setMaterialSortBy(value as 'progress' | 'name');
     };
 
-    // Toggle sort orders
-    const handleToggleMaterialSort = () => {
-        setMaterialSortOrder(materialSortOrder === 'asc' ? 'desc' : 'asc');
-    };
-
-    const handleTogglePeopleSort = () => {
-        setPeopleSortOrder(peopleSortOrder === 'asc' ? 'desc' : 'asc');
-    };
-
-
-    // Convert materials to progress items
-    const materialsToProgressItems = (): ProgressItem[] => {
-        const regularMaterials = viewType === 'all' || viewType === 'regular'
-            ? formContent.materials.map(material => ({
-                    id: `regular-${material.id}`,
-                    title: material.title,
-                    currentCount: getMaterialCount(material.id, 'regular'),
-                    totalNeeded: material.num_needed,
-                    badgeContent: getUsersForMaterial(material.id, 'regular').length,
-                    badgeIcon: <PersonIcon color="action"/>,
-                    isRegular: true,
-                    material
-                }))
-            : [];
-
-        const artistMaterials = viewType === 'all' || viewType === 'artist'
-            ? artistFormContent.artist_materials.map(material => ({
-                id: `artist-${material.id}`,
-                title: material.title,
-                currentCount: getMaterialCount(material.id, 'artist'),
-                totalNeeded: material.num_needed,
-                badgeContent: getUsersForMaterial(material.id, 'artist').length,
-                badgeIcon: <PersonIcon color="action"/>,
-                isRegular: false,
-                material
-            }))
-            : [];
-
-        return [...regularMaterials, ...artistMaterials]
-            .sort((a, b) => {
-                    const comparison = materialSortBy === 'name'
-                        ? a.title.localeCompare(b.title)
-                        : (a.currentCount / a.totalNeeded) - (b.currentCount / b.totalNeeded);
-
-                    return materialSortOrder === 'asc' ? comparison : -comparison;
-                })
-            .map(item => ({
-            ...item,
-            children: (
-                <Box>
-                    <Typography variant="body2" sx={{mb: 2}}>
-                        {item.isRegular ?
-                            "Regular material needed for the festival setup." :
-                            "Special material needed for artist performances."}
-                    </Typography>
-
-                    <Box sx={{textAlign: 'center'}}>
-                        <Chip
-                            label="View People"
-                            color="primary"
-                            onClick={() => handleOpenMaterialModal(
-                                item.material,
-                                item.isRegular ? 'regular' : 'artist'
-                            )}
-                            icon={<PersonIcon/>}
-                        />
-                    </Box>
-                </Box>
-            )
-        }));
-    };
-
-    // Get users for a specific material
-    const getUsersForMaterial = (materialId: number, materialType: 'regular' | 'artist') => {
-        if (materialType === 'regular') {
-            return regularBookings
-                .filter(booking => booking.material_ids?.includes(materialId))
-                .map(booking => ({
-                    first_name: booking.first_name,
-                    last_name: booking.last_name,
-                    is_artist: false
-                }));
-        } else {
-            return artistBookings
-                .filter(booking => booking.artist_material_ids?.includes(materialId))
-                .map(booking => ({
-                    first_name: booking.first_name,
-                    last_name: booking.last_name,
-                    is_artist: true
-                }));
-        }
-    };
-
-    // Count materials
-    const getMaterialCount = (materialId: number, materialType: 'regular' | 'artist') => {
-        if (materialType === 'regular') {
-            return regularBookings.reduce((count, booking) => {
-                return count + (booking.material_ids?.includes(materialId) ? 1 : 0);
-            }, 0);
-        } else {
-            return artistBookings.reduce((count, booking) => {
-                return count + (booking.artist_material_ids?.includes(materialId) ? 1 : 0);
-            }, 0);
-        }
-    };
-
-    // Convert people with materials to list items
-    const peopleToPeopleItems = (): Person[] => {
-        const regularPeople = viewType === 'all' || viewType === 'regular'
-            ? regularBookings
-                .filter(booking => booking.material_ids && booking.material_ids.length > 0)
-                .map(booking => ({
-                    id: `regular-${booking.id}`,
-                    name: `${booking.first_name} ${booking.last_name}`,
-                    type: 'regular' as const,
-                    badgeContent: booking.material_ids?.length || 0,
-                    badgeIcon: <HandymanIcon color="action"/>,
-                    children: (
-                        <Box>
-                            <Typography variant="subtitle2" gutterBottom>
-                                Materials being brought:
-                            </Typography>
-                            <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1}}>
-                                {booking.material_ids?.map((materialId: number) => {
-                                    const material = formContent.materials.find(m => m.id === materialId);
-                                    return material ? (
-                                        <Chip
-                                            key={materialId}
-                                            label={material.title}
-                                            variant="outlined"
-                                            size="small"
-                                        />
-                                    ) : null;
-                                })}
-                            </Box>
-                        </Box>
-                    )
-                }))
-            : [];
-
-        const artistPeople = viewType === 'all' || viewType === 'artist'
-            ? artistBookings
-                .filter(booking => booking.artist_material_ids && booking.artist_material_ids.length > 0)
-                .map(booking => ({
-                    id: `artist-${booking.id}`,
-                    name: `${booking.first_name} ${booking.last_name}`,
-                    type: 'artist' as const,
-                    badgeContent: booking.artist_material_ids?.length || 0,
-                    badgeIcon: <HandymanIcon color="action"/>,
-                    children: (
-                        <Box>
-                            <Typography variant="subtitle2" gutterBottom>
-                                Materials being brought:
-                            </Typography>
-                            <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1}}>
-                                {booking.artist_material_ids?.map((materialId: number) => {
-                                    const material = artistFormContent.artist_materials.find(m => m.id === materialId);
-                                    return material ? (
-                                        <Chip
-                                            key={materialId}
-                                            label={material.title}
-                                            color="primary"
-                                            variant="outlined"
-                                            size="small"
-                                        />
-                                    ) : null;
-                                })}
-                            </Box>
-                        </Box>
-                    )
-                }))
-            : [];
-
-        return [...regularPeople, ...artistPeople].sort((a, b) => {
-                    const comparison = peopleSortBy === 'name'
-                        ? a.name.localeCompare(b.name)
-                        : a.badgeContent - b.badgeContent;
-
-                    return peopleSortOrder === 'asc' ? comparison : -comparison;
-                })
-            ;
+    const handlePeopleSortByChange = (value: string) => {
+        setPeopleSortBy(value as 'name' | 'materials');
     };
 
     return (
@@ -268,12 +134,11 @@ const MaterialsPage: React.FC = () => {
                         ]}
                         sortBy={materialSortBy}
                         sortOrder={materialSortOrder}
-                        onSortByChange={(value) => {setMaterialSortBy(value)
-                        }} // Not implemented in this example
+                        onSortByChange={handleMaterialSortByChange}
                         onSortOrderToggle={handleToggleMaterialSort}
                     >
                         <Typography variant="body2">
-                            Showing {materialsToProgressItems().length} materials sorted by progress
+                            Showing {materialsToProgressItems().length} materials sorted by {materialSortBy}
                         </Typography>
                     </FilterSortBar>
 
@@ -293,17 +158,16 @@ const MaterialsPage: React.FC = () => {
                         ]}
                         sortBy={peopleSortBy}
                         sortOrder={peopleSortOrder}
-                        onSortByChange={(value) => {setPeopleSortBy(value)
-                        }} // Not implemented in this example
+                        onSortByChange={handlePeopleSortByChange}
                         onSortOrderToggle={handleTogglePeopleSort}
                     >
                         <Typography variant="body2">
-                            Showing {peopleToPeopleItems().length} people bringing materials
+                            Showing {bookingsToPeopleItems().length} people bringing materials sorted by {peopleSortBy}
                         </Typography>
                     </FilterSortBar>
 
                     <PeopleList
-                        people={peopleToPeopleItems()}
+                        people={bookingsToPeopleItems()}
                     />
                 </>
             )}
@@ -331,21 +195,25 @@ const MaterialsPage: React.FC = () => {
                         />
                     </Box>
 
-                    {selectedMaterial && selectedMaterialType && (
+                    {selectedMaterialData && (
                         <Box>
                             <Box sx={{mb: 3, pr: 4}}>
                                 <Box sx={{display: 'flex', alignItems: 'center', mb: 1}}>
                                     <Typography variant="h6" color="text.primary">
-                                        {selectedMaterial.title}
+                                        {selectedMaterialData.material.title}
                                     </Typography>
-                                    {selectedMaterialType === 'artist' && (
+                                    {selectedMaterialData.materialType === 'artist' && (
                                         <Chip label="Artist Material" color="primary" size="small" sx={{ml: 1}}/>
                                     )}
                                 </Box>
 
                                 <Typography variant="body2" color="text.secondary">
-                                    {getUsersForMaterial(selectedMaterial.id, selectedMaterialType).length} people
-                                    are bringing this item (needed: {selectedMaterial.num_needed})
+                                    {getUsersForMaterial(
+                                        selectedMaterialData.material.id,
+                                        selectedMaterialData.materialType,
+                                        regularBookings,
+                                        artistBookings
+                                    ).length} people are bringing this item (needed: {selectedMaterialData.material.num_needed})
                                 </Typography>
                             </Box>
 
@@ -358,21 +226,25 @@ const MaterialsPage: React.FC = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {getUsersForMaterial(selectedMaterial.id, selectedMaterialType)
-                                            .map((user, index) => (
-                                                <TableRow key={index}>
-                                                    <TableCell>
-                                                        {user.first_name} {user.last_name}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {user.is_artist ? (
-                                                            <Chip label="Artist" color="primary" size="small"/>
-                                                        ) : (
-                                                            <Chip label="Regular" size="small"/>
-                                                        )}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
+                                        {getUsersForMaterial(
+                                            selectedMaterialData.material.id,
+                                            selectedMaterialData.materialType,
+                                            regularBookings,
+                                            artistBookings
+                                        ).map((user, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>
+                                                    {user.first_name} {user.last_name}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {user.is_artist ? (
+                                                        <Chip label="Artist" color="primary" size="small"/>
+                                                    ) : (
+                                                        <Chip label="Regular" size="small"/>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>

@@ -3,8 +3,9 @@
  */
 
 import { useContext } from 'react';
-import axios from 'axios';
 import { TokenContext } from '../contexts/AuthContext';
+import { setAuthToken } from '../services/apiClient';
+import api from '../services/api';
 
 export function useBookingActions() {
     const { token } = useContext(TokenContext);
@@ -13,13 +14,14 @@ export function useBookingActions() {
         bookingId: number,
         bookingType: 'regular' | 'artist'
     ): Promise<void> => {
-        const endpoint = bookingType === 'artist'
-            ? `/api/artist/booking/${bookingId}`
-            : `/api/booking/${bookingId}`;
+        // Update API client token
+        setAuthToken(token);
 
-        await axios.delete(endpoint, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        if (bookingType === 'artist') {
+            await api.artistBookings.delete(bookingId);
+        } else {
+            await api.bookings.delete(bookingId);
+        }
     };
 
     return {

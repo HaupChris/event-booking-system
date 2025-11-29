@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, Theme, Components } from '@mui/material/styles';
 import { alpha } from '@mui/material';
 import { createContext, useContext } from 'react';
 
@@ -78,9 +78,146 @@ const lightPalette = {
   }
 };
 
+// Shared typography configuration
+const sharedTypography = {
+  fontFamily: 'DSEG7Classic, monospace',
+  h4: {
+    fontWeight: 500,
+    letterSpacing: '0.03em',
+  },
+  h5: {
+    fontWeight: 500,
+    letterSpacing: '0.02em',
+  },
+  h6: {
+    fontWeight: 500,
+    letterSpacing: '0.02em',
+  },
+  body1: {
+    letterSpacing: '0.03em',
+  },
+  body2: {
+    letterSpacing: '0.02em',
+  },
+};
+
+// Component overrides factory function
+const getComponentOverrides = (palette: typeof darkPalette, mode: 'dark' | 'light'): Components<Omit<Theme, 'components'>> => {
+  const isDark = mode === 'dark';
+  const boxShadowStrength = isDark ? '0.5' : '0.1';
+  const buttonBg = isDark
+    ? 'linear-gradient(145deg, #222222, #1a1a1a)'
+    : 'linear-gradient(145deg, #f5f5f5, #e0e0e0)';
+  const buttonHoverBg = isDark
+    ? 'linear-gradient(145deg, #2a2a2a, #1f1f1f)'
+    : 'linear-gradient(145deg, #ffffff, #f0f0f0)';
+  const buttonBoxShadow = isDark
+    ? 'inset 1px 1px 2px #111, inset -1px -1px 2px #333'
+    : 'inset 1px 1px 2px #fff, inset -1px -1px 2px #ccc';
+  const inputBg = isDark
+    ? 'linear-gradient(145deg, #2a2a2a, #1f1f1f)'
+    : 'linear-gradient(145deg, #ffffff, #f0f0f0)';
+
+  return {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 2,
+          textTransform: 'none',
+          padding: '8px 16px',
+          border: `1px solid ${palette.primary.main}`,
+          background: buttonBg,
+          boxShadow: buttonBoxShadow,
+          color: palette.primary.main,
+          '&:hover': {
+            boxShadow: `0 0 6px ${palette.primary.main}`,
+            background: buttonHoverBg,
+          },
+        },
+        contained: {
+          background: `linear-gradient(45deg, ${palette.primary.dark}, ${palette.primary.main})`,
+          color: palette.text.primary,
+          '&:hover': {
+            background: `linear-gradient(45deg, ${palette.primary.main}, ${palette.primary.light})`,
+          }
+        }
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 2,
+          background: inputBg,
+          boxShadow: buttonBoxShadow,
+          '& fieldset': {
+            borderColor: alpha(palette.primary.main, 0.3),
+          },
+          '&:hover fieldset': {
+            borderColor: alpha(palette.primary.main, 0.5),
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: palette.primary.main,
+            boxShadow: `0 0 6px ${palette.primary.main}`,
+          },
+        },
+        input: {
+          color: palette.text.primary,
+          caretColor: palette.primary.main,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          background: palette.background.card,
+          boxShadow: `0 5px 20px rgba(0,0,0,${boxShadowStrength})`,
+          border: `1px solid ${alpha(palette.primary.main, 0.2)}`,
+          borderRadius: '14px',
+          overflow: 'hidden',
+          position: 'relative',
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          paddingLeft: 0,
+          paddingRight: 0,
+          paddingTop: 16,
+          paddingBottom: 16
+        }
+      }
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+        },
+        elevation2: {
+          background: palette.background.card,
+          boxShadow: `0 5px 20px rgba(0,0,0,${boxShadowStrength})`,
+          border: `1px solid ${alpha(palette.primary.main, 0.2)}`,
+          borderRadius: '14px',
+          overflow: 'hidden',
+          position: 'relative',
+          backgroundColor: alpha(palette.background.paper, isDark ? 0.7 : 0.9),
+        },
+        elevation3: {
+          background: palette.background.card,
+          boxShadow: `0 5px 20px rgba(0,0,0,${boxShadowStrength})`,
+          border: `1px solid ${alpha(palette.primary.main, 0.2)}`,
+          borderRadius: '14px',
+          overflow: 'hidden',
+          position: 'relative',
+        }
+      },
+    },
+  };
+};
+
 // Create dark theme
 export const darkTheme = createTheme({
-  spacing: 8, // Default MUI spacing unit (8px)
+  spacing: 8,
   palette: {
     mode: 'dark',
     primary: darkPalette.primary,
@@ -96,127 +233,13 @@ export const darkTheme = createTheme({
       secondary: darkPalette.text.secondary,
     },
   },
-  typography: {
-    fontFamily: 'DSEG7Classic, monospace',
-    h4: {
-      fontWeight: 500,
-      letterSpacing: '0.03em',
-    },
-    h5: {
-      fontWeight: 500,
-      letterSpacing: '0.02em',
-    },
-    h6: {
-      fontWeight: 500,
-      letterSpacing: '0.02em',
-    },
-    body1: {
-      letterSpacing: '0.03em',
-    },
-    body2: {
-      letterSpacing: '0.02em',
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 2,
-          textTransform: 'none',
-          padding: '8px 16px',
-          border: `1px solid ${darkPalette.primary.main}`,
-          background: 'linear-gradient(145deg, #222222, #1a1a1a)',
-          boxShadow: 'inset 1px 1px 2px #111, inset -1px -1px 2px #333',
-          color: darkPalette.primary.main,
-          '&:hover': {
-            boxShadow: `0 0 6px ${darkPalette.primary.main}`,
-            background: 'linear-gradient(145deg, #2a2a2a, #1f1f1f)',
-          },
-        },
-        contained: {
-          background: `linear-gradient(45deg, ${darkPalette.primary.dark}, ${darkPalette.primary.main})`,
-          color: darkPalette.text.primary,
-          '&:hover': {
-            background: `linear-gradient(45deg, ${darkPalette.primary.main}, ${darkPalette.primary.light})`,
-          }
-        }
-      },
-    },
-    MuiOutlinedInput: {
-      styleOverrides: {
-        root: {
-          borderRadius: 2,
-          background: 'linear-gradient(145deg, #2a2a2a, #1f1f1f)',
-          boxShadow: 'inset 1px 1px 2px #111, inset -1px -1px 2px #333',
-          '& fieldset': {
-            borderColor: alpha(darkPalette.primary.main, 0.3),
-          },
-          '&:hover fieldset': {
-            borderColor: alpha(darkPalette.primary.main, 0.5),
-          },
-          '&.Mui-focused fieldset': {
-            borderColor: darkPalette.primary.main,
-            boxShadow: `0 0 6px ${darkPalette.primary.main}`,
-          },
-        },
-        input: {
-          color: darkPalette.text.primary,
-          caretColor: darkPalette.primary.main,
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          background: darkPalette.background.card,
-          boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
-          border: `1px solid ${alpha(darkPalette.primary.main, 0.2)}`,
-          borderRadius: '14px',
-          overflow: 'hidden',
-          position: 'relative',
-        },
-      },
-    },
-    MuiCardContent: {
-      styleOverrides: {
-        root: {
-          paddingLeft: 0,
-          paddingRight: 0,
-          paddingTop: 16,
-          paddingBottom: 16
-        }
-      }
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: 'none',
-        },
-        elevation2: {
-          background: darkPalette.background.card,
-          boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
-          border: `1px solid ${alpha(darkPalette.primary.main, 0.2)}`,
-          borderRadius: '14px',
-          overflow: 'hidden',
-          position: 'relative',
-          backgroundColor: alpha(darkPalette.background.paper, 0.7),
-        },
-        elevation3: {
-          background: darkPalette.background.card,
-          boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
-          border: `1px solid ${alpha(darkPalette.primary.main, 0.2)}`,
-          borderRadius: '14px',
-          overflow: 'hidden',
-          position: 'relative',
-        }
-      },
-    },
-  },
+  typography: sharedTypography,
+  components: getComponentOverrides(darkPalette, 'dark'),
 });
 
 // Create light theme
 export const lightTheme = createTheme({
-  spacing: 8, // Default MUI spacing unit (8px)
+  spacing: 8,
   palette: {
     mode: 'light',
     primary: lightPalette.primary,
@@ -232,122 +255,8 @@ export const lightTheme = createTheme({
       secondary: lightPalette.text.secondary,
     },
   },
-  typography: {
-    fontFamily: 'DSEG7Classic, monospace',
-    h4: {
-      fontWeight: 500,
-      letterSpacing: '0.03em',
-    },
-    h5: {
-      fontWeight: 500,
-      letterSpacing: '0.02em',
-    },
-    h6: {
-      fontWeight: 500,
-      letterSpacing: '0.02em',
-    },
-    body1: {
-      letterSpacing: '0.03em',
-    },
-    body2: {
-      letterSpacing: '0.02em',
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 2,
-          textTransform: 'none',
-          padding: '8px 16px',
-          border: `1px solid ${lightPalette.primary.main}`,
-          background: 'linear-gradient(145deg, #f5f5f5, #e0e0e0)',
-          boxShadow: 'inset 1px 1px 2px #fff, inset -1px -1px 2px #ccc',
-          color: lightPalette.primary.main,
-          '&:hover': {
-            boxShadow: `0 0 6px ${lightPalette.primary.main}`,
-            background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
-          },
-        },
-        contained: {
-          background: `linear-gradient(45deg, ${lightPalette.primary.dark}, ${lightPalette.primary.main})`,
-          color: lightPalette.text.primary,
-          '&:hover': {
-            background: `linear-gradient(45deg, ${lightPalette.primary.main}, ${lightPalette.primary.light})`,
-          }
-        }
-      },
-    },
-    MuiOutlinedInput: {
-      styleOverrides: {
-        root: {
-          borderRadius: 2,
-          background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
-          boxShadow: 'inset 1px 1px 2px #fff, inset -1px -1px 2px #ccc',
-          '& fieldset': {
-            borderColor: alpha(lightPalette.primary.main, 0.3),
-          },
-          '&:hover fieldset': {
-            borderColor: alpha(lightPalette.primary.main, 0.5),
-          },
-          '&.Mui-focused fieldset': {
-            borderColor: lightPalette.primary.main,
-            boxShadow: `0 0 6px ${lightPalette.primary.main}`,
-          },
-        },
-        input: {
-          color: lightPalette.text.primary,
-          caretColor: lightPalette.primary.main,
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          background: lightPalette.background.card,
-          boxShadow: '0 5px 20px rgba(0,0,0,0.1)',
-          border: `1px solid ${alpha(lightPalette.primary.main, 0.2)}`,
-          borderRadius: '14px',
-          overflow: 'hidden',
-          position: 'relative',
-        },
-      },
-    },
-    MuiCardContent: {
-      styleOverrides: {
-        root: {
-          paddingLeft: 0,
-          paddingRight: 0,
-          paddingTop: 16,
-          paddingBottom: 16
-        }
-      }
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: 'none',
-        },
-        elevation2: {
-          background: lightPalette.background.card,
-          boxShadow: '0 5px 20px rgba(0,0,0,0.1)',
-          border: `1px solid ${alpha(lightPalette.primary.main, 0.2)}`,
-          borderRadius: '14px',
-          overflow: 'hidden',
-          position: 'relative',
-          backgroundColor: alpha(lightPalette.background.paper, 0.9),
-        },
-        elevation3: {
-          background: lightPalette.background.card,
-          boxShadow: '0 5px 20px rgba(0,0,0,0.1)',
-          border: `1px solid ${alpha(lightPalette.primary.main, 0.2)}`,
-          borderRadius: '14px',
-          overflow: 'hidden',
-          position: 'relative',
-        }
-      },
-    },
-  },
+  typography: sharedTypography,
+  components: getComponentOverrides(lightPalette, 'light'),
 });
 
 // Export spacePalette for direct use

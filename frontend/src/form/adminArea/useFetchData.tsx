@@ -1,9 +1,10 @@
 import {useCallback, useContext, useEffect, useState} from "react";
-import axios from "axios";
 import {TokenContext} from "../../contexts/AuthContext";
 import {ArtistBookingWithTimestamp, ArtistFormContent} from "../artistArea/interface";
 import {BookingWithTimestamp, FormContent} from "../userArea/interface";
 import {CombinedBooking} from "./interface";
+import {setAuthToken} from "../../services/apiClient";
+import api from "../../services/api";
 
 export const useFetchData = () => {
     const [regularBookings, setRegularBookings] = useState<BookingWithTimestamp[]>([]);
@@ -27,24 +28,19 @@ export const useFetchData = () => {
 
     const fetchData = useCallback(async () => {
         try {
+            // Update API client token
+            setAuthToken(token);
+
             // Fetch regular user data
             const [bookingsResponse, formContentResponse] = await Promise.all([
-                axios.get('/api/data', {
-                    headers: {Authorization: `Bearer ${token}`}
-                }),
-                axios.get('/api/formcontent', {
-                    headers: {Authorization: `Bearer ${token}`}
-                })
+                api.bookings.getAll(),
+                api.formContent.getRegular()
             ]);
 
             // Fetch artist data
             const [artistBookingsResponse, artistFormContentResponse] = await Promise.all([
-                axios.get('/api/artist/data', {
-                    headers: {Authorization: `Bearer ${token}`}
-                }),
-                axios.get('/api/artist/formcontent', {
-                    headers: {Authorization: `Bearer ${token}`}
-                })
+                api.artistBookings.getAll(),
+                api.formContent.getArtist()
             ]);
 
             setRegularBookings(bookingsResponse.data);
@@ -52,6 +48,7 @@ export const useFetchData = () => {
             setArtistBookings(artistBookingsResponse.data);
             setArtistFormContent(artistFormContentResponse.data);
         } catch (error) {
+            console.error('Error fetching data:', error);
         }
     }, [token]);
 
