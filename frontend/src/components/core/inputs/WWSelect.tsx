@@ -1,17 +1,20 @@
 // src/components/core/inputs/SpaceSelect.tsx
-import React, { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import React from 'react';
+import type {
+  SelectProps,
+  SelectChangeEvent
+} from '@mui/material';
 import {
   Select,
-  SelectProps,
   MenuItem,
   Typography,
   IconButton,
-  alpha,
-  SelectChangeEvent
+  alpha
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { spacePalette } from '../../styles/theme';
-import { SxProps, Theme } from '@mui/material/styles';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 export interface SpaceSelectOption {
   value: string | number;

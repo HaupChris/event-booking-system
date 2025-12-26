@@ -1,5 +1,5 @@
 import React from "react";
-import {FormProps} from "./UserRegistrationFormContainer";
+import type {FormProps} from "./UserRegistrationFormContainer";
 import {userAreaTexts} from "../constants/texts";
 import MaterialsFormBase from "../../components/core/forms/MaterialsFormBase";
 

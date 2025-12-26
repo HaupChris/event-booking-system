@@ -1,12 +1,11 @@
 import os
 import sqlite3
 from sqlite3 import Connection
-from typing import List
 
 from src.models.datatypes import FormContent
 
 
-def init_db(db_file_path: str, schema_paths: List[str], form_content: FormContent) -> None:
+def init_db(db_file_path: str, schema_paths: list[str], form_content: FormContent) -> None:
     """
     Creates the SQLite database and applies the schema if not already done.
     """
@@ -19,7 +18,7 @@ def init_db(db_file_path: str, schema_paths: List[str], form_content: FormConten
 
     # Read schema.sql
     for schema_path in schema_paths:
-        with open(schema_path, 'r') as f:
+        with open(schema_path) as f:
             schema_script = f.read()
             conn.executescript(schema_script)
             conn.commit()
@@ -52,28 +51,28 @@ def _init_db_data(connection: Connection, form_content: FormContent):
         for idx, ticket in enumerate(form_content.ticket_options):
             cursor.execute(
                 "INSERT INTO TicketOptions (id, title, price, amount) VALUES (?, ?, ?, ?)",
-                (idx, ticket.title, ticket.price, ticket.amount)
+                (idx, ticket.title, ticket.price, ticket.amount),
             )
 
         # Insert BeverageOptions
         for idx, beverage in enumerate(form_content.beverage_options):
             cursor.execute(
                 "INSERT INTO BeverageOptions (id, title, description, price) VALUES (?, ?, ?, ?)",
-                (idx, beverage.title, beverage.description, beverage.price)
+                (idx, beverage.title, beverage.description, beverage.price),
             )
 
         # Insert FoodOptions
         for idx, food in enumerate(form_content.food_options):
             cursor.execute(
                 "INSERT INTO FoodOptions (id, title, description, price) VALUES (?, ?, ?, ?)",
-                (idx, food.title, food.description, food.price)
+                (idx, food.title, food.description, food.price),
             )
 
         # Insert Materials
         for idx, material in enumerate(form_content.materials):
             cursor.execute(
                 "INSERT INTO Materials (id, title, num_needed) VALUES (?, ?, ?)",
-                (idx, material.title, material.num_needed)
+                (idx, material.title, material.num_needed),
             )
 
         # Insert WorkShifts and TimeSlots
@@ -81,7 +80,7 @@ def _init_db_data(connection: Connection, form_content: FormContent):
             # Insert WorkShift
             cursor.execute(
                 "INSERT INTO WorkShifts (id, title, description) VALUES (?, ?, ?)",
-                (ws_idx, workshift.title, workshift.description)
+                (ws_idx, workshift.title, workshift.description),
             )
 
             # Insert TimeSlots for this WorkShift
@@ -98,8 +97,8 @@ def _init_db_data(connection: Connection, form_content: FormContent):
                         timeslot.start_time,
                         timeslot.end_time,
                         timeslot.num_needed,
-                        ws_idx
-                    )
+                        ws_idx,
+                    ),
                 )
 
         connection.commit()

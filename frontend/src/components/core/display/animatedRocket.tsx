@@ -1,10 +1,8 @@
-import React, { useEffect} from 'react';
+import React, { useEffect } from 'react';
 import rocketImage from '../../../img/rocket_baak.png';
-import "../../../css/formConfirmation.css"
+import '../../../css/formConfirmation.css';
 
-const AnimatedRocket: React.FC<{ onAnimationComplete: () => void }> = ({
-  onAnimationComplete
-}) => {
+const AnimatedRocket: React.FC<{ onAnimationComplete: () => void }> = ({ onAnimationComplete }) => {
   useEffect(() => {
     // After rocket animation completes, signal to parent to remove component
     const animationTimer = setTimeout(() => {
@@ -20,11 +18,7 @@ const AnimatedRocket: React.FC<{ onAnimationComplete: () => void }> = ({
     <div className="rocket-animation-container">
       {/* Rocket using custom image */}
       <div className="rocket custom-rocket">
-        <img
-          src={rocketImage}
-          alt="Rocket"
-          className="rocket-img"
-        />
+        <img src={rocketImage} alt="Rocket" className="rocket-img" />
 
         {/* Flames */}
         <div className="rocket-flames">

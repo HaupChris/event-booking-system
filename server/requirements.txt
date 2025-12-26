@@ -1,3 +1,9 @@
+# NOTE: This project now uses uv for dependency management.
+# Dependencies are defined in pyproject.toml
+# To install: uv pip install -e ".[dev]"
+# For production: uv pip install -e .
+
+# Legacy requirements for backwards compatibility
 Flask==2.3.2
 Flask-Cors==3.0.10
 py-ts-interfaces==0.5.0

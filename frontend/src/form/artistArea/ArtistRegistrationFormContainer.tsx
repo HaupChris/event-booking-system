@@ -1,5 +1,5 @@
 import React from "react";
-import {ArtistBooking, ArtistFormContent} from "./interface";
+import type {ArtistBooking, ArtistFormContent} from "./interface";
 import {artistAreaTexts} from "../constants/texts";
 import {calculateTotalPriceArtist} from "../../components/core/utils/Pricing";
 import {

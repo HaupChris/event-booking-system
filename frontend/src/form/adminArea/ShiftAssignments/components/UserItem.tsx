@@ -7,8 +7,8 @@ import {
     LooksTwo as LooksTwoIcon,
     Looks3 as Looks3Icon, Check
 } from '@mui/icons-material';
-import {ShiftAssignment, UserWithAssignments} from '../types';
-import {FormContent} from '../../../userArea/interface';
+import type {ShiftAssignment, UserWithAssignments} from '../types';
+import type {FormContent} from '../../../userArea/interface';
 import {spacePalette} from '../../../../components/styles/theme';
 import ListItemButton from "@mui/material/ListItemButton";
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Typography, Box, alpha, Divider} from '@mui/material';
-import {ArtistBooking, ArtistFormContent, ArtistMaterial} from "./interface";
+import type {ArtistBooking, ArtistFormContent, ArtistMaterial} from "./interface";
 import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
 import {artistAreaTexts} from "../constants/texts";
 import PersonIcon from '@mui/icons-material/Person';

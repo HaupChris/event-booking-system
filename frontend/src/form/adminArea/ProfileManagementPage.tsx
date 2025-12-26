@@ -41,7 +41,8 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import { TokenContext } from '../../contexts/AuthContext';
-import { getProfileStats, sendProfileLink, bulkSendProfileLinks, ProfileStats } from '../../services/adminProfileService';
+import type { ProfileStats } from '../../services/adminProfileService';
+import { getProfileStats, sendProfileLink, bulkSendProfileLinks } from '../../services/adminProfileService';
 
 const ProfileManagementPage: React.FC = () => {
   const { token } = useContext(TokenContext);

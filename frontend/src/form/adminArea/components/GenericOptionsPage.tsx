@@ -8,7 +8,7 @@ import { Box, Typography } from '@mui/material';
 import { useFetchData } from '../useFetchData';
 import OptionsTable from './OptionsTable';
 import FilterControls from './FilterControls';
-import { CombinedBooking } from '../interface';
+import type { CombinedBooking } from '../interface';
 import { useAdminPageFilters } from '../../../hooks/useAdminPageFilters';
 
 interface OptionItem {

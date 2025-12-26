@@ -2,9 +2,9 @@ import React from 'react';
 import {
     Box, Typography, ListItem, ListItemButton, LinearProgress, Chip, alpha
 } from '@mui/material';
-import {ShiftAssignment} from '../types';
+import type {ShiftAssignment} from '../types';
 import {spacePalette} from '../../../../components/styles/theme';
-import {BookingWithTimestamp} from "../../../userArea/interface";
+import type {BookingWithTimestamp} from "../../../userArea/interface";
 
 interface TimeslotItemProps {
     timeslot: {

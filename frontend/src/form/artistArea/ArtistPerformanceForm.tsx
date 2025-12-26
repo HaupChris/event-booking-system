@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box,  Typography, Grid} from '@mui/material';
-import { ArtistFormProps } from './ArtistRegistrationFormContainer';
+import type { ArtistFormProps } from './ArtistRegistrationFormContainer';
 import SpacePanelLayout from '../../components/core/layouts/SpacePanelLayout';
 import { artistAreaTexts } from '../constants/texts';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';

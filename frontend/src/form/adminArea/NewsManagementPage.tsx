@@ -38,13 +38,14 @@ import {
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
 import { TokenContext } from '../../contexts/AuthContext';
+import type {
+  NewsItem,
+  CreateNewsRequest} from '../../services/adminNewsService';
 import {
   getAllNews,
   createNews,
   updateNews,
-  deleteNews,
-  NewsItem,
-  CreateNewsRequest,
+  deleteNews
 } from '../../services/adminNewsService';
 
 const NEWS_CATEGORIES = [

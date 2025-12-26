@@ -1,5 +1,6 @@
 // src/components/core/display/MissionHeading.tsx
-import React, { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import React from 'react';
 import { Box, Typography, Divider, alpha } from '@mui/material';
 import { spacePalette } from '../../styles/theme';
 
@@ -18,21 +19,21 @@ const MissionHeading: React.FC<MissionHeadingProps> = ({
 }) => {
   return (
     <Box sx={{ mb: 3 }}>
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        mb: subtitle ? 1 : 2
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mb: subtitle ? 1 : 2,
+        }}
+      >
         {icon && (
-          <Box sx={{ color: spacePalette.primary.main, mr: 1, display: 'flex' }}>
-            {icon}
-          </Box>
+          <Box sx={{ color: spacePalette.primary.main, mr: 1, display: 'flex' }}>{icon}</Box>
         )}
         <Typography
           variant="h6"
           sx={{
             color: alpha('#fff', 0.9),
-            fontWeight: 'medium'
+            fontWeight: 'medium',
           }}
         >
           {title}
@@ -45,7 +46,7 @@ const MissionHeading: React.FC<MissionHeadingProps> = ({
           sx={{
             color: alpha('#fff', 0.7),
             pl: icon ? 4 : 0, // Align with title if icon present
-            mb: 2
+            mb: 2,
           }}
         >
           {subtitle}
@@ -53,9 +54,11 @@ const MissionHeading: React.FC<MissionHeadingProps> = ({
       )}
 
       {withDivider && (
-        <Divider sx={{
-          borderColor: alpha(spacePalette.primary.main, 0.2)
-        }} />
+        <Divider
+          sx={{
+            borderColor: alpha(spacePalette.primary.main, 0.2),
+          }}
+        />
       )}
     </Box>
   );

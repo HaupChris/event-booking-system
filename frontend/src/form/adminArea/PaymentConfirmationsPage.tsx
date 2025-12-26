@@ -12,8 +12,8 @@ import {
 import axios from 'axios';
 import {useFetchData} from './useFetchData';
 import {TokenContext} from "../../contexts/AuthContext";
-import {Booking} from "../userArea/interface";
-import {CombinedBooking} from "./interface";
+import type {Booking} from "../userArea/interface";
+import type {CombinedBooking} from "./interface";
 
 
 const PaymentConfirmationsPage: React.FC = () => {

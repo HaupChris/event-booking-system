@@ -23,7 +23,7 @@ import AnnouncementIcon from '@mui/icons-material/Announcement';
 import EventIcon from '@mui/icons-material/Event';
 import SchoolIcon from '@mui/icons-material/School';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import { NewsItem } from '../../services/profileService';
+import type { NewsItem } from '../../services/profileService';
 
 interface NewsFeedProps {
   news: NewsItem[];

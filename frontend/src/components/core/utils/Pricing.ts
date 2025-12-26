@@ -1,5 +1,5 @@
-import {Booking, FormContent} from "../../../form/userArea/interface";
-import {ArtistBooking, ArtistFormContent} from "../../../form/artistArea/interface";
+import type {Booking, FormContent} from "../../../form/userArea/interface";
+import type {ArtistBooking, ArtistFormContent} from "../../../form/artistArea/interface";
 
 export function getDiscountUser(booking: Booking, formContent: FormContent): number {
     if (booking.amount_shifts > 1) {

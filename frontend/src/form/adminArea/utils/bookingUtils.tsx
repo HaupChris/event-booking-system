@@ -1,6 +1,6 @@
-import {CombinedBooking} from "../interface";
-import {Booking, FormContent} from "../../userArea/interface";
-import {ArtistBooking, ArtistFormContent} from "../../artistArea/interface";
+import type {CombinedBooking} from "../interface";
+import type {Booking, FormContent} from "../../userArea/interface";
+import type {ArtistBooking, ArtistFormContent} from "../../artistArea/interface";
 import {calculateTotalPriceArtist, calculateTotalPriceUser} from "../../../components/core/utils/Pricing";
 
 /**
@@ -54,7 +54,7 @@ export function calculateTotalPrice(
     artistFormContent: ArtistFormContent
 ): number {
     const options = booking.bookingType === 'artist' ? artistFormContent : formContent;
-    let totalPrice = 0;
+    const totalPrice = 0;
     if (booking.bookingType === "artist") {
         return calculateTotalPriceArtist(booking as ArtistBooking, artistFormContent);
     }

@@ -1,65 +1,75 @@
 import json
 import os
 import smtplib
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from dotenv import load_dotenv
 
-from src.models.datatypes import Booking, ArtistBooking
-from typing import Dict
+from src.models.datatypes import ArtistBooking, Booking
 
 load_dotenv()
 
 PAYPAL_LINK = "https://www.paypal.me/Wiesenwahn"
 
-def get_booking_details(booking: Booking, form_content: Dict) -> str:
+
+def get_booking_details(booking: Booking, form_content: dict) -> str:
     """
     Returns a human-readable textual summary of the booking in German.
     """
     # Retrieve ticket option
-    ticket_option = next((
-        to for to in form_content["ticket_options"]
-        if to["id"] == booking.ticket_id
-    ), None)
-    ticket_info = f"Ticket: {ticket_option['title']} - Preis: {ticket_option['price']}€" if ticket_option else "Ticket: Nicht gefunden"
+    ticket_option = next(
+        (to for to in form_content["ticket_options"] if to["id"] == booking.ticket_id), None
+    )
+    ticket_info = (
+        f"Ticket: {ticket_option['title']} - Preis: {ticket_option['price']}€"
+        if ticket_option
+        else "Ticket: Nicht gefunden"
+    )
 
     # Retrieve beverage option
-    beverage_option = next((
-        bo for bo in form_content['beverage_options']
-        if bo['id'] == booking.beverage_id
-    ), None)
-    beverage_info = f"Getränkeoption: {beverage_option['title']} - Preis: {beverage_option['price']}€" if beverage_option else "Getränkeoption: Nicht gefunden"
+    beverage_option = next(
+        (bo for bo in form_content["beverage_options"] if bo["id"] == booking.beverage_id), None
+    )
+    beverage_info = (
+        f"Getränkeoption: {beverage_option['title']} - Preis: {beverage_option['price']}€"
+        if beverage_option
+        else "Getränkeoption: Nicht gefunden"
+    )
 
     # Retrieve food option
-    food_option = next((
-        fo for fo in form_content['food_options']
-        if fo['id'] == booking.food_id
-    ), None)
-    food_info = f"Essensoption: {food_option['title']} - Preis: {food_option['price']}€" if food_option else "Essensoption: Nicht gefunden"
+    food_option = next(
+        (fo for fo in form_content["food_options"] if fo["id"] == booking.food_id), None
+    )
+    food_info = (
+        f"Essensoption: {food_option['title']} - Preis: {food_option['price']}€"
+        if food_option
+        else "Essensoption: Nicht gefunden"
+    )
 
     # Format timeslot info
     def format_timeslot_info(timeslot_id):
-        for ws in form_content['work_shifts']:
-            for ts in ws['time_slots']:
-                if ts['id'] == timeslot_id:
+        for ws in form_content["work_shifts"]:
+            for ts in ws["time_slots"]:
+                if ts["id"] == timeslot_id:
                     return f"{ws['title']}, Zeitfenster: {ts['title']}, Von: {ts['start_time']}, Bis: {ts['end_time']}"
         return "Zeitfenster: Nicht gefunden"
 
     timeslot_info = "Du hast folgende Prioritäten für deine Supporterschicht gewählt:\n"
-    for i, ts_id in enumerate([
-        booking.timeslot_priority_1,
-        booking.timeslot_priority_2,
-        booking.timeslot_priority_3
-    ]):
+    for i, ts_id in enumerate(
+        [booking.timeslot_priority_1, booking.timeslot_priority_2, booking.timeslot_priority_3]
+    ):
         timeslot_info += f"Priorität {i+1}: {format_timeslot_info(ts_id)}\n"
 
-    timeslot_info += f"Du hast dich bereit erklärt, maximal {booking.amount_shifts} Schicht(en) zu übernehmen.\n"
+    timeslot_info += (
+        f"Du hast dich bereit erklärt, maximal {booking.amount_shifts} Schicht(en) zu übernehmen.\n"
+    )
 
     # Materials
     if booking.material_ids:
         materials_info = "Du bringst mit:\n"
-        for material in form_content['materials']:
-            if material['id'] in booking.material_ids:
+        for material in form_content["materials"]:
+            if material["id"] in booking.material_ids:
                 materials_info += f"- {material['title']}\n"
     else:
         materials_info = "Du bringst keine Materialien mit.\n"
@@ -75,7 +85,7 @@ def get_booking_details(booking: Booking, form_content: Dict) -> str:
     return details
 
 
-def send_confirmation_mail(booking: Booking, form_content: Dict, profile_uuid: str = None) -> None:
+def send_confirmation_mail(booking: Booking, form_content: dict, profile_uuid: str = None) -> None:
     """
     Sends a confirmation email to the user based on the booking details.
 
@@ -90,16 +100,24 @@ def send_confirmation_mail(booking: Booking, form_content: Dict, profile_uuid: s
     # Get base URL from environment or use default
     base_url = os.environ.get("APP_BASE_URL", "http://localhost:3000")
 
-    booking_details_html = get_booking_details(booking, form_content).replace('\n', '<br>')
+    booking_details_html = get_booking_details(booking, form_content).replace("\n", "<br>")
 
     # Ticket, beverage, and food title (for PayPal subject)
-    ticket_option = next((to for to in form_content["ticket_options"] if to["id"] == booking.ticket_id), None)
-    beverage_option = next((bo for bo in form_content['beverage_options'] if bo['id'] == booking.beverage_id), None)
-    food_option = next((fo for fo in form_content['food_options'] if fo['id'] == booking.food_id), None)
+    ticket_option = next(
+        (to for to in form_content["ticket_options"] if to["id"] == booking.ticket_id), None
+    )
+    beverage_option = next(
+        (bo for bo in form_content["beverage_options"] if bo["id"] == booking.beverage_id), None
+    )
+    food_option = next(
+        (fo for fo in form_content["food_options"] if fo["id"] == booking.food_id), None
+    )
 
-    ticket_title = ticket_option['title'] if ticket_option else "Ticket nicht gefunden"
-    beverage_title = beverage_option['title'] if beverage_option else "Getränkeoption nicht gefunden"
-    food_title = food_option['title'] if food_option else "Essensoption nicht gefunden"
+    ticket_title = ticket_option["title"] if ticket_option else "Ticket nicht gefunden"
+    beverage_title = (
+        beverage_option["title"] if beverage_option else "Getränkeoption nicht gefunden"
+    )
+    food_title = food_option["title"] if food_option else "Essensoption nicht gefunden"
 
     subject = "Weiher Wald & Weltall-Wahn - Deine Mission ist bestätigt!"
 
@@ -275,15 +293,15 @@ def send_confirmation_mail(booking: Booking, form_content: Dict, profile_uuid: s
     </html>
     """
 
-    msg = MIMEMultipart('alternative')
-    msg['From'] = gmail_user
-    msg['To'] = booking.email
-    msg['Subject'] = subject
+    msg = MIMEMultipart("alternative")
+    msg["From"] = gmail_user
+    msg["To"] = booking.email
+    msg["Subject"] = subject
 
-    msg.attach(MIMEText(html, 'html'))
+    msg.attach(MIMEText(html, "html"))
 
     try:
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
         server.ehlo()
         server.login(gmail_user, gmail_password)
         server.sendmail(gmail_user, booking.email, msg.as_string())
@@ -293,7 +311,9 @@ def send_confirmation_mail(booking: Booking, form_content: Dict, profile_uuid: s
         print(f"Fehler beim Senden der E-Mail: {e}")
 
 
-def send_artist_confirmation_mail(booking: ArtistBooking, form_content: Dict, profile_uuid: str = None) -> None:
+def send_artist_confirmation_mail(
+    booking: ArtistBooking, form_content: dict, profile_uuid: str = None
+) -> None:
     """
     Sends a confirmation email to the artist based on the booking details.
 
@@ -309,16 +329,24 @@ def send_artist_confirmation_mail(booking: ArtistBooking, form_content: Dict, pr
     base_url = os.environ.get("APP_BASE_URL", "http://localhost:3000")
 
     # Get booking details in HTML format
-    booking_details_html = get_artist_booking_details(booking, form_content).replace('\n', '<br>')
+    booking_details_html = get_artist_booking_details(booking, form_content).replace("\n", "<br>")
 
     # Get ticket, beverage, and food titles for PayPal subject
-    ticket_option = next((to for to in form_content["ticket_options"] if to["id"] == booking.ticket_id), None)
-    beverage_option = next((bo for bo in form_content['beverage_options'] if bo['id'] == booking.beverage_id), None)
-    food_option = next((fo for fo in form_content['food_options'] if fo['id'] == booking.food_id), None)
+    ticket_option = next(
+        (to for to in form_content["ticket_options"] if to["id"] == booking.ticket_id), None
+    )
+    beverage_option = next(
+        (bo for bo in form_content["beverage_options"] if bo["id"] == booking.beverage_id), None
+    )
+    food_option = next(
+        (fo for fo in form_content["food_options"] if fo["id"] == booking.food_id), None
+    )
 
-    ticket_title = ticket_option['title'] if ticket_option else "Ticket nicht gefunden"
-    beverage_title = beverage_option['title'] if beverage_option else "Getränkeoption nicht gefunden"
-    food_title = food_option['title'] if food_option else "Essensoption nicht gefunden"
+    ticket_title = ticket_option["title"] if ticket_option else "Ticket nicht gefunden"
+    beverage_title = (
+        beverage_option["title"] if beverage_option else "Getränkeoption nicht gefunden"
+    )
+    food_title = food_option["title"] if food_option else "Essensoption nicht gefunden"
 
     subject = "Weiher Wald & Weltall-Wahn - Schön, dass du zu uns kommst!"
 
@@ -509,15 +537,15 @@ def send_artist_confirmation_mail(booking: ArtistBooking, form_content: Dict, pr
     </html>
     """
 
-    msg = MIMEMultipart('alternative')
-    msg['From'] = gmail_user
-    msg['To'] = booking.email
-    msg['Subject'] = subject
+    msg = MIMEMultipart("alternative")
+    msg["From"] = gmail_user
+    msg["To"] = booking.email
+    msg["Subject"] = subject
 
-    msg.attach(MIMEText(html, 'html'))
+    msg.attach(MIMEText(html, "html"))
 
     try:
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
         server.ehlo()
         server.login(gmail_user, gmail_password)
         server.sendmail(gmail_user, booking.email, msg.as_string())
@@ -526,30 +554,40 @@ def send_artist_confirmation_mail(booking: ArtistBooking, form_content: Dict, pr
     except Exception as e:
         print(f"Error sending artist email: {e}")
 
-def get_artist_booking_details(booking: ArtistBooking, form_content: Dict) -> str:
+
+def get_artist_booking_details(booking: ArtistBooking, form_content: dict) -> str:
     """
     Returns a human-readable textual summary of the artist booking in German.
     """
     # Retrieve ticket option
-    ticket_option = next((
-        to for to in form_content["ticket_options"]
-        if to["id"] == booking.ticket_id
-    ), None)
-    ticket_info = f"Ticket: {ticket_option['title']} - Preis: {ticket_option['price']}€" if ticket_option else "Ticket: Nicht gefunden"
+    ticket_option = next(
+        (to for to in form_content["ticket_options"] if to["id"] == booking.ticket_id), None
+    )
+    ticket_info = (
+        f"Ticket: {ticket_option['title']} - Preis: {ticket_option['price']}€"
+        if ticket_option
+        else "Ticket: Nicht gefunden"
+    )
 
     # Retrieve beverage option
-    beverage_option = next((
-        bo for bo in form_content['beverage_options']
-        if bo['id'] == booking.beverage_id
-    ), None)
-    beverage_info = f"Getränkeoption: {beverage_option['title']} - Preis: {beverage_option['price']}€" if beverage_option else "Getränkeoption: Nicht gefunden"
+    beverage_option = next(
+        (bo for bo in form_content["beverage_options"] if bo["id"] == booking.beverage_id), None
+    )
+    beverage_info = (
+        f"Getränkeoption: {beverage_option['title']} - Preis: {beverage_option['price']}€"
+        if beverage_option
+        else "Getränkeoption: Nicht gefunden"
+    )
 
     # Retrieve food option
-    food_option = next((
-        fo for fo in form_content['food_options']
-        if fo['id'] == booking.food_id
-    ), None)
-    food_info = f"Essensoption: {food_option['title']} - Preis: {food_option['price']}€" if food_option else "Essensoption: Nicht gefunden"
+    food_option = next(
+        (fo for fo in form_content["food_options"] if fo["id"] == booking.food_id), None
+    )
+    food_info = (
+        f"Essensoption: {food_option['title']} - Preis: {food_option['price']}€"
+        if food_option
+        else "Essensoption: Nicht gefunden"
+    )
 
     # Format performance details
     performance_info = "Auftrittsinformationen:\n"
@@ -573,7 +611,9 @@ def get_artist_booking_details(booking: ArtistBooking, form_content: Dict) -> st
     if booking.artist_material_ids:
         materials_info = "Du bringst mit:\n"
         for material_id in booking.artist_material_ids:
-            material = next((m for m in form_content['artist_materials'] if m['id'] == material_id), None)
+            material = next(
+                (m for m in form_content["artist_materials"] if m["id"] == material_id), None
+            )
             if material:
                 materials_info += f"- {material['title']}\n"
     else:
@@ -613,7 +653,7 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
     profile_links_html = ""
     for profile in profiles:
         profile_url = f"{base_url}/profile/{profile['profile_uuid']}"
-        booking_type_label = "Künstler" if profile['booking_type'] == 'artist' else "Regular"
+        booking_type_label = "Künstler" if profile["booking_type"] == "artist" else "Regular"
         profile_links_html += f"""
           <div class="profile-item">
             <h4>{profile['name']} ({booking_type_label})</h4>
@@ -748,15 +788,15 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
     </html>
     """
 
-    msg = MIMEMultipart('alternative')
-    msg['From'] = gmail_user
-    msg['To'] = email
-    msg['Subject'] = subject
+    msg = MIMEMultipart("alternative")
+    msg["From"] = gmail_user
+    msg["To"] = email
+    msg["Subject"] = subject
 
-    msg.attach(MIMEText(html, 'html'))
+    msg.attach(MIMEText(html, "html"))
 
     try:
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
         server.ehlo()
         server.login(gmail_user, gmail_password)
         server.sendmail(gmail_user, email, msg.as_string())

@@ -9,9 +9,9 @@ import {
     Person as PersonIcon,
     Handyman as HandymanIcon,
 } from '@mui/icons-material';
-import {ProgressItem} from '../components/ProgressList';
-import {Person} from '../components/PeopleList';
-import {ViewFilterType} from '../utils/optionsUtils';
+import type {ProgressItem} from '../components/ProgressList';
+import type {Person} from '../components/PeopleList';
+import type {ViewFilterType} from '../utils/optionsUtils';
 import {getMaterialCount, getUsersForMaterial} from '../utils/materialUtils';
 
 interface MaterialTransformConfig {

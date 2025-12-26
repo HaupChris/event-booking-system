@@ -1,9 +1,10 @@
 // src/form/adminArea/components/FilterSortBar.tsx
 
 import React from 'react';
+import type { SelectChangeEvent} from '@mui/material';
 import {
   Box, FormControl, InputLabel, Select, MenuItem,
-  Button, useMediaQuery, useTheme, SelectChangeEvent,
+  Button, useMediaQuery, useTheme,
   alpha
 } from '@mui/material';
 import {

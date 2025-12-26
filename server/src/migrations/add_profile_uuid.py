@@ -9,11 +9,9 @@ shift acceptance workflow.
 Run this script once to migrate the database.
 """
 
+import os
 import sqlite3
 import uuid
-import os
-import sys
-from datetime import datetime
 
 # Determine database path
 IN_DOCKER = os.environ.get('IN_DOCKER', 'False').lower() == 'true'
@@ -291,7 +289,7 @@ def migrate():
                     VALUES (?, ?, ?, ?, ?, ?, 'pending')
                 """, row)
 
-            print(f"   ✓ Extended ShiftAssignments with acceptance workflow columns")
+            print("   ✓ Extended ShiftAssignments with acceptance workflow columns")
         else:
             print("   ✓ ShiftAssignments already has new columns")
 
@@ -348,8 +346,8 @@ def migrate():
         print("=" * 60)
         print(f"✓ Migrated {booking_count} regular bookings")
         print(f"✓ Migrated {artist_count} artist bookings")
-        print(f"✓ Extended ShiftAssignments table")
-        print(f"✓ Created News and NewsReadStatus tables")
+        print("✓ Extended ShiftAssignments table")
+        print("✓ Created News and NewsReadStatus tables")
 
         # Print sample profile UUIDs for testing
         cursor.execute("SELECT id, profile_uuid FROM Bookings LIMIT 3")

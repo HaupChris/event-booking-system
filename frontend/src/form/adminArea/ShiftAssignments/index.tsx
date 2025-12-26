@@ -4,7 +4,7 @@ import {useContext} from 'react';
 import {TokenContext} from '../../../contexts/AuthContext';
 import {useFetchData} from '../useFetchData';
 import {ShiftAssignmentAPI} from './api';
-import {ShiftAssignment} from './types';
+import type {ShiftAssignment} from './types';
 import UserList from './components/UserList';
 import WorkshiftList from './components/WorkshiftList';
 import ActionButtons from './components/ActionButtons';

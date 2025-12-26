@@ -7,8 +7,9 @@ Requires admin JWT authentication.
 """
 
 import time
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
@@ -91,10 +92,10 @@ def send_profile_link():
             return jsonify({"error": "Missing JSON body"}), 400
 
         data = request.json
-        profile_uuid = data.get('profile_uuid')
-        email = data.get('email')
-        first_name = data.get('first_name')
-        resend = data.get('resend', False)
+        profile_uuid = data.get("profile_uuid")
+        email = data.get("email")
+        first_name = data.get("first_name")
+        resend = data.get("resend", False)
 
         # Validate required fields
         if not profile_uuid or not email or not first_name:
@@ -145,7 +146,7 @@ def bulk_send_profile_links():
             return jsonify({"error": "Missing JSON body"}), 400
 
         data = request.json
-        profile_uuids = data.get('profile_uuids', [])
+        profile_uuids = data.get("profile_uuids", [])
 
         # Validate
         if not profile_uuids or not isinstance(profile_uuids, list):
@@ -153,12 +154,14 @@ def bulk_send_profile_links():
             return jsonify({"error": "profile_uuids must be a non-empty list"}), 400
 
         if len(profile_uuids) > 100:
-            logger.warning(f"Bulk send failed: too many UUIDs ({len(profile_uuids)}) from {client_ip}")
+            logger.warning(
+                f"Bulk send failed: too many UUIDs ({len(profile_uuids)}) from {client_ip}"
+            )
             return jsonify({"error": "Maximum 100 profile links can be sent at once"}), 400
 
         # Get profile stats to get email addresses
         all_stats = get_profile_stats()
-        uuid_to_profile = {stat['profile_uuid']: stat for stat in all_stats}
+        uuid_to_profile = {stat["profile_uuid"]: stat for stat in all_stats}
 
         # Send emails
         sent_count = 0
@@ -171,11 +174,7 @@ def bulk_send_profile_links():
                 failed_count += 1
                 continue
 
-            success = send_profile_link_email(
-                uuid,
-                profile['email'],
-                profile['first_name']
-            )
+            success = send_profile_link_email(uuid, profile["email"], profile["first_name"])
 
             if success:
                 sent_count += 1
@@ -183,13 +182,14 @@ def bulk_send_profile_links():
                 failed_count += 1
 
         elapsed_time = time.time() - start_time
-        logger.info(f"Bulk send completed by {admin_user} in {elapsed_time:.2f}s: {sent_count} sent, {failed_count} failed")
+        logger.info(
+            f"Bulk send completed by {admin_user} in {elapsed_time:.2f}s: {sent_count} sent, {failed_count} failed"
+        )
 
-        return jsonify({
-            "message": f"Bulk send completed",
-            "sent": sent_count,
-            "failed": failed_count
-        }), 200
+        return (
+            jsonify({"message": "Bulk send completed", "sent": sent_count, "failed": failed_count}),
+            200,
+        )
 
     except Exception as e:
         elapsed_time = time.time() - start_time

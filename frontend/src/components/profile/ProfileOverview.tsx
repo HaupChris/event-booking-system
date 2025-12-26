@@ -21,7 +21,7 @@ import PendingIcon from '@mui/icons-material/Pending';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
-import { ProfileData } from '../../services/profileService';
+import type { ProfileData } from '../../services/profileService';
 
 interface ProfileOverviewProps {
   profile: ProfileData;

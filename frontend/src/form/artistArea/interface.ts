@@ -1,4 +1,4 @@
-import {TicketOption, BeverageOption, FoodOption, Profession} from '../userArea/interface';
+import type {TicketOption, BeverageOption, FoodOption, Profession} from '../userArea/interface';
 
 export interface ArtistMaterial {
     id: number;

@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { syncService } from '../services/syncService';
-import { ProfileData, BookingData, NewsFeedItem } from '../utils/indexedDB';
+import type { ProfileData, BookingData, NewsFeedItem } from '../utils/indexedDB';
 
 export interface UseOfflineDataOptions {
   userId?: string;

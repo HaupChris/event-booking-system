@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Snackbar, Alert } from '@mui/material';
 import { SignalCellularNodata } from "@mui/icons-material";
-import { Booking, FormContent } from "../interface";
-import { BookingState } from "../UserRegistrationFormContainer";
+import type { Booking, FormContent } from "../interface";
+import type { BookingState } from "../UserRegistrationFormContainer";
 
 import InitialView from './InitialView';
 import SuccessView from './SuccessView';

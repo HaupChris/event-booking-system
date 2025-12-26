@@ -4,7 +4,7 @@ import {
   TableRow, TableCell, TableBody, Chip, Paper
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-import { CombinedBooking } from "../interface";
+import type { CombinedBooking } from "../interface";
 import { alpha } from '@mui/material/styles';
 import { spacePalette } from '../../../components/styles/theme';
 

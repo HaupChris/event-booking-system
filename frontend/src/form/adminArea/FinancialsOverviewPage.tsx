@@ -7,7 +7,7 @@ import {
 import {useFetchData} from './useFetchData';
 import FilterControls from './components/FilterControls';
 import StatsCard from './components/StatsCard';
-import {ViewFilterType} from './utils/optionsUtils';
+import type {ViewFilterType} from './utils/optionsUtils';
 import FormCard from '../../components/core/display/FormCard';
 import {spacePalette} from '../../components/styles/theme';
 import {ConfirmationNumber, LocalDining, MusicNote, Paid, People, Person, SportsBar} from '@mui/icons-material';
@@ -27,9 +27,9 @@ const FinancialsOverviewPage: React.FC = () => {
     const calculateTotalsByCategory = () => {
         const filteredBookings = getFilteredBookings();
 
-        let ticketTotals: { [key: string]: { count: number, total: number, isArtist: boolean } } = {};
-        let beverageTotals: { [key: string]: { count: number, total: number, isArtist: boolean } } = {};
-        let foodTotals: { [key: string]: { count: number, total: number, isArtist: boolean } } = {};
+        const ticketTotals: { [key: string]: { count: number, total: number, isArtist: boolean } } = {};
+        const beverageTotals: { [key: string]: { count: number, total: number, isArtist: boolean } } = {};
+        const foodTotals: { [key: string]: { count: number, total: number, isArtist: boolean } } = {};
 
         let grandTotal = 0;
         let artistCount = 0;

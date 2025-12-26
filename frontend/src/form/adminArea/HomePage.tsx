@@ -14,7 +14,7 @@ import {
 import {useFetchData} from './useFetchData';
 import StatsCard from './components/StatsCard';
 import FormCard from '../../components/core/display/FormCard';
-import {TicketOption, BeverageOption, FoodOption} from '../userArea/interface';
+import type {TicketOption, BeverageOption, FoodOption} from '../userArea/interface';
 import {calculateDayVisitors, getMaxCapacityPerDay} from "../../components/core/utils/CalculateNumberOfVisitors";
 
 // Interface for option info with counts
@@ -124,9 +124,9 @@ function HomePage() {
     const maxArtistsPerDay = getMaxCapacityPerDay(artistFormContent);
 
     const {
-        visitorsThursday: visitorsThursday,
-        visitorsFriday: visitorsFriday,
-        visitorsSaturday: visitorsSaturday
+        visitorsThursday,
+        visitorsFriday,
+        visitorsSaturday
     } = calculateDayVisitors(formContent);
 
     const {

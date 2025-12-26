@@ -1,5 +1,14 @@
-import React from "react";
-import { Box, Typography, Checkbox, FormGroup, FormControlLabel, Paper, alpha, Chip} from "@mui/material";
+import React from 'react';
+import {
+  Box,
+  Typography,
+  Checkbox,
+  FormGroup,
+  FormControlLabel,
+  Paper,
+  alpha,
+  Chip,
+} from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import SmartphoneIcon from '@mui/icons-material/Smartphone';
@@ -10,8 +19,7 @@ import SpacePanelLayout from '../layouts/SpacePanelLayout';
 import MissionHeading from '../display/MissionHeading';
 import FormCard from '../display/FormCard';
 import { spacePalette } from '../../styles/theme';
-import {Profession} from "../../../form/userArea/interface";
-
+import type { Profession } from '../../../form/userArea/interface';
 
 interface PersonalDetailsTextProps {
   missionBriefing: string;
@@ -48,7 +56,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
     texts,
     icon = <PersonIcon />,
     formContent,
-    professionIdsField = 'profession_ids'
+    professionIdsField = 'profession_ids',
   } = props;
 
   const handleProfessionToggle = (professionId: number) => {
@@ -65,14 +73,12 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
     }
   };
 
-  const selectedProfessions = (formContent.professions || [])
-    .filter(profession => props.currentBooking[professionIdsField].includes(profession.id));
+  const selectedProfessions = (formContent.professions || []).filter((profession) =>
+    props.currentBooking[professionIdsField].includes(profession.id)
+  );
 
   return (
-    <SpacePanelLayout
-      missionBriefing={texts.missionBriefing}
-      footerId={texts.footerId}
-    >
+    <SpacePanelLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
       {/* Event date information */}
       <MissionHeading
         title={texts.title}
@@ -81,17 +87,14 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
         withDivider={false}
       />
 
-      <Box
-        component="form"
-        sx={{ mt: 2 }}
-      >
+      <Box component="form" sx={{ mt: 2 }}>
         <FormField
           error={!!props.formValidation.first_name}
           id="first_name"
           label="Vorname"
           name="first_name"
           value={props.currentBooking.first_name}
-          onChange={e => props.updateBooking("first_name", e.target.value)}
+          onChange={(e) => props.updateBooking('first_name', e.target.value)}
           autoFocus
           required
           icon={<PersonIcon />}
@@ -103,7 +106,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
           label="Nachname"
           id="last_name"
           value={props.currentBooking.last_name}
-          onChange={e => props.updateBooking("last_name", e.target.value)}
+          onChange={(e) => props.updateBooking('last_name', e.target.value)}
           required
           icon={<BadgeIcon />}
         />
@@ -115,7 +118,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
           label="E-Mail (für deine Bestätigung)"
           id="email"
           value={props.currentBooking.email}
-          onChange={e => props.updateBooking("email", e.target.value)}
+          onChange={(e) => props.updateBooking('email', e.target.value)}
           required
           icon={<AlternateEmailIcon />}
         />
@@ -127,7 +130,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
           label="Telefon"
           id="phone"
           value={props.currentBooking.phone}
-          onChange={e => props.updateBooking("phone", e.target.value)}
+          onChange={(e) => props.updateBooking('phone', e.target.value)}
           required
           icon={<SmartphoneIcon />}
         />
@@ -148,17 +151,17 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
               {texts.selectedProfessions(selectedProfessions.length)}
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {selectedProfessions.map(profession => (
+              {selectedProfessions.map((profession) => (
                 <Chip
                   key={profession.id}
                   label={profession.title}
                   color="primary"
                   size="small"
-                  icon={<WorkIcon sx={{ fontSize: '0.8rem !important' }}/>}
+                  icon={<WorkIcon sx={{ fontSize: '0.8rem !important' }} />}
                   sx={{
                     fontWeight: 'medium',
                     bgcolor: alpha('#1e88e5', 0.2),
-                    '& .MuiChip-label': { px: 1 }
+                    '& .MuiChip-label': { px: 1 },
                   }}
                   onDelete={() => handleProfessionToggle(profession.id)}
                 />
@@ -170,7 +173,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
         <FormCard>
           <Box sx={{ p: 2 }}>
             <FormGroup>
-              {(formContent.professions || []).map(profession => (
+              {(formContent.professions || []).map((profession) => (
                 <Paper
                   key={profession.id}
                   elevation={1}
@@ -178,7 +181,9 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
                     mb: 1,
                     p: 1,
                     borderRadius: '8px',
-                    backgroundColor: props.currentBooking[professionIdsField].includes(profession.id)
+                    backgroundColor: props.currentBooking[professionIdsField].includes(
+                      profession.id
+                    )
                       ? alpha(spacePalette.primary.main, 0.1)
                       : alpha('#020c1b', 0.7),
                     border: '1px solid',
@@ -201,7 +206,11 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
                         variant="body1"
                         sx={{
                           color: alpha('#fff', 0.9),
-                          fontWeight: props.currentBooking[professionIdsField].includes(profession.id) ? 'medium' : 'normal'
+                          fontWeight: props.currentBooking[professionIdsField].includes(
+                            profession.id
+                          )
+                            ? 'medium'
+                            : 'normal',
                         }}
                       >
                         {profession.title}

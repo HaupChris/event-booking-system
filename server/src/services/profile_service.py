@@ -8,24 +8,23 @@ Business logic for profile page operations including:
 - Profile recovery by email
 """
 
-import sqlite3
 import os
+import sqlite3
 from contextlib import closing
-from typing import Dict, List, Optional, Any
 from datetime import datetime
+from typing import Any
 
 from src.utils.logger import get_logger
-from src.utils.email_sender import send_email
 
 logger = get_logger(__name__)
 
-IN_DOCKER = os.environ.get('IN_DOCKER', 'False').lower() == 'true'
+IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 
 if IN_DOCKER:
-    DB_FILE_PATH = '/app/user_data/bookings.db'
+    DB_FILE_PATH = "/app/user_data/bookings.db"
 else:
-    DB_DIR = os.path.join(os.path.dirname(__file__), '../../db')
-    DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
+    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")
+    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
 
 
 def _connect_db() -> sqlite3.Connection:
@@ -39,7 +38,7 @@ def _connect_db() -> sqlite3.Connection:
         raise
 
 
-def get_profile_by_uuid(profile_uuid: str) -> Optional[Dict[str, Any]]:
+def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
     """
     Get complete profile data by profile UUID.
 
@@ -59,7 +58,8 @@ def get_profile_by_uuid(profile_uuid: str) -> Optional[Dict[str, Any]]:
             cursor = conn.cursor()
 
             # First, try to find booking in regular Bookings table
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     b.id as booking_id,
                     b.timestamp,
@@ -102,13 +102,16 @@ def get_profile_by_uuid(profile_uuid: str) -> Optional[Dict[str, Any]]:
                 LEFT JOIN TimeSlots ts2 ON b.second_priority_timeslot_id = ts2.id
                 LEFT JOIN TimeSlots ts3 ON b.third_priority_timeslot_id = ts3.id
                 WHERE b.profile_uuid = ?
-            """, (profile_uuid,))
+            """,
+                (profile_uuid,),
+            )
 
             row = cursor.fetchone()
 
             if not row:
                 # Try artist bookings
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT
                         ab.id as booking_id,
                         ab.timestamp,
@@ -143,7 +146,9 @@ def get_profile_by_uuid(profile_uuid: str) -> Optional[Dict[str, Any]]:
                     LEFT JOIN FoodOptions f ON ab.food_option_id = f.id
                     LEFT JOIN BeverageOptions bv ON ab.beverage_option_id = bv.id
                     WHERE ab.profile_uuid = ?
-                """, (profile_uuid,))
+                """,
+                    (profile_uuid,),
+                )
 
                 row = cursor.fetchone()
 
@@ -158,126 +163,156 @@ def get_profile_by_uuid(profile_uuid: str) -> Optional[Dict[str, Any]]:
 
             # Build user info
             user = {
-                'id': row['user_id'],
-                'first_name': row['first_name'],
-                'last_name': row['last_name'],
-                'email': row['email'],
-                'phone_number': row['phone_number'],
-                'is_artist': is_artist
+                "id": row["user_id"],
+                "first_name": row["first_name"],
+                "last_name": row["last_name"],
+                "email": row["email"],
+                "phone_number": row["phone_number"],
+                "is_artist": is_artist,
             }
 
             # Build booking info
             booking = {
-                'id': row['booking_id'],
-                'timestamp': row['timestamp'],
-                'total_price': row['total_price'],
-                'profile_uuid': row['profile_uuid'],
-                'ticket': {
-                    'id': row['ticket_id'],
-                    'title': row['ticket_title'],
-                    'price': row['ticket_price']
-                } if row['ticket_id'] else None,
-                'food': {
-                    'id': row['food_id'],
-                    'title': row['food_title'],
-                    'description': row['food_description'],
-                    'price': row['food_price']
-                } if row['food_id'] else None,
-                'beverage': {
-                    'id': row['beverage_id'],
-                    'title': row['beverage_title'],
-                    'description': row['beverage_description'],
-                    'price': row['beverage_price']
-                } if row['beverage_id'] else None
+                "id": row["booking_id"],
+                "timestamp": row["timestamp"],
+                "total_price": row["total_price"],
+                "profile_uuid": row["profile_uuid"],
+                "ticket": (
+                    {
+                        "id": row["ticket_id"],
+                        "title": row["ticket_title"],
+                        "price": row["ticket_price"],
+                    }
+                    if row["ticket_id"]
+                    else None
+                ),
+                "food": (
+                    {
+                        "id": row["food_id"],
+                        "title": row["food_title"],
+                        "description": row["food_description"],
+                        "price": row["food_price"],
+                    }
+                    if row["food_id"]
+                    else None
+                ),
+                "beverage": (
+                    {
+                        "id": row["beverage_id"],
+                        "title": row["beverage_title"],
+                        "description": row["beverage_description"],
+                        "price": row["beverage_price"],
+                    }
+                    if row["beverage_id"]
+                    else None
+                ),
             }
 
             if is_artist:
-                booking['equipment'] = row['equipment']
-                booking['special_requests'] = row['special_requests']
-                booking['performance_details'] = row['performance_details']
+                booking["equipment"] = row["equipment"]
+                booking["special_requests"] = row["special_requests"]
+                booking["performance_details"] = row["performance_details"]
             else:
-                booking['amount_shifts'] = row['amount_shifts']
-                booking['supporter_buddy'] = row['supporter_buddy']
-                booking['work_shift_priorities'] = []
+                booking["amount_shifts"] = row["amount_shifts"]
+                booking["supporter_buddy"] = row["supporter_buddy"]
+                booking["work_shift_priorities"] = []
 
-                if row['priority_1_timeslot_id']:
-                    booking['work_shift_priorities'].append({
-                        'priority': 1,
-                        'timeslot_id': row['priority_1_timeslot_id'],
-                        'timeslot_title': row['priority_1_timeslot_title']
-                    })
-                if row['priority_2_timeslot_id']:
-                    booking['work_shift_priorities'].append({
-                        'priority': 2,
-                        'timeslot_id': row['priority_2_timeslot_id'],
-                        'timeslot_title': row['priority_2_timeslot_title']
-                    })
-                if row['priority_3_timeslot_id']:
-                    booking['work_shift_priorities'].append({
-                        'priority': 3,
-                        'timeslot_id': row['priority_3_timeslot_id'],
-                        'timeslot_title': row['priority_3_timeslot_title']
-                    })
+                if row["priority_1_timeslot_id"]:
+                    booking["work_shift_priorities"].append(
+                        {
+                            "priority": 1,
+                            "timeslot_id": row["priority_1_timeslot_id"],
+                            "timeslot_title": row["priority_1_timeslot_title"],
+                        }
+                    )
+                if row["priority_2_timeslot_id"]:
+                    booking["work_shift_priorities"].append(
+                        {
+                            "priority": 2,
+                            "timeslot_id": row["priority_2_timeslot_id"],
+                            "timeslot_title": row["priority_2_timeslot_title"],
+                        }
+                    )
+                if row["priority_3_timeslot_id"]:
+                    booking["work_shift_priorities"].append(
+                        {
+                            "priority": 3,
+                            "timeslot_id": row["priority_3_timeslot_id"],
+                            "timeslot_title": row["priority_3_timeslot_title"],
+                        }
+                    )
 
             # Payment info
             payment = {
-                'is_paid': bool(row['is_paid']),
-                'paid_amount': row['paid_amount'],
-                'payment_notes': row['payment_notes'],
-                'payment_date': row['payment_date']
+                "is_paid": bool(row["is_paid"]),
+                "paid_amount": row["paid_amount"],
+                "payment_notes": row["payment_notes"],
+                "payment_date": row["payment_date"],
             }
 
             # Get materials
             materials = []
             if is_artist:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT am.id, am.title, am.num_needed
                     FROM ArtistBookingMaterials abm
                     JOIN ArtistMaterials am ON abm.artist_material_id = am.id
                     WHERE abm.booking_id = ?
-                """, (row['booking_id'],))
+                """,
+                    (row["booking_id"],),
+                )
             else:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT m.id, m.title, m.num_needed
                     FROM BookingMaterials bm
                     JOIN Materials m ON bm.material_id = m.id
                     WHERE bm.booking_id = ?
-                """, (row['booking_id'],))
+                """,
+                    (row["booking_id"],),
+                )
 
             materials = [dict(m) for m in cursor.fetchall()]
 
             # Get professions
             if is_artist:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT p.id, p.title
                     FROM ArtistBookingProfessions abp
                     JOIN Professions p ON abp.profession_id = p.id
                     WHERE abp.booking_id = ?
-                """, (row['booking_id'],))
+                """,
+                    (row["booking_id"],),
+                )
             else:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT p.id, p.title
                     FROM BookingProfessions bp
                     JOIN Professions p ON bp.profession_id = p.id
                     WHERE bp.booking_id = ?
-                """, (row['booking_id'],))
+                """,
+                    (row["booking_id"],),
+                )
 
             professions = [dict(p) for p in cursor.fetchall()]
 
             # Get assigned shifts (only for regular users)
             shifts = []
             if not is_artist:
-                shifts = get_assigned_shifts(row['booking_id'])
+                shifts = get_assigned_shifts(row["booking_id"])
 
             logger.info(f"Successfully retrieved profile for UUID: {profile_uuid}")
 
             return {
-                'user': user,
-                'booking': booking,
-                'materials': materials,
-                'professions': professions,
-                'shifts': shifts,
-                'payment': payment
+                "user": user,
+                "booking": booking,
+                "materials": materials,
+                "professions": professions,
+                "shifts": shifts,
+                "payment": payment,
             }
 
     except sqlite3.Error as e:
@@ -285,7 +320,7 @@ def get_profile_by_uuid(profile_uuid: str) -> Optional[Dict[str, Any]]:
         raise
 
 
-def get_assigned_shifts(booking_id: int) -> List[Dict[str, Any]]:
+def get_assigned_shifts(booking_id: int) -> list[dict[str, Any]]:
     """Get all assigned work shifts for a booking."""
     try:
         logger.debug(f"Fetching assigned shifts for booking {booking_id}")
@@ -293,7 +328,8 @@ def get_assigned_shifts(booking_id: int) -> List[Dict[str, Any]]:
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     sa.id as assignment_id,
                     sa.status,
@@ -316,32 +352,36 @@ def get_assigned_shifts(booking_id: int) -> List[Dict[str, Any]]:
                 JOIN WorkShifts ws ON ts.workshift_id = ws.id
                 WHERE sa.booking_id = ?
                 ORDER BY ts.start_time
-            """, (booking_id,))
+            """,
+                (booking_id,),
+            )
 
             shifts = []
             for row in cursor.fetchall():
-                shifts.append({
-                    'assignment_id': row['assignment_id'],
-                    'status': row['status'] or 'pending',
-                    'is_confirmed': bool(row['is_confirmed']),
-                    'assignment_date': row['assignment_date'],
-                    'response_date': row['response_date'],
-                    'rejection_reason': row['rejection_reason'],
-                    'alternative_preferences': row['alternative_preferences'],
-                    'admin_notes': row['admin_notes'],
-                    'timeslot': {
-                        'id': row['timeslot_id'],
-                        'title': row['timeslot_title'],
-                        'start_time': row['start_time'],
-                        'end_time': row['end_time'],
-                        'num_needed': row['num_needed']
-                    },
-                    'workshift': {
-                        'id': row['workshift_id'],
-                        'title': row['workshift_title'],
-                        'description': row['workshift_description']
+                shifts.append(
+                    {
+                        "assignment_id": row["assignment_id"],
+                        "status": row["status"] or "pending",
+                        "is_confirmed": bool(row["is_confirmed"]),
+                        "assignment_date": row["assignment_date"],
+                        "response_date": row["response_date"],
+                        "rejection_reason": row["rejection_reason"],
+                        "alternative_preferences": row["alternative_preferences"],
+                        "admin_notes": row["admin_notes"],
+                        "timeslot": {
+                            "id": row["timeslot_id"],
+                            "title": row["timeslot_title"],
+                            "start_time": row["start_time"],
+                            "end_time": row["end_time"],
+                            "num_needed": row["num_needed"],
+                        },
+                        "workshift": {
+                            "id": row["workshift_id"],
+                            "title": row["workshift_title"],
+                            "description": row["workshift_description"],
+                        },
                     }
-                })
+                )
 
             logger.debug(f"Found {len(shifts)} assigned shifts for booking {booking_id}")
             return shifts
@@ -360,24 +400,32 @@ def accept_shift(profile_uuid: str, assignment_id: int) -> bool:
             cursor = conn.cursor()
 
             # Verify the assignment belongs to this profile
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT sa.id
                 FROM ShiftAssignments sa
                 JOIN Bookings b ON sa.booking_id = b.id
                 WHERE sa.id = ? AND b.profile_uuid = ?
-            """, (assignment_id, profile_uuid))
+            """,
+                (assignment_id, profile_uuid),
+            )
 
             if not cursor.fetchone():
-                logger.warning(f"Shift assignment {assignment_id} not found for profile {profile_uuid}")
+                logger.warning(
+                    f"Shift assignment {assignment_id} not found for profile {profile_uuid}"
+                )
                 return False
 
             # Update status
-            cursor.execute("""
+            cursor.execute(
+                """
                 UPDATE ShiftAssignments
                 SET status = 'accepted',
                     response_date = ?
                 WHERE id = ?
-            """, (datetime.now().isoformat(), assignment_id))
+            """,
+                (datetime.now().isoformat(), assignment_id),
+            )
 
             conn.commit()
 
@@ -389,8 +437,12 @@ def accept_shift(profile_uuid: str, assignment_id: int) -> bool:
         raise
 
 
-def decline_shift(profile_uuid: str, assignment_id: int, rejection_reason: str = None,
-                  alternative_preferences: str = None) -> bool:
+def decline_shift(
+    profile_uuid: str,
+    assignment_id: int,
+    rejection_reason: str = None,
+    alternative_preferences: str = None,
+) -> bool:
     """Mark a shift assignment as declined with optional reason and alternatives."""
     try:
         logger.debug(f"Declining shift assignment {assignment_id} for profile {profile_uuid}")
@@ -399,26 +451,39 @@ def decline_shift(profile_uuid: str, assignment_id: int, rejection_reason: str =
             cursor = conn.cursor()
 
             # Verify the assignment belongs to this profile
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT sa.id
                 FROM ShiftAssignments sa
                 JOIN Bookings b ON sa.booking_id = b.id
                 WHERE sa.id = ? AND b.profile_uuid = ?
-            """, (assignment_id, profile_uuid))
+            """,
+                (assignment_id, profile_uuid),
+            )
 
             if not cursor.fetchone():
-                logger.warning(f"Shift assignment {assignment_id} not found for profile {profile_uuid}")
+                logger.warning(
+                    f"Shift assignment {assignment_id} not found for profile {profile_uuid}"
+                )
                 return False
 
             # Update status
-            cursor.execute("""
+            cursor.execute(
+                """
                 UPDATE ShiftAssignments
                 SET status = 'declined',
                     response_date = ?,
                     rejection_reason = ?,
                     alternative_preferences = ?
                 WHERE id = ?
-            """, (datetime.now().isoformat(), rejection_reason, alternative_preferences, assignment_id))
+            """,
+                (
+                    datetime.now().isoformat(),
+                    rejection_reason,
+                    alternative_preferences,
+                    assignment_id,
+                ),
+            )
 
             conn.commit()
 
@@ -430,7 +495,7 @@ def decline_shift(profile_uuid: str, assignment_id: int, rejection_reason: str =
         raise
 
 
-def get_profile_uuids_by_email(email: str) -> List[Dict[str, str]]:
+def get_profile_uuids_by_email(email: str) -> list[dict[str, str]]:
     """
     Get all profile UUIDs associated with an email address.
     Returns list of dicts with profile_uuid, name, and booking_type.
@@ -444,38 +509,48 @@ def get_profile_uuids_by_email(email: str) -> List[Dict[str, str]]:
             profiles = []
 
             # Check regular bookings
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT b.profile_uuid, u.first_name, u.last_name, b.timestamp
                 FROM Bookings b
                 JOIN Users u ON b.user_id = u.id
                 WHERE u.email = ?
                 ORDER BY b.timestamp DESC
-            """, (email,))
+            """,
+                (email,),
+            )
 
             for row in cursor.fetchall():
-                profiles.append({
-                    'profile_uuid': row['profile_uuid'],
-                    'name': f"{row['first_name']} {row['last_name']}",
-                    'booking_type': 'regular',
-                    'timestamp': row['timestamp']
-                })
+                profiles.append(
+                    {
+                        "profile_uuid": row["profile_uuid"],
+                        "name": f"{row['first_name']} {row['last_name']}",
+                        "booking_type": "regular",
+                        "timestamp": row["timestamp"],
+                    }
+                )
 
             # Check artist bookings
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT ab.profile_uuid, a.first_name, a.last_name, ab.timestamp
                 FROM ArtistBookings ab
                 JOIN Artists a ON ab.artist_id = a.id
                 WHERE a.email = ?
                 ORDER BY ab.timestamp DESC
-            """, (email,))
+            """,
+                (email,),
+            )
 
             for row in cursor.fetchall():
-                profiles.append({
-                    'profile_uuid': row['profile_uuid'],
-                    'name': f"{row['first_name']} {row['last_name']}",
-                    'booking_type': 'artist',
-                    'timestamp': row['timestamp']
-                })
+                profiles.append(
+                    {
+                        "profile_uuid": row["profile_uuid"],
+                        "name": f"{row['first_name']} {row['last_name']}",
+                        "booking_type": "artist",
+                        "timestamp": row["timestamp"],
+                    }
+                )
 
             logger.info(f"Found {len(profiles)} profile(s) for email: {email}")
             return profiles
@@ -485,7 +560,7 @@ def get_profile_uuids_by_email(email: str) -> List[Dict[str, str]]:
         raise
 
 
-def get_profile_stats() -> List[Dict[str, Any]]:
+def get_profile_stats() -> list[dict[str, Any]]:
     """
     Get profile access statistics for all bookings.
     Returns list of profiles with access information.
@@ -499,7 +574,8 @@ def get_profile_stats() -> List[Dict[str, Any]]:
             profiles = []
 
             # Get regular bookings
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     b.id as booking_id,
                     'regular' as booking_type,
@@ -514,23 +590,27 @@ def get_profile_stats() -> List[Dict[str, Any]]:
                 JOIN Users u ON b.user_id = u.id
                 WHERE b.profile_uuid IS NOT NULL
                 ORDER BY u.last_name, u.first_name
-            """)
+            """
+            )
 
             for row in cursor.fetchall():
-                profiles.append({
-                    'booking_id': row['booking_id'],
-                    'booking_type': row['booking_type'],
-                    'first_name': row['first_name'],
-                    'last_name': row['last_name'],
-                    'email': row['email'],
-                    'profile_uuid': row['profile_uuid'],
-                    'last_accessed': row['profile_last_accessed'],
-                    'access_count': row['profile_access_count'] or 0,
-                    'registration_date': row['registration_date']
-                })
+                profiles.append(
+                    {
+                        "booking_id": row["booking_id"],
+                        "booking_type": row["booking_type"],
+                        "first_name": row["first_name"],
+                        "last_name": row["last_name"],
+                        "email": row["email"],
+                        "profile_uuid": row["profile_uuid"],
+                        "last_accessed": row["profile_last_accessed"],
+                        "access_count": row["profile_access_count"] or 0,
+                        "registration_date": row["registration_date"],
+                    }
+                )
 
             # Get artist bookings
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     ab.id as booking_id,
                     'artist' as booking_type,
@@ -545,20 +625,23 @@ def get_profile_stats() -> List[Dict[str, Any]]:
                 JOIN Artists a ON ab.artist_id = a.id
                 WHERE ab.profile_uuid IS NOT NULL
                 ORDER BY a.last_name, a.first_name
-            """)
+            """
+            )
 
             for row in cursor.fetchall():
-                profiles.append({
-                    'booking_id': row['booking_id'],
-                    'booking_type': row['booking_type'],
-                    'first_name': row['first_name'],
-                    'last_name': row['last_name'],
-                    'email': row['email'],
-                    'profile_uuid': row['profile_uuid'],
-                    'last_accessed': row['profile_last_accessed'],
-                    'access_count': row['profile_access_count'] or 0,
-                    'registration_date': row['registration_date']
-                })
+                profiles.append(
+                    {
+                        "booking_id": row["booking_id"],
+                        "booking_type": row["booking_type"],
+                        "first_name": row["first_name"],
+                        "last_name": row["last_name"],
+                        "email": row["email"],
+                        "profile_uuid": row["profile_uuid"],
+                        "last_accessed": row["profile_last_accessed"],
+                        "access_count": row["profile_access_count"] or 0,
+                        "registration_date": row["registration_date"],
+                    }
+                )
 
             logger.info(f"Retrieved profile stats for {len(profiles)} profiles")
             return profiles
@@ -584,7 +667,7 @@ def send_profile_link_email(profile_uuid: str, email: str, first_name: str) -> b
         logger.debug(f"Sending profile link email to {email} for profile {profile_uuid}")
 
         # Get the base URL from environment (default to localhost for development)
-        base_url = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+        base_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
         profile_url = f"{base_url}/profile/{profile_uuid}"
 
         subject = "Dein Wiesenwahn Festival Profil-Link"
@@ -612,11 +695,7 @@ Wir freuen uns auf dich beim Wiesenwahn Festival!
 Dein Wiesenwahn-Team
 """
 
-        success = send_email(
-            recipient=email,
-            subject=subject,
-            body=body
-        )
+        success = send_email(recipient=email, subject=subject, body=body)
 
         if success:
             logger.info(f"Profile link email sent successfully to {email}")

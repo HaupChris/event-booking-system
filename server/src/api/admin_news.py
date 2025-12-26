@@ -7,17 +7,18 @@ Requires admin JWT authentication.
 """
 
 import time
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 from src.services.news_service import (
+    create_news,
+    delete_news,
     get_all_news,
     get_news_by_id,
-    create_news,
     update_news,
-    delete_news
 )
 from src.utils.logger import get_logger
 
@@ -44,11 +45,13 @@ def get_news_list():
     try:
         logger.info(f"News list request from admin {admin_user} at {client_ip}")
 
-        include_inactive = request.args.get('include_inactive', 'false').lower() == 'true'
+        include_inactive = request.args.get("include_inactive", "false").lower() == "true"
 
         news_items = get_all_news(include_inactive=include_inactive)
 
-        logger.debug(f"Retrieved {len(news_items)} news items (include_inactive={include_inactive})")
+        logger.debug(
+            f"Retrieved {len(news_items)} news items (include_inactive={include_inactive})"
+        )
 
         return jsonify({"news": news_items}), 200
 
@@ -109,10 +112,10 @@ def create_news_item():
             return jsonify({"error": "Missing JSON body"}), 400
 
         data = request.json
-        title = data.get('title')
-        content = data.get('content')
-        category = data.get('category')
-        author = data.get('author', admin_user)
+        title = data.get("title")
+        content = data.get("content")
+        category = data.get("category")
+        author = data.get("author", admin_user)
 
         # Validate required fields
         if not title or not content:
@@ -123,12 +126,11 @@ def create_news_item():
         news_id = create_news(title, content, category, author)
 
         elapsed_time = time.time() - start_time
-        logger.info(f"News item {news_id} created successfully by {admin_user} in {elapsed_time:.2f}s")
+        logger.info(
+            f"News item {news_id} created successfully by {admin_user} in {elapsed_time:.2f}s"
+        )
 
-        return jsonify({
-            "message": "News item created successfully",
-            "id": news_id
-        }), 201
+        return jsonify({"message": "News item created successfully", "id": news_id}), 201
 
     except Exception as e:
         elapsed_time = time.time() - start_time
@@ -156,7 +158,9 @@ def update_news_item(news_id: int):
     admin_user = get_jwt_identity()
 
     try:
-        logger.info(f"News update request for item {news_id} from admin {admin_user} at {client_ip}")
+        logger.info(
+            f"News update request for item {news_id} from admin {admin_user} at {client_ip}"
+        )
 
         # Validate request
         if not request.json:
@@ -164,17 +168,19 @@ def update_news_item(news_id: int):
             return jsonify({"error": "Missing JSON body"}), 400
 
         data = request.json
-        title = data.get('title')
-        content = data.get('content')
-        category = data.get('category')
-        author = data.get('author')
+        title = data.get("title")
+        content = data.get("content")
+        category = data.get("category")
+        author = data.get("author")
 
         # Update news item
         success = update_news(news_id, title, content, category, author)
 
         if success:
             elapsed_time = time.time() - start_time
-            logger.info(f"News item {news_id} updated successfully by {admin_user} in {elapsed_time:.2f}s")
+            logger.info(
+                f"News item {news_id} updated successfully by {admin_user} in {elapsed_time:.2f}s"
+            )
             return jsonify({"message": "News item updated successfully"}), 200
         else:
             logger.warning(f"News update failed: item {news_id} not found")
@@ -201,9 +207,11 @@ def delete_news_item(news_id: int):
     admin_user = get_jwt_identity()
 
     try:
-        logger.info(f"News deletion request for item {news_id} from admin {admin_user} at {client_ip}")
+        logger.info(
+            f"News deletion request for item {news_id} from admin {admin_user} at {client_ip}"
+        )
 
-        permanent = request.args.get('permanent', 'false').lower() == 'true'
+        permanent = request.args.get("permanent", "false").lower() == "true"
 
         # Delete news item
         success = delete_news(news_id, soft_delete=not permanent)

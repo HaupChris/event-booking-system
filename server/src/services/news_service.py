@@ -8,23 +8,23 @@ Business logic for news feed management including:
 - News feed retrieval with read status
 """
 
-import sqlite3
 import os
+import sqlite3
 from contextlib import closing
-from typing import Dict, List, Optional, Any
 from datetime import datetime
+from typing import Any
 
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-IN_DOCKER = os.environ.get('IN_DOCKER', 'False').lower() == 'true'
+IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 
 if IN_DOCKER:
-    DB_FILE_PATH = '/app/user_data/bookings.db'
+    DB_FILE_PATH = "/app/user_data/bookings.db"
 else:
-    DB_DIR = os.path.join(os.path.dirname(__file__), '../../db')
-    DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
+    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")
+    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
 
 
 def _connect_db() -> sqlite3.Connection:
@@ -38,7 +38,7 @@ def _connect_db() -> sqlite3.Connection:
         raise
 
 
-def get_all_news(include_inactive: bool = False) -> List[Dict[str, Any]]:
+def get_all_news(include_inactive: bool = False) -> list[dict[str, Any]]:
     """Get all news items."""
     try:
         logger.debug(f"Fetching all news (include_inactive={include_inactive})")
@@ -47,18 +47,22 @@ def get_all_news(include_inactive: bool = False) -> List[Dict[str, Any]]:
             cursor = conn.cursor()
 
             if include_inactive:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT id, title, content, category, published_date, author, is_active
                     FROM News
                     ORDER BY published_date DESC
-                """)
+                """
+                )
             else:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT id, title, content, category, published_date, author, is_active
                     FROM News
                     WHERE is_active = 1
                     ORDER BY published_date DESC
-                """)
+                """
+                )
 
             news_items = [dict(row) for row in cursor.fetchall()]
 
@@ -70,7 +74,7 @@ def get_all_news(include_inactive: bool = False) -> List[Dict[str, Any]]:
         raise
 
 
-def get_news_by_id(news_id: int) -> Optional[Dict[str, Any]]:
+def get_news_by_id(news_id: int) -> dict[str, Any] | None:
     """Get a specific news item by ID."""
     try:
         logger.debug(f"Fetching news item {news_id}")
@@ -78,11 +82,14 @@ def get_news_by_id(news_id: int) -> Optional[Dict[str, Any]]:
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT id, title, content, category, published_date, author, is_active
                 FROM News
                 WHERE id = ?
-            """, (news_id,))
+            """,
+                (news_id,),
+            )
 
             row = cursor.fetchone()
 
@@ -105,10 +112,13 @@ def create_news(title: str, content: str, category: str = None, author: str = No
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO News (title, content, category, author, published_date, is_active)
                 VALUES (?, ?, ?, ?, ?, 1)
-            """, (title, content, category, author, datetime.now().isoformat()))
+            """,
+                (title, content, category, author, datetime.now().isoformat()),
+            )
 
             conn.commit()
             news_id = cursor.lastrowid
@@ -121,8 +131,9 @@ def create_news(title: str, content: str, category: str = None, author: str = No
         raise
 
 
-def update_news(news_id: int, title: str = None, content: str = None,
-                category: str = None, author: str = None) -> bool:
+def update_news(
+    news_id: int, title: str = None, content: str = None, category: str = None, author: str = None
+) -> bool:
     """Update an existing news item."""
     try:
         logger.debug(f"Updating news item {news_id}")
@@ -202,7 +213,7 @@ def delete_news(news_id: int, soft_delete: bool = True) -> bool:
         raise
 
 
-def get_news_for_profile(profile_uuid: str) -> List[Dict[str, Any]]:
+def get_news_for_profile(profile_uuid: str) -> list[dict[str, Any]]:
     """
     Get all active news items with read status for a specific profile.
     """
@@ -213,21 +224,25 @@ def get_news_for_profile(profile_uuid: str) -> List[Dict[str, Any]]:
             cursor = conn.cursor()
 
             # First, get the booking_id for this profile
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT id FROM Bookings WHERE profile_uuid = ?
                 UNION
                 SELECT id FROM ArtistBookings WHERE profile_uuid = ?
-            """, (profile_uuid, profile_uuid))
+            """,
+                (profile_uuid, profile_uuid),
+            )
 
             row = cursor.fetchone()
             if not row:
                 logger.warning(f"No booking found for profile {profile_uuid}")
                 return []
 
-            booking_id = row['id']
+            booking_id = row["id"]
 
             # Get all active news with read status
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     n.id,
                     n.title,
@@ -242,20 +257,24 @@ def get_news_for_profile(profile_uuid: str) -> List[Dict[str, Any]]:
                     ON n.id = nrs.news_id AND nrs.booking_id = ?
                 WHERE n.is_active = 1
                 ORDER BY n.published_date DESC
-            """, (booking_id,))
+            """,
+                (booking_id,),
+            )
 
             news_items = []
             for row in cursor.fetchall():
-                news_items.append({
-                    'id': row['id'],
-                    'title': row['title'],
-                    'content': row['content'],
-                    'category': row['category'],
-                    'published_date': row['published_date'],
-                    'author': row['author'],
-                    'is_read': bool(row['is_read']),
-                    'read_date': row['read_date']
-                })
+                news_items.append(
+                    {
+                        "id": row["id"],
+                        "title": row["title"],
+                        "content": row["content"],
+                        "category": row["category"],
+                        "published_date": row["published_date"],
+                        "author": row["author"],
+                        "is_read": bool(row["is_read"]),
+                        "read_date": row["read_date"],
+                    }
+                )
 
             logger.debug(f"Found {len(news_items)} news items for profile {profile_uuid}")
             return news_items
@@ -274,24 +293,30 @@ def mark_news_as_read(profile_uuid: str, news_id: int) -> bool:
             cursor = conn.cursor()
 
             # Get the booking_id for this profile
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT id FROM Bookings WHERE profile_uuid = ?
                 UNION
                 SELECT id FROM ArtistBookings WHERE profile_uuid = ?
-            """, (profile_uuid, profile_uuid))
+            """,
+                (profile_uuid, profile_uuid),
+            )
 
             row = cursor.fetchone()
             if not row:
                 logger.warning(f"No booking found for profile {profile_uuid}")
                 return False
 
-            booking_id = row['id']
+            booking_id = row["id"]
 
             # Insert or ignore (in case already marked as read)
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT OR IGNORE INTO NewsReadStatus (booking_id, news_id, read_date)
                 VALUES (?, ?, ?)
-            """, (booking_id, news_id, datetime.now().isoformat()))
+            """,
+                (booking_id, news_id, datetime.now().isoformat()),
+            )
 
             conn.commit()
 
@@ -316,28 +341,34 @@ def get_unread_count(profile_uuid: str) -> int:
             cursor = conn.cursor()
 
             # Get the booking_id for this profile
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT id FROM Bookings WHERE profile_uuid = ?
                 UNION
                 SELECT id FROM ArtistBookings WHERE profile_uuid = ?
-            """, (profile_uuid, profile_uuid))
+            """,
+                (profile_uuid, profile_uuid),
+            )
 
             row = cursor.fetchone()
             if not row:
                 return 0
 
-            booking_id = row['id']
+            booking_id = row["id"]
 
             # Count unread news
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT COUNT(*) as count
                 FROM News n
                 LEFT JOIN NewsReadStatus nrs
                     ON n.id = nrs.news_id AND nrs.booking_id = ?
                 WHERE n.is_active = 1 AND nrs.id IS NULL
-            """, (booking_id,))
+            """,
+                (booking_id,),
+            )
 
-            count = cursor.fetchone()['count']
+            count = cursor.fetchone()["count"]
 
             logger.debug(f"Profile {profile_uuid} has {count} unread news items")
             return count

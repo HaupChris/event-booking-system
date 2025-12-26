@@ -1,6 +1,6 @@
 // src/form/adminArea/utils/optionsUtils.ts
 
-import {CombinedBooking} from "../interface";
+import type {CombinedBooking} from "../interface";
 
 /**
  * Generic interface for option items (tickets, beverages, food)

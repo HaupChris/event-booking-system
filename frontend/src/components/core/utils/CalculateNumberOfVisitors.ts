@@ -1,4 +1,4 @@
-import {TicketOption} from "../../../form/userArea/interface";
+import type {TicketOption} from "../../../form/userArea/interface";
 
 
 export function getMaxCapacityPerDay(formContent: { ticket_options: TicketOption[] }) {

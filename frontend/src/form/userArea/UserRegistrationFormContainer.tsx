@@ -1,5 +1,5 @@
 import React from "react";
-import {Booking, FormContent} from "./interface";
+import type {Booking, FormContent} from "./interface";
 import {userAreaTexts} from "../constants/texts";
 import {calculateTotalPriceUser} from "../../components/core/utils/Pricing";
 import {

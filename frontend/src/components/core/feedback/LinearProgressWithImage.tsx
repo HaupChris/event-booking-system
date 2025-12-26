@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect } from "react";
-import { LinearProgress } from "@mui/material";
+import React, { useRef, useState, useEffect } from 'react';
+import { LinearProgress } from '@mui/material';
 import { styled } from '@mui/system';
 
 // Common styles moved from CSS to styled components
@@ -19,13 +19,13 @@ const ProgressImage = styled('img')({
     '50%': { transform: 'translateY(-50%) rotate(0deg)' },
     '75%': { transform: 'translateY(-48%) rotate(-10deg)' },
     '100%': { transform: 'translateY(-50%) rotate(0deg)' },
-  }
+  },
 });
 
 interface LinearProgressWithImageProps {
   activeStep: number;
   maxSteps: number;
-  variant: "determinate";
+  variant: 'determinate';
   image: string;
 }
 

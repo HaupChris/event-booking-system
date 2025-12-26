@@ -9,10 +9,11 @@ import {
 } from '@mui/icons-material';
 import { useFetchData } from './useFetchData';
 import TabSwitcher from './components/TabSwitcher';
-import PeopleList, { Person } from './components/PeopleList';
+import type { Person } from './components/PeopleList';
+import PeopleList from './components/PeopleList';
 import FilterControls from './components/FilterControls';
 import FormCard from '../../components/core/display/FormCard';
-import { ViewFilterType } from './utils/optionsUtils';
+import type { ViewFilterType } from './utils/optionsUtils';
 import OptionsTable from "./components/OptionsTable";
 
 const ProfessionsPage: React.FC = () => {

@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
-from typing import List
+
 from py_ts_interfaces import Interface
+
 
 @dataclass
 class TimeSlot(Interface):
@@ -11,12 +12,14 @@ class TimeSlot(Interface):
     num_needed: int
     num_booked: int = 0
 
+
 @dataclass
 class WorkShift(Interface):
     id: int
     title: str
     description: str
-    time_slots: List[TimeSlot]
+    time_slots: list[TimeSlot]
+
 
 @dataclass
 class Material(Interface):
@@ -25,12 +28,14 @@ class Material(Interface):
     num_needed: int
     num_booked: int = 0
 
+
 @dataclass
 class ArtistMaterial(Interface):
     id: int
     title: str
     num_needed: int
     num_booked: int = 0
+
 
 @dataclass
 class BeverageOption(Interface):
@@ -40,6 +45,7 @@ class BeverageOption(Interface):
     price: float
     num_booked: int = 0
 
+
 @dataclass
 class FoodOption(Interface):
     id: int
@@ -47,6 +53,7 @@ class FoodOption(Interface):
     description: str
     price: float
     num_booked: int = 0
+
 
 @dataclass
 class TicketOption(Interface):
@@ -56,20 +63,23 @@ class TicketOption(Interface):
     amount: int
     num_booked: int = 0
 
+
 @dataclass
 class Profession(Interface):
     id: int
     title: str
 
+
 @dataclass
 class FormContent(Interface):
-    ticket_options: List[TicketOption]
-    beverage_options: List[BeverageOption]
-    food_options: List[FoodOption]
-    work_shifts: List[WorkShift]
-    materials: List[Material]
-    artist_materials: List[ArtistMaterial] = field(default_factory=list)
-    professions: List[Profession] = field(default_factory=list)
+    ticket_options: list[TicketOption]
+    beverage_options: list[BeverageOption]
+    food_options: list[FoodOption]
+    work_shifts: list[WorkShift]
+    materials: list[Material]
+    artist_materials: list[ArtistMaterial] = field(default_factory=list)
+    professions: list[Profession] = field(default_factory=list)
+
 
 @dataclass
 class Booking(Interface):
@@ -83,7 +93,7 @@ class Booking(Interface):
     timeslot_priority_1: int
     timeslot_priority_2: int
     timeslot_priority_3: int
-    material_ids: List[int]
+    material_ids: list[int]
     amount_shifts: int
     supporter_buddy: str
     total_price: float
@@ -92,8 +102,9 @@ class Booking(Interface):
     paid_amount: float
     payment_notes: str
     payment_date: str
-    artist_material_ids: List[int] = field(default_factory=list)
-    profession_ids: List[int] = field(default_factory=list)
+    artist_material_ids: list[int] = field(default_factory=list)
+    profession_ids: list[int] = field(default_factory=list)
+
 
 @dataclass
 class BookingWithTimestamp(Booking):
@@ -110,7 +121,7 @@ class ArtistBooking(Interface):
     ticket_id: int
     beverage_id: int
     food_id: int
-    artist_material_ids: List[int]
+    artist_material_ids: list[int]
     total_price: float
     signature: str
     is_paid: bool = False
@@ -120,7 +131,7 @@ class ArtistBooking(Interface):
     equipment: str = ""
     special_requests: str = ""
     performance_details: str = ""
-    profession_ids: List[int] = field(default_factory=list)
+    profession_ids: list[int] = field(default_factory=list)
 
 
 @dataclass
@@ -131,11 +142,11 @@ class ArtistBookingWithTimestamp(ArtistBooking):
 
 @dataclass
 class ArtistFormContent(Interface):
-    ticket_options: List[TicketOption]
-    beverage_options: List[BeverageOption]
-    food_options: List[FoodOption]
-    artist_materials: List[ArtistMaterial]
-    professions: List[Profession] = field(default_factory=list)
+    ticket_options: list[TicketOption]
+    beverage_options: list[BeverageOption]
+    food_options: list[FoodOption]
+    artist_materials: list[ArtistMaterial]
+    professions: list[Profession] = field(default_factory=list)
 
 
 @dataclass
@@ -146,6 +157,7 @@ class ShiftAssignment(Interface):
     admin_notes: str = ""
     id: int = -1
     assignment_date: str = ""
+
 
 @dataclass
 class ShiftAssignmentWithDetails(ShiftAssignment):

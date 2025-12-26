@@ -1,14 +1,20 @@
 import time
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-
 from src.models.datatypes import Booking
-from src.services.booking_service import insert_booking, get_all_bookings, get_up_to_date_form_content, delete_booking
+from src.services.booking_service import (
+    delete_booking,
+    get_all_bookings,
+    get_up_to_date_form_content,
+    insert_booking,
+    update_booking_db,
+    update_booking_payment,
+)
 from src.services.mail_service import send_confirmation_mail
-from src.services.booking_service import update_booking_db, update_booking_payment
 from src.utils.logger import get_logger, log_security_event
 
 # Initialize logger
@@ -40,7 +46,9 @@ def submit_form():
 
         # Create booking object
         booking = Booking(**booking_data)
-        logger.info(f"Booking submission from {booking.first_name} {booking.last_name} ({booking.email})")
+        logger.info(
+            f"Booking submission from {booking.first_name} {booking.last_name} ({booking.email})"
+        )
 
         # Attempt to insert booking
         success, profile_uuid = insert_booking(booking)
@@ -50,18 +58,25 @@ def submit_form():
             try:
                 form_content_dict = get_up_to_date_form_content()
                 send_confirmation_mail(booking, form_content_dict, profile_uuid)
-                logger.info(f"Booking and confirmation email successful for {booking.first_name} {booking.last_name}")
+                logger.info(
+                    f"Booking and confirmation email successful for {booking.first_name} {booking.last_name}"
+                )
             except Exception as email_error:
                 logger.error(
                     f"Booking successful but email failed for {booking.first_name} {booking.last_name}: {str(email_error)}",
-                    exc_info=True)
+                    exc_info=True,
+                )
                 # Still return success since booking was created
 
             duration = time.time() - start_time
-            logger.info(f"Booking process completed in {duration:.3f}s for {booking.first_name} {booking.last_name}")
+            logger.info(
+                f"Booking process completed in {duration:.3f}s for {booking.first_name} {booking.last_name}"
+            )
             return jsonify({"msg": "Booking successful"}), 200
         else:
-            logger.warning(f"Duplicate booking attempt for {booking.first_name} {booking.last_name} ({booking.email})")
+            logger.warning(
+                f"Duplicate booking attempt for {booking.first_name} {booking.last_name} ({booking.email})"
+            )
             return jsonify({"error": "Duplicate booking"}), 400
 
     except Exception as e:
@@ -82,11 +97,11 @@ def get_bookings():
         identity = get_jwt_identity()
         if identity not in ["admin"]:
             logger.warning(
-                f"Unauthorized access attempt to booking data from user: {identity}, IP: {request.remote_addr}")
-            log_security_event('UNAUTHORIZED_DATA_ACCESS', {
-                'endpoint': 'bookings_data',
-                'user_identity': identity
-            })
+                f"Unauthorized access attempt to booking data from user: {identity}, IP: {request.remote_addr}"
+            )
+            log_security_event(
+                "UNAUTHORIZED_DATA_ACCESS", {"endpoint": "bookings_data", "user_identity": identity}
+            )
             return jsonify({"error": "Unauthorized"}), 403
 
         logger.info(f"Admin {identity} accessing booking data from {request.remote_addr}")
@@ -98,13 +113,17 @@ def get_bookings():
         logger.info(f"Retrieved {booking_count} bookings in {duration:.3f}s for admin {identity}")
 
         if duration > 2.0:  # Log slow queries
-            logger.warning(f"Slow booking data retrieval: {duration:.3f}s for {booking_count} bookings")
+            logger.warning(
+                f"Slow booking data retrieval: {duration:.3f}s for {booking_count} bookings"
+            )
 
         return jsonify([vars(b) for b in all_bookings]), 200
 
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(f"Failed to retrieve booking data after {duration:.3f}s: {str(e)}", exc_info=True)
+        logger.error(
+            f"Failed to retrieve booking data after {duration:.3f}s: {str(e)}", exc_info=True
+        )
         return jsonify({"error": "Failed to retrieve booking data"}), 500
 
 
@@ -117,12 +136,13 @@ def update_booking(booking_id):
         # Check if user has admin permissions
         identity = get_jwt_identity()
         if identity not in ["admin"]:
-            logger.warning(f"Unauthorized booking update attempt by {identity} for booking {booking_id}")
-            log_security_event('UNAUTHORIZED_UPDATE_ATTEMPT', {
-                'endpoint': 'update_booking',
-                'user_identity': identity,
-                'booking_id': booking_id
-            })
+            logger.warning(
+                f"Unauthorized booking update attempt by {identity} for booking {booking_id}"
+            )
+            log_security_event(
+                "UNAUTHORIZED_UPDATE_ATTEMPT",
+                {"endpoint": "update_booking", "user_identity": identity, "booking_id": booking_id},
+            )
             return jsonify({"error": "Unauthorized"}), 403
 
         logger.info(f"Admin {identity} updating booking {booking_id}")
@@ -155,12 +175,13 @@ def update_payment(booking_id):
         # Check if user has admin permissions
         identity = get_jwt_identity()
         if identity not in ["admin"]:
-            logger.warning(f"Unauthorized payment update attempt by {identity} for booking {booking_id}")
-            log_security_event('UNAUTHORIZED_PAYMENT_UPDATE', {
-                'endpoint': 'update_payment',
-                'user_identity': identity,
-                'booking_id': booking_id
-            })
+            logger.warning(
+                f"Unauthorized payment update attempt by {identity} for booking {booking_id}"
+            )
+            log_security_event(
+                "UNAUTHORIZED_PAYMENT_UPDATE",
+                {"endpoint": "update_payment", "user_identity": identity, "booking_id": booking_id},
+            )
             return jsonify({"error": "Unauthorized"}), 403
 
         logger.info(f"Admin {identity} updating payment for booking {booking_id}")
@@ -193,15 +214,18 @@ def delete_booking_endpoint(booking_id):
         # Check if user has admin permissions
         identity = get_jwt_identity()
         if identity not in ["admin"]:
-            logger.warning(f"Unauthorized booking deletion attempt by {identity} for booking {booking_id}")
-            log_security_event('UNAUTHORIZED_DELETE_ATTEMPT', {
-                'endpoint': 'delete_booking',
-                'user_identity': identity,
-                'booking_id': booking_id
-            })
+            logger.warning(
+                f"Unauthorized booking deletion attempt by {identity} for booking {booking_id}"
+            )
+            log_security_event(
+                "UNAUTHORIZED_DELETE_ATTEMPT",
+                {"endpoint": "delete_booking", "user_identity": identity, "booking_id": booking_id},
+            )
             return jsonify({"error": "Unauthorized"}), 403
 
-        logger.warning(f"Admin {identity} deleting booking {booking_id}")  # Use warning for deletion
+        logger.warning(
+            f"Admin {identity} deleting booking {booking_id}"
+        )  # Use warning for deletion
 
         success = delete_booking(booking_id)
 

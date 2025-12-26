@@ -1,27 +1,30 @@
 import sys
 from collections import defaultdict
+from datetime import datetime, timedelta
 
+from dotenv import load_dotenv
 from flask import Flask, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from dotenv import load_dotenv
-from datetime import datetime, timedelta
-
+from src.api.admin_news import admin_news_bp
+from src.api.admin_profiles import admin_profiles_bp
+from src.api.artist_bookings import artist_bp
 from src.api.auth import auth_bp
 from src.api.bookings import bookings_bp
 from src.api.formcontent import formcontent_bp
-from src.api.profile import profile_bp
-from src.api.admin_news import admin_news_bp
-from src.api.admin_profiles import admin_profiles_bp
-
-from src.utils.config import load_config
-from src.utils.logger import setup_logging, get_logger, log_request, log_response, log_security_event
 from src.api.health import health_bp
-from src.api.artist_bookings import artist_bp
+from src.api.profile import profile_bp
 from src.api.shift_assignments import shift_assignments_bp
-
+from src.utils.config import load_config
+from src.utils.logger import (
+    get_logger,
+    log_request,
+    log_response,
+    log_security_event,
+    setup_logging,
+)
 
 load_dotenv()
 
@@ -46,12 +49,13 @@ limiter = Limiter(get_remote_address, app=app, default_limits=["20000 per day", 
 
 logger = get_logger(__name__)
 
+
 # Rate limiting callback functions
 @limiter.request_filter
 def header_whitelist():
     """Filter requests that should bypass rate limiting."""
     # Only bypass for health checks or similar
-    return request.endpoint == 'health.health_check'
+    return request.endpoint == "health.health_check"
 
 
 # Register blueprints
@@ -86,17 +90,20 @@ def handle_not_found(e):
         rate_limit_violations[key] = []
 
     rate_limit_violations[key] = [
-        attempt for attempt in rate_limit_violations[key]
-        if now - attempt < timedelta(minutes=10)
+        attempt for attempt in rate_limit_violations[key] if now - attempt < timedelta(minutes=10)
     ]
     rate_limit_violations[key].append(now)
 
     if len(rate_limit_violations[key]) >= 10:
-        log_security_event('POTENTIAL_SCANNING', {
-            'path': request.path,
-            'method': request.method,
-            'attempts_in_10min': len(rate_limit_violations[key])
-        }, severity='ERROR')
+        log_security_event(
+            "POTENTIAL_SCANNING",
+            {
+                "path": request.path,
+                "method": request.method,
+                "attempts_in_10min": len(rate_limit_violations[key]),
+            },
+            severity="ERROR",
+        )
 
     return {"message": "Endpoint not found"}, 404
 
@@ -110,28 +117,30 @@ def handle_rate_limit_exceeded(e):
 
     # Clean old violations (older than 1 hour)
     rate_limit_violations[client_ip] = [
-        violation for violation in rate_limit_violations[client_ip]
+        violation
+        for violation in rate_limit_violations[client_ip]
         if now - violation < timedelta(hours=1)
     ]
 
     rate_limit_violations[client_ip].append(now)
     violation_count = len(rate_limit_violations[client_ip])
 
-    logger.warning(f"Rate limit exceeded: {client_ip} on {endpoint} (violation #{violation_count} in last hour)")
+    logger.warning(
+        f"Rate limit exceeded: {client_ip} on {endpoint} (violation #{violation_count} in last hour)"
+    )
 
     # Log as security event if excessive
     if violation_count >= 5:
-        log_security_event('EXCESSIVE_RATE_LIMITING', {
-            'endpoint': endpoint,
-            'violation_count': violation_count,
-            'time_window': '1_hour'
-        }, severity='ERROR')
+        log_security_event(
+            "EXCESSIVE_RATE_LIMITING",
+            {"endpoint": endpoint, "violation_count": violation_count, "time_window": "1_hour"},
+            severity="ERROR",
+        )
     elif violation_count >= 3:
-        log_security_event('REPEATED_RATE_LIMITING', {
-            'endpoint': endpoint,
-            'violation_count': violation_count,
-            'time_window': '1_hour'
-        })
+        log_security_event(
+            "REPEATED_RATE_LIMITING",
+            {"endpoint": endpoint, "violation_count": violation_count, "time_window": "1_hour"},
+        )
 
     return {"message": "Rate limit exceeded"}, 429
 
@@ -154,5 +163,5 @@ def handle_exception(exc_type, exc_value, exc_traceback):
     app.logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     app.run(debug=True, host="127.0.0.1", port=5001)

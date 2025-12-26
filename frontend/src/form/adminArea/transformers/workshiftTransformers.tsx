@@ -11,8 +11,8 @@ import {
     Work as WorkIcon,
     AccessTime as AccessTimeIcon,
 } from '@mui/icons-material';
-import {ProgressItem} from '../components/ProgressList';
-import {Person} from '../components/PeopleList';
+import type {ProgressItem} from '../components/ProgressList';
+import type {Person} from '../components/PeopleList';
 import {spacePalette} from '../../../components/styles/theme';
 import {
     getTimeslotCount,
@@ -20,7 +20,7 @@ import {
     getWorkshiftForTimeslot,
     timeslotPriorityToString
 } from '../utils/workshiftUtils';
-import {TimeSlot} from "../../userArea/interface";
+import type {TimeSlot} from "../../userArea/interface";
 
 interface WorkshiftTransformConfig {
     workshifts: any[];

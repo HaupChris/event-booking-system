@@ -7,23 +7,20 @@ Authentication is handled via profile UUID in the URL path.
 """
 
 import time
-from flask import Blueprint, request, jsonify
+
+from flask import Blueprint, jsonify, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+from src.services.mail_service import send_profile_recovery_mail
+from src.services.news_service import get_news_for_profile, get_unread_count, mark_news_as_read
 from src.services.profile_service import (
-    get_profile_by_uuid,
-    get_assigned_shifts,
     accept_shift,
     decline_shift,
-    get_profile_uuids_by_email
+    get_assigned_shifts,
+    get_profile_by_uuid,
+    get_profile_uuids_by_email,
 )
-from src.services.news_service import (
-    get_news_for_profile,
-    mark_news_as_read,
-    get_unread_count
-)
-from src.services.mail_service import send_profile_recovery_mail
 from src.utils.logger import get_logger, log_security_event
 
 # Initialize logger
@@ -49,7 +46,7 @@ def get_profile(profile_uuid: str):
         logger.info(f"Profile access request for UUID {profile_uuid[:8]}... from {client_ip}")
 
         # Validate UUID format (basic check)
-        if len(profile_uuid) != 36 or profile_uuid.count('-') != 4:
+        if len(profile_uuid) != 36 or profile_uuid.count("-") != 4:
             logger.warning(f"Invalid UUID format from {client_ip}: {profile_uuid}")
             log_security_event("invalid_uuid_format", {"uuid": profile_uuid, "ip": client_ip})
             return jsonify({"error": "Invalid profile UUID"}), 400
@@ -88,7 +85,7 @@ def get_shifts(profile_uuid: str):
             return jsonify({"error": "Profile not found"}), 404
 
         # Get shifts
-        shifts = get_assigned_shifts(profile['booking']['id'])
+        shifts = get_assigned_shifts(profile["booking"]["id"])
 
         return jsonify({"shifts": shifts}), 200
 
@@ -104,7 +101,9 @@ def accept_shift_assignment(profile_uuid: str, assignment_id: int):
     client_ip = request.remote_addr
 
     try:
-        logger.info(f"Shift acceptance: UUID {profile_uuid[:8]}..., assignment {assignment_id} from {client_ip}")
+        logger.info(
+            f"Shift acceptance: UUID {profile_uuid[:8]}..., assignment {assignment_id} from {client_ip}"
+        )
 
         success = accept_shift(profile_uuid, assignment_id)
 
@@ -112,7 +111,9 @@ def accept_shift_assignment(profile_uuid: str, assignment_id: int):
             logger.info(f"Shift {assignment_id} accepted by profile {profile_uuid[:8]}...")
             return jsonify({"message": "Shift accepted successfully"}), 200
         else:
-            logger.warning(f"Shift acceptance failed: assignment {assignment_id} not found for profile {profile_uuid[:8]}...")
+            logger.warning(
+                f"Shift acceptance failed: assignment {assignment_id} not found for profile {profile_uuid[:8]}..."
+            )
             return jsonify({"error": "Shift assignment not found"}), 404
 
     except Exception as e:
@@ -127,20 +128,26 @@ def decline_shift_assignment(profile_uuid: str, assignment_id: int):
     client_ip = request.remote_addr
 
     try:
-        logger.info(f"Shift decline: UUID {profile_uuid[:8]}..., assignment {assignment_id} from {client_ip}")
+        logger.info(
+            f"Shift decline: UUID {profile_uuid[:8]}..., assignment {assignment_id} from {client_ip}"
+        )
 
         data = request.json or {}
-        rejection_reason = data.get('rejection_reason')
-        alternative_preferences = data.get('alternative_preferences')
+        rejection_reason = data.get("rejection_reason")
+        alternative_preferences = data.get("alternative_preferences")
 
-        success = decline_shift(profile_uuid, assignment_id, rejection_reason, alternative_preferences)
+        success = decline_shift(
+            profile_uuid, assignment_id, rejection_reason, alternative_preferences
+        )
 
         if success:
             logger.info(f"Shift {assignment_id} declined by profile {profile_uuid[:8]}...")
             # TODO: Send notification to admin about declined shift
             return jsonify({"message": "Shift declined successfully"}), 200
         else:
-            logger.warning(f"Shift decline failed: assignment {assignment_id} not found for profile {profile_uuid[:8]}...")
+            logger.warning(
+                f"Shift decline failed: assignment {assignment_id} not found for profile {profile_uuid[:8]}..."
+            )
             return jsonify({"error": "Shift assignment not found"}), 404
 
     except Exception as e:
@@ -226,14 +233,14 @@ def recover_profile():
             logger.warning(f"Profile recovery failed: missing JSON body from {client_ip}")
             return jsonify({"error": "Missing JSON body"}), 400
 
-        email = request.json.get('email')
+        email = request.json.get("email")
 
         if not email:
             logger.warning(f"Profile recovery failed: missing email from {client_ip}")
             return jsonify({"error": "Email is required"}), 400
 
         # Validate email format (basic check)
-        if '@' not in email or '.' not in email:
+        if "@" not in email or "." not in email:
             logger.warning(f"Profile recovery failed: invalid email format from {client_ip}")
             log_security_event("invalid_email_format", {"email": email, "ip": client_ip})
             return jsonify({"error": "Invalid email format"}), 400
@@ -247,9 +254,14 @@ def recover_profile():
             # Don't reveal whether email exists in system (security best practice)
             logger.info(f"No profiles found for email {email}, but returning success")
             elapsed_time = time.time() - start_time
-            return jsonify({
-                "message": "If this email is registered, you will receive a recovery link shortly."
-            }), 200
+            return (
+                jsonify(
+                    {
+                        "message": "If this email is registered, you will receive a recovery link shortly."
+                    }
+                ),
+                200,
+            )
 
         # Send recovery email
         try:
@@ -263,9 +275,14 @@ def recover_profile():
         elapsed_time = time.time() - start_time
         logger.info(f"Profile recovery completed in {elapsed_time:.2f}s")
 
-        return jsonify({
-            "message": "If this email is registered, you will receive a recovery link shortly."
-        }), 200
+        return (
+            jsonify(
+                {
+                    "message": "If this email is registered, you will receive a recovery link shortly."
+                }
+            ),
+            200,
+        )
 
     except Exception as e:
         elapsed_time = time.time() - start_time

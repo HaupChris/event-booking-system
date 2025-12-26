@@ -5,7 +5,7 @@ import {
   Box, Button, Menu, MenuItem, Tabs, Tab, useMediaQuery, useTheme
 } from '@mui/material';
 import { FilterAlt as FilterAltIcon } from '@mui/icons-material';
-import { ViewFilterType } from '../utils/optionsUtils';
+import type { ViewFilterType } from '../utils/optionsUtils';
 
 interface FilterControlsProps {
   viewType: ViewFilterType;

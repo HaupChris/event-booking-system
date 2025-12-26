@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material';
+import type {
+  ThemeMode} from '../components/styles/theme';
 import {
   ThemeContext,
   updateThemeMode,
-  ThemeMode,
   darkTheme,
   lightTheme
 } from '../components/styles/theme';

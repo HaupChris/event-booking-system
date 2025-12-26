@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {FormProps} from "./UserRegistrationFormContainer";
+import type {FormProps} from "./UserRegistrationFormContainer";
 import WorkShift from "../../components/core/inputs/workShift";
-import {WorkShift as WorkShiftType} from '../userArea/interface';
+import type {WorkShift as WorkShiftType} from '../userArea/interface';
 import {
     Box,
     Divider,
@@ -14,7 +14,7 @@ import {PRIORITIES} from "./constants";
 
 import '../../css/workShift.css';
 
-import {TimeSlot} from "./interface";
+import type {TimeSlot} from "./interface";
 import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
 import FormCard from "../../components/core/display/FormCard";
 import FormField from "../../components/core/inputs/FormField";
@@ -57,7 +57,7 @@ function WorkShiftForm(props: FormProps) {
     ]);
 
     function updateAvailablePriorities() {
-        let availablePriorities = [
+        const availablePriorities = [
             PRIORITIES.FIRST,
             PRIORITIES.SECOND,
             PRIORITIES.THIRD,

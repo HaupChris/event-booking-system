@@ -1,20 +1,19 @@
-
-import sqlite3
-import random
-import json
-from datetime import datetime
 import argparse
-from pathlib import Path
+import json
+import random
+import sqlite3
 
 # Ensure imports work when script is run directly
 import sys
+from datetime import datetime
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from src.models.datatypes import Booking, ArtistBooking
-from src.services.booking_service import insert_booking, _connect_db, DB_FILE_PATH
+from src.models.datatypes import ArtistBooking, Booking
 from src.services.artist_service import insert_artist_booking
-from src.services.formcontent_service import get_form_content_obj, get_artist_form_content_obj
+from src.services.booking_service import _connect_db, insert_booking
+from src.services.formcontent_service import get_artist_form_content_obj, get_form_content_obj
 
 
 def generate_mock_signature():
@@ -28,7 +27,7 @@ def generate_mock_email(first_name, last_name):
     """
     Generates a mock email based on first and last name.
     """
-    domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'example.com']
+    domains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "example.com"]
     return f"{first_name.lower()}.{last_name.lower()}@{random.choice(domains)}"
 
 
@@ -44,21 +43,116 @@ def generate_mock_name():
     Generates a mock first and last name.
     """
     first_names = [
-        "Anna", "Max", "Sophie", "Paul", "Emma", "Felix", "Lena", "Tim", "Laura", "Jonas",
-        "Julia", "David", "Sarah", "Lukas", "Lisa", "Noah", "Marie", "Leon", "Leonie", "Finn",
-        "Hannah", "Jan", "Lara", "Tom", "Amelie", "Lucas", "Lea", "Simon", "Emilia", "Ben",
-        "Johanna", "Niklas", "Katharina", "Daniel", "Charlotte", "Philipp", "Sophia", "Fabian",
-        "Maria", "Alexander", "Lina", "Florian", "Nele", "Julian", "Mia", "Michael", "Antonia",
-        "Maximilian", "Helena", "Christopher", "Olivia", "Jakob", "Emily", "Leo", "Lotta"
+        "Anna",
+        "Max",
+        "Sophie",
+        "Paul",
+        "Emma",
+        "Felix",
+        "Lena",
+        "Tim",
+        "Laura",
+        "Jonas",
+        "Julia",
+        "David",
+        "Sarah",
+        "Lukas",
+        "Lisa",
+        "Noah",
+        "Marie",
+        "Leon",
+        "Leonie",
+        "Finn",
+        "Hannah",
+        "Jan",
+        "Lara",
+        "Tom",
+        "Amelie",
+        "Lucas",
+        "Lea",
+        "Simon",
+        "Emilia",
+        "Ben",
+        "Johanna",
+        "Niklas",
+        "Katharina",
+        "Daniel",
+        "Charlotte",
+        "Philipp",
+        "Sophia",
+        "Fabian",
+        "Maria",
+        "Alexander",
+        "Lina",
+        "Florian",
+        "Nele",
+        "Julian",
+        "Mia",
+        "Michael",
+        "Antonia",
+        "Maximilian",
+        "Helena",
+        "Christopher",
+        "Olivia",
+        "Jakob",
+        "Emily",
+        "Leo",
+        "Lotta",
     ]
 
     last_names = [
-        "Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer", "Wagner", "Becker",
-        "Schulz", "Hoffmann", "Schäfer", "Koch", "Bauer", "Richter", "Klein", "Wolf", "Schröder",
-        "Neumann", "Schwarz", "Zimmermann", "Braun", "Krüger", "Hofmann", "Hartmann", "Lange",
-        "Schmitt", "Werner", "Schmitz", "Krause", "Meier", "Lehmann", "Schmid", "Schulze", "Maier",
-        "Köhler", "Herrmann", "König", "Walter", "Mayer", "Huber", "Kaiser", "Fuchs", "Peters",
-        "Lang", "Scholz", "Möller", "Weiß", "Jung", "Hahn", "Schubert", "Vogel", "Friedrich"
+        "Müller",
+        "Schmidt",
+        "Schneider",
+        "Fischer",
+        "Weber",
+        "Meyer",
+        "Wagner",
+        "Becker",
+        "Schulz",
+        "Hoffmann",
+        "Schäfer",
+        "Koch",
+        "Bauer",
+        "Richter",
+        "Klein",
+        "Wolf",
+        "Schröder",
+        "Neumann",
+        "Schwarz",
+        "Zimmermann",
+        "Braun",
+        "Krüger",
+        "Hofmann",
+        "Hartmann",
+        "Lange",
+        "Schmitt",
+        "Werner",
+        "Schmitz",
+        "Krause",
+        "Meier",
+        "Lehmann",
+        "Schmid",
+        "Schulze",
+        "Maier",
+        "Köhler",
+        "Herrmann",
+        "König",
+        "Walter",
+        "Mayer",
+        "Huber",
+        "Kaiser",
+        "Fuchs",
+        "Peters",
+        "Lang",
+        "Scholz",
+        "Möller",
+        "Weiß",
+        "Jung",
+        "Hahn",
+        "Schubert",
+        "Vogel",
+        "Friedrich",
     ]
 
     return random.choice(first_names), random.choice(last_names)
@@ -71,20 +165,31 @@ def generate_mock_artists_data(num_artists, form_content):
     artists = []
 
     # Extract options from form content
-    ticket_options = form_content['ticket_options']
-    beverage_options = form_content['beverage_options']
-    food_options = form_content['food_options']
-    artist_materials = form_content['artist_materials']
-    professions = form_content.get('professions', [])
+    ticket_options = form_content["ticket_options"]
+    beverage_options = form_content["beverage_options"]
+    food_options = form_content["food_options"]
+    artist_materials = form_content["artist_materials"]
+    professions = form_content.get("professions", [])
 
     for _ in range(num_artists):
         first_name, last_name = generate_mock_name()
 
         # Generate performance details as JSON
-        genres = ['Rock', 'Pop', 'Electronic', 'Hip Hop', 'Folk', 'Jazz', 'Classical', 'Indie', 'Metal', 'Reggae',
-                  'Funk']
-        days = ['Donnerstag', 'Freitag', 'Samstag']
-        times = ['Nachmittag', 'Abend', 'Nacht']
+        genres = [
+            "Rock",
+            "Pop",
+            "Electronic",
+            "Hip Hop",
+            "Folk",
+            "Jazz",
+            "Classical",
+            "Indie",
+            "Metal",
+            "Reggae",
+            "Funk",
+        ]
+        days = ["Donnerstag", "Freitag", "Samstag"]
+        times = ["Nachmittag", "Abend", "Nacht"]
         durations = [30, 45, 60, 90, 120]
 
         performance_details = {
@@ -93,7 +198,7 @@ def generate_mock_artists_data(num_artists, form_content):
             "duration": random.choice(durations),
             "genre": random.choice(genres),
             "description": f"Mock performance by {first_name} {last_name}",
-            "bandMembers": random.randint(1, 5)
+            "bandMembers": random.randint(1, 5),
         }
 
         # Choose random options
@@ -103,11 +208,19 @@ def generate_mock_artists_data(num_artists, form_content):
 
         # Random selection of materials
         num_materials = random.randint(0, min(5, len(artist_materials)))
-        material_ids = random.sample([m.id for m in artist_materials], num_materials) if num_materials > 0 else []
+        material_ids = (
+            random.sample([m.id for m in artist_materials], num_materials)
+            if num_materials > 0
+            else []
+        )
 
         # Random selection of professions
         num_professions = random.randint(0, min(3, len(professions)))
-        profession_ids = random.sample([p.id for p in professions], num_professions) if num_professions > 0 else []
+        profession_ids = (
+            random.sample([p.id for p in professions], num_professions)
+            if num_professions > 0
+            else []
+        )
 
         # Calculate price
         ticket_price = next((t.price for t in ticket_options if t.id == ticket_id), 0)
@@ -133,8 +246,12 @@ def generate_mock_artists_data(num_artists, form_content):
             payment_notes="",
             payment_date=datetime.now().strftime("%Y-%m-%d") if random.random() > 0.3 else "",
             equipment=f"Mock equipment needs for {first_name} {last_name}",
-            special_requests=f"Mock special requests for {first_name} {last_name}" if random.random() > 0.7 else "",
-            performance_details=json.dumps(performance_details)
+            special_requests=(
+                f"Mock special requests for {first_name} {last_name}"
+                if random.random() > 0.7
+                else ""
+            ),
+            performance_details=json.dumps(performance_details),
         )
 
         artists.append(artist)
@@ -149,12 +266,12 @@ def generate_mock_bookings_data(num_bookings, form_content):
     bookings = []
 
     # Extract options from form content
-    ticket_options = form_content['ticket_options']
-    beverage_options = form_content['beverage_options']
-    food_options = form_content['food_options']
-    materials = form_content['materials']
-    work_shifts = form_content['work_shifts']
-    professions = form_content.get('professions', [])
+    ticket_options = form_content["ticket_options"]
+    beverage_options = form_content["beverage_options"]
+    food_options = form_content["food_options"]
+    materials = form_content["materials"]
+    work_shifts = form_content["work_shifts"]
+    professions = form_content.get("professions", [])
 
     # Flatten timeslots for easier selection
     all_timeslots = []
@@ -172,11 +289,17 @@ def generate_mock_bookings_data(num_bookings, form_content):
 
         # Random selection of materials
         num_materials = random.randint(0, min(3, len(materials)))
-        material_ids = random.sample([m.id for m in materials], num_materials) if num_materials > 0 else []
+        material_ids = (
+            random.sample([m.id for m in materials], num_materials) if num_materials > 0 else []
+        )
 
         # Random selection of professions
         num_professions = random.randint(0, min(2, len(professions)))
-        profession_ids = random.sample([p.id for p in professions], num_professions) if num_professions > 0 else []
+        profession_ids = (
+            random.sample([p.id for p in professions], num_professions)
+            if num_professions > 0
+            else []
+        )
 
         # Random work shift preferences (1-3 unique timeslots)
         amount_shifts = random.randint(1, 3)
@@ -227,7 +350,7 @@ def generate_mock_bookings_data(num_bookings, form_content):
             paid_amount=total_price if random.random() > 0.3 else 0,
             payment_notes="",
             payment_date=datetime.now().strftime("%Y-%m-%d") if random.random() > 0.3 else "",
-            artist_material_ids=[]  # Not used for regular bookings
+            artist_material_ids=[],  # Not used for regular bookings
         )
 
         bookings.append(booking)
@@ -236,10 +359,12 @@ def generate_mock_bookings_data(num_bookings, form_content):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate mock data for testing')
-    parser.add_argument('--participants', type=int, default=150, help='Number of participants to generate')
-    parser.add_argument('--artists', type=int, default=20, help='Number of artists to generate')
-    parser.add_argument('--force', action='store_true', help='Force overwrite existing bookings')
+    parser = argparse.ArgumentParser(description="Generate mock data for testing")
+    parser.add_argument(
+        "--participants", type=int, default=150, help="Number of participants to generate"
+    )
+    parser.add_argument("--artists", type=int, default=20, help="Number of artists to generate")
+    parser.add_argument("--force", action="store_true", help="Force overwrite existing bookings")
     args = parser.parse_args()
 
     # Connect to database
@@ -254,7 +379,9 @@ def main():
     artist_booking_count = cursor.fetchone()[0]
 
     if (booking_count > 0 or artist_booking_count > 0) and not args.force:
-        print(f"Database already contains {booking_count} bookings and {artist_booking_count} artist bookings.")
+        print(
+            f"Database already contains {booking_count} bookings and {artist_booking_count} artist bookings."
+        )
         print("Use --force to overwrite existing data.")
         return
 
@@ -279,7 +406,9 @@ def main():
 
         conn.commit()
 
-    print(f"Generating {args.participants} participant bookings and {args.artists} artist bookings...")
+    print(
+        f"Generating {args.participants} participant bookings and {args.artists} artist bookings..."
+    )
 
     # Load form content for options
     form_content = get_form_content_obj()

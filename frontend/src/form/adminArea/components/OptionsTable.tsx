@@ -24,7 +24,7 @@ import {
     Stack
 } from '@mui/material';
 import { VisibilityOutlined as ViewIcon } from '@mui/icons-material';
-import { CombinedBooking } from "../interface";
+import type { CombinedBooking } from "../interface";
 import { getUsersForOption } from "../utils/optionsUtils";
 import { spacePalette } from '../../../components/styles/theme';
 import OptionItemModal from './OptionItemModal';

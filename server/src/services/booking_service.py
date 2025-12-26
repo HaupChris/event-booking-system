@@ -3,33 +3,33 @@ import os
 import sqlite3
 import time
 import uuid
-
 from contextlib import closing
-from typing import List, Tuple, Optional
 
 from src.models.datatypes import Booking, BookingWithTimestamp
-from src.services.formcontent_service import get_form_content_obj, update_form_content_with_db_counts
 from src.models.schema import init_db
+from src.services.formcontent_service import (
+    get_form_content_obj,
+    update_form_content_with_db_counts,
+)
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-IN_DOCKER = os.environ.get('IN_DOCKER', 'False').lower() == 'true'
+IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 
 if IN_DOCKER:
     # Docker paths
-    DB_DIR='/app/user_data'
-    DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
-    DATA_DIR='/app/data'
-    REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, 'schema.sql')
+    DB_DIR = "/app/user_data"
+    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
+    DATA_DIR = "/app/data"
+    REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, "schema.sql")
 
 else:
     # Local development paths
-    DB_DIR = os.path.join(os.path.dirname(__file__), '../../db')
-    DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
-    DATA_DIR=os.path.join(os.path.dirname(__file__), '../../data')
-    REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, 'schema.sql')
-
+    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")
+    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
+    DATA_DIR = os.path.join(os.path.dirname(__file__), "../../data")
+    REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, "schema.sql")
 
 
 # Ensure database is initialized on import
@@ -54,17 +54,22 @@ def booking_exists(booking: Booking) -> bool:
     Checks if a booking already exists with the same first name, last name, and email.
     """
     try:
-        logger.debug(f"Checking for existing booking: {booking.first_name} {booking.last_name} ({booking.email})")
+        logger.debug(
+            f"Checking for existing booking: {booking.first_name} {booking.last_name} ({booking.email})"
+        )
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                            SELECT COUNT(*)
                            FROM Users u
                                     JOIN Bookings b ON u.id = b.user_id
                            WHERE u.first_name = ?
                              AND u.last_name = ?
                              AND u.email = ?
-                           """, (booking.first_name, booking.last_name, booking.email))
+                           """,
+                (booking.first_name, booking.last_name, booking.email),
+            )
             exists = cursor.fetchone()[0] > 0
             if exists:
                 logger.debug(f"Existing booking found for {booking.first_name} {booking.last_name}")
@@ -80,20 +85,28 @@ def create_user(booking: Booking) -> int:
         logger.debug(f"Creating user: {booking.first_name} {booking.last_name}")
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                            INSERT INTO Users (last_name, first_name, email, phone_number)
                            VALUES (?, ?, ?, ?)
-                           """, (booking.last_name, booking.first_name, booking.email, booking.phone))
+                           """,
+                (booking.last_name, booking.first_name, booking.email, booking.phone),
+            )
             conn.commit()
             user_id = cursor.lastrowid
-            logger.info(f"User created successfully with ID {user_id}: {booking.first_name} {booking.last_name}")
+            logger.info(
+                f"User created successfully with ID {user_id}: {booking.first_name} {booking.last_name}"
+            )
             return user_id
     except sqlite3.Error as e:
-        logger.error(f"Database error creating user {booking.first_name} {booking.last_name}: {e}", exc_info=True)
+        logger.error(
+            f"Database error creating user {booking.first_name} {booking.last_name}: {e}",
+            exc_info=True,
+        )
         return -1
 
 
-def create_booking(user_id: int, booking: Booking) -> Tuple[int, Optional[str]]:
+def create_booking(user_id: int, booking: Booking) -> tuple[int, str | None]:
     """
     Creates a booking in the Bookings table and returns (booking_id, profile_uuid).
     """
@@ -105,41 +118,46 @@ def create_booking(user_id: int, booking: Booking) -> Tuple[int, Optional[str]]:
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                            INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, food_option_id,
                                                  first_priority_timeslot_id, second_priority_timeslot_id,
                                                  third_priority_timeslot_id,
                                                  amount_shifts, supporter_buddy, signature, total_price, is_paid,
                                                  paid_amount, payment_notes, payment_date, profile_uuid)
                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                           """, (
-                               user_id,
-                               booking.ticket_id,
-                               booking.beverage_id,
-                               booking.food_id,
-                               booking.timeslot_priority_1,
-                               booking.timeslot_priority_2,
-                               booking.timeslot_priority_3,
-                               booking.amount_shifts,
-                               booking.supporter_buddy,
-                               booking.signature,
-                               booking.total_price,
-                               booking.is_paid,
-                               booking.paid_amount,
-                               booking.payment_notes,
-                               booking.payment_date,
-                               profile_uuid
-                           ))
+                           """,
+                (
+                    user_id,
+                    booking.ticket_id,
+                    booking.beverage_id,
+                    booking.food_id,
+                    booking.timeslot_priority_1,
+                    booking.timeslot_priority_2,
+                    booking.timeslot_priority_3,
+                    booking.amount_shifts,
+                    booking.supporter_buddy,
+                    booking.signature,
+                    booking.total_price,
+                    booking.is_paid,
+                    booking.paid_amount,
+                    booking.payment_notes,
+                    booking.payment_date,
+                    profile_uuid,
+                ),
+            )
             conn.commit()
             booking_id = cursor.lastrowid
-            logger.info(f"Booking created successfully with ID {booking_id} (UUID: {profile_uuid[:8]}...) for user {user_id}")
+            logger.info(
+                f"Booking created successfully with ID {booking_id} (UUID: {profile_uuid[:8]}...) for user {user_id}"
+            )
             return booking_id, profile_uuid
     except sqlite3.Error as e:
         logger.error(f"Database error creating booking for user {user_id}: {e}", exc_info=True)
         return -1, None
 
 
-def assign_materials(booking_id: int, material_ids: List[int]) -> None:
+def assign_materials(booking_id: int, material_ids: list[int]) -> None:
     """
     Inserts the chosen materials into BookingMaterials.
     """
@@ -150,14 +168,22 @@ def assign_materials(booking_id: int, material_ids: List[int]) -> None:
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
             for material_id in material_ids:
-                cursor.execute("""
+                cursor.execute(
+                    """
                                INSERT INTO BookingMaterials (booking_id, material_id)
                                VALUES (?, ?)
-                               """, (booking_id, material_id))
+                               """,
+                    (booking_id, material_id),
+                )
             conn.commit()
-        logger.info(f"Materials {material_ids} to booking_id assigned successfully to booking {booking_id}")
+        logger.info(
+            f"Materials {material_ids} to booking_id assigned successfully to booking {booking_id}"
+        )
     except Exception as e:
-        logger.error(f"Unexpected error assigning materials {material_ids} to booking_id {booking_id}: {str(e)}", exc_info=True)
+        logger.error(
+            f"Unexpected error assigning materials {material_ids} to booking_id {booking_id}: {str(e)}",
+            exc_info=True,
+        )
 
 
 def save_signature_image(booking: Booking) -> None:
@@ -165,28 +191,31 @@ def save_signature_image(booking: Booking) -> None:
     Decodes the signature from base64 and saves it as an image.
     """
     try:
-        logger.info(f"Saving signature image of booking {booking.first_name + ' ' + booking.last_name}")
+        logger.info(
+            f"Saving signature image of booking {booking.first_name + ' ' + booking.last_name}"
+        )
         signature = booking.signature
-        if ',' in signature:
+        if "," in signature:
             # Remove possible 'data:image/png;base64,' prefix
-            signature = signature.split(',', 1)[1]
+            signature = signature.split(",", 1)[1]
 
-        signature_dir = os.path.join(DB_DIR, 'signatures')
+        signature_dir = os.path.join(DB_DIR, "signatures")
         if not os.path.exists(signature_dir):
             os.makedirs(signature_dir)
 
         img_data = base64.b64decode(signature)
-        file_path = os.path.join(
-            signature_dir, f'{booking.last_name}_{booking.first_name}.png'
-        )
+        file_path = os.path.join(signature_dir, f"{booking.last_name}_{booking.first_name}.png")
 
-        with open(file_path, 'wb') as file:
+        with open(file_path, "wb") as file:
             file.write(img_data)
     except Exception as e:
-        logger.error(f"Failed to save the signature image of booking {booking.first_name + ' ' + booking.last_name}: {str(e)}", exc_info=True)
+        logger.error(
+            f"Failed to save the signature image of booking {booking.first_name + ' ' + booking.last_name}: {str(e)}",
+            exc_info=True,
+        )
 
 
-def assign_professions(booking_id: int, profession_ids: List[int]) -> None:
+def assign_professions(booking_id: int, profession_ids: list[int]) -> None:
     """
     Inserts the chosen professions into BookingProfessions.
     """
@@ -196,16 +225,22 @@ def assign_professions(booking_id: int, profession_ids: List[int]) -> None:
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
             for profession_id in profession_ids:
-                cursor.execute("""
+                cursor.execute(
+                    """
                                INSERT INTO BookingProfessions (booking_id, profession_id)
                                VALUES (?, ?)
-                               """, (booking_id, profession_id))
+                               """,
+                    (booking_id, profession_id),
+                )
             conn.commit()
     except Exception as e:
-        logger.error(f"Unexpected Error assingin profession ids: {profession_ids} to booking id {booking_id}: {e}", exc_info=True)
+        logger.error(
+            f"Unexpected Error assingin profession ids: {profession_ids} to booking id {booking_id}: {e}",
+            exc_info=True,
+        )
 
 
-def insert_booking(booking: Booking) -> Tuple[bool, Optional[str]]:
+def insert_booking(booking: Booking) -> tuple[bool, str | None]:
     """
     Inserts a booking with comprehensive logging.
 
@@ -218,12 +253,16 @@ def insert_booking(booking: Booking) -> Tuple[bool, Optional[str]]:
         logger.info(f"Starting booking insertion for {booking.first_name} {booking.last_name}")
 
         if booking_exists(booking):
-            logger.warning(f"Duplicate booking attempt for {booking.first_name} {booking.last_name} ({booking.email})")
+            logger.warning(
+                f"Duplicate booking attempt for {booking.first_name} {booking.last_name} ({booking.email})"
+            )
             return False, None
 
         user_id = create_user(booking)
         if user_id == -1:
-            logger.error(f"Failed to create user for booking: {booking.first_name} {booking.last_name}")
+            logger.error(
+                f"Failed to create user for booking: {booking.first_name} {booking.last_name}"
+            )
             return False, None
 
         booking_id, profile_uuid = create_booking(user_id, booking)
@@ -233,7 +272,8 @@ def insert_booking(booking: Booking) -> Tuple[bool, Optional[str]]:
 
         duration = time.time() - start_time
         logger.info(
-            f"Booking insertion completed in {duration:.3f}s for {booking.first_name} {booking.last_name} (ID: {booking_id}, UUID: {profile_uuid[:8] if profile_uuid else 'None'}...)")
+            f"Booking insertion completed in {duration:.3f}s for {booking.first_name} {booking.last_name} (ID: {booking_id}, UUID: {profile_uuid[:8] if profile_uuid else 'None'}...)"
+        )
 
         if duration > 1.0:
             logger.warning(f"Slow booking insertion: {duration:.3f}s for booking {booking_id}")
@@ -244,11 +284,12 @@ def insert_booking(booking: Booking) -> Tuple[bool, Optional[str]]:
         duration = time.time() - start_time
         logger.error(
             f"Booking insertion failed after {duration:.3f}s for {booking.first_name} {booking.last_name}: {str(e)}",
-            exc_info=True)
+            exc_info=True,
+        )
         return False, None
 
 
-def get_all_bookings() -> List[BookingWithTimestamp]:
+def get_all_bookings() -> list[BookingWithTimestamp]:
     """
     Returns all bookings with user + booking info, including material_ids, as a list of BookingWithTimestamp.
     """
@@ -259,7 +300,8 @@ def get_all_bookings() -> List[BookingWithTimestamp]:
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                            SELECT b.id as booking_id,
                                   u.last_name,
                                   u.first_name,
@@ -282,24 +324,31 @@ def get_all_bookings() -> List[BookingWithTimestamp]:
                                   b.payment_date
                            FROM Users u
                                     JOIN Bookings b ON u.id = b.user_id
-                           """)
+                           """
+            )
             rows = cursor.fetchall()
 
-            bookings: List[BookingWithTimestamp] = []
+            bookings: list[BookingWithTimestamp] = []
             for row in rows:
                 booking_id = row[0]
-                cursor.execute("""
+                cursor.execute(
+                    """
                                SELECT material_id
                                FROM BookingMaterials
                                WHERE booking_id = ?
-                               """, (booking_id,))
+                               """,
+                    (booking_id,),
+                )
                 material_ids = [item[0] for item in cursor.fetchall()]
 
-                cursor.execute("""
+                cursor.execute(
+                    """
                                SELECT profession_id
                                FROM BookingProfessions
                                WHERE booking_id = ?
-                               """, (booking_id,))
+                               """,
+                    (booking_id,),
+                )
                 profession_ids = [item[0] for item in cursor.fetchall()]
 
                 booking = BookingWithTimestamp(
@@ -320,23 +369,27 @@ def get_all_bookings() -> List[BookingWithTimestamp]:
                     timestamp=row[14],
                     signature=row[15] or "",
                     is_paid=True if row[16] == 1 else False,
-                    paid_amount= row[17],
+                    paid_amount=row[17],
                     payment_notes=row[18],
                     payment_date=row[19],
                     profession_ids=profession_ids,
-                    material_ids=material_ids
+                    material_ids=material_ids,
                 )
                 bookings.append(booking)
             duration = time.time() - start_time
             logger.info(f"Retrieved {len(bookings)} bookings in {duration:.3f}s")
 
             if duration > 2.0:
-                logger.warning(f"Slow booking retrieval: {duration:.3f}s for {len(bookings)} bookings")
+                logger.warning(
+                    f"Slow booking retrieval: {duration:.3f}s for {len(bookings)} bookings"
+                )
 
             return bookings
     except sqlite3.Error as e:
         duration = time.time() - start_time
-        logger.error(f"Database error retrieving bookings after {duration:.3f}s: {e}", exc_info=True)
+        logger.error(
+            f"Database error retrieving bookings after {duration:.3f}s: {e}", exc_info=True
+        )
         return []
 
 
@@ -352,8 +405,8 @@ def check_email_exists(email: str) -> bool:
             return cursor.fetchone() is not None
 
     except sqlite3.Error as e:
-            logger.error(f"Database error checking email existence: {e}", exc_info=True)
-            return True
+        logger.error(f"Database error checking email existence: {e}", exc_info=True)
+        return True
 
 
 def get_up_to_date_form_content() -> dict:
@@ -373,7 +426,9 @@ def get_up_to_date_form_content() -> dict:
         return result
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(f"Failed to generate form content after {duration:.3f}s: {str(e)}", exc_info=True)
+        logger.error(
+            f"Failed to generate form content after {duration:.3f}s: {str(e)}", exc_info=True
+        )
         return {}
 
 
@@ -399,23 +454,27 @@ def update_booking_db(booking_id: int, booking_data: dict) -> bool:
             conn.execute("BEGIN TRANSACTION")
             try:
                 # Update User information
-                cursor.execute("""
+                cursor.execute(
+                    """
                                UPDATE Users
                                SET first_name   = ?,
                                    last_name    = ?,
                                    email        = ?,
                                    phone_number = ?
                                WHERE id = ?
-                               """, (
-                                   booking_data['first_name'],
-                                   booking_data['last_name'],
-                                   booking_data['email'],
-                                   booking_data['phone'],
-                                   user_id
-                               ))
+                               """,
+                    (
+                        booking_data["first_name"],
+                        booking_data["last_name"],
+                        booking_data["email"],
+                        booking_data["phone"],
+                        user_id,
+                    ),
+                )
 
                 # Update Booking information
-                cursor.execute("""
+                cursor.execute(
+                    """
                                UPDATE Bookings
                                SET ticket_option_id            = ?,
                                    beverage_option_id          = ?,
@@ -427,29 +486,33 @@ def update_booking_db(booking_id: int, booking_data: dict) -> bool:
                                    supporter_buddy             = ?,
                                    total_price                 = ?
                                WHERE id = ?
-                               """, (
-                                   booking_data['ticket_id'],
-                                   booking_data['beverage_id'],
-                                   booking_data['food_id'],
-                                   booking_data['timeslot_priority_1'],
-                                   booking_data['timeslot_priority_2'],
-                                   booking_data['timeslot_priority_3'],
-                                   booking_data['amount_shifts'],
-                                   booking_data['supporter_buddy'],
-                                   booking_data['total_price'],
-                                   booking_id
-                               ))
+                               """,
+                    (
+                        booking_data["ticket_id"],
+                        booking_data["beverage_id"],
+                        booking_data["food_id"],
+                        booking_data["timeslot_priority_1"],
+                        booking_data["timeslot_priority_2"],
+                        booking_data["timeslot_priority_3"],
+                        booking_data["amount_shifts"],
+                        booking_data["supporter_buddy"],
+                        booking_data["total_price"],
+                        booking_id,
+                    ),
+                )
 
                 # Handle materials if they were updated
-                if 'material_ids' in booking_data:
+                if "material_ids" in booking_data:
                     # Delete existing materials first
-                    cursor.execute("DELETE FROM BookingMaterials WHERE booking_id = ?", (booking_id,))
+                    cursor.execute(
+                        "DELETE FROM BookingMaterials WHERE booking_id = ?", (booking_id,)
+                    )
 
                     # Insert new material selections
-                    for material_id in booking_data['material_ids']:
+                    for material_id in booking_data["material_ids"]:
                         cursor.execute(
                             "INSERT INTO BookingMaterials (booking_id, material_id) VALUES (?, ?)",
-                            (booking_id, material_id)
+                            (booking_id, material_id),
                         )
 
                 # Commit transaction
@@ -487,20 +550,23 @@ def update_booking_payment(booking_id: int, payment_data: dict) -> bool:
 
             try:
                 # Update payment information
-                cursor.execute("""
+                cursor.execute(
+                    """
                                UPDATE Bookings
                                SET is_paid       = ?,
                                    paid_amount   = ?,
                                    payment_notes = ?,
                                    payment_date  = ?
                                WHERE id = ?
-                               """, (
-                                   payment_data['is_paid'],
-                                   payment_data['paid_amount'],
-                                   payment_data.get('payment_notes', ''),
-                                   payment_data.get('payment_date'),
-                                   booking_id
-                               ))
+                               """,
+                    (
+                        payment_data["is_paid"],
+                        payment_data["paid_amount"],
+                        payment_data.get("payment_notes", ""),
+                        payment_data.get("payment_date"),
+                        booking_id,
+                    ),
+                )
 
                 conn.commit()
                 logger.info(f"Payment status updated for booking {booking_id}")

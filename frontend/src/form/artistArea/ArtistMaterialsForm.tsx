@@ -1,5 +1,5 @@
 import React from "react";
-import {ArtistFormProps} from "./ArtistRegistrationFormContainer";
+import type {ArtistFormProps} from "./ArtistRegistrationFormContainer";
 import {artistAreaTexts} from "../constants/texts";
 import MaterialsFormBase from "../../components/core/forms/MaterialsFormBase";
 

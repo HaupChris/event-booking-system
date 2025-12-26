@@ -1,4 +1,4 @@
-import {Booking, WorkShift as WorkShiftType} from '../../../form/userArea/interface';
+import type {Booking, WorkShift as WorkShiftType} from '../../../form/userArea/interface';
 import {Box, List, ListItem, Typography, alpha} from '@mui/material';
 import React, {useEffect, useState} from 'react';
 import TimeSlot from './timeSlot';

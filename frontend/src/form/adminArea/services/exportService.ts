@@ -3,8 +3,8 @@
  * Extracted from Dashboard.tsx to improve maintainability and reduce file size.
  */
 
-import {BookingWithTimestamp, FormContent} from '../../userArea/interface';
-import {ArtistBookingWithTimestamp, ArtistFormContent} from '../../artistArea/interface';
+import type {BookingWithTimestamp, FormContent} from '../../userArea/interface';
+import type {ArtistBookingWithTimestamp, ArtistFormContent} from '../../artistArea/interface';
 
 type ExportData = Record<string, any>;
 

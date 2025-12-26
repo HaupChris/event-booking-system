@@ -1,4 +1,4 @@
-import {Booking, TimeSlot as TimeSlotType} from '../../../form/userArea/interface';
+import type {Booking, TimeSlot as TimeSlotType} from '../../../form/userArea/interface';
 import {
     Box,
     FormControl,

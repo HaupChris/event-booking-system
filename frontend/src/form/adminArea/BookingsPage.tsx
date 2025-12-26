@@ -14,7 +14,7 @@ import {
 } from '@mui/icons-material';
 import {TokenContext} from "../../contexts/AuthContext";
 import {useFetchData} from "./useFetchData";
-import {CombinedBooking} from "./interface";
+import type {CombinedBooking} from "./interface";
 import FormCard from "../../components/core/display/FormCard";
 import BookingTable from "./components/BookingTable";
 import BookingDetailModal from "./components/BookingDetailModal";

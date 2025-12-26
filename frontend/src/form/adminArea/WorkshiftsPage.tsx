@@ -13,7 +13,7 @@ import TabSwitcher from './components/TabSwitcher';
 import ProgressList from './components/ProgressList';
 import PeopleList from './components/PeopleList';
 import FilterSortBar from './components/FilterSortBar';
-import {TimeSlot} from "../userArea/interface";
+import type {TimeSlot} from "../userArea/interface";
 import {useModal} from "../../hooks/useModal";
 import {useSort} from "../../hooks/useSort";
 import {transformWorkshiftsToProgressItems, transformBookingsToPeopleItems} from './transformers/workshiftTransformers';

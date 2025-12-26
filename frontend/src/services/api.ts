@@ -3,8 +3,8 @@
  */
 
 import apiClient from './apiClient';
-import { FormContent } from '../form/userArea/interface';
-import { ArtistFormContent } from '../form/artistArea/interface';
+import type { FormContent } from '../form/userArea/interface';
+import type { ArtistFormContent } from '../form/artistArea/interface';
 
 /**
  * Regular booking endpoints

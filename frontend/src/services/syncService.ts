@@ -3,16 +3,17 @@
  * Handles syncing data between server and IndexedDB
  */
 
+import type {
+  ProfileData,
+  BookingData,
+  NewsFeedItem,
+  SyncOperation} from '../utils/indexedDB';
 import {
   ProfileDB,
   BookingDB,
   NewsFeedDB,
   SyncQueueDB,
-  MetadataDB,
-  ProfileData,
-  BookingData,
-  NewsFeedItem,
-  SyncOperation,
+  MetadataDB
 } from '../utils/indexedDB';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || '';

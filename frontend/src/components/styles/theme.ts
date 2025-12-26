@@ -1,4 +1,5 @@
-import { createTheme, Theme, Components } from '@mui/material/styles';
+import type { Theme, Components } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import { alpha } from '@mui/material';
 import { createContext, useContext } from 'react';
 

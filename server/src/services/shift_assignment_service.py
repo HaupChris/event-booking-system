@@ -1,17 +1,18 @@
 import sqlite3
 from contextlib import closing
-from typing import List, Dict
+
 from src.models.datatypes import ShiftAssignment, ShiftAssignmentWithDetails
 from src.services.booking_service import _connect_db
 
 
-def get_all_shift_assignments() -> List[ShiftAssignmentWithDetails]:
+def get_all_shift_assignments() -> list[ShiftAssignmentWithDetails]:
     """
     Returns all shift assignments with detailed information.
     """
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
                        SELECT sa.id,
                               sa.booking_id,
                               sa.timeslot_id,
@@ -37,7 +38,8 @@ def get_all_shift_assignments() -> List[ShiftAssignmentWithDetails]:
                                 JOIN Users u ON b.user_id = u.id
                                 JOIN TimeSlots ts ON sa.timeslot_id = ts.id
                                 JOIN WorkShifts ws ON ts.workshift_id = ws.id
-                       """)
+                       """
+        )
 
         assignments = []
         for row in cursor.fetchall():
@@ -56,20 +58,21 @@ def get_all_shift_assignments() -> List[ShiftAssignmentWithDetails]:
                 timeslot_title=row[11],
                 timeslot_start=row[12] or "",
                 timeslot_end=row[13] or "",
-                priority=row[14]
+                priority=row[14],
             )
             assignments.append(assignment)
 
         return assignments
 
 
-def get_assignments_by_timeslot(timeslot_id: int) -> List[ShiftAssignmentWithDetails]:
+def get_assignments_by_timeslot(timeslot_id: int) -> list[ShiftAssignmentWithDetails]:
     """
     Returns all assignments for a specific timeslot.
     """
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
                        SELECT sa.id,
                               sa.booking_id,
                               sa.timeslot_id,
@@ -96,7 +99,9 @@ def get_assignments_by_timeslot(timeslot_id: int) -> List[ShiftAssignmentWithDet
                                 JOIN TimeSlots ts ON sa.timeslot_id = ts.id
                                 JOIN WorkShifts ws ON ts.workshift_id = ws.id
                        WHERE sa.timeslot_id = ?
-                       """, (timeslot_id,))
+                       """,
+            (timeslot_id,),
+        )
 
         assignments = []
         for row in cursor.fetchall():
@@ -115,20 +120,21 @@ def get_assignments_by_timeslot(timeslot_id: int) -> List[ShiftAssignmentWithDet
                 timeslot_title=row[11],
                 timeslot_start=row[12] or "",
                 timeslot_end=row[13] or "",
-                priority=row[14]
+                priority=row[14],
             )
             assignments.append(assignment)
 
         return assignments
 
 
-def get_assignments_by_booking(booking_id: int) -> List[ShiftAssignmentWithDetails]:
+def get_assignments_by_booking(booking_id: int) -> list[ShiftAssignmentWithDetails]:
     """
     Returns all assignments for a specific booking (participant).
     """
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
                        SELECT sa.id,
                               sa.booking_id,
                               sa.timeslot_id,
@@ -155,7 +161,9 @@ def get_assignments_by_booking(booking_id: int) -> List[ShiftAssignmentWithDetai
                                 JOIN TimeSlots ts ON sa.timeslot_id = ts.id
                                 JOIN WorkShifts ws ON ts.workshift_id = ws.id
                        WHERE sa.booking_id = ?
-                       """, (booking_id,))
+                       """,
+            (booking_id,),
+        )
 
         assignments = []
         for row in cursor.fetchall():
@@ -174,7 +182,7 @@ def get_assignments_by_booking(booking_id: int) -> List[ShiftAssignmentWithDetai
                 timeslot_title=row[11],
                 timeslot_start=row[12] or "",
                 timeslot_end=row[13] or "",
-                priority=row[14]
+                priority=row[14],
             )
             assignments.append(assignment)
 
@@ -192,21 +200,24 @@ def create_assignment(assignment: ShiftAssignment) -> int:
             # Check if booking already has this timeslot assigned
             cursor.execute(
                 "SELECT COUNT(*) FROM ShiftAssignments WHERE booking_id = ? AND timeslot_id = ?",
-                (assignment.booking_id, assignment.timeslot_id)
+                (assignment.booking_id, assignment.timeslot_id),
             )
             if cursor.fetchone()[0] > 0:
                 return -1  # Already exists
 
-            cursor.execute("""
+            cursor.execute(
+                """
                            INSERT INTO ShiftAssignments
                                (booking_id, timeslot_id, is_confirmed, admin_notes)
                            VALUES (?, ?, ?, ?)
-                           """, (
-                               assignment.booking_id,
-                               assignment.timeslot_id,
-                               1 if assignment.is_confirmed else 0,
-                               assignment.admin_notes
-                           ))
+                           """,
+                (
+                    assignment.booking_id,
+                    assignment.timeslot_id,
+                    1 if assignment.is_confirmed else 0,
+                    assignment.admin_notes,
+                ),
+            )
             conn.commit()
             return cursor.lastrowid
         except sqlite3.Error as e:
@@ -222,16 +233,15 @@ def update_assignment(assignment_id: int, assignment: ShiftAssignment) -> bool:
         cursor = conn.cursor()
 
         try:
-            cursor.execute("""
+            cursor.execute(
+                """
                            UPDATE ShiftAssignments
                            SET is_confirmed = ?,
                                admin_notes  = ?
                            WHERE id = ?
-                           """, (
-                               1 if assignment.is_confirmed else 0,
-                               assignment.admin_notes,
-                               assignment_id
-                           ))
+                           """,
+                (1 if assignment.is_confirmed else 0, assignment.admin_notes, assignment_id),
+            )
             conn.commit()
             return cursor.rowcount > 0
         except sqlite3.Error as e:
@@ -247,10 +257,7 @@ def delete_assignment(assignment_id: int) -> bool:
         cursor = conn.cursor()
 
         try:
-            cursor.execute(
-                "DELETE FROM ShiftAssignments WHERE id = ?",
-                (assignment_id,)
-            )
+            cursor.execute("DELETE FROM ShiftAssignments WHERE id = ?", (assignment_id,))
             conn.commit()
             return cursor.rowcount > 0
         except sqlite3.Error as e:
@@ -264,10 +271,7 @@ def get_booking_shift_count(booking_id: int) -> int:
     """
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT COUNT(*) FROM ShiftAssignments WHERE booking_id = ?",
-            (booking_id,)
-        )
+        cursor.execute("SELECT COUNT(*) FROM ShiftAssignments WHERE booking_id = ?", (booking_id,))
         return cursor.fetchone()[0]
 
 
@@ -277,10 +281,7 @@ def get_booking_max_shifts(booking_id: int) -> int:
     """
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT amount_shifts FROM Bookings WHERE id = ?",
-            (booking_id,)
-        )
+        cursor.execute("SELECT amount_shifts FROM Bookings WHERE id = ?", (booking_id,))
         result = cursor.fetchone()
         return result[0] if result else 0
 
@@ -291,10 +292,7 @@ def get_timeslot_capacity(timeslot_id: int) -> int:
     """
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT num_needed FROM TimeSlots WHERE id = ?",
-            (timeslot_id,)
-        )
+        cursor.execute("SELECT num_needed FROM TimeSlots WHERE id = ?", (timeslot_id,))
         result = cursor.fetchone()
         return result[0] if result else 0
 
@@ -306,19 +304,19 @@ def get_timeslot_assignment_count(timeslot_id: int) -> int:
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT COUNT(*) FROM ShiftAssignments WHERE timeslot_id = ?",
-            (timeslot_id,)
+            "SELECT COUNT(*) FROM ShiftAssignments WHERE timeslot_id = ?", (timeslot_id,)
         )
         return cursor.fetchone()[0]
 
 
-def get_booking_assignments_summary() -> List[Dict]:
+def get_booking_assignments_summary() -> list[dict]:
     """
     Returns a summary of bookings with their assignment status.
     """
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
                        SELECT b.id            as booking_id,
                               u.first_name,
                               u.last_name,
@@ -328,30 +326,32 @@ def get_booking_assignments_summary() -> List[Dict]:
                                 JOIN Users u ON b.user_id = u.id
                                 LEFT JOIN ShiftAssignments sa ON b.id = sa.booking_id
                        GROUP BY b.id
-                       """)
+                       """
+        )
 
         summaries = []
         for row in cursor.fetchall():
             summary = {
-                'booking_id': row[0],
-                'first_name': row[1],
-                'last_name': row[2],
-                'max_shifts': row[3],
-                'assigned_shifts': row[4],
-                'is_fully_assigned': row[4] >= row[3]
+                "booking_id": row[0],
+                "first_name": row[1],
+                "last_name": row[2],
+                "max_shifts": row[3],
+                "assigned_shifts": row[4],
+                "is_fully_assigned": row[4] >= row[3],
             }
             summaries.append(summary)
 
         return summaries
 
 
-def get_timeslot_summary() -> List[Dict]:
+def get_timeslot_summary() -> list[dict]:
     """
     Returns a summary of timeslots with their assignment status.
     """
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
                        SELECT ts.id        as timeslot_id,
                               ws.title     as workshift_title,
                               ts.title     as timeslot_title,
@@ -363,7 +363,8 @@ def get_timeslot_summary() -> List[Dict]:
                                 JOIN WorkShifts ws ON ts.workshift_id = ws.id
                                 LEFT JOIN ShiftAssignments sa ON ts.id = sa.timeslot_id
                        GROUP BY ts.id
-                       """)
+                       """
+        )
 
         summaries = []
         for row in cursor.fetchall():
@@ -371,16 +372,16 @@ def get_timeslot_summary() -> List[Dict]:
             assigned = row[6]
 
             summary = {
-                'timeslot_id': row[0],
-                'workshift_title': row[1],
-                'timeslot_title': row[2],
-                'start_time': row[3] or "",
-                'end_time': row[4] or "",
-                'capacity': capacity,
-                'assigned_count': assigned,
-                'remaining': max(0, capacity - assigned),
-                'is_filled': assigned >= capacity,
-                'fill_percentage': (assigned / capacity * 100) if capacity > 0 else 0
+                "timeslot_id": row[0],
+                "workshift_title": row[1],
+                "timeslot_title": row[2],
+                "start_time": row[3] or "",
+                "end_time": row[4] or "",
+                "capacity": capacity,
+                "assigned_count": assigned,
+                "remaining": max(0, capacity - assigned),
+                "is_filled": assigned >= capacity,
+                "fill_percentage": (assigned / capacity * 100) if capacity > 0 else 0,
             }
             summaries.append(summary)
 

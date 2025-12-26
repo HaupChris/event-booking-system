@@ -9,8 +9,8 @@ import {
 } from '@mui/material';
 import {Check, ErrorOutline, FileCopy, OpenInNew, SignalCellularNodata} from "@mui/icons-material";
 import rocketBaak from "../../img/rocket_baak.png"
-import {ArtistBooking, ArtistFormContent} from "./interface";
-import {ArtistBookingState} from "./ArtistRegistrationFormContainer";
+import type {ArtistBooking, ArtistFormContent} from "./interface";
+import type {ArtistBookingState} from "./ArtistRegistrationFormContainer";
 import {generalConstants} from "../constants/texts";
 
 

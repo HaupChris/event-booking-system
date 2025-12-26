@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ShiftAssignment } from './types';
+import type { ShiftAssignment } from './types';
 
 export const ShiftAssignmentAPI = {
   getAllAssignments: async (token: string): Promise<ShiftAssignment[]> => {

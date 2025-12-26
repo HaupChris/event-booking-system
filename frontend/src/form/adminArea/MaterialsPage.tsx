@@ -16,7 +16,7 @@ import ProgressList from './components/ProgressList';
 import PeopleList from './components/PeopleList';
 import FilterSortBar from './components/FilterSortBar';
 import FormCard from '../../components/core/display/FormCard';
-import {ViewFilterType} from './utils/optionsUtils';
+import type {ViewFilterType} from './utils/optionsUtils';
 import {useModal} from '../../hooks/useModal';
 import {useSort} from '../../hooks/useSort';
 import {transformMaterialsToProgressItems, transformBookingsToPeopleItems} from './transformers/materialTransformers';

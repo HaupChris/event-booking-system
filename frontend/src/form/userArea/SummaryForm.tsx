@@ -6,7 +6,7 @@ import {
     Chip,
     alpha,
 } from '@mui/material';
-import {Booking, FormContent, TimeSlot, WorkShift} from './interface';
+import type {Booking, FormContent, TimeSlot, WorkShift} from './interface';
 import "../../css/formSummary.css";
 import {PRIORITIES} from "./constants";
 import PersonIcon from '@mui/icons-material/Person';

@@ -2,7 +2,8 @@
  * Centralized API client with interceptors for error handling and authentication
  */
 
-import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import axios from 'axios';
 
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({

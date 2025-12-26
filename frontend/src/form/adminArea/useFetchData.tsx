@@ -1,8 +1,8 @@
 import {useCallback, useContext, useEffect, useState} from "react";
 import {TokenContext} from "../../contexts/AuthContext";
-import {ArtistBookingWithTimestamp, ArtistFormContent} from "../artistArea/interface";
-import {BookingWithTimestamp, FormContent} from "../userArea/interface";
-import {CombinedBooking} from "./interface";
+import type {ArtistBookingWithTimestamp, ArtistFormContent} from "../artistArea/interface";
+import type {BookingWithTimestamp, FormContent} from "../userArea/interface";
+import type {CombinedBooking} from "./interface";
 import {setAuthToken} from "../../services/apiClient";
 import api from "../../services/api";
 

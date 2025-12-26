@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type { SxProps, Theme } from '@mui/material';
 import {
   Paper,
   Box,
@@ -7,8 +8,6 @@ import {
   AccordionSummary,
   AccordionDetails,
   alpha,
-  SxProps,
-  Theme
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
@@ -31,11 +30,11 @@ interface WWFAQProps {
 
 const WWFAQ: React.FC<WWFAQProps> = ({
   items,
-  title = "",
+  title = '',
   description,
   icon = <QuestionAnswerIcon />,
   sx,
-  defaultExpandedIndex = -1
+  defaultExpandedIndex = -1,
 }) => {
   const [expanded, setExpanded] = useState<string | false>(
     defaultExpandedIndex >= 0 && defaultExpandedIndex < items.length
@@ -57,7 +56,7 @@ const WWFAQ: React.FC<WWFAQProps> = ({
         boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
         overflow: 'hidden',
         position: 'relative',
-        ...sx
+        ...sx,
       }}
     >
       {/* Header Section */}
@@ -66,12 +65,14 @@ const WWFAQ: React.FC<WWFAQProps> = ({
           {title && (
             <Box sx={{ display: 'flex', alignItems: 'center', mb: description ? 1.5 : 0 }}>
               {icon && (
-                <Box sx={{
-                  color: spacePalette.primary.main,
-                  mr: 1.5,
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
+                <Box
+                  sx={{
+                    color: spacePalette.primary.main,
+                    mr: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
                   {icon}
                 </Box>
               )}
@@ -80,7 +81,7 @@ const WWFAQ: React.FC<WWFAQProps> = ({
                 component="h2"
                 sx={{
                   color: alpha('#fff', 0.9),
-                  fontWeight: 'medium'
+                  fontWeight: 'medium',
                 }}
               >
                 {title}
@@ -103,7 +104,7 @@ const WWFAQ: React.FC<WWFAQProps> = ({
       )}
 
       {/* FAQ Accordion Items */}
-      <Box sx={{ px: 2, pb: 2, pt: (title || description) ? 0 : 2 }}>
+      <Box sx={{ px: 2, pb: 2, pt: title || description ? 0 : 2 }}>
         {items.map((item, index) => {
           const panelId = item.id || `panel-${index}`;
           return (
@@ -127,18 +128,18 @@ const WWFAQ: React.FC<WWFAQProps> = ({
               }}
             >
               <AccordionSummary
-                expandIcon={
-                  <ExpandMoreIcon sx={{ color: spacePalette.primary.main }} />
-                }
+                expandIcon={<ExpandMoreIcon sx={{ color: spacePalette.primary.main }} />}
                 aria-controls={`${panelId}-content`}
                 id={`${panelId}-header`}
                 sx={{
-                  borderBottom: expanded === panelId
-                    ? `1px solid ${alpha(spacePalette.primary.main, 0.2)}`
-                    : 'none',
-                  backgroundColor: expanded === panelId
-                    ? alpha(spacePalette.primary.main, 0.1)
-                    : alpha('#000', 0.2),
+                  borderBottom:
+                    expanded === panelId
+                      ? `1px solid ${alpha(spacePalette.primary.main, 0.2)}`
+                      : 'none',
+                  backgroundColor:
+                    expanded === panelId
+                      ? alpha(spacePalette.primary.main, 0.1)
+                      : alpha('#000', 0.2),
                   '&:hover': {
                     backgroundColor: alpha(spacePalette.primary.main, 0.1),
                   },
@@ -149,9 +150,7 @@ const WWFAQ: React.FC<WWFAQProps> = ({
               >
                 <Typography
                   sx={{
-                    color: expanded === panelId
-                      ? spacePalette.primary.main
-                      : alpha('#fff', 0.9),
+                    color: expanded === panelId ? spacePalette.primary.main : alpha('#fff', 0.9),
                     fontWeight: expanded === panelId ? 'medium' : 'normal',
                   }}
                 >

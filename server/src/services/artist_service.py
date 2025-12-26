@@ -3,20 +3,23 @@ import os
 import sqlite3
 import uuid
 from contextlib import closing
-from typing import List, Optional, Tuple
 
 from src.models.datatypes import ArtistBooking, ArtistBookingWithTimestamp
-from src.services.booking_service import DB_FILE_PATH, DB_DIR
-from src.services.formcontent_service import get_artist_form_content_obj, update_artist_form_content_with_db_counts
+from src.services.booking_service import DB_DIR, DB_FILE_PATH
+from src.services.formcontent_service import (
+    get_artist_form_content_obj,
+    update_artist_form_content_with_db_counts,
+)
 
 
-def get_all_artist_bookings() -> List[ArtistBookingWithTimestamp]:
+def get_all_artist_bookings() -> list[ArtistBookingWithTimestamp]:
     """
     Returns all artist bookings with artist + booking info, including material_ids.
     """
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT b.id as booking_id,
                    a.last_name,
                    a.first_name,
@@ -37,24 +40,31 @@ def get_all_artist_bookings() -> List[ArtistBookingWithTimestamp]:
                    b.performance_details
             FROM Artists a
             JOIN ArtistBookings b ON a.id = b.artist_id
-            """)
+            """
+        )
         rows = cursor.fetchall()
 
-        bookings: List[ArtistBookingWithTimestamp] = []
+        bookings: list[ArtistBookingWithTimestamp] = []
         for row in rows:
             booking_id = row[0]
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT artist_material_id
                 FROM ArtistBookingMaterials
                 WHERE booking_id = ?
-                """, (booking_id,))
+                """,
+                (booking_id,),
+            )
             material_ids = [item[0] for item in cursor.fetchall()]
 
-            cursor.execute("""
+            cursor.execute(
+                """
                            SELECT profession_id
                            FROM ArtistBookingProfessions
                            WHERE booking_id = ?
-                           """, (booking_id,))
+                           """,
+                (booking_id,),
+            )
             profession_ids = [item[0] for item in cursor.fetchall()]
 
             booking = ArtistBookingWithTimestamp(
@@ -77,17 +87,18 @@ def get_all_artist_bookings() -> List[ArtistBookingWithTimestamp]:
                 special_requests=row[16],
                 performance_details=row[17],
                 artist_material_ids=material_ids,
-                profession_ids=profession_ids
+                profession_ids=profession_ids,
             )
             bookings.append(booking)
         return bookings
 
 
-def get_artist_booking_by_id(booking_id: int) -> Optional[ArtistBookingWithTimestamp]:
+def get_artist_booking_by_id(booking_id: int) -> ArtistBookingWithTimestamp | None:
     """Returns a specific artist booking by ID."""
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
                        SELECT b.id as booking_id,
                               a.last_name,
                               a.first_name,
@@ -109,17 +120,22 @@ def get_artist_booking_by_id(booking_id: int) -> Optional[ArtistBookingWithTimes
                        FROM Artists a
                                 JOIN ArtistBookings b ON a.id = b.artist_id
                        WHERE b.id = ?
-                       """, (booking_id,))
+                       """,
+            (booking_id,),
+        )
         row = cursor.fetchone()
 
         if not row:
             return None
 
-        cursor.execute("""
+        cursor.execute(
+            """
                        SELECT artist_material_id
                        FROM ArtistBookingMaterials
                        WHERE booking_id = ?
-                       """, (booking_id,))
+                       """,
+            (booking_id,),
+        )
         material_ids = [item[0] for item in cursor.fetchall()]
 
         return ArtistBookingWithTimestamp(
@@ -141,7 +157,7 @@ def get_artist_booking_by_id(booking_id: int) -> Optional[ArtistBookingWithTimes
             equipment=row[15],
             special_requests=row[16],
             performance_details=row[17],
-            artist_material_ids=material_ids
+            artist_material_ids=material_ids,
         )
 
 
@@ -165,23 +181,27 @@ def update_artist_booking(booking_id: int, booking_data: dict) -> bool:
         conn.execute("BEGIN TRANSACTION")
         try:
             # Update Artist information
-            cursor.execute("""
+            cursor.execute(
+                """
                            UPDATE Artists
                            SET first_name   = ?,
                                last_name    = ?,
                                email        = ?,
                                phone_number = ?
                            WHERE id = ?
-                           """, (
-                               booking_data['first_name'],
-                               booking_data['last_name'],
-                               booking_data['email'],
-                               booking_data['phone'],
-                               artist_id
-                           ))
+                           """,
+                (
+                    booking_data["first_name"],
+                    booking_data["last_name"],
+                    booking_data["email"],
+                    booking_data["phone"],
+                    artist_id,
+                ),
+            )
 
             # Update ArtistBooking information
-            cursor.execute("""
+            cursor.execute(
+                """
                            UPDATE ArtistBookings
                            SET ticket_option_id    = ?,
                                beverage_option_id  = ?,
@@ -195,31 +215,35 @@ def update_artist_booking(booking_id: int, booking_data: dict) -> bool:
                                payment_notes       = ?,
                                payment_date        = ?
                            WHERE id = ?
-                           """, (
-                               booking_data['ticket_id'],
-                               booking_data['beverage_id'],
-                               booking_data['food_id'],
-                               booking_data['total_price'],
-                               booking_data.get('equipment', ''),
-                               booking_data.get('special_requests', ''),
-                               booking_data.get('performance_details', ''),
-                               1 if booking_data.get('is_paid', False) else 0,
-                               booking_data.get('paid_amount', 0),
-                               booking_data.get('payment_notes', ''),
-                               booking_data.get('payment_date', ''),
-                               booking_id
-                           ))
+                           """,
+                (
+                    booking_data["ticket_id"],
+                    booking_data["beverage_id"],
+                    booking_data["food_id"],
+                    booking_data["total_price"],
+                    booking_data.get("equipment", ""),
+                    booking_data.get("special_requests", ""),
+                    booking_data.get("performance_details", ""),
+                    1 if booking_data.get("is_paid", False) else 0,
+                    booking_data.get("paid_amount", 0),
+                    booking_data.get("payment_notes", ""),
+                    booking_data.get("payment_date", ""),
+                    booking_id,
+                ),
+            )
 
             # Handle materials if they were updated
-            if 'artist_material_ids' in booking_data:
+            if "artist_material_ids" in booking_data:
                 # Delete existing materials first
-                cursor.execute("DELETE FROM ArtistBookingMaterials WHERE booking_id = ?", (booking_id,))
+                cursor.execute(
+                    "DELETE FROM ArtistBookingMaterials WHERE booking_id = ?", (booking_id,)
+                )
 
                 # Insert new material selections
-                for material_id in booking_data['artist_material_ids']:
+                for material_id in booking_data["artist_material_ids"]:
                     cursor.execute(
                         "INSERT INTO ArtistBookingMaterials (booking_id, artist_material_id) VALUES (?, ?)",
-                        (booking_id, material_id)
+                        (booking_id, material_id),
                     )
 
             # Commit transaction
@@ -248,20 +272,23 @@ def update_artist_payment(booking_id: int, payment_data: dict) -> bool:
 
         try:
             # Update payment information
-            cursor.execute("""
+            cursor.execute(
+                """
                            UPDATE ArtistBookings
                            SET is_paid       = ?,
                                paid_amount   = ?,
                                payment_notes = ?,
                                payment_date  = ?
                            WHERE id = ?
-                           """, (
-                               1 if payment_data['is_paid'] else 0,
-                               payment_data['paid_amount'],
-                               payment_data.get('payment_notes', ''),
-                               payment_data.get('payment_date'),
-                               booking_id
-                           ))
+                           """,
+                (
+                    1 if payment_data["is_paid"] else 0,
+                    payment_data["paid_amount"],
+                    payment_data.get("payment_notes", ""),
+                    payment_data.get("payment_date"),
+                    booking_id,
+                ),
+            )
 
             conn.commit()
             return True
@@ -271,7 +298,7 @@ def update_artist_payment(booking_id: int, payment_data: dict) -> bool:
             return False
 
 
-def insert_artist_booking(booking: ArtistBooking) -> Tuple[bool, Optional[str]]:
+def insert_artist_booking(booking: ArtistBooking) -> tuple[bool, str | None]:
     """
     Inserts an artist booking if it does not already exist.
 
@@ -312,7 +339,9 @@ def delete_artist_booking(booking_id: int) -> bool:
 
             # Delete related records first
             cursor.execute("DELETE FROM ArtistBookingMaterials WHERE booking_id = ?", (booking_id,))
-            cursor.execute("DELETE FROM ArtistBookingProfessions WHERE booking_id = ?", (booking_id,))
+            cursor.execute(
+                "DELETE FROM ArtistBookingProfessions WHERE booking_id = ?", (booking_id,)
+            )
 
             # Get artist_id to delete if this is the only booking for this artist
             cursor.execute("SELECT artist_id FROM ArtistBookings WHERE id = ?", (booking_id,))
@@ -344,8 +373,8 @@ def delete_artist_booking(booking_id: int) -> bool:
             return False
 
 
-
 ################## helper methods
+
 
 def _connect_db() -> sqlite3.Connection:
     """
@@ -353,20 +382,24 @@ def _connect_db() -> sqlite3.Connection:
     """
     return sqlite3.connect(DB_FILE_PATH)
 
+
 def _artist_booking_exists(booking: ArtistBooking) -> bool:
     """
     Checks if an artist booking already exists with the same name and email.
     """
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT COUNT(*)
             FROM Artists a 
             JOIN ArtistBookings b ON a.id = b.artist_id
             WHERE a.first_name = ? 
             AND a.last_name = ? 
             AND a.email = ?
-            """, (booking.first_name, booking.last_name, booking.email))
+            """,
+            (booking.first_name, booking.last_name, booking.email),
+        )
         return cursor.fetchone()[0] > 0
 
 
@@ -376,15 +409,18 @@ def _create_artist(booking: ArtistBooking) -> int:
     """
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO Artists (last_name, first_name, email, phone_number)
             VALUES (?, ?, ?, ?)
-            """, (booking.last_name, booking.first_name, booking.email, booking.phone))
+            """,
+            (booking.last_name, booking.first_name, booking.email, booking.phone),
+        )
         conn.commit()
         return cursor.lastrowid
 
 
-def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> Tuple[int, Optional[str]]:
+def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> tuple[int, str | None]:
     """
     Creates an artist booking in the ArtistBookings table and returns (booking_id, profile_uuid).
     """
@@ -393,25 +429,37 @@ def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> Tuple[int,
 
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO ArtistBookings (
                 artist_id, ticket_option_id, beverage_option_id, food_option_id,
                 signature, total_price, is_paid, paid_amount, payment_notes, payment_date,
                 equipment, special_requests, performance_details, profile_uuid
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                artist_id, booking.ticket_id, booking.beverage_id, booking.food_id,
-                booking.signature, booking.total_price, booking.is_paid,
-                booking.paid_amount, booking.payment_notes, booking.payment_date,
-                booking.equipment, booking.special_requests, booking.performance_details,
-                profile_uuid
-            ))
+            """,
+            (
+                artist_id,
+                booking.ticket_id,
+                booking.beverage_id,
+                booking.food_id,
+                booking.signature,
+                booking.total_price,
+                booking.is_paid,
+                booking.paid_amount,
+                booking.payment_notes,
+                booking.payment_date,
+                booking.equipment,
+                booking.special_requests,
+                booking.performance_details,
+                profile_uuid,
+            ),
+        )
         conn.commit()
         return cursor.lastrowid, profile_uuid
 
 
-def _assign_artist_materials(booking_id: int, material_ids: List[int]) -> None:
+def _assign_artist_materials(booking_id: int, material_ids: list[int]) -> None:
     """
     Inserts the chosen artist materials into ArtistBookingMaterials.
     """
@@ -420,14 +468,17 @@ def _assign_artist_materials(booking_id: int, material_ids: List[int]) -> None:
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
         for material_id in material_ids:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO ArtistBookingMaterials (booking_id, artist_material_id)
                 VALUES (?, ?)
-                """, (booking_id, material_id))
+                """,
+                (booking_id, material_id),
+            )
         conn.commit()
 
 
-def _assign_artist_professions(booking_id: int, profession_ids: List[int]) -> None:
+def _assign_artist_professions(booking_id: int, profession_ids: list[int]) -> None:
     """
     Inserts the chosen professions into ArtistBookingProfessions.
     """
@@ -436,35 +487,31 @@ def _assign_artist_professions(booking_id: int, profession_ids: List[int]) -> No
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
         for profession_id in profession_ids:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO ArtistBookingProfessions (booking_id, profession_id)
                 VALUES (?, ?)
-                """, (booking_id, profession_id))
+                """,
+                (booking_id, profession_id),
+            )
         conn.commit()
+
 
 def _save_artist_signature_image(booking: ArtistBooking) -> None:
     """
     Decodes the signature from base64 and saves it as an image.
     """
     signature = booking.signature
-    if ',' in signature:
+    if "," in signature:
         # Remove possible 'data:image/png;base64,' prefix
-        signature = signature.split(',', 1)[1]
+        signature = signature.split(",", 1)[1]
 
-    signature_dir = os.path.join(DB_DIR, 'artist_signatures')
+    signature_dir = os.path.join(DB_DIR, "artist_signatures")
     if not os.path.exists(signature_dir):
         os.makedirs(signature_dir)
 
     img_data = base64.b64decode(signature)
-    file_path = os.path.join(
-        signature_dir, f'artist_{booking.last_name}_{booking.first_name}.png'
-    )
+    file_path = os.path.join(signature_dir, f"artist_{booking.last_name}_{booking.first_name}.png")
 
-    with open(file_path, 'wb') as file:
+    with open(file_path, "wb") as file:
         file.write(img_data)
-
-
-
-
-
-

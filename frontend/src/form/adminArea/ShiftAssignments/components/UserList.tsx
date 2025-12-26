@@ -4,8 +4,8 @@ import {
     InputAdornment, FormControl, InputLabel, Select, MenuItem, Grid
 } from '@mui/material';
 import {Search as SearchIcon, Sort as SortIcon} from '@mui/icons-material';
-import {BookingWithTimestamp, FormContent} from '../../../userArea/interface';
-import {ShiftAssignment, UserWithAssignments, UserListFilters} from '../types';
+import type {BookingWithTimestamp, FormContent} from '../../../userArea/interface';
+import type {ShiftAssignment, UserWithAssignments, UserListFilters} from '../types';
 import UserItem from './UserItem';
 
 type SortOption = 'firstName' | 'lastName' | 'priority' | 'wantedShifts';

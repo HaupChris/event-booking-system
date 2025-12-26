@@ -1,6 +1,6 @@
 import React from 'react';
 import {Box, Typography} from '@mui/material';
-import {ArtistFormProps} from './ArtistRegistrationFormContainer';
+import type {ArtistFormProps} from './ArtistRegistrationFormContainer';
 import SpacePanelLayout from '../../components/core/layouts/SpacePanelLayout';
 import {artistAreaTexts} from '../constants/texts';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -62,12 +62,12 @@ function ArtistEquipmentForm(props: ArtistFormProps) {
                     <Typography variant="subtitle2" sx={{mt: 2}}>Bandbühne:</Typography>
                     <ul>
                         <li><a href="https://www.thomann.de/de/yamaha_stagepas_1k_stereo_bundle.htm" target="_blank"
-                               style={{color: "#00ffff"}}>
+                               style={{color: "#00ffff"}} rel="noreferrer">
                             Yamaha Stagepas 1K Stereo Bundle
                         </a></li>
                         <li>
                             <a href="https://www.behringer.com/product.html?modelCode=0605-AAD" target="_blank"
-                               style={{color: "#00ffff"}}>
+                               style={{color: "#00ffff"}} rel="noreferrer">
                                 Behringer XR18 Wireless Mixer
                             </a>
                         </li>

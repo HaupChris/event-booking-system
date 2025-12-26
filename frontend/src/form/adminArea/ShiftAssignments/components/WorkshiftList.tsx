@@ -9,8 +9,8 @@ import {
     Schedule as ScheduleIcon,
     Warning as WarningIcon, RadioButtonUnchecked
 } from '@mui/icons-material';
-import {FormContent, WorkShift, TimeSlot, BookingWithTimestamp} from '../../../userArea/interface';
-import {ShiftAssignment} from '../types';
+import type {FormContent, WorkShift, TimeSlot, BookingWithTimestamp} from '../../../userArea/interface';
+import type {ShiftAssignment} from '../types';
 import TimeslotItem from './TimeslotItem';
 import {spacePalette} from '../../../../components/styles/theme';
 

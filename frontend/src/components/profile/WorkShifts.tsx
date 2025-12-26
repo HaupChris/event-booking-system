@@ -26,7 +26,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import PendingIcon from '@mui/icons-material/Pending';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import { ShiftAssignment } from '../../services/profileService';
+import type { ShiftAssignment } from '../../services/profileService';
 
 interface WorkShiftsProps {
   shifts: ShiftAssignment[];

@@ -24,13 +24,13 @@ import {
     Close as CloseIcon, Delete
 } from '@mui/icons-material';
 import axios from 'axios';
-import {CombinedBooking} from "../interface";
-import {FormContent} from "../../userArea/interface";
+import type {CombinedBooking} from "../interface";
+import type {FormContent} from "../../userArea/interface";
 import {alpha} from '@mui/material/styles';
 import {spacePalette} from '../../../components/styles/theme';
 import FormCard from "../../../components/core/display/FormCard";
 import {getTimeslotWithWorkshift, calculateTotalPrice} from '../utils/bookingUtils';
-import {ArtistFormContent} from "../../artistArea/interface";
+import type {ArtistFormContent} from "../../artistArea/interface";
 
 interface BookingDetailModalProps {
     open: boolean;

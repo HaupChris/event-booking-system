@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ViewFilterType } from '../form/adminArea/utils/optionsUtils';
+import type { ViewFilterType } from '../form/adminArea/utils/optionsUtils';
 
 /**
  * Custom hook for managing common filter state in admin pages.

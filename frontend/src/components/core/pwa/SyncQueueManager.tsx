@@ -19,7 +19,8 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ErrorIcon from '@mui/icons-material/Error';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { syncService } from '../../../services/syncService';
-import { SyncQueueDB, SyncOperation } from '../../../utils/indexedDB';
+import type { SyncOperation } from '../../../utils/indexedDB';
+import { SyncQueueDB } from '../../../utils/indexedDB';
 
 /**
  * Sync Queue Manager Component

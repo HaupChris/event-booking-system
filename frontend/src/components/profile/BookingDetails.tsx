@@ -17,7 +17,7 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import { ProfileData } from '../../services/profileService';
+import type { ProfileData } from '../../services/profileService';
 
 interface BookingDetailsProps {
   profile: ProfileData;

@@ -5,6 +5,10 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import type {
+  ProfileData,
+  ShiftAssignment,
+  NewsItem} from '../services/profileService';
 import {
   getProfile,
   getShifts,
@@ -12,10 +16,7 @@ import {
   declineShift as declineShiftAPI,
   getNewsFeed,
   markNewsAsRead as markNewsAsReadAPI,
-  getUnreadNewsCount,
-  ProfileData,
-  ShiftAssignment,
-  NewsItem,
+  getUnreadNewsCount
 } from '../services/profileService';
 import { syncService } from '../services/syncService';
 import { ProfileDB, BookingDB, NewsFeedDB } from '../utils/indexedDB';

@@ -9,11 +9,11 @@ import {
   Visibility as VisibilityIcon,
   Link as LinkIcon
 } from '@mui/icons-material';
-import { CombinedBooking } from "../interface";
-import { FormContent } from "../../userArea/interface";
+import type { CombinedBooking } from "../interface";
+import type { FormContent } from "../../userArea/interface";
 import { spacePalette } from '../../../components/styles/theme';
 import { getTicketTitle } from '../utils/bookingUtils';
-import {ArtistFormContent} from "../../artistArea/interface";
+import type {ArtistFormContent} from "../../artistArea/interface";
 
 interface ColumnVisibility {
   type: boolean;
