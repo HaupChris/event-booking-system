@@ -150,6 +150,10 @@ def decline_shift_assignment(profile_uuid: str, assignment_id: int):
             )
             return jsonify({"error": "Shift assignment not found"}), 404
 
+    except ValueError as e:
+        # Validation error (e.g., rejection reason too short)
+        logger.warning(f"Shift decline validation failed: {str(e)}")
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         logger.error(f"Shift decline failed: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500

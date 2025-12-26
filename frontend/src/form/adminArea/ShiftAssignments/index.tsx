@@ -1,22 +1,14 @@
-import React, {useState, useEffect} from 'react';
-import {Box, Grid, Typography, Paper, Alert, CircularProgress} from '@mui/material';
-import {useContext} from 'react';
-import {TokenContext} from '../../../contexts/AuthContext';
-import {useFetchData} from '../useFetchData';
-import {ShiftAssignmentAPI} from './api';
-import type {ShiftAssignment} from './types';
+import React, { useState, useEffect, useContext } from 'react';
+import { Box, Grid, Typography, Paper, Alert, CircularProgress } from '@mui/material';
+import { TokenContext } from '../../../contexts/AuthContext';
+import { useFetchData } from '../useFetchData';
+import { ShiftAssignmentAPI } from './api';
+import type { ShiftAssignment } from './types';
 import UserList from './components/UserList';
 import WorkshiftList from './components/WorkshiftList';
 import ActionButtons from './components/ActionButtons';
-import StatsCard from '../components/StatsCard';
-import {
-    Assignment as AssignmentIcon,
-    People as PeopleIcon,
-    Schedule as ScheduleIcon,
-    CheckCircle as CheckCircleIcon
-} from '@mui/icons-material';
-
-import {download, generateCsv, mkConfig} from "export-to-csv";
+import StatisticsGrid from './components/StatisticsGrid';
+import { exportShiftAssignments } from './utils/exportUtils';
 
 function ShiftAssignmentsPage() {
     const {token} = useContext(TokenContext);
@@ -58,59 +50,18 @@ function ShiftAssignmentsPage() {
         return userAssignments.length >= booking.amount_shifts;
     }).length;
 
-    const totalTimeslots = formContent.work_shifts.reduce((sum, ws) => sum + ws.time_slots.length, 0);
-    const totalCapacity = formContent.work_shifts.reduce((sum, ws) =>
-        sum + ws.time_slots.reduce((tsSum, ts) => tsSum + ts.num_needed, 0), 0
+    const totalTimeslots = formContent.work_shifts.reduce(
+      (sum, ws) => sum + ws.time_slots.length,
+      0
+    );
+    const totalCapacity = formContent.work_shifts.reduce(
+      (sum, ws) => sum + ws.time_slots.reduce((tsSum, ts) => tsSum + ts.num_needed, 0),
+      0
     );
 
-const handleExportShiftAssignments = () => {
-   // First export - by name (sorted by lastname, lastname first)
-   const filename_1 = "Assignment_by_name.csv";
-   const csvConfig1 = mkConfig({filename: filename_1, useKeysAsHeaders: true});
-
-   const data1 = assignments
-       .sort((a, b) => a.last_name.localeCompare(b.last_name))
-       .map(assignment => ({
-           LastName: assignment.last_name,
-           FirstName: assignment.first_name,
-           Phone: assignment.phone,
-           // Ticket: assignment
-           Dienst: assignment.workshift_title,
-           Schicht: assignment.timeslot_title,
-           Start: assignment.timeslot_start,
-           Ende: assignment.timeslot_end
-       }));
-
-   const csv1 = generateCsv(csvConfig1)(data1);
-   download(csvConfig1)(csv1);
-
-   // Second export - by shift (sorted by Dienst, then Schicht, then Start)
-   const filename_2 = "Assignment_by_shift.csv";
-   const csvConfig2 = mkConfig({filename: filename_2, useKeysAsHeaders: true});
-
-   const data2 = assignments
-       .sort((a, b) => {
-           if (a.workshift_title !== b.workshift_title) {
-               return a.workshift_title.localeCompare(b.workshift_title);
-           }
-           if (a.timeslot_title !== b.timeslot_title) {
-               return a.timeslot_title.localeCompare(b.timeslot_title);
-           }
-           return a.timeslot_start.localeCompare(b.timeslot_start);
-       })
-       .map(assignment => ({
-           Dienst: assignment.workshift_title,
-           Schicht: assignment.timeslot_title,
-           Start: assignment.timeslot_start,
-           Ende: assignment.timeslot_end,
-           FirstName: assignment.first_name,
-           LastName: assignment.last_name,
-           Phone: assignment.phone
-       }));
-
-   const csv2 = generateCsv(csvConfig2)(data2);
-   download(csvConfig2)(csv2);
-}
+    const handleExportShiftAssignments = () => {
+      exportShiftAssignments(assignments);
+    };
 
     // User selection handlers
     const handleUserSelect = (userId: number) => {
@@ -126,8 +77,9 @@ const handleExportShiftAssignments = () => {
     };
 
     const handleTimeslotSelect = (timeslotId: number) => {
-        setSelectedTimeslot((prevSelectedTimeslot) => timeslotId === prevSelectedTimeslot ? null : timeslotId);
-
+        setSelectedTimeslot((prevSelectedTimeslot) =>
+          timeslotId === prevSelectedTimeslot ? null : timeslotId
+        );
     };
 
     // Assignment actions
@@ -218,8 +170,8 @@ const handleExportShiftAssignments = () => {
     };
 
     const handleClearUserSelection = () => {
-        setSelectedUsers(() => new Set())
-    }
+        setSelectedUsers(() => new Set());
+    };
 
     if (loading && assignments.length === 0) {
         return (
@@ -230,49 +182,15 @@ const handleExportShiftAssignments = () => {
     }
 
     return (
-        <Box sx={{p: 2}}>
-            {/* Statistics Container */}
-            <Grid container spacing={3} sx={{mb: 3}}>
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatsCard
-                        title="Total Users"
-                        value={totalUsers}
-                        icon={<PeopleIcon fontSize="large"/>}
-                        color="primary"
-                        subtitle={`${fullyAssignedUsers} fully assigned`}
-                        progress={(fullyAssignedUsers / totalUsers) * 100}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatsCard
-                        title="Shifts Progress"
-                        value={`${totalShiftsAssigned}/${totalShiftsWanted}`}
-                        icon={<AssignmentIcon fontSize="large"/>}
-                        color="info"
-                        subtitle="Assigned vs Requested"
-                        progress={(totalShiftsAssigned / totalShiftsWanted) * 100}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatsCard
-                        title="Timeslots"
-                        value={totalTimeslots}
-                        icon={<ScheduleIcon fontSize="large"/>}
-                        color="primary"
-                        subtitle={`${totalCapacity} total capacity`}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatsCard
-                        title="Completion Rate"
-                        value={`${Math.round((fullyAssignedUsers / totalUsers) * 100)}%`}
-                        icon={<CheckCircleIcon fontSize="large"/>}
-                        color="success"
-                        subtitle="Users fully assigned"
-                        progress={(fullyAssignedUsers / totalUsers) * 100}
-                    />
-                </Grid>
-            </Grid>
+        <Box sx={{ p: 2 }}>
+            <StatisticsGrid
+                totalUsers={totalUsers}
+                fullyAssignedUsers={fullyAssignedUsers}
+                totalShiftsAssigned={totalShiftsAssigned}
+                totalShiftsWanted={totalShiftsWanted}
+                totalTimeslots={totalTimeslots}
+                totalCapacity={totalCapacity}
+            />
 
             {/* Alerts */}
             {error && (

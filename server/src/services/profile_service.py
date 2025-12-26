@@ -447,6 +447,14 @@ def decline_shift(
     try:
         logger.debug(f"Declining shift assignment {assignment_id} for profile {profile_uuid}")
 
+        # Validate rejection reason (required, minimum 20 characters)
+        MIN_REASON_LENGTH = 20
+        if not rejection_reason or len(rejection_reason.strip()) < MIN_REASON_LENGTH:
+            raise ValueError(
+                f"Rejection reason is required and must be at least {MIN_REASON_LENGTH} characters. "
+                f"This helps us with planning."
+            )
+
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
 

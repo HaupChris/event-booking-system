@@ -70,9 +70,21 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
   const handleDeclineConfirm = async () => {
     if (!selectedShift) return;
 
+    // Validate rejection reason (minimum 20 characters)
+    const MIN_REASON_LENGTH = 20;
+    const trimmedReason = rejectionReason.trim();
+
+    if (!trimmedReason || trimmedReason.length < MIN_REASON_LENGTH) {
+      alert(
+        `Bitte gib einen Ablehnungsgrund von mindestens ${MIN_REASON_LENGTH} Zeichen an. ` +
+          `Das hilft uns bei der Planung. Noch ${MIN_REASON_LENGTH - trimmedReason.length} Zeichen benötigt.`
+      );
+      return;
+    }
+
     try {
       setProcessing(selectedShift.assignment_id);
-      await onDecline(selectedShift.assignment_id, rejectionReason, alternativePreferences);
+      await onDecline(selectedShift.assignment_id, trimmedReason, alternativePreferences);
       setDeclineDialogOpen(false);
       setRejectionReason('');
       setAlternativePreferences('');
@@ -221,12 +233,19 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
 
           <TextField
             fullWidth
-            label="Ablehnungsgrund (optional)"
+            required
+            label="Ablehnungsgrund (erforderlich, mind. 20 Zeichen)"
             multiline
             rows={3}
             value={rejectionReason}
             onChange={(e) => setRejectionReason(e.target.value)}
             placeholder="z.B. Zu dem Zeitpunkt nicht verfügbar..."
+            error={rejectionReason.trim().length > 0 && rejectionReason.trim().length < 20}
+            helperText={
+              rejectionReason.trim().length > 0 && rejectionReason.trim().length < 20
+                ? `Noch ${20 - rejectionReason.trim().length} Zeichen benötigt`
+                : `${rejectionReason.trim().length}/20 Zeichen`
+            }
             sx={{ mb: 2 }}
           />
 

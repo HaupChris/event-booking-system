@@ -107,31 +107,6 @@ cd server
 ruff check . && black --check . && mypy . && pytest
 ```
 
-## VS Code Setup (Recommended)
-
-### 1. Install Recommended Extensions
-
-Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`):
-- Type: "Extensions: Show Recommended Extensions"
-- Click "Install" on all recommended extensions
-
-**Required Extensions:**
-- **Ruff** (charliermarsh.ruff) - Python linting/formatting
-- **Pylance** (ms-python.vscode-pylance) - Python language support
-- **ESLint** (dbaeumer.vscode-eslint) - TypeScript linting
-- **Prettier** (esbenp.prettier-vscode) - Code formatting
-
-### 2. Verify Auto-formatting
-
-Settings are pre-configured in `.vscode/settings.json`. Test it:
-
-1. Open a Python file
-2. Make some formatting errors (extra spaces, wrong indentation)
-3. Save file (`Ctrl+S` / `Cmd+S`)
-4. File should auto-format
-
-Same for TypeScript files!
-
 ## Troubleshooting
 
 ### "Command not found: ruff"
