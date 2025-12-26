@@ -4,31 +4,72 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
+### Prerequisites
+- **Python**: 3.12+ required
+- **Node.js**: 18+ recommended
+- **uv**: Fast Python package installer (install: `pip install uv`)
+
 ### Frontend (React/TypeScript)
 ```bash
 cd frontend
-npm install        # Install dependencies
-npm start         # Start development server on port 3000
-npm run build     # Build for production
-npm test          # Run tests
+npm install              # Install dependencies
+npm start                # Start development server on port 3000
+npm run build            # Build for production
+npm test                 # Run tests
+
+# Code Quality
+npm run lint             # Run ESLint (no auto-fix)
+npm run lint:fix         # Run ESLint with auto-fix
+npm run format           # Format code with Prettier
+npm run format:check     # Check formatting without changes
+npm run type-check       # Run TypeScript type checking
+npm run quality          # Run all quality checks (lint + format + types)
 ```
 
 ### Backend (Flask/Python)
 ```bash
 cd server
-python -m venv venv                    # Create virtual environment
-source venv/bin/activate              # Activate venv (Linux/Mac)
-# or: venv\Scripts\activate           # Activate venv (Windows)
-pip install -r requirements.txt       # Install dependencies
-python main.py                        # Start Flask server on port 5001
+
+# Using uv (recommended - faster than pip)
+uv venv                           # Create virtual environment
+source .venv/bin/activate         # Activate venv (Linux/Mac)
+# or: .venv\Scripts\activate      # Activate venv (Windows)
+uv pip install -e ".[dev]"        # Install all dependencies + dev tools
+
+# OR using traditional pip (legacy)
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Run server
+python main.py                    # Start Flask server on port 5001
+
+# Code Quality
+ruff check .                      # Run linter
+ruff check . --fix                # Run linter with auto-fix
+black .                           # Format code
+mypy .                            # Run type checking
+pytest                            # Run tests with coverage
+```
+
+### Pre-commit Hooks (Recommended)
+```bash
+# Install pre-commit (once per machine)
+pip install pre-commit  # or: uv pip install pre-commit
+
+# Install hooks (once per repo)
+pre-commit install
+
+# Run manually on all files
+pre-commit run --all-files
 ```
 
 ### Testing
 ```bash
-# Backend tests
-cd server && python -m pytest test/
+# Backend tests with coverage
+cd server && pytest
 
-# Frontend tests  
+# Frontend tests
 cd frontend && npm test
 ```
 
@@ -120,8 +161,35 @@ The frontend uses a sophisticated form management system:
 - Mock external dependencies appropriately
 - Test authentication flows and form validation
 
+## Code Quality Standards
+
+### Enforced Rules
+- **Max file length**: 300 lines (excluding blank lines and comments)
+- **Max function length**: 50-80 lines
+- **Max complexity**: 10 (cyclomatic complexity)
+- **Max function parameters**: 4
+- **Max nesting depth**: 4
+
+### Python (Ruff + Black + mypy)
+- **Linting**: Ruff (replaces Flake8, isort, pyupgrade)
+- **Formatting**: Black (100 char line length)
+- **Type checking**: mypy (basic mode)
+- **Config**: `server/pyproject.toml`
+
+### TypeScript (ESLint + Prettier)
+- **Linting**: ESLint with TypeScript support
+- **Formatting**: Prettier (100 char line length)
+- **Type checking**: TypeScript strict mode
+- **Config**: `frontend/.eslintrc.json`, `frontend/.prettierrc`
+
+### VS Code Integration
+- Auto-format on save enabled for all languages
+- Recommended extensions in `.vscode/extensions.json`
+- Install: Open Command Palette → "Extensions: Show Recommended Extensions"
+
 ## Configuration
 - Backend configuration via environment variables (see `utils/config.py`)
 - Frontend proxy configured to backend on port 5001 in `package.json`
 - Database and file storage paths configurable via environment
 - Docker configuration supports both development and production modes
+- Linting configuration: `pyproject.toml` (Python), `.eslintrc.json` (TypeScript)

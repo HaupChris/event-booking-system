@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Production
+build/
+dist/
+
+# Testing
+coverage/
+
+# Misc
+.DS_Store
+*.log
+*.lock
+
+# Generated files
+*.d.ts
