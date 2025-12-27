@@ -133,8 +133,8 @@ def decline_shift_assignment(profile_uuid: str, assignment_id: int):
         )
 
         data = request.json or {}
-        rejection_reason = data.get("rejection_reason")
-        alternative_preferences = data.get("alternative_preferences")
+        rejection_reason = data.get("rejection_reason", "")
+        alternative_preferences = data.get("alternative_preferences", "")
 
         success = decline_shift(
             profile_uuid, assignment_id, rejection_reason, alternative_preferences

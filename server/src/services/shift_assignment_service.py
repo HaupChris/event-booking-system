@@ -244,7 +244,7 @@ def create_assignment(assignment: ShiftAssignment) -> int:
                 ),
             )
             conn.commit()
-            return cursor.lastrowid
+            return cursor.lastrowid if cursor.lastrowid is not None else -1
         except sqlite3.Error as e:
             print(f"Database error: {e}")
             return -1
@@ -303,7 +303,8 @@ def get_booking_shift_count(booking_id: int) -> int:
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM ShiftAssignments WHERE booking_id = ?", (booking_id,))
-        return cursor.fetchone()[0]
+        result = cursor.fetchone()
+        return int(result[0]) if result else 0
 
 
 def get_booking_max_shifts(booking_id: int) -> int:
@@ -337,7 +338,8 @@ def get_timeslot_assignment_count(timeslot_id: int) -> int:
         cursor.execute(
             "SELECT COUNT(*) FROM ShiftAssignments WHERE timeslot_id = ?", (timeslot_id,)
         )
-        return cursor.fetchone()[0]
+        result = cursor.fetchone()
+        return int(result[0]) if result else 0
 
 
 def get_booking_assignments_summary() -> list[dict]:
