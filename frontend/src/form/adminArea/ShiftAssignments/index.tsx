@@ -14,7 +14,6 @@ function ShiftAssignmentsPage() {
     const {token} = useContext(TokenContext);
     const {regularBookings, formContent} = useFetchData();
 
-    // State management
     const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
     const [selectedTimeslot, setSelectedTimeslot] = useState<number | null>(null);
     const [assignments, setAssignments] = useState<ShiftAssignment[]>([]);
@@ -126,16 +125,24 @@ function ShiftAssignmentsPage() {
         }
     };
 
-    const handleUnassignUsers = async () => {
-        if (selectedUsers.size === 0) return;
+    const handleUnassignFromTimeslot = async () => {
+        if (selectedUsers.size === 0 || selectedTimeslot === null) return;
 
         setLoading(true);
         setError(null);
         setSuccess(null);
 
         try {
-            // Find assignments for selected users
-            const userAssignments = assignments.filter(a => selectedUsers.has(a.booking_id));
+            // Find assignments for selected users AND selected timeslot
+            const userAssignments = assignments.filter(a =>
+                selectedUsers.has(a.booking_id) && a.timeslot_id === selectedTimeslot
+            );
+
+            if (userAssignments.length === 0) {
+                setError('No assignments found for selected users and timeslot');
+                setLoading(false);
+                return;
+            }
 
             // Delete each assignment
             const deletePromises = userAssignments.map(assignment =>
@@ -152,17 +159,66 @@ function ShiftAssignmentsPage() {
             const failed = results.filter(r => r.status === 'rejected').length;
 
             if (successful > 0) {
-                setSuccess(`Successfully removed ${successful} assignments`);
+                setSuccess(`Successfully removed ${successful} assignment(s) from timeslot`);
             }
             if (failed > 0) {
-                setError(`Failed to remove ${failed} assignments`);
+                setError(`Failed to remove ${failed} assignment(s)`);
             }
 
             // Refresh assignments and clear selection
             await fetchAssignments();
             setSelectedUsers(new Set());
         } catch (error) {
-            setError('Failed to remove assignments');
+            setError('Failed to remove assignments from timeslot');
+            console.error('Unassignment error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUnassignAllShifts = async () => {
+        if (selectedUsers.size === 0) return;
+
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+
+        try {
+            // Find ALL assignments for selected users
+            const userAssignments = assignments.filter(a => selectedUsers.has(a.booking_id));
+
+            if (userAssignments.length === 0) {
+                setError('No assignments found for selected users');
+                setLoading(false);
+                return;
+            }
+
+            // Delete each assignment
+            const deletePromises = userAssignments.map(assignment =>
+                fetch(`/api/shifts/assignments/${assignment.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+            );
+
+            const results = await Promise.allSettled(deletePromises);
+            const successful = results.filter(r => r.status === 'fulfilled').length;
+            const failed = results.filter(r => r.status === 'rejected').length;
+
+            if (successful > 0) {
+                setSuccess(`Successfully removed all ${successful} assignment(s)`);
+            }
+            if (failed > 0) {
+                setError(`Failed to remove ${failed} assignment(s)`);
+            }
+
+            // Refresh assignments and clear selection
+            await fetchAssignments();
+            setSelectedUsers(new Set());
+        } catch (error) {
+            setError('Failed to remove all assignments');
             console.error('Unassignment error:', error);
         } finally {
             setLoading(false);
@@ -190,6 +246,7 @@ function ShiftAssignmentsPage() {
                 totalShiftsWanted={totalShiftsWanted}
                 totalTimeslots={totalTimeslots}
                 totalCapacity={totalCapacity}
+                assignments={assignments}
             />
 
             {/* Alerts */}
@@ -203,19 +260,6 @@ function ShiftAssignmentsPage() {
                     {success}
                 </Alert>
             )}
-
-            {/* Instructions */}
-            <Paper sx={{p: 2, mb: 3}}>
-                <Typography variant="h6" gutterBottom>
-                    Instructions
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    1. Select users from the left panel by clicking on them
-                    2. Select a timeslot from the right panel to see user priorities
-                    3. Use the action buttons in the center to assign users to timeslots
-                    4. View assignment progress in the statistics above
-                </Typography>
-            </Paper>
 
             {/* Main Assignment Interface - Fixed Height */}
             <Box sx={{height: '90vh'}}>
@@ -257,7 +301,8 @@ function ShiftAssignmentsPage() {
                                 selectedUsers={selectedUsers}
                                 selectedTimeslot={selectedTimeslot}
                                 onAssignUsers={handleAssignUsers}
-                                onUnassignUsers={handleUnassignUsers}
+                                onUnassignFromTimeslot={handleUnassignFromTimeslot}
+                                onUnassignAllShifts={handleUnassignAllShifts}
                                 loading={loading}
                                 onClearUserSelection={handleClearUserSelection}
                                 onExportShiftAssignments={handleExportShiftAssignments}

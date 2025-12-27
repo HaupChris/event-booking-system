@@ -1,11 +1,15 @@
 import React from 'react';
 import {
-    Box, Typography, Chip, alpha
+    Box, Typography, Chip, alpha, Alert
 } from '@mui/material';
 import {
     LooksOne as LooksOneIcon,
     LooksTwo as LooksTwoIcon,
-    Looks3 as Looks3Icon, Check
+    Looks3 as Looks3Icon,
+    Check,
+    CheckCircle as CheckCircleIcon,
+    Cancel as CancelIcon,
+    PendingActions as PendingIcon
 } from '@mui/icons-material';
 import type {ShiftAssignment, UserWithAssignments} from '../types';
 import type {FormContent} from '../../../userArea/interface';
@@ -101,6 +105,42 @@ const UserItem: React.FC<UserItemProps> = ({
         return 'divider';
     };
 
+    // Get status chip for shift assignment
+    const getStatusChip = (status: string) => {
+        switch (status) {
+            case 'accepted':
+                return (
+                    <Chip
+                        label="Angenommen"
+                        size="small"
+                        color="success"
+                        icon={<CheckCircleIcon />}
+                        sx={{ height: 18, '& .MuiChip-label': { fontSize: '0.65rem' } }}
+                    />
+                );
+            case 'declined':
+                return (
+                    <Chip
+                        label="Abgelehnt"
+                        size="small"
+                        color="error"
+                        icon={<CancelIcon />}
+                        sx={{ height: 18, '& .MuiChip-label': { fontSize: '0.65rem' } }}
+                    />
+                );
+            default: // 'pending'
+                return (
+                    <Chip
+                        label="Ausstehend"
+                        size="small"
+                        color="warning"
+                        icon={<PendingIcon />}
+                        sx={{ height: 18, '& .MuiChip-label': { fontSize: '0.65rem' } }}
+                    />
+                );
+        }
+    };
+
     return (
         <ListItemButton
             selected={isSelected}
@@ -180,20 +220,43 @@ const UserItem: React.FC<UserItemProps> = ({
                     border: '1px solid',
                     borderColor: alpha('#fff', 0.1)
                 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{mb: 2}}>
+                    <Typography variant="body2" color="text.secondary" sx={{mb: 1}}>
                         Shifts: {user.assigned_count} / {user.amount_shifts}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{mb: 2}}>
-                        {
-                            shiftAssignments.map((shiftAssignment) => {
-                                return <>{shiftAssignment.workshift_title + " - "
-                                    + shiftAssignment.timeslot_title + " ("
-                                    + shiftAssignment.timeslot_start + " - "
-                                    + shiftAssignment.timeslot_end + ")"
-                                }<br/></>;
-                            })
-                        }
-                    </Typography>
+                    {shiftAssignments.map((shiftAssignment) => (
+                        <Box key={shiftAssignment.id} sx={{ mb: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                    {shiftAssignment.workshift_title} - {shiftAssignment.timeslot_title}
+                                    {' '}({shiftAssignment.timeslot_start} - {shiftAssignment.timeslot_end})
+                                </Typography>
+                                {getStatusChip(shiftAssignment.status || 'pending')}
+                            </Box>
+
+                            {/* Show rejection details if declined */}
+                            {shiftAssignment.status === 'declined' && (
+                                <Alert severity="warning" sx={{ mt: 0.5, py: 0.3, px: 1 }}>
+                                    {shiftAssignment.rejection_reason && (
+                                        <Typography variant="caption" display="block">
+                                            <strong>Grund:</strong> {shiftAssignment.rejection_reason}
+                                        </Typography>
+                                    )}
+                                    {shiftAssignment.alternative_preferences && (
+                                        <Typography variant="caption" display="block">
+                                            <strong>Alternative:</strong> {shiftAssignment.alternative_preferences}
+                                        </Typography>
+                                    )}
+                                </Alert>
+                            )}
+
+                            {/* Show response date if available */}
+                            {shiftAssignment.response_date && (
+                                <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5, fontSize: '0.65rem' }}>
+                                    (Beantwortet: {new Date(shiftAssignment.response_date).toLocaleDateString('de-DE')})
+                                </Typography>
+                            )}
+                        </Box>
+                    ))}
                 </Box>
 
                 {/* Priority Details */}

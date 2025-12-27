@@ -6,7 +6,9 @@ import {
   People as PeopleIcon,
   Schedule as ScheduleIcon,
   CheckCircle as CheckCircleIcon,
+  ThumbUp as ThumbUpIcon,
 } from '@mui/icons-material';
+import type { ShiftAssignment } from '../types';
 
 interface StatisticsGridProps {
   totalUsers: number;
@@ -15,6 +17,7 @@ interface StatisticsGridProps {
   totalShiftsWanted: number;
   totalTimeslots: number;
   totalCapacity: number;
+  assignments: ShiftAssignment[];
 }
 
 const StatisticsGrid: React.FC<StatisticsGridProps> = ({
@@ -24,7 +27,16 @@ const StatisticsGrid: React.FC<StatisticsGridProps> = ({
   totalShiftsWanted,
   totalTimeslots,
   totalCapacity,
+  assignments,
 }) => {
+  // Calculate acceptance statistics
+  const acceptedCount = assignments.filter(a => a.status === 'accepted').length;
+  const pendingCount = assignments.filter(a => a.status === 'pending' || !a.status).length;
+  const declinedCount = assignments.filter(a => a.status === 'declined').length;
+  const acceptanceRate = assignments.length > 0
+    ? Math.round((acceptedCount / assignments.length) * 100)
+    : 0;
+
   return (
     <Grid container spacing={3} sx={{ mb: 3 }}>
       <Grid item xs={12} sm={6} md={3}>
@@ -64,6 +76,16 @@ const StatisticsGrid: React.FC<StatisticsGridProps> = ({
           color="success"
           subtitle="Users fully assigned"
           progress={(fullyAssignedUsers / totalUsers) * 100}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6} md={3}>
+        <StatsCard
+          title="Acceptance Rate"
+          value={`${acceptanceRate}%`}
+          icon={<ThumbUpIcon fontSize="large" />}
+          color="success"
+          subtitle={`✓ ${acceptedCount} | ⏳ ${pendingCount} | ✗ ${declinedCount}`}
+          progress={acceptanceRate}
         />
       </Grid>
     </Grid>

@@ -11,7 +11,8 @@ interface ActionButtonsProps {
     selectedUsers: Set<number>;
     selectedTimeslot: number | null;
     onAssignUsers: () => void;
-    onUnassignUsers: () => void;
+    onUnassignFromTimeslot: () => void;
+    onUnassignAllShifts: () => void;
     loading: boolean;
     onClearUserSelection: () => void;
     onExportShiftAssignments: () => void;
@@ -21,13 +22,15 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                                                          selectedUsers,
                                                          selectedTimeslot,
                                                          onAssignUsers,
-                                                         onUnassignUsers,
+                                                         onUnassignFromTimeslot,
+                                                         onUnassignAllShifts,
                                                          loading,
                                                          onClearUserSelection,
                                                          onExportShiftAssignments
                                                      }) => {
     const canAssign = selectedUsers.size > 0 && selectedTimeslot !== null;
-    const canUnassign = selectedUsers.size > 0;
+    const canUnassignFromTimeslot = selectedUsers.size > 0 && selectedTimeslot !== null;
+    const canUnassignAll = selectedUsers.size > 0;
 
     return (
         <Box sx={{
@@ -65,24 +68,37 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                     Assign to Timeslot
                 </Button>
 
-                {/* Unassign Button */}
+                {/* Remove from Timeslot Button */}
                 <Button
                     variant="outlined"
                     startIcon={<PersonRemoveIcon/>}
-                    onClick={onUnassignUsers}
-                    disabled={!canUnassign || loading}
+                    onClick={onUnassignFromTimeslot}
+                    disabled={!canUnassignFromTimeslot || loading}
                     color="error"
                     fullWidth
                     sx={{py: 1.5}}
                 >
-                    Remove Assignment
+                    Remove from Timeslot
+                </Button>
+
+                {/* Remove All Shifts Button */}
+                <Button
+                    variant="outlined"
+                    startIcon={<ClearAll/>}
+                    onClick={onUnassignAllShifts}
+                    disabled={!canUnassignAll || loading}
+                    color="error"
+                    fullWidth
+                    sx={{py: 1.5}}
+                >
+                    Remove All Shifts
                 </Button>
 
                 <Button
                     variant="outlined"
                     startIcon={<Clear/>}
                     onClick={onClearUserSelection}
-                    disabled={!canUnassign || loading}
+                    disabled={!canUnassignAll || loading}
                     color="error"
                     fullWidth
                     sx={{py: 1.5}}

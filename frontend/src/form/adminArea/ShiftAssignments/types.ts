@@ -40,6 +40,7 @@ export interface UserWithAssignments {
 export interface UserListFilters {
     searchTerm: string;
     assignmentFilter: 'all' | 'completed' | 'incomplete' | 'unassigned';
+    acceptanceFilter: 'all' | 'all_accepted' | 'has_pending' | 'has_declined';
     ticketDayFilter: string; // e.g., 'all', 'Freitag', 'Samstag', etc.
     shiftCountFilter: 'all' | '1' | '2' | '3'; // or however many shift options you have
     daysCountFilter: 'all' | '1' | '2' | '3';

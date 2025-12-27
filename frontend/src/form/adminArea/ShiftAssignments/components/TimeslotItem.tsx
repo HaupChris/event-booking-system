@@ -2,6 +2,11 @@ import React from 'react';
 import {
     Box, Typography, ListItem, ListItemButton, LinearProgress, Chip, alpha
 } from '@mui/material';
+import {
+    CheckCircle,
+    Cancel,
+    PendingActions
+} from '@mui/icons-material';
 import type {ShiftAssignment} from '../types';
 import {spacePalette} from '../../../../components/styles/theme';
 import type {BookingWithTimestamp} from "../../../userArea/interface";
@@ -29,7 +34,7 @@ const TimeslotItem: React.FC<TimeslotItemProps> = ({
                                                        onSelect,
                                                        bookings
                                                    }) => {
-    const getStatusColor = () => {
+    const getTimeslotStatusColor = () => {
         if (timeslot.is_filled) return spacePalette.status.success;
         if (timeslot.fill_percentage >= 75) return spacePalette.status.warning;
         if (timeslot.fill_percentage >= 50) return spacePalette.status.info;
@@ -43,7 +48,7 @@ const TimeslotItem: React.FC<TimeslotItemProps> = ({
         return 'Needs People';
     };
 
-    const statusColor = getStatusColor();
+    const statusColor = getTimeslotStatusColor();
 
     const getSupporterBuddyForBookingId = (bookingId: number) => {
         const booking = bookings.find((booking => booking.id === bookingId))
@@ -53,6 +58,30 @@ const TimeslotItem: React.FC<TimeslotItemProps> = ({
             return booking.supporter_buddy
         }
     }
+
+    // Get status icon for shift assignment
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case 'accepted':
+                return <CheckCircle sx={{ fontSize: 12, color: 'success.main' }} />;
+            case 'declined':
+                return <Cancel sx={{ fontSize: 12, color: 'error.main' }} />;
+            default:
+                return <PendingActions sx={{ fontSize: 12, color: 'warning.main' }} />;
+        }
+    };
+
+    // Get status color for text
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'accepted':
+                return 'success.main';
+            case 'declined':
+                return 'error.main';
+            default:
+                return 'warning.main';
+        }
+    };
 
     return (
         <ListItem disablePadding>
@@ -123,16 +152,37 @@ const TimeslotItem: React.FC<TimeslotItemProps> = ({
 
                     {/* Assigned users preview */}
                     {timeslot.assignments.length > 0 && (
-                        <Typography variant="caption" color="text.secondary">
-                            Assigned:<br/> {timeslot.assignments.map((assignment) => {
-                            const supporterBuddy = getSupporterBuddyForBookingId(assignment.booking_id);
+                        <Box sx={{ mt: 1 }}>
+                            <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+                                Zugewiesen:
+                            </Typography>
+                            {timeslot.assignments.map((assignment) => {
+                                const supporterBuddy = getSupporterBuddyForBookingId(assignment.booking_id);
+                                const statusIcon = getStatusIcon(assignment.status || 'pending');
+                                const statusColor = getStatusColor(assignment.status || 'pending');
 
-                            return <>
-                                {assignment.first_name + " " + assignment.last_name + " (Buddy: " + (supporterBuddy.length > 1 ?  supporterBuddy + ")" : "- )")}
-                                <br/>
-                            </>
-                        })}
-                        </Typography>
+                                return (
+                                    <Box
+                                        key={assignment.id}
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.5,
+                                            mb: 0.3
+                                        }}
+                                    >
+                                        {statusIcon}
+                                        <Typography
+                                            variant="caption"
+                                            sx={{ color: statusColor }}
+                                        >
+                                            {assignment.first_name} {assignment.last_name}
+                                            {supporterBuddy && supporterBuddy.length > 0 && ` (Buddy: ${supporterBuddy})`}
+                                        </Typography>
+                                    </Box>
+                                );
+                            })}
+                        </Box>
                     )}
                 </Box>
             </ListItemButton>

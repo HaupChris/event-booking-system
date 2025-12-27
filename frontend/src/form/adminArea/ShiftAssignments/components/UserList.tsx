@@ -1,9 +1,9 @@
 import React, {useState, useMemo} from 'react';
 import {
-    Box, TextField, Button, ButtonGroup, List,
+    Box, TextField, List,
     InputAdornment, FormControl, InputLabel, Select, MenuItem, Grid
 } from '@mui/material';
-import {Search as SearchIcon, Sort as SortIcon} from '@mui/icons-material';
+import {Search as SearchIcon} from '@mui/icons-material';
 import type {BookingWithTimestamp, FormContent} from '../../../userArea/interface';
 import type {ShiftAssignment, UserWithAssignments, UserListFilters} from '../types';
 import UserItem from './UserItem';
@@ -30,6 +30,7 @@ const UserList: React.FC<UserListProps> = ({
     const [filters, setFilters] = useState<UserListFilters>({
         searchTerm: '',
         assignmentFilter: 'all',
+        acceptanceFilter: 'all',
         ticketDayFilter: 'all',
         shiftCountFilter: 'all',
         daysCountFilter: 'all'
@@ -118,7 +119,26 @@ const UserList: React.FC<UserListProps> = ({
             const matchesDaysCount = filters.daysCountFilter === 'all' ||
                 user.days_count.toString() === filters.daysCountFilter;
 
-            return matchesSearch && matchesAssignment && matchesTicketDay && matchesShiftCount && matchesDaysCount;
+            // Acceptance filter
+            const matchesAcceptance = (() => {
+                if (filters.acceptanceFilter === 'all') return true;
+
+                const userAssignments = user.assigned_shifts;
+                if (userAssignments.length === 0) return false;
+
+                switch (filters.acceptanceFilter) {
+                    case 'all_accepted':
+                        return userAssignments.every(sa => sa.status === 'accepted');
+                    case 'has_pending':
+                        return userAssignments.some(sa => sa.status === 'pending' || !sa.status);
+                    case 'has_declined':
+                        return userAssignments.some(sa => sa.status === 'declined');
+                    default:
+                        return true;
+                }
+            })();
+
+            return matchesSearch && matchesAssignment && matchesAcceptance && matchesTicketDay && matchesShiftCount && matchesDaysCount;
         });
     }, [sortedUsers, filters]);
 
@@ -158,11 +178,14 @@ const UserList: React.FC<UserListProps> = ({
                 <Grid container spacing={1} sx={{mb: 1.5}}>
                     <Grid item xs={6}>
                         <FormControl fullWidth size="small">
-                            <InputLabel>Status</InputLabel>
+                            <InputLabel>Assignment</InputLabel>
                             <Select
                                 value={filters.assignmentFilter}
-                                onChange={(e) => setFilters(prev => ({...prev, assignmentFilter: e.target.value as any}))}
-                                label="Status"
+                                onChange={(e) => setFilters(prev => ({
+                                    ...prev,
+                                    assignmentFilter: e.target.value as any
+                                }))}
+                                label="Assignment"
                             >
                                 <MenuItem value="all">All</MenuItem>
                                 <MenuItem value="unassigned">Unassigned</MenuItem>
@@ -172,6 +195,24 @@ const UserList: React.FC<UserListProps> = ({
                         </FormControl>
                     </Grid>
                     <Grid item xs={6}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel>Acceptance</InputLabel>
+                            <Select
+                                value={filters.acceptanceFilter}
+                                onChange={(e) => setFilters(prev => ({
+                                    ...prev,
+                                    acceptanceFilter: e.target.value as any
+                                }))}
+                                label="Acceptance"
+                            >
+                                <MenuItem value="all">All</MenuItem>
+                                <MenuItem value="all_accepted">All Accepted</MenuItem>
+                                <MenuItem value="has_pending">Has Pending</MenuItem>
+                                <MenuItem value="has_declined">Has Declined</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
                         <FormControl fullWidth size="small">
                             <InputLabel>Sort</InputLabel>
                             <Select
@@ -191,7 +232,10 @@ const UserList: React.FC<UserListProps> = ({
                             <InputLabel>Day</InputLabel>
                             <Select
                                 value={filters.ticketDayFilter}
-                                onChange={(e) => setFilters(prev => ({...prev, ticketDayFilter: e.target.value as any}))}
+                                onChange={(e) => setFilters(prev => ({
+                                    ...prev,
+                                    ticketDayFilter: e.target.value as any
+                                }))}
                                 label="Day"
                             >
                                 <MenuItem value="all">All</MenuItem>
@@ -206,7 +250,10 @@ const UserList: React.FC<UserListProps> = ({
                             <InputLabel>Days #</InputLabel>
                             <Select
                                 value={filters.daysCountFilter}
-                                onChange={(e) => setFilters(prev => ({...prev, daysCountFilter: e.target.value as any}))}
+                                onChange={(e) => setFilters(prev => ({
+                                    ...prev,
+                                    daysCountFilter: e.target.value as any
+                                }))}
                                 label="Days #"
                             >
                                 <MenuItem value="all">All</MenuItem>
@@ -221,7 +268,10 @@ const UserList: React.FC<UserListProps> = ({
                             <InputLabel>Shifts</InputLabel>
                             <Select
                                 value={filters.shiftCountFilter}
-                                onChange={(e) => setFilters(prev => ({...prev, shiftCountFilter: e.target.value as any}))}
+                                onChange={(e) => setFilters(prev => ({
+                                    ...prev,
+                                    shiftCountFilter: e.target.value as any
+                                }))}
                                 label="Shifts"
                             >
                                 <MenuItem value="all">All</MenuItem>
