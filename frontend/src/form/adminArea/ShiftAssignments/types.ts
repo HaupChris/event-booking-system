@@ -5,6 +5,10 @@ export interface ShiftAssignment {
     is_confirmed: boolean;
     admin_notes: string;
     assignment_date: string;
+    status: 'pending' | 'accepted' | 'declined';
+    rejection_reason?: string;
+    alternative_preferences?: string;
+    response_date?: string;
     first_name: string;
     last_name: string;
     email: string;

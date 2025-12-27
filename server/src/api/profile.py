@@ -142,7 +142,6 @@ def decline_shift_assignment(profile_uuid: str, assignment_id: int):
 
         if success:
             logger.info(f"Shift {assignment_id} declined by profile {profile_uuid[:8]}...")
-            # TODO: Send notification to admin about declined shift
             return jsonify({"message": "Shift declined successfully"}), 200
         else:
             logger.warning(

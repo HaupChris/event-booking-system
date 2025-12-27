@@ -19,6 +19,10 @@ def get_all_shift_assignments() -> list[ShiftAssignmentWithDetails]:
                               sa.is_confirmed,
                               sa.admin_notes,
                               sa.assignment_date,
+                              sa.status,
+                              sa.rejection_reason,
+                              sa.alternative_preferences,
+                              sa.response_date,
                               u.first_name,
                               u.last_name,
                               u.email,
@@ -50,15 +54,19 @@ def get_all_shift_assignments() -> list[ShiftAssignmentWithDetails]:
                 is_confirmed=bool(row[3]),
                 admin_notes=row[4] or "",
                 assignment_date=row[5],
-                first_name=row[6],
-                last_name=row[7],
-                email=row[8],
-                phone=row[9],
-                workshift_title=row[10],
-                timeslot_title=row[11],
-                timeslot_start=row[12] or "",
-                timeslot_end=row[13] or "",
-                priority=row[14],
+                status=row[6] or "pending",
+                rejection_reason=row[7] or "",
+                alternative_preferences=row[8] or "",
+                response_date=row[9] or "",
+                first_name=row[10],
+                last_name=row[11],
+                email=row[12],
+                phone=row[13],
+                workshift_title=row[14],
+                timeslot_title=row[15],
+                timeslot_start=row[16] or "",
+                timeslot_end=row[17] or "",
+                priority=row[18],
             )
             assignments.append(assignment)
 
@@ -79,6 +87,10 @@ def get_assignments_by_timeslot(timeslot_id: int) -> list[ShiftAssignmentWithDet
                               sa.is_confirmed,
                               sa.admin_notes,
                               sa.assignment_date,
+                              sa.status,
+                              sa.rejection_reason,
+                              sa.alternative_preferences,
+                              sa.response_date,
                               u.first_name,
                               u.last_name,
                               u.email,
@@ -112,15 +124,19 @@ def get_assignments_by_timeslot(timeslot_id: int) -> list[ShiftAssignmentWithDet
                 is_confirmed=bool(row[3]),
                 admin_notes=row[4] or "",
                 assignment_date=row[5],
-                first_name=row[6],
-                last_name=row[7],
-                email=row[8],
-                phone=row[9],
-                workshift_title=row[10],
-                timeslot_title=row[11],
-                timeslot_start=row[12] or "",
-                timeslot_end=row[13] or "",
-                priority=row[14],
+                status=row[6] or "pending",
+                rejection_reason=row[7] or "",
+                alternative_preferences=row[8] or "",
+                response_date=row[9] or "",
+                first_name=row[10],
+                last_name=row[11],
+                email=row[12],
+                phone=row[13],
+                workshift_title=row[14],
+                timeslot_title=row[15],
+                timeslot_start=row[16] or "",
+                timeslot_end=row[17] or "",
+                priority=row[18],
             )
             assignments.append(assignment)
 
@@ -141,6 +157,10 @@ def get_assignments_by_booking(booking_id: int) -> list[ShiftAssignmentWithDetai
                               sa.is_confirmed,
                               sa.admin_notes,
                               sa.assignment_date,
+                              sa.status,
+                              sa.rejection_reason,
+                              sa.alternative_preferences,
+                              sa.response_date,
                               u.first_name,
                               u.last_name,
                               u.email,
@@ -174,15 +194,19 @@ def get_assignments_by_booking(booking_id: int) -> list[ShiftAssignmentWithDetai
                 is_confirmed=bool(row[3]),
                 admin_notes=row[4] or "",
                 assignment_date=row[5],
-                first_name=row[6],
-                last_name=row[7],
-                email=row[8],
-                phone=row[9],
-                workshift_title=row[10],
-                timeslot_title=row[11],
-                timeslot_start=row[12] or "",
-                timeslot_end=row[13] or "",
-                priority=row[14],
+                status=row[6] or "pending",
+                rejection_reason=row[7] or "",
+                alternative_preferences=row[8] or "",
+                response_date=row[9] or "",
+                first_name=row[10],
+                last_name=row[11],
+                email=row[12],
+                phone=row[13],
+                workshift_title=row[14],
+                timeslot_title=row[15],
+                timeslot_start=row[16] or "",
+                timeslot_end=row[17] or "",
+                priority=row[18],
             )
             assignments.append(assignment)
 
@@ -208,14 +232,15 @@ def create_assignment(assignment: ShiftAssignment) -> int:
             cursor.execute(
                 """
                            INSERT INTO ShiftAssignments
-                               (booking_id, timeslot_id, is_confirmed, admin_notes)
-                           VALUES (?, ?, ?, ?)
+                               (booking_id, timeslot_id, is_confirmed, admin_notes, status)
+                           VALUES (?, ?, ?, ?, ?)
                            """,
                 (
                     assignment.booking_id,
                     assignment.timeslot_id,
                     1 if assignment.is_confirmed else 0,
                     assignment.admin_notes,
+                    assignment.status or "pending",
                 ),
             )
             conn.commit()
@@ -237,10 +262,16 @@ def update_assignment(assignment_id: int, assignment: ShiftAssignment) -> bool:
                 """
                            UPDATE ShiftAssignments
                            SET is_confirmed = ?,
-                               admin_notes  = ?
+                               admin_notes  = ?,
+                               status = ?
                            WHERE id = ?
                            """,
-                (1 if assignment.is_confirmed else 0, assignment.admin_notes, assignment_id),
+                (
+                    1 if assignment.is_confirmed else 0,
+                    assignment.admin_notes,
+                    assignment.status or "pending",
+                    assignment_id,
+                ),
             )
             conn.commit()
             return cursor.rowcount > 0

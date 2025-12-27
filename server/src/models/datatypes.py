@@ -157,6 +157,10 @@ class ShiftAssignment(Interface):
     admin_notes: str = ""
     id: int = -1
     assignment_date: str = ""
+    status: str = "pending"
+    rejection_reason: str = ""
+    alternative_preferences: str = ""
+    response_date: str = ""
 
 
 @dataclass

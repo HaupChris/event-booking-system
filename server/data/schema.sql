@@ -166,6 +166,10 @@ CREATE TABLE IF NOT EXISTS ShiftAssignments (
     is_confirmed INTEGER DEFAULT 1,
     assignment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     admin_notes TEXT,
+    status TEXT DEFAULT 'pending',
+    rejection_reason TEXT,
+    alternative_preferences TEXT,
+    response_date TEXT,
     FOREIGN KEY(booking_id) REFERENCES Bookings(id) ON DELETE CASCADE,
     FOREIGN KEY(timeslot_id) REFERENCES TimeSlots(id) ON DELETE CASCADE,
     UNIQUE(booking_id, timeslot_id)
