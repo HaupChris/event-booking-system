@@ -1,13 +1,11 @@
 import React, {useMemo} from 'react';
 import {
-    Box, Typography, Accordion, AccordionSummary, AccordionDetails, List,
-    LinearProgress, Chip, alpha
+    Box, Typography, Accordion, AccordionSummary, AccordionDetails, List, alpha
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
     CheckCircle as CheckCircleIcon,
-    Schedule as ScheduleIcon,
-    Warning as WarningIcon, RadioButtonUnchecked
+    RadioButtonUnchecked
 } from '@mui/icons-material';
 import type {FormContent, WorkShift, TimeSlot, BookingWithTimestamp} from '../../../userArea/interface';
 import type {ShiftAssignment} from '../types';
@@ -49,20 +47,24 @@ const WorkshiftList: React.FC<WorkshiftListProps> = ({
 
     // Merge workshifts with assignment data and calculate workshift-level progress
     const workshiftsWithAssignments = useMemo((): WorkshiftWithTimeslots[] => {
-        return formContent.work_shifts.map(workshift => {
-            const timeslotsWithAssignments = workshift.time_slots.map(timeslot => {
-                const timeslotAssignments = assignments.filter(a => a.timeslot_id === timeslot.id);
-                const assigned_count = timeslotAssignments.length;
-                const fill_percentage = timeslot.num_needed > 0 ? (assigned_count / timeslot.num_needed) * 100 : 0;
+        // Helper to process a timeslot with assignments
+        const processTimeslot = (timeslot: TimeSlot) => {
+            const isAssignedToTimeslot = (a: ShiftAssignment) => a.timeslot_id === timeslot.id;
+            const timeslotAssignments = assignments.filter(isAssignedToTimeslot);
+            const assigned_count = timeslotAssignments.length;
+            const fill_percentage = timeslot.num_needed > 0 ? (assigned_count / timeslot.num_needed) * 100 : 0;
 
-                return {
-                    ...timeslot,
-                    assigned_count,
-                    fill_percentage,
-                    is_filled: assigned_count >= timeslot.num_needed,
-                    assignments: timeslotAssignments
-                };
-            });
+            return {
+                ...timeslot,
+                assigned_count,
+                fill_percentage,
+                is_filled: assigned_count >= timeslot.num_needed,
+                assignments: timeslotAssignments
+            };
+        };
+
+        return formContent.work_shifts.map(workshift => {
+            const timeslotsWithAssignments = workshift.time_slots.map(processTimeslot);
 
             // Calculate workshift-level statistics
             const total_assigned = timeslotsWithAssignments.reduce((sum, ts) => sum + ts.assigned_count, 0);

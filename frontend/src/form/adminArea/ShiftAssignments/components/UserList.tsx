@@ -5,8 +5,9 @@ import {
 } from '@mui/material';
 import {Search as SearchIcon} from '@mui/icons-material';
 import type {BookingWithTimestamp, FormContent} from '../../../userArea/interface';
-import type {ShiftAssignment, UserWithAssignments, UserListFilters} from '../types';
+import type {UserWithAssignments, UserListFilters} from '../types';
 import UserItem from './UserItem';
+import {matchesSearch, matchesAssignment, matchesAcceptanceFilter} from './userListHelpers';
 
 type SortOption = 'firstName' | 'lastName' | 'priority' | 'wantedShifts';
 
@@ -61,7 +62,7 @@ const UserList: React.FC<UserListProps> = ({
                 is_fully_assigned: userAssignments.length >= booking.amount_shifts
             };
         });
-    }, [regularBookings, assignments]);
+    }, [regularBookings, assignments, formContent.ticket_options]);
 
     // Sort users
     const sortedUsers = useMemo(() => {
@@ -95,50 +96,21 @@ const UserList: React.FC<UserListProps> = ({
     // Filter users
     const filteredUsers = useMemo(() => {
         return sortedUsers.filter(user => {
-            // Search filter
-            const matchesSearch = filters.searchTerm === '' ||
-                user.first_name.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-                user.last_name.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-                user.supporter_buddy.toLowerCase().includes(filters.searchTerm.toLowerCase());
+            const matchesSearchFilter = matchesSearch(user, filters.searchTerm);
+            const matchesAssignmentFilter = matchesAssignment(user, filters.assignmentFilter);
+            const matchesAcceptance = matchesAcceptanceFilter(user, filters.acceptanceFilter);
 
-            // Assignment filter
-            const matchesAssignment = filters.assignmentFilter === 'all' ||
-                (filters.assignmentFilter === 'completed' && user.is_fully_assigned) ||
-                (filters.assignmentFilter === 'incomplete' && !user.is_fully_assigned) ||
-                (filters.assignmentFilter === 'unassigned' && user.assigned_count === 0);
-
-            // Ticket day filter
             const matchesTicketDay = filters.ticketDayFilter === 'all' ||
                 user.ticket_days.includes(filters.ticketDayFilter);
 
-            // Shift count filter
             const matchesShiftCount = filters.shiftCountFilter === 'all' ||
                 user.amount_shifts.toString() === filters.shiftCountFilter;
 
-            // Days count filter
             const matchesDaysCount = filters.daysCountFilter === 'all' ||
                 user.days_count.toString() === filters.daysCountFilter;
 
-            // Acceptance filter
-            const matchesAcceptance = (() => {
-                if (filters.acceptanceFilter === 'all') return true;
-
-                const userAssignments = user.assigned_shifts;
-                if (userAssignments.length === 0) return false;
-
-                switch (filters.acceptanceFilter) {
-                    case 'all_accepted':
-                        return userAssignments.every(sa => sa.status === 'accepted');
-                    case 'has_pending':
-                        return userAssignments.some(sa => sa.status === 'pending' || !sa.status);
-                    case 'has_declined':
-                        return userAssignments.some(sa => sa.status === 'declined');
-                    default:
-                        return true;
-                }
-            })();
-
-            return matchesSearch && matchesAssignment && matchesAcceptance && matchesTicketDay && matchesShiftCount && matchesDaysCount;
+            return matchesSearchFilter && matchesAssignmentFilter && matchesAcceptance &&
+                   matchesTicketDay && matchesShiftCount && matchesDaysCount;
         });
     }, [sortedUsers, filters]);
 
@@ -183,7 +155,7 @@ const UserList: React.FC<UserListProps> = ({
                                 value={filters.assignmentFilter}
                                 onChange={(e) => setFilters(prev => ({
                                     ...prev,
-                                    assignmentFilter: e.target.value as any
+                                    assignmentFilter: e.target.value as UserListFilters['assignmentFilter']
                                 }))}
                                 label="Assignment"
                             >
@@ -201,7 +173,7 @@ const UserList: React.FC<UserListProps> = ({
                                 value={filters.acceptanceFilter}
                                 onChange={(e) => setFilters(prev => ({
                                     ...prev,
-                                    acceptanceFilter: e.target.value as any
+                                    acceptanceFilter: e.target.value as UserListFilters['acceptanceFilter']
                                 }))}
                                 label="Acceptance"
                             >
@@ -234,7 +206,7 @@ const UserList: React.FC<UserListProps> = ({
                                 value={filters.ticketDayFilter}
                                 onChange={(e) => setFilters(prev => ({
                                     ...prev,
-                                    ticketDayFilter: e.target.value as any
+                                    ticketDayFilter: e.target.value as string
                                 }))}
                                 label="Day"
                             >
@@ -252,7 +224,7 @@ const UserList: React.FC<UserListProps> = ({
                                 value={filters.daysCountFilter}
                                 onChange={(e) => setFilters(prev => ({
                                     ...prev,
-                                    daysCountFilter: e.target.value as any
+                                    daysCountFilter: e.target.value as UserListFilters['daysCountFilter']
                                 }))}
                                 label="Days #"
                             >
@@ -270,7 +242,7 @@ const UserList: React.FC<UserListProps> = ({
                                 value={filters.shiftCountFilter}
                                 onChange={(e) => setFilters(prev => ({
                                     ...prev,
-                                    shiftCountFilter: e.target.value as any
+                                    shiftCountFilter: e.target.value as UserListFilters['shiftCountFilter']
                                 }))}
                                 label="Shifts"
                             >

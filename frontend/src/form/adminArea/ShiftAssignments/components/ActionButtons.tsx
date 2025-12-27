@@ -18,6 +18,23 @@ interface ActionButtonsProps {
     onExportShiftAssignments: () => void;
 }
 
+const getStatusMessage = (
+    canAssign: boolean,
+    selectedUsersCount: number,
+    selectedTimeslot: number | null
+): string => {
+    if (!canAssign && selectedUsersCount > 0 && !selectedTimeslot) {
+        return "Select a timeslot to assign users";
+    }
+    if (!canAssign && selectedUsersCount === 0) {
+        return "Select users to perform actions";
+    }
+    if (canAssign) {
+        return `Ready to assign ${selectedUsersCount} user${selectedUsersCount > 1 ? 's' : ''}`;
+    }
+    return "";
+};
+
 const ActionButtons: React.FC<ActionButtonsProps> = ({
                                                          selectedUsers,
                                                          selectedTimeslot,
@@ -31,6 +48,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     const canAssign = selectedUsers.size > 0 && selectedTimeslot !== null;
     const canUnassignFromTimeslot = selectedUsers.size > 0 && selectedTimeslot !== null;
     const canUnassignAll = selectedUsers.size > 0;
+    const statusMessage = getStatusMessage(canAssign, selectedUsers.size, selectedTimeslot);
 
     return (
         <Box sx={{
@@ -121,12 +139,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             {/* Status Info */}
             <Box sx={{mt: 'auto', flexShrink: 0}}>
                 <Typography variant="caption" color="text.secondary" align="center">
-                    {!canAssign && selectedUsers.size > 0 && !selectedTimeslot &&
-                        "Select a timeslot to assign users"}
-                    {!canAssign && selectedUsers.size === 0 &&
-                        "Select users to perform actions"}
-                    {canAssign &&
-                        `Ready to assign ${selectedUsers.size} user${selectedUsers.size > 1 ? 's' : ''}`}
+                    {statusMessage}
                 </Typography>
             </Box>
         </Box>

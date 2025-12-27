@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { Box, Grid, Typography, Paper, Alert, CircularProgress } from '@mui/material';
 import { TokenContext } from '../../../contexts/AuthContext';
 import { useFetchData } from '../useFetchData';
@@ -21,12 +21,7 @@ function ShiftAssignmentsPage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
 
-    // Fetch assignments on component mount
-    useEffect(() => {
-        fetchAssignments().then();
-    }, [token]);
-
-    const fetchAssignments = async () => {
+    const fetchAssignments = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -38,7 +33,12 @@ function ShiftAssignmentsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [token]);
+
+    // Fetch assignments on component mount
+    useEffect(() => {
+        fetchAssignments().then();
+    }, [fetchAssignments]);
 
     // Calculate statistics
     const totalUsers = regularBookings.length;
