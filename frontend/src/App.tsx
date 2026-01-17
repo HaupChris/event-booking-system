@@ -7,6 +7,8 @@ import Dashboard from './form/adminArea/Dashboard';
 import { ArtistRegistrationFormContainer } from './form/artistArea/ArtistRegistrationFormContainer';
 import ThemeProvider from './contexts/ThemeProvider';
 import SpaceBackground from './components/core/layouts/SpaceBackground';
+import CircusBackground from './components/core/layouts/CircusBackground';
+import { useThemeMode } from './components/styles/theme';
 import LoginPage from './components/core/inputs/LoginPage';
 import PWAInstallPrompt from './components/core/pwa/PWAInstallPrompt';
 import PWAUpdatePrompt from './components/core/pwa/PWAUpdatePrompt';
@@ -14,6 +16,17 @@ import OfflineIndicator from './components/core/pwa/OfflineIndicator';
 import SyncQueueManager from './components/core/pwa/SyncQueueManager';
 import ProfilePage from './pages/ProfilePage';
 import ProfileRecovery from './components/profile/ProfileRecovery';
+
+// Background wrapper component that uses theme context
+const BackgroundWrapper: React.FC = () => {
+  const { mode } = useThemeMode();
+
+  if (mode === 'circus') {
+    return <CircusBackground confettiCount={50} balloonCount={6} sparkleCount={40} />;
+  }
+
+  return <SpaceBackground />;
+};
 
 const App = () => {
   const [auth, setAuth] = useState(false);
@@ -46,8 +59,8 @@ const App = () => {
           overflow: 'auto',
         }}
       >
-        {/* Space background behind everything */}
-        <SpaceBackground />
+        {/* Themed background behind everything */}
+        <BackgroundWrapper />
 
         {/* PWA Components */}
         <PWAInstallPrompt />

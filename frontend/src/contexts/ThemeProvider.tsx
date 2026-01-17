@@ -6,29 +6,33 @@ import {
   ThemeContext,
   updateThemeMode,
   darkTheme,
-  lightTheme
+  lightTheme,
+  circusTheme
 } from '../components/styles/theme';
 
 const ThemeProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
-  const [mode, setMode] = useState<ThemeMode>('dark');
-  const [theme, setTheme] = useState(darkTheme);
+  const [mode, setMode] = useState<ThemeMode>('circus');  // Default to circus theme
+  const [theme, setTheme] = useState(circusTheme);
 
   useEffect(() => {
     // Load saved preference
     const savedMode = localStorage.getItem('themeMode') as ThemeMode;
-    if (savedMode && (savedMode === 'dark' || savedMode === 'light')) {
+    if (savedMode && (savedMode === 'dark' || savedMode === 'light' || savedMode === 'circus')) {
       setMode(savedMode);
-      setTheme(savedMode === 'dark' ? darkTheme : lightTheme);
+      const selectedTheme = savedMode === 'circus' ? circusTheme : (savedMode === 'dark' ? darkTheme : lightTheme);
+      setTheme(selectedTheme);
       updateThemeMode(savedMode);
     }
   }, []);
 
   const toggleTheme = () => {
-    const newMode = mode === 'dark' ? 'light' : 'dark';
+    // Cycle through: circus -> dark -> light -> circus
+    const newMode: ThemeMode = mode === 'circus' ? 'dark' : (mode === 'dark' ? 'light' : 'circus');
     setMode(newMode);
 
-    // Update global space theme
-    setTheme(newMode === 'dark' ? darkTheme : lightTheme);
+    // Update theme
+    const selectedTheme = newMode === 'circus' ? circusTheme : (newMode === 'dark' ? darkTheme : lightTheme);
+    setTheme(selectedTheme);
     updateThemeMode(newMode);
 
     localStorage.setItem('themeMode', newMode);
