@@ -69,7 +69,7 @@ const App = () => {
                     auth ? (
                       <Navigate replace to="/form" />
                     ) : (
-                      <LoginPage title="User Login" endpoint="/api/auth" redirectPath="/form" />
+                      <LoginPage title="User Login" endpoint="/api/auth" redirectPath="/form" showRecoveryLink={true} />
                     )
                   }
                 />
@@ -89,6 +89,7 @@ const App = () => {
                         title="Künstler Login"
                         endpoint="/api/auth/artist"
                         redirectPath="/artist-form"
+                        showRecoveryLink={true}
                       />
                     )
                   }

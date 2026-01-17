@@ -1,5 +1,5 @@
 import React, {useState, useContext} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, Link} from 'react-router-dom';
 import {AuthContext, TokenContext} from '../../../contexts/AuthContext';
 import {
     Box,
@@ -18,12 +18,14 @@ interface LoginPageProps {
     endpoint: string;
     redirectPath: string;
     setIsAdmin?: (value: boolean) => void;
+    showRecoveryLink?: boolean;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({
                                                  endpoint,
                                                  redirectPath,
-                                                 setIsAdmin
+                                                 setIsAdmin,
+                                                 showRecoveryLink = false
                                              }) => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -112,6 +114,22 @@ const LoginPage: React.FC<LoginPageProps> = ({
                     >
                         Startklar!
                     </Button>
+                    {showRecoveryLink && (
+                        <Box sx={{textAlign: 'center', mt: 1}}>
+                            <Link
+                                to="/profile/recover"
+                                style={{
+                                    fontSize: '0.875rem',
+                                    textDecoration: 'none',
+                                    color: 'inherit',
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                                onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                            >
+                                Profil-Link vergessen?
+                            </Link>
+                        </Box>
+                    )}
                     {error && (
                         <Alert severity="error" sx={{mt: 2}}>
                             {error}
