@@ -175,3 +175,23 @@ CREATE TABLE IF NOT EXISTS ShiftAssignments (
     UNIQUE(booking_id, timeslot_id)
 );
 
+CREATE TABLE IF NOT EXISTS FAQCategories (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    display_order INTEGER NOT NULL DEFAULT 0,
+    is_active INTEGER DEFAULT 1,
+    created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS FAQs (
+    id INTEGER PRIMARY KEY NOT NULL,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    category_id INTEGER NOT NULL,
+    display_order INTEGER NOT NULL DEFAULT 0,
+    is_active INTEGER DEFAULT 1,
+    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(category_id) REFERENCES FAQCategories(id) ON DELETE CASCADE
+);
+

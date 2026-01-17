@@ -8,6 +8,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from src.api.admin_faq import admin_faq_bp
 from src.api.admin_news import admin_news_bp
 from src.api.admin_profiles import admin_profiles_bp
 from src.api.artist_bookings import artist_bp
@@ -66,6 +67,7 @@ app.register_blueprint(health_bp, url_prefix="/api")
 app.register_blueprint(artist_bp, url_prefix="/api")
 app.register_blueprint(shift_assignments_bp, url_prefix="/api")
 app.register_blueprint(profile_bp, url_prefix="/api/profile")
+app.register_blueprint(admin_faq_bp, url_prefix="/api/admin")
 app.register_blueprint(admin_news_bp, url_prefix="/api/admin")
 app.register_blueprint(admin_profiles_bp, url_prefix="/api/admin")
 

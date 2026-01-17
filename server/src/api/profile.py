@@ -12,6 +12,7 @@ from flask import Blueprint, jsonify, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+from src.services.faq_service import get_faqs_grouped_by_category
 from src.services.mail_service import send_profile_recovery_mail
 from src.services.news_service import get_news_for_profile, get_unread_count, mark_news_as_read
 from src.services.profile_service import (
@@ -290,4 +291,29 @@ def recover_profile():
     except Exception as e:
         elapsed_time = time.time() - start_time
         logger.error(f"Profile recovery failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@profile_bp.route("/faqs", methods=["GET"])
+@limiter_profile.limit("100/minute")
+def get_faqs_public():
+    """
+    Get all active FAQs grouped by category (public endpoint).
+
+    No authentication required - this is public information.
+    Rate limited to prevent abuse.
+    """
+    client_ip = request.remote_addr
+
+    try:
+        logger.debug(f"Public FAQ request from {client_ip}")
+
+        faqs = get_faqs_grouped_by_category()
+
+        logger.debug(f"Retrieved {len(faqs.get('categories', []))} FAQ categories")
+
+        return jsonify(faqs), 200
+
+    except Exception as e:
+        logger.error(f"FAQ retrieval failed: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500

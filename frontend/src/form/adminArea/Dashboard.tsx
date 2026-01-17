@@ -26,7 +26,8 @@ import {
     School,
     AssignmentInd,
     AccountBox,
-    Newspaper
+    Newspaper,
+    Help
 } from '@mui/icons-material';
 import ListItemButton from "@mui/material/ListItemButton";
 import {CSVLink} from "react-csv";
@@ -47,6 +48,7 @@ import {useFetchData} from './useFetchData';
 import ProfessionsPage from "./ProfessionsPage";
 import ShiftAssignmentsPage from "./ShiftAssignments";
 import NewsManagementPage from "./NewsManagementPage";
+import FAQManagementPage from "./FAQManagementPage";
 
 
 // Define all possible dashboard tabs
@@ -70,7 +72,8 @@ const dashboardTabs: DashboardTab[] = [
     {id: 'payments', label: 'Payments', icon: <PointOfSale/>, permissions: ['financial']},
     {id: 'shiftAssignments', label: 'Shift Assignments', icon: <AssignmentInd/>, permissions: ['read']},
     {id: 'profiles', label: 'Profile Management', icon: <AccountBox/>, permissions: ['read']},
-    {id: 'news', label: 'News Management', icon: <Newspaper/>, permissions: ['read']}
+    {id: 'news', label: 'News Management', icon: <Newspaper/>, permissions: ['read']},
+    {id: 'faqs', label: 'FAQ Management', icon: <Help/>, permissions: ['read']}
 ];
 
 function Dashboard() {
@@ -131,6 +134,8 @@ function Dashboard() {
                 return <ProfessionsPage/>;
             case 'news':
                 return <NewsManagementPage/>;
+            case 'faqs':
+                return <FAQManagementPage/>;
             default:
                 return <HomePage/>;
         }
