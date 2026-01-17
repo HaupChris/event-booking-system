@@ -46,10 +46,7 @@ import PaymentConfirmationsPage from './PaymentConfirmationsPage';
 import {useFetchData} from './useFetchData';
 import ProfessionsPage from "./ProfessionsPage";
 import ShiftAssignmentsPage from "./ShiftAssignments";
-import ProfileManagementPage from "./ProfileManagementPage";
 import NewsManagementPage from "./NewsManagementPage";
-// import {TokenContext} from "../../contexts/AuthContext";
-// import {ShiftAssignment} from "./ShiftAssignments/types";
 
 
 // Define all possible dashboard tabs
@@ -132,8 +129,6 @@ function Dashboard() {
                 return <ShiftAssignmentsPage/>;
             case 'professions':
                 return <ProfessionsPage/>;
-            case 'profiles':
-                return <ProfileManagementPage/>;
             case 'news':
                 return <NewsManagementPage/>;
             default:
