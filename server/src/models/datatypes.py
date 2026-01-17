@@ -102,8 +102,10 @@ class Booking(Interface):
     paid_amount: float
     payment_notes: str
     payment_date: str
+    profile_uuid: str
     artist_material_ids: list[int] = field(default_factory=list)
     profession_ids: list[int] = field(default_factory=list)
+
 
 
 @dataclass
@@ -131,6 +133,7 @@ class ArtistBooking(Interface):
     equipment: str = ""
     special_requests: str = ""
     performance_details: str = ""
+    profile_uuid: str = ""
     profession_ids: list[int] = field(default_factory=list)
 
 

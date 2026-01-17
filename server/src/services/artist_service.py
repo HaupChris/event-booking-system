@@ -37,7 +37,8 @@ def get_all_artist_bookings() -> list[ArtistBookingWithTimestamp]:
                    b.payment_date,
                    b.equipment,
                    b.special_requests,
-                   b.performance_details
+                   b.performance_details,
+                   b.profile_uuid
             FROM Artists a
             JOIN ArtistBookings b ON a.id = b.artist_id
             """
@@ -86,6 +87,7 @@ def get_all_artist_bookings() -> list[ArtistBookingWithTimestamp]:
                 equipment=row[15],
                 special_requests=row[16],
                 performance_details=row[17],
+                profile_uuid=row[18],
                 artist_material_ids=material_ids,
                 profession_ids=profession_ids,
             )
@@ -116,7 +118,8 @@ def get_artist_booking_by_id(booking_id: int) -> ArtistBookingWithTimestamp | No
                               b.payment_date,
                               b.equipment,
                               b.special_requests,
-                              b.performance_details
+                              b.performance_details,
+                              b.profile_uuid
                        FROM Artists a
                                 JOIN ArtistBookings b ON a.id = b.artist_id
                        WHERE b.id = ?
@@ -157,6 +160,7 @@ def get_artist_booking_by_id(booking_id: int) -> ArtistBookingWithTimestamp | No
             equipment=row[15],
             special_requests=row[16],
             performance_details=row[17],
+            profile_uuid=row[18],
             artist_material_ids=material_ids,
         )
 

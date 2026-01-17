@@ -321,7 +321,8 @@ def get_all_bookings() -> list[BookingWithTimestamp]:
                                   b.is_paid,
                                   b.paid_amount,
                                   b.payment_notes,
-                                  b.payment_date
+                                  b.payment_date,
+                                  b.profile_uuid
                            FROM Users u
                                     JOIN Bookings b ON u.id = b.user_id
                            """
@@ -374,6 +375,7 @@ def get_all_bookings() -> list[BookingWithTimestamp]:
                     payment_date=row[19],
                     profession_ids=profession_ids,
                     material_ids=material_ids,
+                    profile_uuid=row[20]
                 )
                 bookings.append(booking)
             duration = time.time() - start_time

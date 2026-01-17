@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import {Search as SearchIcon} from '@mui/icons-material';
 import type {BookingWithTimestamp, FormContent} from '../../../userArea/interface';
-import type {UserWithAssignments, UserListFilters} from '../types';
+import type {UserWithAssignments, UserListFilters, ShiftAssignment} from '../types';
 import UserItem from './UserItem';
 import {matchesSearch, matchesAssignment, matchesAcceptanceFilter} from './userListHelpers';
 
