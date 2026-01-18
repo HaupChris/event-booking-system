@@ -9,9 +9,10 @@ import {
   Tooltip,
   IconButton,
   ClickAwayListener,
+  useTheme,
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
-import { spacePalette } from '../../styles/theme';
+import { useThemeMode } from '../../styles/theme';
 import type { SxProps, Theme } from '@mui/material/styles';
 
 interface FormCardProps {
@@ -53,6 +54,8 @@ const FormCard: React.FC<FormCardProps> = ({
 }) => {
   // State to manage tooltip open state for mobile
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const theme = useTheme();
+  const { mode } = useThemeMode();
 
   const handleTooltipClose = () => {
     setTooltipOpen(false);
@@ -62,23 +65,38 @@ const FormCard: React.FC<FormCardProps> = ({
     setTooltipOpen(true);
   };
 
+  // Theme-aware styling
+  const getCardBackground = () => {
+    if (mode === 'circus') {
+      return alpha(theme.palette.background.paper, 0.8);
+    }
+    return alpha('#020c1b', 0.7);
+  };
+
+  const getFooterBackground = () => {
+    if (mode === 'circus') {
+      return alpha('#704214', 0.3);
+    }
+    return alpha('#010a18', 0.5);
+  };
+
   return (
     <Paper
       elevation={elevation}
       sx={{
-        backgroundColor: alpha('#020c1b', 0.7),
-        borderRadius: '10px',
+        backgroundColor: getCardBackground(),
+        borderRadius: mode === 'circus' ? '8px' : '10px',
         border: selected ? '2px solid' : '1px solid',
-        borderColor: selected ? spacePalette.primary.main : alpha(spacePalette.primary.main, 0.3),
+        borderColor: selected ? theme.palette.primary.main : alpha(theme.palette.primary.main, 0.3),
         position: 'relative',
         overflow: 'hidden',
         paddingX: 2,
         marginTop: 2,
-        boxShadow: selected ? `0 0 12px ${alpha(spacePalette.primary.main, 0.3)}` : 'none',
+        boxShadow: selected ? `0 0 12px ${alpha(theme.palette.primary.main, 0.3)}` : 'none',
         ...sx,
       }}
     >
-      {/* Optional scanning animation for selected items */}
+      {/* Optional animation for selected items */}
       {selected && (
         <Box
           sx={{
@@ -93,14 +111,20 @@ const FormCard: React.FC<FormCardProps> = ({
               content: '""',
               position: 'absolute',
               width: '100%',
-              height: '2px',
-              background: `linear-gradient(to right, transparent, ${spacePalette.primary.main}, transparent)`,
+              height: mode === 'circus' ? '100%' : '2px',
+              background: mode === 'circus'
+                ? `radial-gradient(circle at center, ${alpha(theme.palette.primary.main, 0.2)}, transparent)`
+                : `linear-gradient(to right, transparent, ${theme.palette.primary.main}, transparent)`,
               top: 0,
-              animation: 'scanDown 2s infinite',
+              animation: mode === 'circus' ? 'glowPulse 2s infinite' : 'scanDown 2s infinite',
             },
             '@keyframes scanDown': {
               '0%': { transform: 'translateY(0)' },
               '100%': { transform: 'translateY(100%)' },
+            },
+            '@keyframes glowPulse': {
+              '0%, 100%': { opacity: 0.3 },
+              '50%': { opacity: 0.6 },
             },
           }}
         />
@@ -123,7 +147,7 @@ const FormCard: React.FC<FormCardProps> = ({
             <Box
               sx={{
                 mr: 1.5,
-                color: spacePalette.primary.main,
+                color: theme.palette.primary.main,
                 display: 'flex',
                 alignItems: 'center',
               }}
@@ -142,7 +166,7 @@ const FormCard: React.FC<FormCardProps> = ({
               <Typography
                 variant="h6"
                 sx={{
-                  color: alpha('#fff', 0.9),
+                  color: theme.palette.text.primary,
                   fontWeight: 'medium',
                 }}
               >
@@ -190,7 +214,7 @@ const FormCard: React.FC<FormCardProps> = ({
                           color: 'text.primary',
                           boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
                           border: '1px solid',
-                          borderColor: alpha(spacePalette.primary.main, 0.2),
+                          borderColor: alpha(theme.palette.primary.main, 0.2),
                           borderRadius: 1,
                           p: 1.5,
                           maxWidth: 250,
@@ -203,10 +227,10 @@ const FormCard: React.FC<FormCardProps> = ({
                       size="small"
                       sx={{
                         p: 0.5,
-                        color: alpha(spacePalette.primary.main, 0.8),
+                        color: alpha(theme.palette.primary.main, 0.8),
                         '&:hover': {
-                          color: spacePalette.primary.main,
-                          backgroundColor: alpha(spacePalette.primary.main, 0.1),
+                          color: theme.palette.primary.main,
+                          backgroundColor: alpha(theme.palette.primary.main, 0.1),
                         },
                       }}
                     >
@@ -226,7 +250,7 @@ const FormCard: React.FC<FormCardProps> = ({
           <Typography
             variant="body2"
             sx={{
-              color: alpha('#fff', 0.7),
+              color: theme.palette.text.secondary,
               pl: icon ? 5 : 0, // Align with title
             }}
           >
@@ -251,7 +275,7 @@ const FormCard: React.FC<FormCardProps> = ({
         <>
           <Divider
             sx={{
-              borderColor: alpha(spacePalette.primary.main, 0.2),
+              borderColor: alpha(theme.palette.primary.main, 0.2),
               position: 'relative',
               zIndex: 2,
             }}
@@ -261,7 +285,7 @@ const FormCard: React.FC<FormCardProps> = ({
               p: 2,
               position: 'relative',
               zIndex: 2,
-              backgroundColor: alpha('#010a18', 0.5),
+              backgroundColor: getFooterBackground(),
             }}
           >
             {footer}

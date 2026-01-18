@@ -6,9 +6,10 @@ import {
   ListItemAvatar,
   Typography,
   alpha,
+  useTheme,
 } from '@mui/material';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
-import SpacePanelLayout from '../layouts/SpacePanelLayout';
+import ThemedFormLayout from '../layouts/ThemedFormLayout';
 import FormCard from '../display/FormCard';
 import SelectionOptionWithImage from '../display/SelectionOptionWithImage';
 import type { FoodOption } from '../../../form/userArea/interface';
@@ -34,6 +35,7 @@ interface FoodSelectionFormBaseProps {
 
 function FoodSelectionFormBase(props: FoodSelectionFormBaseProps) {
   const { texts, images } = props;
+  const theme = useTheme();
 
   // Function to handle food selection
   const handleFoodSelect = (id: number) => () => {
@@ -41,7 +43,7 @@ function FoodSelectionFormBase(props: FoodSelectionFormBaseProps) {
   };
 
   return (
-    <SpacePanelLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
+    <ThemedFormLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
       <List sx={{ p: { xs: 1, sm: 2 } }}>
         <FormCard selected={props.currentBooking.food_id === -1}>
           <ListItemButton
@@ -50,14 +52,14 @@ function FoodSelectionFormBase(props: FoodSelectionFormBaseProps) {
               py: 1.5,
               px: { xs: 2, sm: 3 },
               '&:hover': {
-                backgroundColor: alpha('#1e88e5', 0.1),
+                backgroundColor: alpha(theme.palette.primary.main, 0.1),
               },
             }}
           >
             <ListItemAvatar sx={{ minWidth: { xs: 36, sm: 40 } }}>
               <RestaurantIcon
                 sx={{
-                  color: alpha('#fff', 0.7),
+                  color: alpha(theme.palette.text.primary, 0.7),
                   fontSize: '1.5rem',
                 }}
               />
@@ -67,7 +69,7 @@ function FoodSelectionFormBase(props: FoodSelectionFormBaseProps) {
                 <Typography
                   variant="body1"
                   sx={{
-                    color: alpha('#fff', 0.9),
+                    color: theme.palette.text.primary,
                     fontWeight: 'medium',
                   }}
                 >
@@ -93,7 +95,7 @@ function FoodSelectionFormBase(props: FoodSelectionFormBaseProps) {
           );
         })}
       </List>
-    </SpacePanelLayout>
+    </ThemedFormLayout>
   );
 }
 

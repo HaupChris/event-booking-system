@@ -6,9 +6,10 @@ import {
   ListItemAvatar,
   Typography,
   alpha,
+  useTheme,
 } from '@mui/material';
 import LocalBarIcon from '@mui/icons-material/LocalBar';
-import SpacePanelLayout from '../layouts/SpacePanelLayout';
+import ThemedFormLayout from '../layouts/ThemedFormLayout';
 import FormCard from '../display/FormCard';
 import SelectionOptionWithImage from '../display/SelectionOptionWithImage';
 import type { BeverageOption } from '../../../form/userArea/interface';
@@ -34,6 +35,7 @@ interface BeverageSelectionFormBaseProps {
 
 function BeverageSelectionFormBase(props: BeverageSelectionFormBaseProps) {
   const { texts, getImageSource } = props;
+  const theme = useTheme();
 
   // Function to handle beverage selection
   const handleBeverageSelect = (id: number) => () => {
@@ -41,7 +43,7 @@ function BeverageSelectionFormBase(props: BeverageSelectionFormBaseProps) {
   };
 
   return (
-    <SpacePanelLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
+    <ThemedFormLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
       <List sx={{ p: { xs: 1, sm: 2 } }}>
         <FormCard selected={props.currentBooking.beverage_id === -1}>
           <ListItemButton
@@ -50,14 +52,14 @@ function BeverageSelectionFormBase(props: BeverageSelectionFormBaseProps) {
               py: 1.5,
               px: { xs: 2, sm: 3 },
               '&:hover': {
-                backgroundColor: alpha('#1e88e5', 0.1),
+                backgroundColor: alpha(theme.palette.primary.main, 0.1),
               },
             }}
           >
             <ListItemAvatar sx={{ minWidth: { xs: 36, sm: 40 } }}>
               <LocalBarIcon
                 sx={{
-                  color: alpha('#fff', 0.7),
+                  color: alpha(theme.palette.text.primary, 0.7),
                   fontSize: '1.5rem',
                 }}
               />
@@ -67,7 +69,7 @@ function BeverageSelectionFormBase(props: BeverageSelectionFormBaseProps) {
                 <Typography
                   variant="body1"
                   sx={{
-                    color: alpha('#fff', 0.9),
+                    color: theme.palette.text.primary,
                     fontWeight: 'medium',
                   }}
                 >
@@ -94,7 +96,7 @@ function BeverageSelectionFormBase(props: BeverageSelectionFormBaseProps) {
           );
         })}
       </List>
-    </SpacePanelLayout>
+    </ThemedFormLayout>
   );
 }
 

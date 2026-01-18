@@ -5,7 +5,8 @@ import {
     ListItem,
     Typography,
     Paper,
-    alpha
+    alpha,
+    useTheme
 } from '@mui/material';
 import React from 'react';
 import {PRIORITIES} from "../../../form/userArea/constants";
@@ -13,7 +14,6 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import Chip from '@mui/material/Chip';
 import WWSelect from "./WWSelect";
-import {spacePalette} from "../../styles/theme";
 import {ArrowCircleDown, ArrowCircleLeft, ArrowCircleUp, EventAvailable} from "@mui/icons-material";
 import CircularProgressWithLabel from "../feedback/CircularProgressWithLabel";
 
@@ -26,6 +26,7 @@ interface TimeSlotProps {
 }
 
 function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePriorities, currentBooking}: TimeSlotProps) {
+    const theme = useTheme();
     const timeslotAvailablePriorities = availablePriorities.concat([selectedPriority]).filter(p => p !== "");
 
     const options = timeslotAvailablePriorities.map(priority => ({
@@ -64,9 +65,9 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
     };
 
     const getPriorityBorderColor = () => {
-        if (selectedPriority === PRIORITIES.FIRST) return spacePalette.status.success; // success.main
-        if (selectedPriority === PRIORITIES.SECOND) return spacePalette.status.info; // info.main
-        if (selectedPriority === PRIORITIES.THIRD) return spacePalette.status.warning; // warning.main
+        if (selectedPriority === PRIORITIES.FIRST) return theme.palette.success?.main || '#4caf50';
+        if (selectedPriority === PRIORITIES.SECOND) return theme.palette.info?.main || '#2196f3';
+        if (selectedPriority === PRIORITIES.THIRD) return theme.palette.warning?.main || '#ff9800';
         return 'transparent';
     };
 
@@ -104,10 +105,10 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                 pageBreakInside: 'avoid',
                 mb: 2,
                 border: selectedPriority ? `2px solid ${getPriorityBorderColor()}` : '1px solid',
-                borderColor: selectedPriority ? getPriorityBorderColor() : alpha('#90caf9', 0.3),
+                borderColor: selectedPriority ? getPriorityBorderColor() : alpha(theme.palette.primary.main, 0.3),
                 borderRadius: '8px',
                 transition: 'all 0.3s ease',
-                background: alpha('#020c1b', 0.7),
+                background: alpha(theme.palette.background.paper, 0.7),
                 position: 'relative',
                 overflow: 'hidden',
                 boxShadow: selectedPriority
@@ -178,13 +179,12 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                     <Typography
                         component="div"
                         variant="body1"
-                        color="text.primary"
                         sx={{
                             width: '100%',
                             mb: 1,
                             fontWeight: 'medium',
                             fontSize: '1.1rem',
-                            color: alpha('#fff', 0.9)
+                            color: theme.palette.text.primary
                         }}
                     >
                         {timeSlot.title}
@@ -196,7 +196,7 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                             display: 'flex',
                             alignItems: 'center',
                             mb: 2,
-                            color: alpha('#fff', 0.7)
+                            color: alpha(theme.palette.text.primary, 0.7)
                         }}>
                             <AccessTimeIcon sx={{fontSize: '1rem', mr: 0.5}}/>
                             <Typography variant="body2" component="span">
@@ -209,11 +209,11 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        bgcolor: alpha('#000', 0.2),
+                        bgcolor: alpha(theme.palette.background.default, 0.3),
                         borderRadius: 1,
                         p: 1.5,
                         border: '1px solid',
-                        borderColor: alpha('#90caf9', 0.2),
+                        borderColor: alpha(theme.palette.primary.main, 0.2),
                     }}>
                         <Box sx={{
                             display: 'flex',
@@ -229,21 +229,21 @@ function TimeSlot({timeSlot, selectedPriority, updateBooking, availablePrioritie
 
                             {timeslotNumBooked > timeSlot.num_needed ? (
                                 <Box sx={{display: 'flex', alignItems: 'center'}}>
-                                    <EventBusyIcon sx={{color: '#f44336', fontSize: '1rem', mr: 0.5}}/>
-                                    <Typography variant="body2" sx={{color: alpha('#fff', 0.7)}}>
+                                    <EventBusyIcon sx={{color: theme.palette.error?.main || '#f44336', fontSize: '1rem', mr: 0.5}}/>
+                                    <Typography variant="body2" sx={{color: alpha(theme.palette.text.primary, 0.7)}}>
                                         Hohe Nachfrage – Zuteilung per Los
                                     </Typography>
                                 </Box>
-                            ) : timeslotNumBooked == timeSlot.num_needed ? (
+                            ) : timeslotNumBooked === timeSlot.num_needed ? (
                                     <Box sx={{display: 'flex', alignItems: 'center'}}>
-                                        <EventAvailable sx={{color: '#f44336', fontSize: '1rem', mr: 0.5}}/>
-                                        <Typography variant="body2" sx={{color: alpha('#fff', 0.7)}}>
+                                        <EventAvailable sx={{color: theme.palette.error?.main || '#f44336', fontSize: '1rem', mr: 0.5}}/>
+                                        <Typography variant="body2" sx={{color: alpha(theme.palette.text.primary, 0.7)}}>
                                             Anzahl erreicht
                                         </Typography>
                                     </Box>
                                 ) :
                                 <Box sx={{display: 'flex', alignItems: 'center'}}>
-                                    <Typography variant="body2" sx={{color: alpha('#fff', 0.7)}}>
+                                    <Typography variant="body2" sx={{color: alpha(theme.palette.text.primary, 0.7)}}>
                                         {timeslotNumBooked === 0 ? "Dringend gesucht" : "Interesse angemeldet"}
                                     </Typography>
                                 </Box>

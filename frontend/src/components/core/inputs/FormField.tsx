@@ -1,19 +1,48 @@
 // src/components/core/inputs/FormField.tsx
 import React from 'react';
 import type { TextFieldProps } from '@mui/material';
-import { TextField, InputAdornment, alpha } from '@mui/material';
-import { spacePalette } from '../../styles/theme';
+import { TextField, InputAdornment, alpha, useTheme } from '@mui/material';
+import { useThemeMode } from '../../styles/theme';
 
 interface FormFieldProps extends Omit<TextFieldProps, 'variant'> {
   icon?: React.ReactNode;
 }
 
-// const FormField: React.FC<FormFieldProps> = ({
-//                                                  icon,
-//                                                  ...props
-//                                              }) => {
 function FormField(props: FormFieldProps) {
   const icon = props.icon;
+  const theme = useTheme();
+  const { mode } = useThemeMode();
+
+  // Get theme-specific styles
+  const getFieldStyles = () => {
+    if (mode === 'circus') {
+      return {
+        backgroundColor: alpha('#4a2410', 0.4),
+        borderColor: alpha('#704214', 0.6),
+        borderColorHover: alpha(theme.palette.primary.main, 0.8),
+        borderColorFocused: theme.palette.primary.main,
+        labelColor: alpha(theme.palette.text.primary, 0.8),
+        labelColorFocused: theme.palette.primary.main,
+        inputColor: theme.palette.text.primary,
+        caretColor: theme.palette.primary.main,
+      };
+    }
+
+    // Space theme (default)
+    return {
+      backgroundColor: alpha('#020c1b', 0.7),
+      borderColor: alpha(theme.palette.primary.main, 0.3),
+      borderColorHover: alpha(theme.palette.primary.main, 0.5),
+      borderColorFocused: theme.palette.primary.main,
+      labelColor: alpha('#fff', 0.7),
+      labelColorFocused: theme.palette.primary.main,
+      inputColor: alpha('#fff', 0.9),
+      caretColor: theme.palette.primary.main,
+    };
+  };
+
+  const styles = getFieldStyles();
+
   return (
     <TextField
       variant="outlined"
@@ -25,7 +54,7 @@ function FormField(props: FormFieldProps) {
         startAdornment: icon ? (
           <InputAdornment position="start">
             {React.cloneElement(icon as React.ReactElement, {
-              sx: { color: spacePalette.primary.main },
+              sx: { color: theme.palette.primary.main },
             })}
           </InputAdornment>
         ) : (
@@ -36,36 +65,50 @@ function FormField(props: FormFieldProps) {
         mt: 0,
         mb: 2.5,
         '& .MuiOutlinedInput-root': {
-          backgroundColor: alpha('#020c1b', 0.7),
+          backgroundColor: styles.backgroundColor,
           borderRadius: '8px',
           '& fieldset': {
-            borderColor: alpha(spacePalette.primary.main, 0.3),
-            borderWidth: 1,
+            borderColor: styles.borderColor,
+            borderWidth: mode === 'circus' ? 2 : 1,
             transition: 'all 0.2s ease-in-out',
           },
           '&:hover fieldset': {
-            borderColor: alpha(spacePalette.primary.main, 0.5),
+            borderColor: styles.borderColorHover,
           },
           '&.Mui-focused fieldset': {
-            borderColor: spacePalette.primary.main,
+            borderColor: styles.borderColorFocused,
             borderWidth: 2,
+            ...(mode === 'circus' && {
+              boxShadow: `0 0 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+            }),
           },
           '&.Mui-error fieldset': {
-            borderColor: spacePalette.status.error,
+            borderColor: theme.palette.error?.main || '#f44336',
           },
         },
         '& .MuiInputLabel-root': {
-          color: alpha('#fff', 0.7),
+          color: styles.labelColor,
+          fontWeight: 500,
           '&.Mui-focused': {
-            color: spacePalette.primary.main,
+            color: styles.labelColorFocused,
+            fontWeight: 600,
           },
           '&.Mui-error': {
-            color: spacePalette.status.error,
+            color: theme.palette.error?.main || '#f44336',
+          },
+          // Improve floating label visibility
+          '&.MuiInputLabel-shrink': {
+            backgroundColor: mode === 'circus' ? '#2d1810' : '#020c1b',
+            paddingLeft: '6px',
+            paddingRight: '6px',
+            marginLeft: '-3px',
+            fontWeight: 600,
+            color: styles.labelColorFocused,
           },
         },
         '& .MuiInputBase-input': {
-          color: alpha('#fff', 0.9),
-          caretColor: spacePalette.primary.main,
+          color: styles.inputColor,
+          caretColor: styles.caretColor,
         },
         ...props.sx,
       }}

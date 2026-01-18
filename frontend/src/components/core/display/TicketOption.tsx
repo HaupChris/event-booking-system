@@ -1,9 +1,8 @@
 import type { TicketOption } from '../../../form/userArea/interface';
-import { alpha, Box, FormControlLabel, Paper, Radio, Typography } from '@mui/material';
+import { alpha, Box, FormControlLabel, Paper, Radio, Typography, useTheme } from '@mui/material';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import SignalWifiStatusbarConnectedNoInternet4Icon from '@mui/icons-material/SignalWifiStatusbarConnectedNoInternet4';
 import React from 'react';
-import { spacePalette } from '../../styles/theme';
 
 function TicketOptionComponent(props: {
   currentBooking: { ticket_id: number };
@@ -13,26 +12,28 @@ function TicketOptionComponent(props: {
   isLowStock?: boolean;
   maxCapacity?: number;
 }) {
-  const { remaining = 0, isLowStock = false, maxCapacity = 0 } = props;
-  const showRemainingCount = !props.soldOut && !isLowStock && remaining < maxCapacity;
+  const theme = useTheme();
+  const { remaining = 0, isLowStock = false } = props;
 
   return (
     <Paper
       elevation={0}
       sx={{
         mb: 2,
-        backgroundColor: alpha('#020c1b', 0.7),
+        backgroundColor: alpha(theme.palette.background.paper, 0.7),
         borderRadius: '8px',
         border: '1px solid',
         borderColor:
-          props.currentBooking.ticket_id === props.option.id ? '#1e88e5' : alpha('#90caf9', 0.3),
+          props.currentBooking.ticket_id === props.option.id
+            ? theme.palette.primary.main
+            : alpha(theme.palette.primary.main, 0.3),
         position: 'relative',
         overflow: 'hidden',
         width: '100%',
         // Glow effect for selected
         boxShadow:
           props.currentBooking.ticket_id === props.option.id
-            ? `0 0 12px ${alpha('#1e88e5', 0.3)}`
+            ? `0 0 12px ${alpha(theme.palette.primary.main, 0.3)}`
             : 'none',
       }}
     >
@@ -67,7 +68,7 @@ function TicketOptionComponent(props: {
               position: 'absolute',
               width: '100%',
               height: '2px',
-              background: 'linear-gradient(to right, transparent, #64b5f6, transparent)',
+              background: `linear-gradient(to right, transparent, ${theme.palette.primary.main}, transparent)`,
               top: 0,
               animation: 'scanDown 2s infinite',
             },
@@ -98,9 +99,9 @@ function TicketOptionComponent(props: {
               position: 'absolute',
               top: { xs: 12, sm: 14 },
               left: { xs: 8, sm: 12 },
-              color: alpha('#90caf9', 0.6),
+              color: alpha(theme.palette.primary.main, 0.6),
               '&.Mui-checked': {
-                color: '#64b5f6',
+                color: theme.palette.primary.main,
               },
               zIndex: 2,
             }}
@@ -141,7 +142,7 @@ function TicketOptionComponent(props: {
                 >
                   <FlightTakeoffIcon
                     sx={{
-                      color: '#64b5f6',
+                      color: theme.palette.primary.main,
                       fontSize: '1.1rem',
                       mr: 1,
                       ml: 1,
@@ -151,7 +152,7 @@ function TicketOptionComponent(props: {
                   <Typography
                     variant="body1"
                     sx={{
-                      color: alpha('#fff', 0.9),
+                      color: theme.palette.text.primary,
                       fontWeight: 'medium',
                       fontSize: { xs: '0.95rem', sm: '1rem' },
                     }}
@@ -200,12 +201,12 @@ function TicketOptionComponent(props: {
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      bgcolor: alpha('#1e88e5', 0.1),
+                      bgcolor: alpha(theme.palette.primary.main, 0.1),
                       p: 0.5,
                       px: 1.5,
                       borderRadius: '4px',
                       border: '1px solid',
-                      borderColor: alpha('#1e88e5', 0.3),
+                      borderColor: alpha(theme.palette.primary.main, 0.3),
                       flexShrink: 0,
                       ml: 'auto',
                     }}
@@ -213,7 +214,7 @@ function TicketOptionComponent(props: {
                     <Typography
                       variant="h6"
                       sx={{
-                        color: '#64b5f6',
+                        color: theme.palette.primary.main,
                         fontWeight: 'bold',
                         fontSize: { xs: '1.1rem', sm: '1.25rem' },
                       }}
@@ -233,15 +234,14 @@ function TicketOptionComponent(props: {
                     mt: 1,
                     pt: 1,
                     borderTop: '1px solid',
-                    borderColor: alpha('#90caf9', 0.2),
+                    borderColor: alpha(theme.palette.primary.main, 0.2),
                   }}
                 >
                   <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      // bgcolor: alpha('#ff9800', 0.1),
-                      bgcolor: alpha(spacePalette.status.warning, 0.1),
+                      bgcolor: alpha(theme.palette.warning?.main || '#ff9800', 0.1),
                       p: 0.5,
                       px: 1,
                       borderRadius: '4px',
@@ -250,7 +250,7 @@ function TicketOptionComponent(props: {
                     <Typography
                       variant="caption"
                       sx={{
-                        color: spacePalette.status.warning,
+                        color: theme.palette.warning?.main || '#ff9800',
                         fontWeight: 'medium',
                         fontSize: '0.7rem',
                       }}

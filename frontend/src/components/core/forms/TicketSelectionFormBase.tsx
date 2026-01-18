@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormControl, RadioGroup, Box } from '@mui/material';
-import SpacePanelLayout from '../layouts/SpacePanelLayout';
+import ThemedFormLayout from '../layouts/ThemedFormLayout';
 import TicketOptionComponent from '../display/TicketOption';
 import type { TicketOption } from '../../../form/userArea/interface';
 import { calculateDayVisitors, getMaxCapacityPerDay } from '../utils/CalculateNumberOfVisitors';
@@ -68,7 +68,7 @@ function TicketSelectionFormBase(props: TicketSelectionFormBaseProps) {
   };
 
   return (
-    <SpacePanelLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
+    <ThemedFormLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
       <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
         <FormControl
           component="fieldset"
@@ -99,7 +99,7 @@ function TicketSelectionFormBase(props: TicketSelectionFormBaseProps) {
           </RadioGroup>
         </FormControl>
       </Box>
-    </SpacePanelLayout>
+    </ThemedFormLayout>
   );
 }
 

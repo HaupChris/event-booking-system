@@ -9,7 +9,6 @@ import { AuthContext, TokenContext } from '../../../contexts/AuthContext';
 import axios from 'axios';
 import StepNavigation from '../navigation/StepNavigation';
 import { useFormManagement } from '../../../hooks/useFormManagement';
-import { spacePalette } from '../../styles/theme';
 import rocketImage from '../../../img/rocket.png';
 
 /**
@@ -18,7 +17,7 @@ import rocketImage from '../../../img/rocket.png';
 export interface RegistrationFormConfig<
   TBooking extends Record<string, any>,
   TFormContent extends Record<string, any>,
-  TFormSteps extends number,
+  _TFormSteps extends number = number,
 > {
   // Type factories
   getEmptyBooking: () => TBooking;
@@ -126,7 +125,7 @@ export function RegistrationFormContainer<
       .then((response) => {
         setFormContent(response.data);
       })
-      .catch((error) => {
+      .catch(() => {
         setAuth(false);
         setToken('');
       });
@@ -250,7 +249,7 @@ export function RegistrationFormContainer<
           }}
         >
           <Typography
-            color={spacePalette.text.primary}
+            color="text.primary"
             align="center"
             variant="h4"
             sx={{ paddingBottom: '1em' }}

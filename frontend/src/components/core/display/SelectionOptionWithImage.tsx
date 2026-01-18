@@ -1,5 +1,5 @@
 import FormCard from './FormCard';
-import { alpha, Avatar, Box, ListItem, ListItemButton, Typography } from '@mui/material';
+import { alpha, Avatar, Box, ListItem, ListItemButton, Typography, useTheme } from '@mui/material';
 import portholeImage from '../../../img/rocket_porthole.png';
 import React from 'react';
 import SpaIcon from '@mui/icons-material/Spa';
@@ -15,6 +15,8 @@ interface IProps {
 }
 
 function SelectionOptionWithImage(props: IProps) {
+  const theme = useTheme();
+
   // Check if description contains vegetarian or vegan keywords
   const isVegetarian =
     props.description.toLowerCase().includes('vegetarisch') ||
@@ -35,13 +37,13 @@ function SelectionOptionWithImage(props: IProps) {
           px: 1.5,
           borderRadius: '4px',
           border: '1px solid',
-          borderColor: alpha('#1e88e5', 0.3),
+          borderColor: alpha(theme.palette.primary.main, 0.3),
           ml: 2,
         }}
       >
         <Typography
           sx={{
-            color: '#64b5f6',
+            color: theme.palette.primary.main,
             fontWeight: 'bold',
             fontSize: '1.25rem',
           }}
@@ -78,7 +80,7 @@ function SelectionOptionWithImage(props: IProps) {
               position: 'absolute',
               width: '100%',
               height: '2px',
-              background: 'linear-gradient(to right, transparent, #64b5f6, transparent)',
+              background: `linear-gradient(to right, transparent, ${theme.palette.primary.main}, transparent)`,
               top: 0,
               animation: 'scanDown 2s infinite',
             },
@@ -107,7 +109,7 @@ function SelectionOptionWithImage(props: IProps) {
             position: 'relative',
             zIndex: 2,
             '&:hover': {
-              backgroundColor: alpha('#1e88e5', 0.1),
+              backgroundColor: alpha(theme.palette.primary.main, 0.1),
             },
           }}
         >
@@ -123,7 +125,7 @@ function SelectionOptionWithImage(props: IProps) {
             <Typography
               variant="h6"
               sx={{
-                color: alpha('#fff', 0.9),
+                color: theme.palette.text.primary,
                 fontWeight: 'medium',
                 mb: 1.5,
               }}
@@ -149,7 +151,7 @@ function SelectionOptionWithImage(props: IProps) {
                     width: 100,
                     height: 100,
                     border: '2px solid',
-                    borderColor: alpha('#1e88e5', 0.3),
+                    borderColor: alpha(theme.palette.primary.main, 0.3),
                     // objectFit: "cover", // Added to improve image display
                   }}
                 />
@@ -171,7 +173,7 @@ function SelectionOptionWithImage(props: IProps) {
               <Typography
                 variant="body2"
                 sx={{
-                  color: alpha('#fff', 0.7),
+                  color: alpha(theme.palette.text.primary, 0.7),
                   flexGrow: 1,
                 }}
               >
@@ -191,13 +193,13 @@ function SelectionOptionWithImage(props: IProps) {
               <Box
                 sx={{
                   alignSelf: 'flex-end',
-                  bgcolor: alpha('#1e88e5', 0.1),
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
                   mb: 2,
                   p: 0.5,
                   px: 1.5,
                   borderRadius: '4px',
                   border: '1px solid',
-                  borderColor: alpha('#1e88e5', 0.3),
+                  borderColor: alpha(theme.palette.primary.main, 0.3),
                 }}
               >
                 {/* Diet Badge positioned relative to the ListItem */}
@@ -205,7 +207,7 @@ function SelectionOptionWithImage(props: IProps) {
                 <Typography
                   variant="h6"
                   sx={{
-                    color: '#64b5f6',
+                    color: theme.palette.primary.main,
                     fontWeight: 'bold',
                     fontSize: '1.1rem',
                   }}
@@ -235,7 +237,7 @@ function SelectionOptionWithImage(props: IProps) {
                   width: 80,
                   height: 80,
                   border: '2px solid',
-                  borderColor: alpha('#1e88e5', 0.3),
+                  borderColor: alpha(theme.palette.primary.main, 0.3),
                   objectFit: 'cover', // Added to improve image display
                 }}
               />
@@ -258,7 +260,7 @@ function SelectionOptionWithImage(props: IProps) {
               <Typography
                 variant="h6"
                 sx={{
-                  color: alpha('#fff', 0.9),
+                  color: theme.palette.text.primary,
                   fontWeight: 'medium',
                   mb: 0.5,
                 }}
@@ -268,7 +270,7 @@ function SelectionOptionWithImage(props: IProps) {
               <Typography
                 variant="body2"
                 sx={{
-                  color: alpha('#fff', 0.7),
+                  color: alpha(theme.palette.text.primary, 0.7),
                 }}
               >
                 {props.description}
@@ -280,19 +282,19 @@ function SelectionOptionWithImage(props: IProps) {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                bgcolor: alpha('#1e88e5', 0.1),
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
                 p: 0.5,
                 px: 1.5,
                 borderRadius: '4px',
                 border: '1px solid',
-                borderColor: alpha('#1e88e5', 0.3),
+                borderColor: alpha(theme.palette.primary.main, 0.3),
                 ml: 2,
               }}
             >
               <Typography
                 variant="h6"
                 sx={{
-                  color: '#64b5f6',
+                  color: theme.palette.primary.main,
                   fontWeight: 'bold',
                   fontSize: '1.25rem',
                 }}

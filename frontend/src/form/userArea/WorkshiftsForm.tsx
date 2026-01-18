@@ -7,7 +7,8 @@ import {
     Divider,
     List,
     Typography,
-    alpha
+    alpha,
+    useTheme
 } from "@mui/material";
 import {Engineering, PersonAdd} from "@mui/icons-material";
 import {PRIORITIES} from "./constants";
@@ -15,7 +16,7 @@ import {PRIORITIES} from "./constants";
 import '../../css/workShift.css';
 
 import type {TimeSlot} from "./interface";
-import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
+import ThemedFormLayout from "../../components/core/layouts/ThemedFormLayout";
 import FormCard from "../../components/core/display/FormCard";
 import FormField from "../../components/core/inputs/FormField";
 import WWSelect from "../../components/core/inputs/WWSelect";
@@ -27,6 +28,7 @@ function HelpIcon() {
 }
 
 function WorkShiftForm(props: FormProps) {
+    const theme = useTheme();
     const [availablePriorities, setAvailablePriorities] = useState<string[]>([
         PRIORITIES.FIRST,
         PRIORITIES.SECOND,
@@ -123,7 +125,7 @@ function WorkShiftForm(props: FormProps) {
         return 0;
     }
 
-    return <SpacePanelLayout
+    return <ThemedFormLayout
         missionBriefing={userAreaTexts.workshiftsForm.missionBriefing}
         footerId={userAreaTexts.workshiftsForm.footerId}
     >
@@ -135,7 +137,7 @@ function WorkShiftForm(props: FormProps) {
             sx={{mb: 3}}
         />
         <FormCard
-            icon={<Engineering sx={{color: '#64b5f6', mr: 1}}/>}
+            icon={<Engineering sx={{color: theme.palette.primary.main, mr: 1}}/>}
             title={userAreaTexts.workshiftsForm.shiftsCountTitle}
             description={userAreaTexts.workshiftsForm.shiftsCountHelperText}
             // tooltipText={userAreaTexts.workshiftsForm.shiftsCountHelperText}
@@ -152,7 +154,7 @@ function WorkShiftForm(props: FormProps) {
         <FormCard
             title={userAreaTexts.workshiftsForm.crewPartner}
             description={userAreaTexts.workshiftsForm.crewPartnerDescription}
-            icon={<PersonAdd sx={{color: '#64b5f6', mr: 1}}/>}
+            icon={<PersonAdd sx={{color: theme.palette.primary.main, mr: 1}}/>}
             sx={{marginTop: 3, marginBottom: 3}}
         >
             <Box sx={{
@@ -188,13 +190,13 @@ function WorkShiftForm(props: FormProps) {
             mb: 2,
             mt: 4,
             borderBottom: '1px solid',
-            borderColor: alpha('#64b5f6', 0.3),
+            borderColor: alpha(theme.palette.primary.main, 0.3),
             pb: 1
         }}>
             <Typography
                 variant="h6"
                 sx={{
-                    color: '#64b5f6',
+                    color: theme.palette.primary.main,
                     fontWeight: 'medium'
                 }}
             >
@@ -219,14 +221,14 @@ function WorkShiftForm(props: FormProps) {
                             <Divider
                                 sx={{
                                     my: 3,
-                                    borderColor: alpha('#64b5f6', 0.2),
+                                    borderColor: alpha(theme.palette.primary.main, 0.2),
                                 }}
                             />
                         )}
                     </React.Fragment>
                 ))}
         </List>
-    </SpacePanelLayout>
+    </ThemedFormLayout>
 }
 
 export default WorkShiftForm;

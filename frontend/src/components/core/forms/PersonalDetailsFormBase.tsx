@@ -8,6 +8,7 @@ import {
   Paper,
   alpha,
   Chip,
+  useTheme,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
@@ -15,10 +16,9 @@ import SmartphoneIcon from '@mui/icons-material/Smartphone';
 import BadgeIcon from '@mui/icons-material/Badge';
 import WorkIcon from '@mui/icons-material/Work';
 import FormField from '../inputs/FormField';
-import SpacePanelLayout from '../layouts/SpacePanelLayout';
+import ThemedFormLayout from '../layouts/ThemedFormLayout';
 import MissionHeading from '../display/MissionHeading';
 import FormCard from '../display/FormCard';
-import { spacePalette } from '../../styles/theme';
 import type { Profession } from '../../../form/userArea/interface';
 
 interface PersonalDetailsTextProps {
@@ -59,6 +59,8 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
     professionIdsField = 'profession_ids',
   } = props;
 
+  const theme = useTheme();
+
   const handleProfessionToggle = (professionId: number) => {
     const currentIds = [...props.currentBooking[professionIdsField]];
     const index = currentIds.indexOf(professionId);
@@ -78,7 +80,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
   );
 
   return (
-    <SpacePanelLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
+    <ThemedFormLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
       {/* Event date information */}
       <MissionHeading
         title={texts.title}
@@ -147,7 +149,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
 
         {selectedProfessions.length > 0 && (
           <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1, color: alpha('#fff', 0.8) }}>
+            <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.text.secondary }}>
               {texts.selectedProfessions(selectedProfessions.length)}
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -160,7 +162,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
                   icon={<WorkIcon sx={{ fontSize: '0.8rem !important' }} />}
                   sx={{
                     fontWeight: 'medium',
-                    bgcolor: alpha('#1e88e5', 0.2),
+                    bgcolor: alpha(theme.palette.primary.main, 0.2),
                     '& .MuiChip-label': { px: 1 },
                   }}
                   onDelete={() => handleProfessionToggle(profession.id)}
@@ -184,12 +186,12 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
                     backgroundColor: props.currentBooking[professionIdsField].includes(
                       profession.id
                     )
-                      ? alpha(spacePalette.primary.main, 0.1)
-                      : alpha('#020c1b', 0.7),
+                      ? alpha(theme.palette.primary.main, 0.15)
+                      : alpha(theme.palette.background.paper, 0.7),
                     border: '1px solid',
                     borderColor: props.currentBooking[professionIdsField].includes(profession.id)
-                      ? alpha(spacePalette.primary.main, 0.5)
-                      : alpha('#90caf9', 0.3),
+                      ? alpha(theme.palette.primary.main, 0.5)
+                      : alpha(theme.palette.primary.main, 0.2),
                     transition: 'all 0.2s ease',
                   }}
                 >
@@ -205,7 +207,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
                       <Typography
                         variant="body1"
                         sx={{
-                          color: alpha('#fff', 0.9),
+                          color: theme.palette.text.primary,
                           fontWeight: props.currentBooking[professionIdsField].includes(
                             profession.id
                           )
@@ -223,7 +225,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
           </Box>
         </FormCard>
       </Box>
-    </SpacePanelLayout>
+    </ThemedFormLayout>
   );
 }
 

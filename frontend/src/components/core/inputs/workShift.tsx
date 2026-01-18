@@ -1,5 +1,5 @@
 import type {Booking, WorkShift as WorkShiftType} from '../../../form/userArea/interface';
-import {Box, List, ListItem, Typography, alpha} from '@mui/material';
+import {Box, List, ListItem, Typography, alpha, useTheme} from '@mui/material';
 import React, {useEffect, useState} from 'react';
 import TimeSlot from './timeSlot';
 import '../../../css/workShift.css';
@@ -14,6 +14,7 @@ interface WorkShiftProps {
 }
 
 function WorkShift({workShift, currentBooking, updateBooking, availablePriorities}: WorkShiftProps) {
+    const theme = useTheme();
     const [sortedTimeSlots, setSortedTimeSlots] = useState(workShift.time_slots);
 
     useEffect(() => {
@@ -47,7 +48,7 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
                     alignItems: 'center',
                     mb: 1,
                 }}>
-                    <AssignmentIcon sx={{ color: '#64b5f6', mr: 1 }} />
+                    <AssignmentIcon sx={{ color: theme.palette.primary.main, mr: 1 }} />
                     <Typography
                         color="primary"
                         variant="h5"
@@ -61,7 +62,7 @@ function WorkShift({workShift, currentBooking, updateBooking, availablePrioritie
 
                 <Typography
                     sx={{
-                        color: alpha('#fff', 0.7),
+                        color: alpha(theme.palette.text.primary, 0.7),
                         pl: 4, // Align with title (after icon)
                     }}
                     variant="body2"

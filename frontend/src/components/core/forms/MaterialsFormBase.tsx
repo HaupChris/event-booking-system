@@ -9,15 +9,14 @@ import {
   Paper,
   Typography,
   alpha,
-  CircularProgress,
   Chip,
+  useTheme,
 } from '@mui/material';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import BackpackIcon from '@mui/icons-material/Backpack';
-import SpacePanelLayout from '../layouts/SpacePanelLayout';
+import ThemedFormLayout from '../layouts/ThemedFormLayout';
 import FormCard from '../display/FormCard';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { spacePalette } from '../../styles/theme';
 import type { Material } from '../../../form/userArea/interface';
 import CircularProgressWithLabel from '../feedback/CircularProgressWithLabel';
 
@@ -44,6 +43,7 @@ interface MaterialsFormBaseProps {
 
 function MaterialsFormBase(props: MaterialsFormBaseProps) {
   const { texts, materialsPropName = 'material_ids' } = props;
+  const theme = useTheme();
 
   function handleToggle(material_id: number) {
     if (props.currentBooking[materialsPropName].indexOf(material_id) === -1) {
@@ -59,29 +59,22 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
     }
   }
 
-  // Get dynamic styling for the capacity indicator
-  const getCapacityColor = (numBooked: number, numNeeded: number) => {
-    if (numBooked >= numNeeded) return spacePalette.status.error;
-    if (numBooked / numNeeded > 0.7) return spacePalette.status.warning;
-    return spacePalette.status.success;
-  };
-
   // Get materials array from appropriate prop in formContent
   const materials = props.formContent.materials || [];
 
   return (
-    <SpacePanelLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
+    <ThemedFormLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
       <FormCard
         elevation={2}
         sx={{ border: 'None' }}
         title={texts.materialsTitle}
-        icon={<BackpackIcon sx={{ color: spacePalette.primary.main, mr: 1, fontSize: '1.5rem' }} />}
+        icon={<BackpackIcon sx={{ color: theme.palette.primary.main, mr: 1, fontSize: '1.5rem' }} />}
       >
         {props.currentBooking[materialsPropName].length > 0 && (
           <FormCard
             selected={true}
             icon={
-              <InventoryIcon sx={{ color: spacePalette.primary.main, fontSize: '1.2rem', mr: 1 }} />
+              <InventoryIcon sx={{ color: theme.palette.primary.main, fontSize: '1.2rem', mr: 1 }} />
             }
             title={texts.bringingItems(props.currentBooking[materialsPropName].length)}
           >
@@ -97,7 +90,7 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
                     icon={<CheckCircleIcon />}
                     sx={{
                       fontWeight: 'medium',
-                      bgcolor: alpha('#1e88e5', 0.2),
+                      bgcolor: alpha(theme.palette.primary.main, 0.2),
                       '& .MuiChip-label': { px: 1 },
                       margin: 0.5,
                     }}
@@ -122,7 +115,6 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
               const isSelected =
                 props.currentBooking[materialsPropName].indexOf(material.id) !== -1;
               const num_booked = material.num_booked + (isSelected ? 1 : 0);
-              const capacityColor = getCapacityColor(num_booked, material.num_needed);
 
               return (
                 <Paper
@@ -130,13 +122,17 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
                   key={material.id}
                   sx={{
                     mb: 2,
-                    backgroundColor: alpha('#020c1b', 0.7),
+                    backgroundColor: alpha(theme.palette.background.paper, 0.7),
                     borderRadius: '8px',
                     border: isSelected ? '2px solid' : '1px solid',
-                    borderColor: isSelected ? '#1e88e5' : alpha('#90caf9', 0.3),
+                    borderColor: isSelected
+                      ? theme.palette.primary.main
+                      : alpha(theme.palette.primary.main, 0.3),
                     position: 'relative',
                     overflow: 'hidden',
-                    boxShadow: isSelected ? `0 0 12px ${alpha('#1e88e5', 0.3)}` : 'none',
+                    boxShadow: isSelected
+                      ? `0 0 12px ${alpha(theme.palette.primary.main, 0.3)}`
+                      : 'none',
                   }}
                 >
                   {/* Futuristic scanner line animation for selected option */}
@@ -155,8 +151,7 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
                           position: 'absolute',
                           width: '100%',
                           height: '2px',
-                          background:
-                            'linear-gradient(to right, transparent, #1e88e5, transparent)',
+                          background: `linear-gradient(to right, transparent, ${theme.palette.primary.main}, transparent)`,
                           top: 0,
                           animation: 'scanDown 2s infinite',
                         },
@@ -181,7 +176,7 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
                         py: 1.5,
                         px: { xs: 2, sm: 2.5 },
                         '&:hover': {
-                          backgroundColor: alpha('#1e88e5', 0.1),
+                          backgroundColor: alpha(theme.palette.primary.main, 0.1),
                         },
                       }}
                     >
@@ -198,7 +193,7 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
                           <Typography
                             variant={'subtitle1'}
                             sx={{
-                              color: alpha('#fff', 0.9),
+                              color: theme.palette.text.primary,
                               fontWeight: isSelected ? 'medium' : 'normal',
                             }}
                           >
@@ -212,9 +207,9 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
                         checked={isSelected}
                         inputProps={{ 'aria-labelledby': labelId }}
                         sx={{
-                          color: alpha('#64b5f6', 0.7),
+                          color: alpha(theme.palette.primary.main, 0.7),
                           '&.Mui-checked': {
-                            color: '#64b5f6',
+                            color: theme.palette.primary.main,
                           },
                         }}
                       />
@@ -225,7 +220,7 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
             })}
         </List>
       </FormCard>
-    </SpacePanelLayout>
+    </ThemedFormLayout>
   );
 }
 
