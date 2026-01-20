@@ -3,7 +3,7 @@ import { alpha, Avatar, Box, ListItem, ListItemButton, Typography, useTheme } fr
 import portholeImage from '../../../img/rocket_porthole.png';
 import React from 'react';
 import SpaIcon from '@mui/icons-material/Spa';
-import { Park } from '@mui/icons-material'; // For vegan
+import { Park } from '@mui/icons-material';
 
 interface IProps {
   selected: boolean;
@@ -146,7 +146,7 @@ function SelectionOptionWithImage(props: IProps) {
                 <Avatar
                   alt={props.title}
                   src={props.imageSource}
-                  // variant="rounded"  // Changed to reduce pixelation
+                  variant="rounded"
                   sx={{
                     width: 100,
                     height: 100,
@@ -233,6 +233,7 @@ function SelectionOptionWithImage(props: IProps) {
               <Avatar
                 alt={props.title}
                 src={props.imageSource}
+                variant="rounded"
                 sx={{
                   width: 80,
                   height: 80,

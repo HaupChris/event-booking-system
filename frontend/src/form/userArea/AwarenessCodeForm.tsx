@@ -16,7 +16,7 @@ import NoRacism from "../../assets/icons/no-racism.png";
 import Partiality from "../../assets/icons/partiality.png";
 import {Balance} from "@mui/icons-material";
 import FormCard from "../../components/core/display/FormCard";
-import SpacePanelLayout from "../../components/core/layouts/SpacePanelLayout";
+import ThemedFormLayout from "../../components/core/layouts/ThemedFormLayout";
 import {userAreaTexts} from "../constants/texts";
 
 
@@ -32,7 +32,7 @@ function AwarenessCodeForm() {
         <Balance color={"secondary"} fontSize={"large"}/>,
     ];
 
-    return <SpacePanelLayout
+    return <ThemedFormLayout
         missionBriefing={userAreaTexts.awarenessCodeForm.missionBriefing}
         footerId={userAreaTexts.awarenessCodeForm.footerId}
     >
@@ -40,6 +40,7 @@ function AwarenessCodeForm() {
         <List sx={{width: '100%'}}>
             {userAreaTexts.awarenessCodeForm.codeRules.map((item, index) => (
                 <FormCard
+                    key={index}
                     sx={{mt: 2, pl:0, pr: 2}}
                 >
                     {/* Circuit background decoration */}
@@ -52,9 +53,9 @@ function AwarenessCodeForm() {
                         opacity: 0.03,
                         zIndex: 0,
                         backgroundImage: `
-                     radial-gradient(circle, #64b5f6 1px, transparent 1px),
-                     linear-gradient(to right, transparent 4px, #64b5f6 1px, transparent 1px),
-                     linear-gradient(to bottom, transparent 4px, #64b5f6 1px, transparent 1px)
+                     radial-gradient(circle, ${theme.palette.primary.main} 1px, transparent 1px),
+                     linear-gradient(to right, transparent 4px, ${theme.palette.primary.main} 1px, transparent 1px),
+                     linear-gradient(to bottom, transparent 4px, ${theme.palette.primary.main} 1px, transparent 1px)
                    `,
                         backgroundSize: '20px 20px, 10px 10px, 10px 10px',
                         backgroundPosition: '0 0, 10px 0, 0 10px',
@@ -74,7 +75,7 @@ function AwarenessCodeForm() {
                                     variant="h6"
                                     component="div"
                                     sx={{
-                                        color: '#64b5f6',
+                                        color: theme.palette.primary.main,
                                         fontWeight: 'medium',
                                         mb: 1,
                                     }}
@@ -85,26 +86,26 @@ function AwarenessCodeForm() {
                             secondary={
                                 <Box sx={{
                                     display: "flex",
-                                    alignItems: "center", // This aligns items vertically in the center
+                                    alignItems: "center",
                                     justifyContent: "flex-start",
                                     flexDirection: "row",
-                                    gap: 1, // Add some spacing between avatar and text
+                                    gap: 1,
                                 }}>
                                     {/* Modified ListItemAvatar */}
                                     <Box
                                         sx={{
                                             display: "flex",
-                                            alignItems: "center", // Vertical center alignment
-                                            justifyContent: "center", // Horizontal center alignment
-                                            minWidth: {xs: 80, sm: 120}, // Give it some minimum width
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            minWidth: {xs: 80, sm: 120},
                                         }}
                                     >
                                         <Avatar
                                             sx={{
-                                                bgcolor: alpha('#1e88e5', 0.1),
+                                                bgcolor: alpha(theme.palette.primary.main, 0.1),
                                                 border: '1px solid',
-                                                borderColor: alpha('#64b5f6', 0.5),
-                                                boxShadow: '0 0 10px rgba(100, 181, 246, 0.2)',
+                                                borderColor: alpha(theme.palette.primary.main, 0.5),
+                                                boxShadow: `0 0 10px ${alpha(theme.palette.primary.main, 0.2)}`,
                                                 width: {xs:70, sm:100},
                                                 height: {xs:70, sm:100}
                                             }}
@@ -117,9 +118,9 @@ function AwarenessCodeForm() {
                                         variant="body2"
                                         component="div"
                                         sx={{
-                                            color: alpha('#fff', 0.8),
+                                            color: alpha(theme.palette.text.primary, 0.8),
                                             lineHeight: 1.6,
-                                            flex: 1, // This allows the text to take up remaining space
+                                            flex: 1,
                                         }}
                                     >
                                         {item.text}
@@ -131,7 +132,7 @@ function AwarenessCodeForm() {
                 </FormCard>
             ))}
         </List>
-    </SpacePanelLayout>
+    </ThemedFormLayout>
 }
 
 export default AwarenessCodeForm;

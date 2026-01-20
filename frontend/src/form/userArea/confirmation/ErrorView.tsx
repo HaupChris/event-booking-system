@@ -1,9 +1,8 @@
 import React from 'react';
-import {Box, Typography, Button, alpha} from '@mui/material';
+import {Box, Typography, Button, alpha, useTheme} from '@mui/material';
 import {ErrorOutline, Refresh} from '@mui/icons-material';
-import SpacePanelLayout from '../../../components/core/layouts/SpacePanelLayout';
+import ThemedFormLayout from '../../../components/core/layouts/ThemedFormLayout';
 import FormCard from '../../../components/core/display/FormCard';
-import {spacePalette} from '../../../components/styles/theme';
 import {userAreaTexts} from "../../constants/texts";
 
 interface ErrorViewProps {
@@ -11,7 +10,9 @@ interface ErrorViewProps {
 }
 
 const ErrorView: React.FC<ErrorViewProps> = ({onRetry}) => {
-    return <SpacePanelLayout
+    const theme = useTheme();
+
+    return <ThemedFormLayout
         missionBriefing={userAreaTexts.confirmationForm.errorView.missionBriefing}
         footerId={userAreaTexts.confirmationForm.errorView.footerId}
     >
@@ -22,11 +23,11 @@ const ErrorView: React.FC<ErrorViewProps> = ({onRetry}) => {
                 alignItems: 'center',
                 p: 2
             }}>
-                <ErrorOutline sx={{color: spacePalette.status.error, fontSize: 60, mb: 1}}/>
+                <ErrorOutline sx={{color: theme.palette.error?.main || '#f44336', fontSize: 60, mb: 1}}/>
                 <Typography
                     variant="h5"
                     fontWeight="bold"
-                    sx={{color: alpha('#fff', 0.9)}}
+                    sx={{color: theme.palette.text.primary}}
                 >
                     {userAreaTexts.confirmationForm.errorView.title}
                 </Typography>
@@ -37,7 +38,7 @@ const ErrorView: React.FC<ErrorViewProps> = ({onRetry}) => {
             variant="body1"
             paragraph
             align="center"
-            sx={{color: alpha('#fff', 0.8)}}
+            sx={{color: alpha(theme.palette.text.primary, 0.8)}}
         >
             {userAreaTexts.confirmationForm.errorView.subtitle}
         </Typography>
@@ -49,7 +50,7 @@ const ErrorView: React.FC<ErrorViewProps> = ({onRetry}) => {
                 py: 2,
                 mb: 0,
                 '& > li': {
-                    color: alpha('#fff', 0.8),
+                    color: alpha(theme.palette.text.primary, 0.8),
                     mb: 1,
                 }
             }}>
@@ -66,7 +67,7 @@ const ErrorView: React.FC<ErrorViewProps> = ({onRetry}) => {
             sx={{
                 textAlign: 'center',
                 mb: 3,
-                color: alpha('#fff', 0.8),
+                color: alpha(theme.palette.text.primary, 0.8),
             }}
         >
             {userAreaTexts.confirmationForm.errorView.contactInfo}
@@ -81,15 +82,11 @@ const ErrorView: React.FC<ErrorViewProps> = ({onRetry}) => {
             sx={{
                 mt: 2,
                 py: 1.5,
-                background: 'linear-gradient(45deg, #1e88e5, #64b5f6)',
-                '&:hover': {
-                    background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
-                }
             }}
         >
             {userAreaTexts.confirmationForm.errorView.retryButton}
         </Button>
-    </SpacePanelLayout>;
+    </ThemedFormLayout>;
 };
 
 export default ErrorView;

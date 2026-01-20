@@ -3,7 +3,7 @@ import { Box, Typography } from '@mui/material';
 import DrawIcon from '@mui/icons-material/Draw';
 import GavelIcon from '@mui/icons-material/Gavel';
 import SignaturePad from '../inputs/SignaturePad';
-import SpacePanelLayout from '../layouts/SpacePanelLayout';
+import ThemedFormLayout from '../layouts/ThemedFormLayout';
 import MissionHeading from '../display/MissionHeading';
 import FormCard from '../display/FormCard';
 
@@ -29,7 +29,7 @@ function SignatureFormBase(props: SignatureFormBaseProps) {
   const { texts } = props;
 
   return (
-    <SpacePanelLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
+    <ThemedFormLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
       <MissionHeading title={texts.legalTitle} icon={<GavelIcon />} />
 
       {/* Legal Text */}
@@ -65,7 +65,7 @@ function SignatureFormBase(props: SignatureFormBaseProps) {
           </Typography>
         )}
       </Box>
-    </SpacePanelLayout>
+    </ThemedFormLayout>
   );
 }
 

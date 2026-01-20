@@ -1,8 +1,8 @@
 import React from 'react';
-import { Box, Typography, TextField, Button, IconButton, alpha } from '@mui/material';
+import { Box, Typography, TextField, Button, IconButton, alpha, useTheme } from '@mui/material';
 import { EuroSymbol, ContentCopy, OpenInNew } from '@mui/icons-material';
 import FormCard from '../../../components/core/display/FormCard';
-import { spacePalette } from '../../../components/styles/theme';
+import { useThemeMode } from '../../../components/styles/theme';
 import {userAreaTexts} from "../../constants/texts";
 
 interface PaymentInfoProps {
@@ -18,6 +18,16 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
   onCopy,
   onPaypalClick
 }) => {
+  const theme = useTheme();
+  const { mode } = useThemeMode();
+
+  const getTextFieldBackground = () => {
+    if (mode === 'circus') {
+      return alpha('#4a2410', 0.4);
+    }
+    return alpha('#020c1b', 0.4);
+  };
+
   return (
     <FormCard
         title={userAreaTexts.confirmationForm.paymentInfo.title}
@@ -29,7 +39,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
           <Typography
             variant="h4"
             fontWeight="bold"
-            sx={{ color: spacePalette.primary.main }}
+            sx={{ color: theme.palette.primary.main }}
           >
             {totalPrice}€
           </Typography>
@@ -38,7 +48,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
         <Box sx={{ mt: 3, mb: 3 }}>
           <Typography
             variant="subtitle2"
-            sx={{ color: alpha('#fff', 0.7), mb: 1 }}
+            sx={{ color: alpha(theme.palette.text.primary, 0.7), mb: 1 }}
           >
             {userAreaTexts.confirmationForm.paymentInfo.instructionsSubject}
           </Typography>
@@ -48,26 +58,27 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
               width: '100%',
               mb: 2,
               '& .MuiOutlinedInput-root': {
-                backgroundColor: alpha('#020c1b', 0.4),
+                backgroundColor: getTextFieldBackground(),
                 '& fieldset': {
-                  borderColor: alpha(spacePalette.primary.main, 0.3),
+                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                  borderWidth: mode === 'circus' ? 2 : 1,
                 },
                 '&:hover fieldset': {
-                  borderColor: alpha(spacePalette.primary.main, 0.5),
+                  borderColor: alpha(theme.palette.primary.main, 0.5),
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: spacePalette.primary.dark,
+                  borderColor: theme.palette.primary.dark,
                 },
               },
               '& .MuiInputBase-input': {
-                color: alpha('#fff', 0.9),
+                color: theme.palette.text.primary,
               },
             }}
             variant="outlined"
             InputProps={{
               endAdornment: (
                 <IconButton onClick={onCopy} size="small">
-                  <ContentCopy sx={{ color: alpha('#fff', 0.7) }} />
+                  <ContentCopy sx={{ color: alpha(theme.palette.text.primary, 0.7) }} />
                 </IconButton>
               ),
               readOnly: true
@@ -78,7 +89,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
 
           <Typography
             variant="body2"
-            sx={{ mb: 3, color: alpha('#fff', 0.6) }}
+            sx={{ mb: 3, color: alpha(theme.palette.text.primary, 0.6) }}
           >
                     {userAreaTexts.confirmationForm.paymentInfo.subjectHelp}
           </Typography>
@@ -95,10 +106,6 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
               fontSize: '1.1rem',
               boxShadow: 3,
               textTransform: 'none',
-              background: 'linear-gradient(45deg, #1e88e5, #64b5f6)',
-              '&:hover': {
-                background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
-              }
             }}
           >
                     {userAreaTexts.confirmationForm.paymentInfo.paypalButton}
@@ -108,7 +115,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
         <Box sx={{ mt: 2 }}>
           <Typography
             variant="body2"
-            sx={{ textAlign: 'center', color: alpha('#fff', 0.6) }}
+            sx={{ textAlign: 'center', color: alpha(theme.palette.text.primary, 0.6) }}
           >
                     {userAreaTexts.confirmationForm.paymentInfo.alternativePayment}
           </Typography>

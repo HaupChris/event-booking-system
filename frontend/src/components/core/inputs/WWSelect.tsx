@@ -1,4 +1,3 @@
-// src/components/core/inputs/SpaceSelect.tsx
 import type { ReactNode } from 'react';
 import React from 'react';
 import type {
@@ -10,10 +9,11 @@ import {
   MenuItem,
   Typography,
   IconButton,
-  alpha
+  alpha,
+  useTheme
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { spacePalette } from '../../styles/theme';
+import { useThemeMode } from '../../styles/theme';
 import type { SxProps, Theme } from '@mui/material/styles';
 
 export interface SpaceSelectOption {
@@ -43,12 +43,14 @@ const WWSelect: React.FC<WWSelectProps> = ({
   allowClear = false,
   isFullWidth = false,
   disabled = false,
-  label,
   renderCustomValue,
   sx,
   minWidth = { xs: '100%', sm: '200px' },
   ...selectProps
 }) => {
+  const theme = useTheme();
+  const { mode } = useThemeMode();
+
   const handleChange = (event: SelectChangeEvent<unknown>) => {
     onChange(event.target.value as string | number);
   };
@@ -61,6 +63,21 @@ const WWSelect: React.FC<WWSelectProps> = ({
   // Determine if the value is selected (not null/undefined/empty string)
   const hasValue = value !== null && value !== undefined && value !== '';
 
+  // Theme-aware styling
+  const getBackgroundColor = () => {
+    if (mode === 'circus') {
+      return alpha('#4a2410', 0.4);
+    }
+    return alpha('#020c1b', 0.4);
+  };
+
+  const getMenuBackgroundColor = () => {
+    if (mode === 'circus') {
+      return alpha('#2d1810', 0.98);
+    }
+    return alpha('#020c1b', 0.95);
+  };
+
   return (
     <Select
       value={value !== null && value !== undefined ? value : ''}
@@ -71,20 +88,20 @@ const WWSelect: React.FC<WWSelectProps> = ({
       renderValue={(selected) => {
         if (!selected) {
           return (
-            <Typography variant="body2" sx={{ color: alpha('#fff', 0.5) }}>
+            <Typography variant="body2" sx={{ color: alpha(theme.palette.text.primary, 0.5) }}>
               {placeholder}
             </Typography>
           );
         }
-        
+
         if (renderCustomValue) {
           return renderCustomValue(selected as string | number);
         }
-        
+
         // Find the matching option to display its label
         const selectedOption = options.find(opt => opt.value === selected);
         return (
-          <Typography variant="body2" sx={{ color: alpha('#fff', 0.9) }}>
+          <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
             {selectedOption ? selectedOption.label : String(selected)}
           </Typography>
         );
@@ -95,7 +112,7 @@ const WWSelect: React.FC<WWSelectProps> = ({
             onClick={handleClear}
             size="small"
             edge="end"
-            sx={{ marginRight: 2, color: alpha('#fff', 0.7) }}
+            sx={{ marginRight: 2, color: alpha(theme.palette.text.primary, 0.7) }}
           >
             <Close fontSize="small" />
           </IconButton>
@@ -104,42 +121,46 @@ const WWSelect: React.FC<WWSelectProps> = ({
       sx={{
         minWidth: minWidth,
         borderRadius: "8px",
-        bgcolor: alpha('#020c1b', 0.4),
+        bgcolor: getBackgroundColor(),
         '& .MuiOutlinedInput-notchedOutline': {
-          borderColor: alpha(spacePalette.primary.main, 0.3),
+          borderColor: alpha(theme.palette.primary.main, 0.3),
+          borderWidth: mode === 'circus' ? 2 : 1,
         },
         '&:hover .MuiOutlinedInput-notchedOutline': {
-          borderColor: alpha(spacePalette.primary.main, 0.5),
+          borderColor: alpha(theme.palette.primary.main, 0.5),
         },
         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-          borderColor: spacePalette.primary.main,
+          borderColor: theme.palette.primary.main,
+          ...(mode === 'circus' && {
+            boxShadow: `0 0 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+          }),
         },
         '& .MuiSelect-select': {
-          color: alpha('#fff', 0.9),
+          color: theme.palette.text.primary,
           py: 1.25,
         },
         '& .MuiSvgIcon-root': {
-          color: alpha('#fff', 0.7),
+          color: alpha(theme.palette.text.primary, 0.7),
         },
         ...sx
       }}
       MenuProps={{
         PaperProps: {
           sx: {
-            bgcolor: alpha('#020c1b', 0.95),
+            bgcolor: getMenuBackgroundColor(),
             borderRadius: '8px',
-            border: '1px solid',
-            borderColor: alpha(spacePalette.primary.main, 0.3),
+            border: mode === 'circus' ? '2px solid' : '1px solid',
+            borderColor: alpha(theme.palette.primary.main, 0.3),
             boxShadow: `0 4px 20px rgba(0, 0, 0, 0.5)`,
             '& .MuiMenuItem-root': {
-              color: alpha('#fff', 0.9),
+              color: theme.palette.text.primary,
               '&:hover': {
-                bgcolor: alpha(spacePalette.primary.main, 0.1),
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
               },
               '&.Mui-selected': {
-                bgcolor: alpha(spacePalette.primary.main, 0.2),
+                bgcolor: alpha(theme.palette.primary.main, 0.2),
                 '&:hover': {
-                  bgcolor: alpha(spacePalette.primary.main, 0.3),
+                  bgcolor: alpha(theme.palette.primary.main, 0.3),
                 },
               },
             },

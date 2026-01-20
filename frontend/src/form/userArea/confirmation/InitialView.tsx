@@ -1,9 +1,8 @@
 import React from 'react';
-import {Box, Typography, Button, Alert, CircularProgress, alpha} from '@mui/material';
+import {Box, Typography, Button, Alert, CircularProgress, alpha, useTheme} from '@mui/material';
 import {Check, SignalCellularNodata, RocketLaunch} from '@mui/icons-material';
-import SpacePanelLayout from '../../../components/core/layouts/SpacePanelLayout';
+import ThemedFormLayout from '../../../components/core/layouts/ThemedFormLayout';
 import FormCard from '../../../components/core/display/FormCard';
-import {spacePalette} from '../../../components/styles/theme';
 import {userAreaTexts} from "../../constants/texts";
 
 interface InitialViewProps {
@@ -21,8 +20,10 @@ const InitialView: React.FC<InitialViewProps> = ({
                                                      submissionAttempted,
                                                      onSubmit
                                                  }) => {
+    const theme = useTheme();
+
     return (
-        <SpacePanelLayout
+        <ThemedFormLayout
             missionBriefing={userAreaTexts.confirmationForm.initialView.missionBriefing}
             footerId={userAreaTexts.confirmationForm.initialView.footerId}
         >
@@ -33,12 +34,12 @@ const InitialView: React.FC<InitialViewProps> = ({
                     alignItems: 'center',
                     p: 2
                 }}>
-                    <RocketLaunch sx={{color: spacePalette.primary.main, fontSize: 60, mb: 1}}/>
+                    <RocketLaunch sx={{color: theme.palette.primary.main, fontSize: 60, mb: 1}}/>
                     <Typography
                         variant="h5"
                         align="center"
                         fontWeight="bold"
-                        sx={{color: alpha('#fff', 0.9)}}
+                        sx={{color: theme.palette.text.primary}}
                     >
                         {userAreaTexts.confirmationForm.initialView.title}
                     </Typography>
@@ -52,7 +53,7 @@ const InitialView: React.FC<InitialViewProps> = ({
                 sx={{
                     mt: 3,
                     fontSize: '1.1rem',
-                    color: alpha('#fff', 0.8),
+                    color: alpha(theme.palette.text.primary, 0.8),
                 }}
             >
                 {userAreaTexts.confirmationForm.initialView.subtitle}
@@ -62,9 +63,9 @@ const InitialView: React.FC<InitialViewProps> = ({
                 mt: 3,
                 p: 3,
                 borderRadius: '10px',
-                bgcolor: alpha(spacePalette.primary.dark, 0.1),
+                bgcolor: alpha(theme.palette.primary.dark, 0.1),
                 border: '1px solid',
-                borderColor: alpha(spacePalette.primary.dark, 0.3),
+                borderColor: alpha(theme.palette.primary.dark, 0.3),
                 display: "flex",
                 justifyContent: "center",
                 flexDirection: "column"
@@ -73,7 +74,7 @@ const InitialView: React.FC<InitialViewProps> = ({
                     variant="h6"
                     align="center"
                     gutterBottom
-                    sx={{color: alpha('#fff', 0.9)}}
+                    sx={{color: theme.palette.text.primary}}
                 >
                     {userAreaTexts.confirmationForm.initialView.totalContribution}
                 </Typography>
@@ -81,7 +82,7 @@ const InitialView: React.FC<InitialViewProps> = ({
                     variant="h4"
                     align="center"
                     fontWeight="bold"
-                    sx={{color: spacePalette.primary.main}}
+                    sx={{color: theme.palette.primary.main}}
                 >
                     {totalPrice}€
                 </Typography>
@@ -99,13 +100,9 @@ const InitialView: React.FC<InitialViewProps> = ({
                         fontSize: '1.1rem',
                         boxShadow: 3,
                         minWidth: '60%',
-                        background: 'linear-gradient(45deg, #1e88e5, #64b5f6)',
-                        '&:hover': {
-                            background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
-                        },
                         '&.Mui-disabled': {
-                            background: alpha(spacePalette.primary.light, 0.2),
-                            color: alpha('#fff', 0.4),
+                            background: alpha(theme.palette.primary.light, 0.2),
+                            color: alpha(theme.palette.text.primary, 0.4),
                         }
                     }}
                     startIcon={isSubmitting ? null : <Check/>}
@@ -124,12 +121,12 @@ const InitialView: React.FC<InitialViewProps> = ({
                     sx={{
                         mt: 3,
                         width: '100%',
-                        bgcolor: alpha(spacePalette.status.warning, 0.1),
-                        color: alpha('#fff', 0.9),
+                        bgcolor: alpha(theme.palette.warning?.main || '#ff9800', 0.1),
+                        color: theme.palette.text.primary,
                         border: '1px solid',
-                        borderColor: alpha(spacePalette.status.warning, 0.3),
+                        borderColor: alpha(theme.palette.warning?.main || '#ff9800', 0.3),
                         '& .MuiAlert-icon': {
-                            color: spacePalette.status.warning,
+                            color: theme.palette.warning?.main || '#ff9800',
                         },
                     }}
                 >
@@ -143,12 +140,12 @@ const InitialView: React.FC<InitialViewProps> = ({
                     sx={{
                         mt: 3,
                         width: '100%',
-                        bgcolor: alpha(spacePalette.status.error, 0.1),
-                        color: alpha('#fff', 0.9),
+                        bgcolor: alpha(theme.palette.error?.main || '#f44336', 0.1),
+                        color: theme.palette.text.primary,
                         border: '1px solid',
-                        borderColor: alpha(spacePalette.status.error, 0.3),
+                        borderColor: alpha(theme.palette.error?.main || '#f44336', 0.3),
                         '& .MuiAlert-icon': {
-                            color: spacePalette.status.error,
+                            color: theme.palette.error?.main || '#f44336',
                         },
                     }}
                 >
@@ -160,13 +157,13 @@ const InitialView: React.FC<InitialViewProps> = ({
                 variant="body2"
                 sx={{
                     mt: 2,
-                    color: alpha('#fff', 0.6),
+                    color: alpha(theme.palette.text.primary, 0.6),
                     textAlign: 'center'
                 }}
             >
                 {userAreaTexts.confirmationForm.initialView.paymentNote}
             </Typography>
-        </SpacePanelLayout>
+        </ThemedFormLayout>
     );
 };
 

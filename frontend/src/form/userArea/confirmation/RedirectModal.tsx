@@ -1,7 +1,7 @@
 import React from 'react';
-import {Box, Typography, Button, Modal, CircularProgress, alpha} from '@mui/material';
+import {Box, Typography, Button, Modal, CircularProgress, alpha, useTheme} from '@mui/material';
 import {CheckCircleOutline, OpenInNew} from '@mui/icons-material';
-import {spacePalette} from '../../../components/styles/theme';
+import {useThemeMode} from '../../../components/styles/theme';
 import {generalConstants, userAreaTexts} from "../../constants/texts";
 
 interface RedirectModalProps {
@@ -15,6 +15,16 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                                                          onClose,
                                                          countdown
                                                      }) => {
+    const theme = useTheme();
+    const { mode } = useThemeMode();
+
+    const getModalBackground = () => {
+        if (mode === 'circus') {
+            return 'radial-gradient(circle at bottom left, #1a0d08 0%, #2d1810 100%)';
+        }
+        return 'radial-gradient(circle at bottom left, #061429 0%, #071f3b 100%)';
+    };
+
     return (
         <Modal
             open={open}
@@ -27,23 +37,23 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                 transform: 'translate(-50%, -50%)',
                 width: 350,
                 border: '2px solid',
-                borderColor: spacePalette.primary.dark,
+                borderColor: theme.palette.primary.dark,
                 borderRadius: '16px',
                 boxShadow: 24,
                 p: 4,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                background: 'radial-gradient(circle at bottom left, #061429 0%, #071f3b 100%)',
+                background: getModalBackground(),
             }}>
-                <CheckCircleOutline sx={{fontSize: 60, mb: 2, color: spacePalette.status.success}}/>
+                <CheckCircleOutline sx={{fontSize: 60, mb: 2, color: theme.palette.success?.main || '#4caf50'}}/>
 
                 <Typography
                     variant="h6"
                     component="h2"
                     align="center"
                     fontWeight="bold"
-                    sx={{color: alpha('#fff', 0.9)}}
+                    sx={{color: theme.palette.text.primary}}
                 >
                     {userAreaTexts.confirmationForm.redirectModal.title}
                 </Typography>
@@ -52,7 +62,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                     mt: 2,
                     mb: 3,
                     textAlign: 'center',
-                    color: alpha('#fff', 0.8)
+                    color: alpha(theme.palette.text.primary, 0.8)
                 }}>
                     {userAreaTexts.confirmationForm.redirectModal.subtitle}
                 </Typography>
@@ -71,7 +81,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                                 value={((5 - countdown) / 5) * 100}
                                 size={50}
                                 thickness={5}
-                                sx={{color: spacePalette.primary.main}}
+                                sx={{color: theme.palette.primary.main}}
                             />
                             <Box sx={{
                                 top: 0, left: 0, bottom: 0, right: 0,
@@ -84,7 +94,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                                     variant="h6"
                                     component="div"
                                     fontWeight="bold"
-                                    sx={{color: alpha('#fff', 0.9)}}
+                                    sx={{color: theme.palette.text.primary}}
                                 >
                                     {countdown}
                                 </Typography>
@@ -93,7 +103,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                         <Typography
                             variant="subtitle1"
                             fontWeight="medium"
-                            sx={{color: spacePalette.primary.main}}
+                            sx={{color: theme.palette.primary.main}}
                         >
                             {userAreaTexts.confirmationForm.redirectModal.redirectText(countdown)}
                         </Typography>
@@ -105,7 +115,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                                 mb: 2,
                                 fontWeight: 'medium',
                                 textAlign: 'center',
-                                color: alpha('#fff', 0.8)
+                                color: alpha(theme.palette.text.primary, 0.8)
                             }}
                         >
                             {userAreaTexts.confirmationForm.redirectModal.manualRedirectText}
@@ -122,14 +132,10 @@ const RedirectModal: React.FC<RedirectModalProps> = ({
                                 size="large"
                                 sx={{
                                     py: 1.5,
-                                    background: 'linear-gradient(45deg, #1e88e5, #64b5f6)',
-                                    '&:hover': {
-                                        background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
-                                    }
                                 }}
                             >
                                 {userAreaTexts.confirmationForm.redirectModal.manualRedirectButton} <OpenInNew
-                                sx={{ml: 1}}/> <OpenInNew sx={{ml: 1}}/>
+                                sx={{ml: 1}}/>
                             </Button>
                         </a>
                     </Box>

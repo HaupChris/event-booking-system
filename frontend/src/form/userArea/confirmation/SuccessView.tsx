@@ -1,12 +1,11 @@
 import React, {useState} from 'react';
-import {Box, Typography, Snackbar, Alert, alpha} from '@mui/material';
+import {Box, Typography, Snackbar, Alert, alpha, useTheme} from '@mui/material';
 import {Celebration, CheckCircleOutline} from '@mui/icons-material';
-import SpacePanelLayout from '../../../components/core/layouts/SpacePanelLayout';
+import ThemedFormLayout from '../../../components/core/layouts/ThemedFormLayout';
 import FormCard from '../../../components/core/display/FormCard';
 import AnimatedRocket from '../../../components/core/display/animatedRocket';
 import PaymentInfo from './PaymentInfo';
 import RedirectModal from './RedirectModal';
-import {spacePalette} from '../../../components/styles/theme';
 import {userAreaTexts} from "../../constants/texts";
 
 interface SuccessViewProps {
@@ -32,10 +31,11 @@ const SuccessView: React.FC<SuccessViewProps> = ({
                                                      copied,
                                                      onCloseCopied
                                                  }) => {
+    const theme = useTheme();
     const [showRocket, setShowRocket] = useState(true);
 
     return (
-        <SpacePanelLayout
+        <ThemedFormLayout
             missionBriefing={userAreaTexts.confirmationForm.successView.subtitle}
             footerId={userAreaTexts.confirmationForm.successView.footerId}
         >
@@ -50,12 +50,12 @@ const SuccessView: React.FC<SuccessViewProps> = ({
                     alignItems: 'center',
                     p: 2
                 }}>
-                    <CheckCircleOutline sx={{color: spacePalette.status.success, fontSize: 60, mb: 1}}/>
+                    <CheckCircleOutline sx={{color: theme.palette.success?.main || '#4caf50', fontSize: 60, mb: 1}}/>
                     <Typography
                         variant="h5"
                         fontWeight="bold"
                         align="center"
-                        sx={{color: alpha('#fff', 0.9)}}
+                        sx={{color: theme.palette.text.primary}}
                     >
                         {userAreaTexts.confirmationForm.successView.title}
                     </Typography>
@@ -75,19 +75,6 @@ const SuccessView: React.FC<SuccessViewProps> = ({
                 </Box>
             )}
 
-            {/*<Typography*/}
-            {/*    variant="body1"*/}
-            {/*    paragraph*/}
-            {/*    sx={{*/}
-            {/*        mb: 3,*/}
-            {/*        fontSize: '1.1rem',*/}
-            {/*        color: alpha('#fff', 0.8),*/}
-            {/*        textAlign: 'center',*/}
-            {/*    }}*/}
-            {/*>*/}
-            {/*    */}
-            {/*</Typography>*/}
-
             {/* Payment Box */}
             <PaymentInfo
                 totalPrice={totalPrice}
@@ -102,11 +89,11 @@ const SuccessView: React.FC<SuccessViewProps> = ({
                 justifyContent: 'center',
                 alignItems: 'center',
             }}>
-                <Celebration sx={{mr: 1, color: spacePalette.primary.main}}/>
+                <Celebration sx={{mr: 1, color: theme.palette.primary.main}}/>
                 <Typography
                     variant="subtitle1"
                     fontWeight="medium"
-                    sx={{color: alpha('#fff', 0.8)}}
+                    sx={{color: alpha(theme.palette.text.primary, 0.8)}}
                 >
                     {userAreaTexts.confirmationForm.successView.footer}
                 </Typography>
@@ -130,7 +117,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({
                     Betreff wurde in die Zwischenablage kopiert
                 </Alert>
             </Snackbar>
-        </SpacePanelLayout>
+        </ThemedFormLayout>
     );
 };
 
