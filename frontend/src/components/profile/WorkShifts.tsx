@@ -48,6 +48,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
   const [rejectionReason, setRejectionReason] = useState('');
   const [alternativePreferences, setAlternativePreferences] = useState('');
   const [processing, setProcessing] = useState<number | null>(null);
+  const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
 
   const handleAcceptClick = async (shift: ShiftAssignment) => {
     try {
@@ -118,7 +119,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
 
   if (shifts.length === 0) {
     return (
-      <Box sx={{ p: 2 }}>
+      <Box>
         <Alert severity="info">
           Dir wurden noch keine Schichten zugewiesen. Schau später wieder vorbei!
         </Alert>
@@ -127,19 +128,19 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box>
       {!isOnline && (
-        <Alert severity="warning" sx={{ mb: 2 }}>
+        <Alert severity="warning" sx={{ mb: 3 }}>
           Du bist offline. Änderungen werden synchronisiert, sobald du wieder online bist.
         </Alert>
       )}
 
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         {shifts.map((shift) => (
           <Grid item xs={12} key={shift.assignment_id}>
-            <Card variant="outlined">
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'between', alignItems: 'flex-start', mb: 2 }}>
+            <Card variant="outlined" sx={{ borderRadius: 2 }}>
+              <CardContent sx={cardContentSx}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                   <Typography variant="h6" color="primary" sx={{ flexGrow: 1 }}>
                     {shift.workshift.title}
                   </Typography>
@@ -198,7 +199,14 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
               </CardContent>
 
               {shift.status === 'pending' && (
-                <CardActions sx={{ justifyContent: 'flex-end', p: 2 }}>
+                <CardActions
+                  sx={{
+                    justifyContent: 'flex-end',
+                    px: { xs: 2.5, sm: 3 },
+                    pb: { xs: 2.5, sm: 3 },
+                    pt: 0,
+                  }}
+                >
                   <Button
                     variant="outlined"
                     color="error"

@@ -8,20 +8,16 @@ import React from 'react';
 import {
   Box,
   Typography,
-  Paper,
   Alert,
-  Container,
+  Card,
+  CardContent,
 } from '@mui/material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
-interface RideSharingProps {
-  profileUuid: string;
-}
-
-const RideSharing: React.FC<RideSharingProps> = ({ profileUuid }) => {
+const RideSharing: React.FC = () => {
   return (
-    <Container maxWidth="md" sx={{ py: 3 }}>
-      <Paper sx={{ p: 3 }}>
+    <Card variant="outlined" sx={{ borderRadius: 2 }}>
+      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
         <Box sx={{ textAlign: 'center', mb: 3 }}>
           <DirectionsCarIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
           <Typography variant="h5" gutterBottom>
@@ -68,8 +64,8 @@ const RideSharing: React.FC<RideSharingProps> = ({ profileUuid }) => {
             </li>
           </ul>
         </Box>
-      </Paper>
-    </Container>
+      </CardContent>
+    </Card>
   );
 };
 

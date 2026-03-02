@@ -11,11 +11,11 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Container,
-  Paper,
   CircularProgress,
   Alert,
   Divider,
+  Card,
+  CardContent,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import HelpIcon from '@mui/icons-material/Help';
@@ -66,8 +66,8 @@ const FAQs: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 3 }}>
-      <Paper sx={{ p: 3 }}>
+    <Card variant="outlined" sx={{ borderRadius: 2 }}>
+      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
         <Box sx={{ textAlign: 'center', mb: 3 }}>
           <HelpIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
           <Typography variant="h5" gutterBottom>
@@ -138,8 +138,8 @@ const FAQs: React.FC = () => {
             Wenn deine Frage hier nicht beantwortet wurde, wende dich gerne an das Orga-Team per E-Mail.
           </Typography>
         </Box>
-      </Paper>
-    </Container>
+      </CardContent>
+    </Card>
   );
 };
 

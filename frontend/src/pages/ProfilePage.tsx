@@ -25,7 +25,6 @@ import {
   Menu as MenuIcon,
   Newspaper as NewspaperIcon,
   AccountBox as AccountBoxIcon,
-  Assignment as AssignmentIcon,
   Work as WorkIcon,
   DirectionsCar as DirectionsCarIcon,
   Help as HelpIcon,
@@ -36,7 +35,6 @@ import OfflineIndicator from '../components/core/pwa/OfflineIndicator';
 // Import page components
 import NewsFeed from '../components/profile/NewsFeed';
 import ProfileOverview from '../components/profile/ProfileOverview';
-import BookingDetails from '../components/profile/BookingDetails';
 import WorkShifts from '../components/profile/WorkShifts';
 import RideSharing from '../components/profile/RideSharing';
 import FAQs from '../components/profile/FAQs';
@@ -50,7 +48,6 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { id: 'news', label: 'Neuigkeiten', icon: <NewspaperIcon /> },
   { id: 'profile', label: 'Mein Profil', icon: <AccountBoxIcon /> },
-  { id: 'booking', label: 'Buchungsdetails', icon: <AssignmentIcon /> },
   { id: 'shifts', label: 'Schichten', icon: <WorkIcon /> },
   { id: 'rideshare', label: 'Mitfahrbörse', icon: <DirectionsCarIcon /> },
   { id: 'faqs', label: 'FAQs', icon: <HelpIcon /> },
@@ -69,9 +66,7 @@ const ProfilePage: React.FC = () => {
     isLoading,
     error,
     isOnline,
-    refreshProfile,
     refreshShifts,
-    refreshNews,
     acceptShift,
     declineShift,
     markNewsAsRead,
@@ -88,8 +83,8 @@ const ProfilePage: React.FC = () => {
   };
 
   const renderView = () => {
-    // Show loading if profile is still loading for profile/booking views
-    if (!profile && (activeView === 'profile' || activeView === 'booking')) {
+    // Show loading if profile is still loading for profile view
+    if (!profile && activeView === 'profile') {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
           <CircularProgress />
@@ -104,13 +99,10 @@ const ProfilePage: React.FC = () => {
             news={news}
             isOnline={isOnline}
             onMarkAsRead={markNewsAsRead}
-            onRefresh={refreshNews}
           />
         );
       case 'profile':
-        return profile ? <ProfileOverview profile={profile} isOnline={isOnline} /> : null;
-      case 'booking':
-        return profile ? <BookingDetails profile={profile} /> : null;
+        return profile ? <ProfileOverview profile={profile} /> : null;
       case 'shifts':
         return (
           <WorkShifts
@@ -122,7 +114,7 @@ const ProfilePage: React.FC = () => {
           />
         );
       case 'rideshare':
-        return <RideSharing profileUuid={profileUuid || ''} />;
+        return <RideSharing />;
       case 'faqs':
         return <FAQs />;
       default:
@@ -131,7 +123,6 @@ const ProfilePage: React.FC = () => {
             news={news}
             isOnline={isOnline}
             onMarkAsRead={markNewsAsRead}
-            onRefresh={refreshNews}
           />
         );
     }
@@ -243,7 +234,15 @@ const ProfilePage: React.FC = () => {
           backgroundColor: 'background.default',
         }}
       >
-        {renderView()}
+        <Container
+          maxWidth="lg"
+          sx={{
+            py: { xs: 2, md: 3 },
+            px: { xs: 2, sm: 3 },
+          }}
+        >
+          {renderView()}
+        </Container>
       </Box>
     </Box>
   );

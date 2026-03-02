@@ -6,7 +6,6 @@
 
 import React from 'react';
 import {
-  Paper,
   Box,
   Typography,
   Grid,
@@ -22,26 +21,28 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import type { ProfileData } from '../../services/profileService';
+import BookingDetails from './BookingDetails';
 
 interface ProfileOverviewProps {
   profile: ProfileData;
-  isOnline: boolean;
 }
 
-const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile, isOnline }) => {
+const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
   const { user, booking, payment } = profile;
+  const cardSx = { borderRadius: 2 };
+  const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
 
   return (
-    <Paper sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        Profil-Übersicht
+    <Box>
+      <Typography variant="h5" color={"text.primary"} sx={{ mb: 2 }}>
+        Profil Übersicht
       </Typography>
 
-      <Grid container spacing={3} sx={{ mt: 1 }}>
+      <Grid container spacing={3}>
         {/* User Info */}
         <Grid item xs={12} md={6}>
-          <Card variant="outlined">
-            <CardContent>
+          <Card variant="outlined" sx={cardSx}>
+            <CardContent sx={cardContentSx}>
               <Typography variant="h6" gutterBottom color="primary">
                 Kontaktinformationen
               </Typography>
@@ -72,8 +73,8 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile, isOnline }) 
 
         {/* Payment Status */}
         <Grid item xs={12} md={6}>
-          <Card variant="outlined">
-            <CardContent>
+          <Card variant="outlined" sx={cardSx}>
+            <CardContent sx={cardContentSx}>
               <Typography variant="h6" gutterBottom color="primary">
                 Zahlungsstatus
               </Typography>
@@ -152,8 +153,8 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile, isOnline }) 
 
         {/* Booking Summary */}
         <Grid item xs={12}>
-          <Card variant="outlined">
-            <CardContent>
+          <Card variant="outlined" sx={cardSx}>
+            <CardContent sx={cardContentSx}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <ConfirmationNumberIcon sx={{ mr: 1, color: 'primary.main' }} />
                 <Typography variant="h6" color="primary">
@@ -164,7 +165,7 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile, isOnline }) 
               <Grid container spacing={2}>
                 {booking.ticket && (
                   <Grid item xs={12} sm={6} md={3}>
-                    <Box>
+                    <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Ticket
                       </Typography>
@@ -180,7 +181,7 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile, isOnline }) 
 
                 {booking.food && (
                   <Grid item xs={12} sm={6} md={3}>
-                    <Box>
+                    <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Essen
                       </Typography>
@@ -196,7 +197,7 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile, isOnline }) 
 
                 {booking.beverage && (
                   <Grid item xs={12} sm={6} md={3}>
-                    <Box>
+                    <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Getränke
                       </Typography>
@@ -212,7 +213,7 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile, isOnline }) 
 
                 {booking.amount_shifts !== undefined && (
                   <Grid item xs={12} sm={6} md={3}>
-                    <Box>
+                    <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Schichten
                       </Typography>
@@ -241,8 +242,15 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile, isOnline }) 
             </CardContent>
           </Card>
         </Grid>
+
+        <Grid item xs={12}>
+          <Typography color="text.primary" variant="h6" sx={{ mb: 2 }}>
+            Weitere Buchungsdetails
+          </Typography>
+          <BookingDetails profile={profile} />
+        </Grid>
       </Grid>
-    </Paper>
+    </Box>
   );
 };
 

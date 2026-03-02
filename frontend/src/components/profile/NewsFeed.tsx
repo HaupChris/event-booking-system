@@ -29,11 +29,11 @@ interface NewsFeedProps {
   news: NewsItem[];
   isOnline: boolean;
   onMarkAsRead: (newsId: number) => Promise<void>;
-  onRefresh: () => Promise<void>;
 }
 
-const NewsFeed: React.FC<NewsFeedProps> = ({ news, isOnline, onMarkAsRead, onRefresh }) => {
+const NewsFeed: React.FC<NewsFeedProps> = ({ news, isOnline, onMarkAsRead }) => {
   const [expandedNews, setExpandedNews] = useState<Set<number>>(new Set());
+  const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
 
   const handleExpandClick = async (newsId: number, isRead: boolean) => {
     const newExpanded = new Set(expandedNews);
@@ -86,7 +86,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ news, isOnline, onMarkAsRead, onRef
 
   if (news.length === 0) {
     return (
-      <Box sx={{ p: 2 }}>
+      <Box>
         <Alert severity="info">
           Noch keine Neuigkeiten verfügbar. Schau später wieder vorbei!
         </Alert>
@@ -95,9 +95,9 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ news, isOnline, onMarkAsRead, onRef
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box>
       {!isOnline && (
-        <Alert severity="warning" sx={{ mb: 2 }}>
+        <Alert severity="warning" sx={{ mb: 3 }}>
           Du bist offline. Neueste Nachrichten werden angezeigt, sobald du wieder online bist.
         </Alert>
       )}
@@ -111,12 +111,14 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ news, isOnline, onMarkAsRead, onRef
             key={item.id}
             variant="outlined"
             sx={{
-              mb: 2,
+              mb: 3,
+              borderRadius: 2,
               borderLeft: isNew ? '4px solid' : undefined,
               borderLeftColor: isNew ? 'primary.main' : undefined,
             }}
           >
             <CardHeader
+              sx={{ px: { xs: 2.5, sm: 3 }, pt: { xs: 2.5, sm: 3 }, pb: 1.5 }}
               avatar={getCategoryIcon(item.category)}
               action={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -171,7 +173,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ news, isOnline, onMarkAsRead, onRef
               }
             />
             <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-              <CardContent>
+              <CardContent sx={cardContentSx}>
                 <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
                   {item.content}
                 </Typography>

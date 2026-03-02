@@ -6,7 +6,6 @@
 
 import React from 'react';
 import {
-  Box,
   Typography,
   Grid,
   Card,
@@ -16,6 +15,8 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Stack,
+  Box,
 } from '@mui/material';
 import type { ProfileData } from '../../services/profileService';
 
@@ -25,19 +26,21 @@ interface BookingDetailsProps {
 
 const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
   const { booking, materials, professions } = profile;
+  const cardSx = { borderRadius: 2 };
+  const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Stack spacing={3}>
       {/* Work Shift Priorities (for regular users) */}
       {booking.work_shift_priorities && booking.work_shift_priorities.length > 0 && (
-        <Card variant="outlined" sx={{ mb: 3 }}>
-          <CardContent>
+        <Card variant="outlined" sx={cardSx}>
+          <CardContent sx={cardContentSx}>
             <Typography variant="h6" gutterBottom color="primary">
               Schicht-Prioritäten
             </Typography>
-            <List>
+            <List disablePadding>
               {booking.work_shift_priorities.map((priority) => (
-                <ListItem key={priority.priority}>
+                <ListItem key={priority.priority} sx={{ px: 0 }}>
                   <ListItemText
                     primary={`Priorität ${priority.priority}: ${priority.timeslot_title}`}
                     secondary={`Zeitfenster ID: ${priority.timeslot_id}`}
@@ -59,8 +62,8 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
 
       {/* Artist-specific details */}
       {booking.equipment && (
-        <Card variant="outlined" sx={{ mb: 3 }}>
-          <CardContent>
+        <Card variant="outlined" sx={cardSx}>
+          <CardContent sx={cardContentSx}>
             <Typography variant="h6" gutterBottom color="primary">
               Technische Anforderungen
             </Typography>
@@ -70,8 +73,8 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
       )}
 
       {booking.special_requests && (
-        <Card variant="outlined" sx={{ mb: 3 }}>
-          <CardContent>
+        <Card variant="outlined" sx={cardSx}>
+          <CardContent sx={cardContentSx}>
             <Typography variant="h6" gutterBottom color="primary">
               Besondere Anfragen
             </Typography>
@@ -82,8 +85,8 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
 
       {/* Materials */}
       {materials.length > 0 && (
-        <Card variant="outlined" sx={{ mb: 3 }}>
-          <CardContent>
+        <Card variant="outlined" sx={cardSx}>
+          <CardContent sx={cardContentSx}>
             <Typography variant="h6" gutterBottom color="primary">
               Materialien
             </Typography>
@@ -106,8 +109,8 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
 
       {/* Professions */}
       {professions.length > 0 && (
-        <Card variant="outlined" sx={{ mb: 3 }}>
-          <CardContent>
+        <Card variant="outlined" sx={cardSx}>
+          <CardContent sx={cardContentSx}>
             <Typography variant="h6" gutterBottom color="primary">
               Fähigkeiten / Professionen
             </Typography>
@@ -126,11 +129,11 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
       )}
 
       {/* Food & Beverage Details */}
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         {booking.food && (
           <Grid item xs={12} md={6}>
-            <Card variant="outlined">
-              <CardContent>
+            <Card variant="outlined" sx={cardSx}>
+              <CardContent sx={cardContentSx}>
                 <Typography variant="h6" gutterBottom color="primary">
                   Essen
                 </Typography>
@@ -153,8 +156,8 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
 
         {booking.beverage && (
           <Grid item xs={12} md={6}>
-            <Card variant="outlined">
-              <CardContent>
+            <Card variant="outlined" sx={cardSx}>
+              <CardContent sx={cardContentSx}>
                 <Typography variant="h6" gutterBottom color="primary">
                   Getränke
                 </Typography>
@@ -175,7 +178,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
           </Grid>
         )}
       </Grid>
-    </Box>
+    </Stack>
   );
 };
 
