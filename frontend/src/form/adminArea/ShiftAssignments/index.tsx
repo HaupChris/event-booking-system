@@ -7,6 +7,7 @@ import type { ShiftAssignment } from './types';
 import { exportShiftAssignments } from './utils/exportUtils';
 import ShiftMessagesTab from './ShiftMessagesTab';
 import AssignmentsTab from './AssignmentsTab';
+import CurrentShiftPlanTab from './CurrentShiftPlanTab';
 
 function ShiftAssignmentsPage() {
     const {token} = useContext(TokenContext);
@@ -15,7 +16,7 @@ function ShiftAssignmentsPage() {
     const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
     const [selectedTimeslot, setSelectedTimeslot] = useState<number | null>(null);
     const [assignments, setAssignments] = useState<ShiftAssignment[]>([]);
-    const [activeTab, setActiveTab] = useState<'assignments' | 'messages'>('assignments');
+    const [activeTab, setActiveTab] = useState<'assignments' | 'messages' | 'current_plan'>('assignments');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -240,11 +241,12 @@ function ShiftAssignmentsPage() {
       <Box>
         <Tabs
           value={activeTab}
-          onChange={(_event, value: 'assignments' | 'messages') => setActiveTab(value)}
+          onChange={(_event, value: 'assignments' | 'messages' | 'current_plan') => setActiveTab(value)}
           sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}
         >
           <Tab label="Assignments" value="assignments" />
           <Tab label="Messages" value="messages" />
+          <Tab label="Current Plan" value="current_plan" />
         </Tabs>
 
         {activeTab === 'assignments' ? (
@@ -273,8 +275,10 @@ function ShiftAssignmentsPage() {
             onClearUserSelection={handleClearUserSelection}
             onExportShiftAssignments={handleExportShiftAssignments}
           />
-        ) : (
+        ) : activeTab === 'messages' ? (
           <ShiftMessagesTab formContent={formContent} />
+        ) : (
+          <CurrentShiftPlanTab assignments={assignments} formContent={formContent} />
         )}
       </Box>
     );
