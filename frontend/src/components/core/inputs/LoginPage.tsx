@@ -104,16 +104,28 @@ const LoginPage: React.FC<LoginPageProps> = ({
                                 letterSpacing: '0.1em',
                                 textTransform: 'uppercase',
                                 '&::before': {
-                                    content: '"★ "',
+                                    content: '"★★★"',
                                     color: '#6B46C1',
                                 },
                                 '&::after': {
-                                    content: '" ★"',
+                                    content: '"★★★"',
                                     color: '#6B46C1',
                                 }
                             }}
                         >
-                            Zirkus Wiesenwahn
+                            &nbsp;Zirkus&nbsp;
+                        </Typography>
+                        <Typography
+                            sx={{
+                                fontFamily: '"Abril Fatface", "Playfair Display", serif',
+                                fontSize: { xs: '2rem', sm: '2.5rem' },
+                                color: '#D4AF37',
+                                textShadow: '2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(212, 175, 55, 0.3)',
+                                letterSpacing: '0.1em',
+                                textTransform: 'uppercase'
+                            }}
+                        >
+                            Wiesenwahn
                         </Typography>
                         <Typography
                             sx={{
