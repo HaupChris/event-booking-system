@@ -101,6 +101,19 @@ export interface ShiftAssignment {
   workshift: WorkShift;
 }
 
+export interface ShiftMessage {
+  id: number;
+  title: string;
+  category: string | null;
+  content: string;
+  created_by: string | null;
+  created_date: string;
+  workshift_title: string;
+  timeslot_title: string;
+  timeslot_start: string;
+  timeslot_end: string;
+}
+
 export interface NewsItem {
   id: number;
   title: string;
@@ -139,6 +152,14 @@ export const getProfile = async (profileUuid: string): Promise<ProfileData> => {
 export const getShifts = async (profileUuid: string): Promise<ShiftAssignment[]> => {
   const response = await axios.get(`${API_BASE_URL}/profile/${profileUuid}/shifts`);
   return response.data.shifts;
+};
+
+/**
+ * Get shift message feed for a profile
+ */
+export const getShiftMessages = async (profileUuid: string): Promise<ShiftMessage[]> => {
+  const response = await axios.get(`${API_BASE_URL}/profile/${profileUuid}/shifts/messages`);
+  return response.data.messages;
 };
 
 /**

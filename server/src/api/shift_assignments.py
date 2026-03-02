@@ -18,6 +18,11 @@ from src.services.shift_assignment_service import (
     get_timeslot_summary,
     update_assignment,
 )
+from src.services.shift_message_service import (
+    create_shift_messages,
+    delete_shift_message,
+    get_shift_messages_grouped,
+)
 
 shift_assignments_bp = Blueprint("shift_assignments", __name__)
 limiter_assignments = Limiter(get_remote_address)
@@ -225,3 +230,72 @@ def bulk_assign_shifts():
                 )
 
     return jsonify({"successful_assignments": successful, "failed_assignments": failed}), 200
+
+
+@shift_assignments_bp.route("/shifts/messages", methods=["GET"])
+@limiter_assignments.limit("200/minute")
+@jwt_required()
+def get_shift_messages():
+    identity = get_jwt_identity()
+    if identity != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    messages = get_shift_messages_grouped()
+    return jsonify({"groups": messages}), 200
+
+
+@shift_assignments_bp.route("/shifts/messages", methods=["POST"])
+@limiter_assignments.limit("60/minute")
+@jwt_required()
+def create_shift_message_item():
+    identity = get_jwt_identity()
+    if identity != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    data = request.json or {}
+    timeslot_ids = data.get("timeslot_ids", [])
+    single_timeslot_id = data.get("timeslot_id")
+    if not timeslot_ids and single_timeslot_id is not None:
+        timeslot_ids = [single_timeslot_id]
+    title = data.get("title", "").strip()
+    content = data.get("content", "").strip()
+    category = data.get("category")
+
+    if not timeslot_ids or not isinstance(timeslot_ids, list) or not title or not content:
+        return jsonify({"error": "timeslot_ids, title and content are required"}), 400
+
+    created_count, failed_timeslot_ids = create_shift_messages(
+        timeslot_ids=[int(timeslot_id) for timeslot_id in timeslot_ids],
+        title=title,
+        content=content,
+        category=category,
+        created_by=identity,
+    )
+
+    if created_count <= 0:
+        return jsonify({"error": "Failed to create shift message"}), 500
+
+    return (
+        jsonify(
+            {
+                "message": "Shift messages created successfully",
+                "created_count": created_count,
+                "failed_timeslot_ids": failed_timeslot_ids,
+            }
+        ),
+        201,
+    )
+
+
+@shift_assignments_bp.route("/shifts/messages/<int:message_id>", methods=["DELETE"])
+@limiter_assignments.limit("60/minute")
+@jwt_required()
+def delete_shift_message_item(message_id: int):
+    identity = get_jwt_identity()
+    if identity != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    success = delete_shift_message(message_id)
+    if not success:
+        return jsonify({"error": "Shift message not found"}), 404
+    return jsonify({"message": "Shift message deleted successfully"}), 200

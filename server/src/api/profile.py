@@ -22,6 +22,7 @@ from src.services.profile_service import (
     get_profile_by_uuid,
     get_profile_uuids_by_email,
 )
+from src.services.shift_message_service import get_shift_messages_for_booking
 from src.utils.logger import get_logger, log_security_event
 
 # Initialize logger
@@ -92,6 +93,26 @@ def get_shifts(profile_uuid: str):
 
     except Exception as e:
         logger.error(f"Shift retrieval failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@profile_bp.route("/<profile_uuid>/shifts/messages", methods=["GET"])
+@limiter_profile.limit("100/minute")
+def get_shift_messages_for_profile(profile_uuid: str):
+    """Get shift-related message feed for a profile."""
+    client_ip = request.remote_addr
+
+    try:
+        logger.debug(f"Shift message feed request for UUID {profile_uuid[:8]}... from {client_ip}")
+
+        profile = get_profile_by_uuid(profile_uuid)
+        if not profile:
+            return jsonify({"error": "Profile not found"}), 404
+
+        messages = get_shift_messages_for_booking(profile["booking"]["id"])
+        return jsonify({"messages": messages}), 200
+    except Exception as e:
+        logger.error(f"Shift message feed retrieval failed: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500
 
 

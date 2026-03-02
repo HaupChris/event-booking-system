@@ -20,6 +20,7 @@ export interface ProfileData {
   email?: string;
   name?: string;
   role?: string;
+  profileData?: unknown;
   lastSync: string;
 }
 

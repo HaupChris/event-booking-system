@@ -45,3 +45,28 @@ export interface UserListFilters {
     shiftCountFilter: 'all' | '1' | '2' | '3'; // or however many shift options you have
     daysCountFilter: 'all' | '1' | '2' | '3';
 }
+
+export interface ShiftMessage {
+    id: number;
+    title: string;
+    category: string | null;
+    content: string;
+    created_by: string | null;
+    created_date: string;
+}
+
+export interface ShiftMessageGroup {
+    timeslot_id: number;
+    workshift_title: string;
+    timeslot_title: string;
+    timeslot_start: string;
+    timeslot_end: string;
+    messages: ShiftMessage[];
+}
+
+export interface CreateShiftMessageRequest {
+    timeslot_ids: number[];
+    title: string;
+    category?: string;
+    content: string;
+}

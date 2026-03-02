@@ -61,6 +61,7 @@ const ProfilePage: React.FC = () => {
   const {
     profile,
     shifts,
+    shiftMessages,
     news,
     unreadCount,
     isLoading,
@@ -107,6 +108,7 @@ const ProfilePage: React.FC = () => {
         return (
           <WorkShifts
             shifts={shifts}
+            shiftMessages={shiftMessages}
             isOnline={isOnline}
             onAccept={acceptShift}
             onDecline={declineShift}
@@ -186,7 +188,7 @@ const ProfilePage: React.FC = () => {
           <Typography variant="h6" sx={{ px: 2, mb: 2, fontWeight: 'bold' }}>
             Wiesenwahn Festival
           </Typography>
-          {profile && (
+          {profile?.user && (
             <Typography variant="caption" color="text.secondary" sx={{ px: 2, display: 'block', mb: 2 }}>
               {profile.user.first_name} {profile.user.last_name}
             </Typography>

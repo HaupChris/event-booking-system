@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { Box, Grid, Typography, Paper, Alert, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Tabs, Tab } from '@mui/material';
 import { TokenContext } from '../../../contexts/AuthContext';
 import { useFetchData } from '../useFetchData';
 import { ShiftAssignmentAPI } from './api';
 import type { ShiftAssignment } from './types';
-import UserList from './components/UserList';
-import WorkshiftList from './components/WorkshiftList';
-import ActionButtons from './components/ActionButtons';
-import StatisticsGrid from './components/StatisticsGrid';
 import { exportShiftAssignments } from './utils/exportUtils';
+import ShiftMessagesTab from './ShiftMessagesTab';
+import AssignmentsTab from './AssignmentsTab';
 
 function ShiftAssignmentsPage() {
     const {token} = useContext(TokenContext);
@@ -17,6 +15,7 @@ function ShiftAssignmentsPage() {
     const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
     const [selectedTimeslot, setSelectedTimeslot] = useState<number | null>(null);
     const [assignments, setAssignments] = useState<ShiftAssignment[]>([]);
+    const [activeTab, setActiveTab] = useState<'assignments' | 'messages'>('assignments');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -238,101 +237,46 @@ function ShiftAssignmentsPage() {
     }
 
     return (
-        <Box sx={{ p: 2 }}>
-            <StatisticsGrid
-                totalUsers={totalUsers}
-                fullyAssignedUsers={fullyAssignedUsers}
-                totalShiftsAssigned={totalShiftsAssigned}
-                totalShiftsWanted={totalShiftsWanted}
-                totalTimeslots={totalTimeslots}
-                totalCapacity={totalCapacity}
-                assignments={assignments}
-            />
+      <Box>
+        <Tabs
+          value={activeTab}
+          onChange={(_event, value: 'assignments' | 'messages') => setActiveTab(value)}
+          sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}
+        >
+          <Tab label="Assignments" value="assignments" />
+          <Tab label="Messages" value="messages" />
+        </Tabs>
 
-            {/* Alerts */}
-            {error && (
-                <Alert severity="error" sx={{mb: 2}} onClose={() => setError(null)}>
-                    {error}
-                </Alert>
-            )}
-            {success && (
-                <Alert severity="success" sx={{mb: 2}} onClose={() => setSuccess(null)}>
-                    {success}
-                </Alert>
-            )}
-
-            {/* Main Assignment Interface - Fixed Height */}
-            <Box sx={{height: '90vh'}}>
-                <Grid container spacing={2} sx={{height: '100%'}}>
-                    {/* User List */}
-                    <Grid item xs={12} md={5} sx={{height: '100%'}}>
-                        <Paper sx={{
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            overflow: 'hidden'
-                        }}>
-                            <Box sx={{p: 2, borderBottom: 1, borderColor: 'divider'}}>
-                                <Typography variant="h6">Participants</Typography>
-                            </Box>
-                            <UserList
-                                regularBookings={regularBookings}
-                                selectedTimeslot={selectedTimeslot}
-                                onUserSelect={handleUserSelect}
-                                selectedUsers={selectedUsers}
-                                formContent={formContent}
-                                assignments={assignments}
-                            />
-                        </Paper>
-                    </Grid>
-
-                    {/* Action Buttons */}
-                    <Grid item xs={12} md={2} sx={{height: '100%'}}>
-                        <Paper sx={{
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            overflow: 'hidden'
-                        }}>
-                            <Box sx={{p: 2, borderBottom: 1, borderColor: 'divider'}}>
-                                <Typography variant="h6">Actions</Typography>
-                            </Box>
-                            <ActionButtons
-                                selectedUsers={selectedUsers}
-                                selectedTimeslot={selectedTimeslot}
-                                onAssignUsers={handleAssignUsers}
-                                onUnassignFromTimeslot={handleUnassignFromTimeslot}
-                                onUnassignAllShifts={handleUnassignAllShifts}
-                                loading={loading}
-                                onClearUserSelection={handleClearUserSelection}
-                                onExportShiftAssignments={handleExportShiftAssignments}
-                            />
-                        </Paper>
-                    </Grid>
-
-                    {/* Workshift List */}
-                    <Grid item xs={12} md={5} sx={{height: '100%'}}>
-                        <Paper sx={{
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            overflow: 'hidden'
-                        }}>
-                            <Box sx={{p: 2, borderBottom: 1, borderColor: 'divider'}}>
-                                <Typography variant="h6">Workshifts</Typography>
-                            </Box>
-                            <WorkshiftList
-                                formContent={formContent}
-                                selectedTimeslot={selectedTimeslot}
-                                onTimeslotSelect={handleTimeslotSelect}
-                                assignments={assignments}
-                                bookings={regularBookings}
-                            />
-                        </Paper>
-                    </Grid>
-                </Grid>
-            </Box>
-        </Box>
+        {activeTab === 'assignments' ? (
+          <AssignmentsTab
+            totalUsers={totalUsers}
+            fullyAssignedUsers={fullyAssignedUsers}
+            totalShiftsAssigned={totalShiftsAssigned}
+            totalShiftsWanted={totalShiftsWanted}
+            totalTimeslots={totalTimeslots}
+            totalCapacity={totalCapacity}
+            assignments={assignments}
+            regularBookings={regularBookings}
+            formContent={formContent}
+            selectedUsers={selectedUsers}
+            selectedTimeslot={selectedTimeslot}
+            error={error}
+            success={success}
+            loading={loading}
+            onClearError={() => setError(null)}
+            onClearSuccess={() => setSuccess(null)}
+            onUserSelect={handleUserSelect}
+            onTimeslotSelect={handleTimeslotSelect}
+            onAssignUsers={handleAssignUsers}
+            onUnassignFromTimeslot={handleUnassignFromTimeslot}
+            onUnassignAllShifts={handleUnassignAllShifts}
+            onClearUserSelection={handleClearUserSelection}
+            onExportShiftAssignments={handleExportShiftAssignments}
+          />
+        ) : (
+          <ShiftMessagesTab formContent={formContent} />
+        )}
+      </Box>
     );
 }
 

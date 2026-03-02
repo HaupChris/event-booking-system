@@ -175,6 +175,18 @@ CREATE TABLE IF NOT EXISTS ShiftAssignments (
     UNIQUE(booking_id, timeslot_id)
 );
 
+CREATE TABLE IF NOT EXISTS ShiftMessages (
+    id INTEGER PRIMARY KEY NOT NULL,
+    timeslot_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    category TEXT,
+    content TEXT NOT NULL,
+    created_by TEXT,
+    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_active INTEGER DEFAULT 1,
+    FOREIGN KEY(timeslot_id) REFERENCES TimeSlots(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS FAQCategories (
     id INTEGER PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
@@ -194,4 +206,3 @@ CREATE TABLE IF NOT EXISTS FAQs (
     updated_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(category_id) REFERENCES FAQCategories(id) ON DELETE CASCADE
 );
-

@@ -21,15 +21,21 @@ import {
   Alert,
   Grid,
   Divider,
+  FormControlLabel,
+  Stack,
+  Switch,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import PendingIcon from '@mui/icons-material/Pending';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import type { ShiftAssignment } from '../../services/profileService';
+import type { ShiftMessage } from '../../services/profileService';
+import ShiftMessageFeed from './ShiftMessageFeed';
 
 interface WorkShiftsProps {
   shifts: ShiftAssignment[];
+  shiftMessages: ShiftMessage[];
   isOnline: boolean;
   onAccept: (assignmentId: number) => Promise<void>;
   onDecline: (assignmentId: number, reason?: string, alternatives?: string) => Promise<void>;
@@ -38,6 +44,7 @@ interface WorkShiftsProps {
 
 const WorkShifts: React.FC<WorkShiftsProps> = ({
   shifts,
+  shiftMessages,
   isOnline,
   onAccept,
   onDecline,
@@ -48,6 +55,8 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
   const [rejectionReason, setRejectionReason] = useState('');
   const [alternativePreferences, setAlternativePreferences] = useState('');
   const [processing, setProcessing] = useState<number | null>(null);
+  const [showAssignments, setShowAssignments] = useState(true);
+  const [showMessages, setShowMessages] = useState(true);
   const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
 
   const handleAcceptClick = async (shift: ShiftAssignment) => {
@@ -117,16 +126,6 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
     }
   };
 
-  if (shifts.length === 0) {
-    return (
-      <Box>
-        <Alert severity="info">
-          Dir wurden noch keine Schichten zugewiesen. Schau später wieder vorbei!
-        </Alert>
-      </Box>
-    );
-  }
-
   return (
     <Box>
       {!isOnline && (
@@ -135,7 +134,28 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
         </Alert>
       )}
 
-      <Grid container spacing={3}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} color={"text.primary"} spacing={1} sx={{ mb: 2 }}>
+        <FormControlLabel
+          control={
+            <Switch checked={showAssignments} onChange={(event) => setShowAssignments(event.target.checked)} />
+          }
+          label="Schichtangebote anzeigen"
+        />
+        <FormControlLabel
+          control={<Switch checked={showMessages} onChange={(event) => setShowMessages(event.target.checked)} />}
+          label="Nachrichten anzeigen"
+        />
+      </Stack>
+
+      {showMessages && <ShiftMessageFeed shiftMessages={shiftMessages} />}
+
+      {showAssignments && shifts.length === 0 && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Dir wurden noch keine Schichten zugewiesen. Schau später wieder vorbei!
+        </Alert>
+      )}
+
+      {showAssignments && <Grid container spacing={3}>
         {shifts.map((shift) => (
           <Grid item xs={12} key={shift.assignment_id}>
             <Card variant="outlined" sx={{ borderRadius: 2 }}>
@@ -229,7 +249,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
             </Card>
           </Grid>
         ))}
-      </Grid>
+      </Grid>}
 
       {/* Decline Dialog */}
       <Dialog open={declineDialogOpen} onClose={handleDeclineCancel} maxWidth="sm" fullWidth>
