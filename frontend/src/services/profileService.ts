@@ -46,6 +46,9 @@ export interface WorkShiftPriority {
   priority: number;
   timeslot_id: number;
   timeslot_title: string;
+  timeslot_start_time?: string;
+  timeslot_end_time?: string;
+  workshift_title?: string;
 }
 
 export interface Booking {

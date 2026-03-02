@@ -7,14 +7,12 @@
 import React from 'react';
 import {
   Typography,
-  Grid,
   Card,
   CardContent,
   Chip,
   List,
   ListItem,
   ListItemText,
-  Divider,
   Stack,
   Box,
 } from '@mui/material';
@@ -28,6 +26,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
   const { booking, materials, professions } = profile;
   const cardSx = { borderRadius: 2 };
   const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
+  const formatTime = (time?: string) => (time ? time.slice(0, 5) : '');
 
   return (
     <Stack spacing={3}>
@@ -42,18 +41,25 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
               {booking.work_shift_priorities.map((priority) => (
                 <ListItem key={priority.priority} sx={{ px: 0 }}>
                   <ListItemText
-                    primary={`Priorität ${priority.priority}: ${priority.timeslot_title}`}
-                    secondary={`Zeitfenster ID: ${priority.timeslot_id}`}
+                    primary={`Priorität ${priority.priority}: ${
+                      priority.workshift_title
+                        ? `${priority.workshift_title} - ${priority.timeslot_title}`
+                        : priority.timeslot_title
+                    }`}
+                    secondary={
+                      priority.timeslot_start_time && priority.timeslot_end_time
+                        ? `${formatTime(priority.timeslot_start_time)} - ${formatTime(priority.timeslot_end_time)} Uhr`
+                        : 'Zeitfenster wird geladen'
+                    }
                   />
                 </ListItem>
               ))}
             </List>
-            {booking.supporter_buddy && (
+            {booking.supporter_buddy?.length !== 0 && (
               <Box sx={{ mt: 2, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
                 <Typography variant="body2" color="text.secondary">
-                  Support-Buddy:
+                  Support-Buddy: {booking.supporter_buddy}
                 </Typography>
-                <Typography variant="body1">{booking.supporter_buddy}</Typography>
               </Box>
             )}
           </CardContent>
@@ -128,56 +134,6 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
         </Card>
       )}
 
-      {/* Food & Beverage Details */}
-      <Grid container spacing={3}>
-        {booking.food && (
-          <Grid item xs={12} md={6}>
-            <Card variant="outlined" sx={cardSx}>
-              <CardContent sx={cardContentSx}>
-                <Typography variant="h6" gutterBottom color="primary">
-                  Essen
-                </Typography>
-                <Typography variant="h5" gutterBottom>
-                  {booking.food.title}
-                </Typography>
-                {booking.food.description && (
-                  <Typography variant="body2" color="text.secondary">
-                    {booking.food.description}
-                  </Typography>
-                )}
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="h6" color="primary">
-                  {booking.food.price.toFixed(2)} €
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        )}
-
-        {booking.beverage && (
-          <Grid item xs={12} md={6}>
-            <Card variant="outlined" sx={cardSx}>
-              <CardContent sx={cardContentSx}>
-                <Typography variant="h6" gutterBottom color="primary">
-                  Getränke
-                </Typography>
-                <Typography variant="h5" gutterBottom>
-                  {booking.beverage.title}
-                </Typography>
-                {booking.beverage.description && (
-                  <Typography variant="body2" color="text.secondary">
-                    {booking.beverage.description}
-                  </Typography>
-                )}
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="h6" color="primary">
-                  {booking.beverage.price.toFixed(2)} €
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        )}
-      </Grid>
     </Stack>
   );
 };

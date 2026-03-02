@@ -89,10 +89,19 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                     bv.price as beverage_price,
                     ts1.id as priority_1_timeslot_id,
                     ts1.title as priority_1_timeslot_title,
+                    ts1.start_time as priority_1_timeslot_start_time,
+                    ts1.end_time as priority_1_timeslot_end_time,
+                    ws1.title as priority_1_workshift_title,
                     ts2.id as priority_2_timeslot_id,
                     ts2.title as priority_2_timeslot_title,
+                    ts2.start_time as priority_2_timeslot_start_time,
+                    ts2.end_time as priority_2_timeslot_end_time,
+                    ws2.title as priority_2_workshift_title,
                     ts3.id as priority_3_timeslot_id,
-                    ts3.title as priority_3_timeslot_title
+                    ts3.title as priority_3_timeslot_title,
+                    ts3.start_time as priority_3_timeslot_start_time,
+                    ts3.end_time as priority_3_timeslot_end_time,
+                    ws3.title as priority_3_workshift_title
                 FROM Bookings b
                 LEFT JOIN Users u ON b.user_id = u.id
                 LEFT JOIN TicketOptions t ON b.ticket_option_id = t.id
@@ -101,6 +110,9 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                 LEFT JOIN TimeSlots ts1 ON b.first_priority_timeslot_id = ts1.id
                 LEFT JOIN TimeSlots ts2 ON b.second_priority_timeslot_id = ts2.id
                 LEFT JOIN TimeSlots ts3 ON b.third_priority_timeslot_id = ts3.id
+                LEFT JOIN WorkShifts ws1 ON ts1.workshift_id = ws1.id
+                LEFT JOIN WorkShifts ws2 ON ts2.workshift_id = ws2.id
+                LEFT JOIN WorkShifts ws3 ON ts3.workshift_id = ws3.id
                 WHERE b.profile_uuid = ?
             """,
                 (profile_uuid,),
@@ -183,7 +195,7 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                         "title": row["ticket_title"],
                         "price": row["ticket_price"],
                     }
-                    if row["ticket_id"]
+                    if row["ticket_id"] is not None
                     else None
                 ),
                 "food": (
@@ -193,7 +205,7 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                         "description": row["food_description"],
                         "price": row["food_price"],
                     }
-                    if row["food_id"]
+                    if row["food_id"] is not None
                     else None
                 ),
                 "beverage": (
@@ -203,7 +215,7 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                         "description": row["beverage_description"],
                         "price": row["beverage_price"],
                     }
-                    if row["beverage_id"]
+                    if row["beverage_id"] is not None
                     else None
                 ),
             }
@@ -217,28 +229,37 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                 booking["supporter_buddy"] = row["supporter_buddy"]
                 booking["work_shift_priorities"] = []
 
-                if row["priority_1_timeslot_id"]:
+                if row["priority_1_timeslot_id"] is not None:
                     booking["work_shift_priorities"].append(
                         {
                             "priority": 1,
                             "timeslot_id": row["priority_1_timeslot_id"],
                             "timeslot_title": row["priority_1_timeslot_title"],
+                            "timeslot_start_time": row["priority_1_timeslot_start_time"],
+                            "timeslot_end_time": row["priority_1_timeslot_end_time"],
+                            "workshift_title": row["priority_1_workshift_title"],
                         }
                     )
-                if row["priority_2_timeslot_id"]:
+                if row["priority_2_timeslot_id"] is not None:
                     booking["work_shift_priorities"].append(
                         {
                             "priority": 2,
                             "timeslot_id": row["priority_2_timeslot_id"],
                             "timeslot_title": row["priority_2_timeslot_title"],
+                            "timeslot_start_time": row["priority_2_timeslot_start_time"],
+                            "timeslot_end_time": row["priority_2_timeslot_end_time"],
+                            "workshift_title": row["priority_2_workshift_title"],
                         }
                     )
-                if row["priority_3_timeslot_id"]:
+                if row["priority_3_timeslot_id"] is not None:
                     booking["work_shift_priorities"].append(
                         {
                             "priority": 3,
                             "timeslot_id": row["priority_3_timeslot_id"],
                             "timeslot_title": row["priority_3_timeslot_title"],
+                            "timeslot_start_time": row["priority_3_timeslot_start_time"],
+                            "timeslot_end_time": row["priority_3_timeslot_end_time"],
+                            "workshift_title": row["priority_3_workshift_title"],
                         }
                     )
 

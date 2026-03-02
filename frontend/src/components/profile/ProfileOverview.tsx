@@ -31,6 +31,7 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
   const { user, booking, payment } = profile;
   const cardSx = { borderRadius: 2 };
   const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
+  console.log(booking);
 
   return (
     <Box>
