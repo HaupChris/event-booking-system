@@ -41,8 +41,8 @@ This checklist tracks the React/TypeScript/MUI modernization effort from the cur
 
 ## Phase 5 - Hardening and Cleanup
 
-- [ ] Re-run dependency audit and address remaining critical/high issues.
-- [ ] Re-run `npm run quality` and address warnings that should be enforced.
-- [ ] Run build and deployment image checks after all upgrades.
-- [ ] Update documentation (developer setup, env variables, scripts).
-- [ ] Prepare final changelog + rollout notes.
+- [x] Re-run dependency audit and address remaining critical/high issues.
+- [x] Re-run `npm run quality` and address warnings that should be enforced.
+- [x] Run build and deployment image checks after all upgrades.
+- [x] Update documentation (developer setup, env variables, scripts).
+- [x] Prepare final changelog + rollout notes.

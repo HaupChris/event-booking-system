@@ -19,11 +19,13 @@ A full-stack booking and management system for a small, non-commercial music fes
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 18** with TypeScript
-- **Material UI** for component library
+- **React 19** with TypeScript 6
+- **Vite 7** for build/dev tooling
+- **Material UI 7** for component library
 - **React Router** for navigation
 - **Axios** for API calls
 - **JWT** for authentication
+- **Vitest + Testing Library** for frontend tests
 
 ### Backend
 - **Flask** web framework
@@ -63,7 +65,7 @@ A full-stack booking and management system for a small, non-commercial music fes
 ## 🔧 Setup and Installation
 
 ### Prerequisites
-- Node.js 16+
+- Node.js 20+
 - Python 3.11+
 - Docker (optional)
 
@@ -75,11 +77,11 @@ A full-stack booking and management system for a small, non-commercial music fes
 cd server
 
 # Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -e ".[dev]"
 
 # Run the server
 python main.py
@@ -95,6 +97,12 @@ npm install
 
 # Run the development server
 npm start
+
+# Run quality checks
+npm run quality
+
+# Run tests
+npm run test
 ```
 
 ### Docker Setup
