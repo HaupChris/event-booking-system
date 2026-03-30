@@ -29,3 +29,8 @@ Vite-prefixed environment variables are supported:
 - `VITE_VAPID_PUBLIC_KEY`
 
 Legacy `REACT_APP_*` names are still accepted during migration.
+
+## Development Notes
+
+- The Vite dev server runs on `http://localhost:3000`.
+- API requests to `/api/*` are proxied to `http://localhost:5001` in development.

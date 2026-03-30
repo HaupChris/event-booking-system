@@ -46,7 +46,8 @@ A full-stack booking and management system for a small, non-commercial music fes
 │   │   │   ├── userArea/    # User registration components
 │   │   │   ├── adminArea/   # Admin dashboard components
 │   │   │   └── artistArea/  # Artist registration components
-│   │   ├── AuthContext.tsx  # Authentication context
+│   │   ├── contexts/         # React contexts (auth/theme)
+│   │   ├── services/         # API and data services
 │   │   └── App.tsx          # Main application component
 │   └── package.json
 │
@@ -56,10 +57,9 @@ A full-stack booking and management system for a small, non-commercial music fes
 │   │   ├── models/          # Data models
 │   │   ├── services/        # Business logic
 │   │   └── utils/           # Utility functions
-│   ├── data/                # Configuration files
 │   ├── Dockerfile           # Docker configuration
 │   ├── main.py              # Application entry point
-│   └── requirements.txt     # Python dependencies
+│   └── pyproject.toml        # Python dependencies and tooling config
 ```
 
 ## 🔧 Setup and Installation
@@ -105,6 +105,19 @@ npm run quality
 npm run test
 ```
 
+### Quality Checks
+
+```bash
+# Backend
+cd server
+source .venv/bin/activate
+ruff check . && black --check . && mypy . && pytest
+
+# Frontend
+cd frontend
+npm run quality
+```
+
 ### Docker Setup
 ```bash
 # Build and run with Docker Compose
@@ -131,6 +144,16 @@ The backend provides a RESTful API with the following main endpoints:
   - GET `/api/artist/formcontent`: Get artist form configuration
   - POST `/api/artist/submitForm`: Submit artist booking
   - GET `/api/artist/data`: Get all artist bookings (admin only)
+
+- **Admin Management**
+  - GET `/api/admin/news`: List news items
+  - GET `/api/admin/faqs`: List FAQs
+  - GET `/api/admin/profiles/stats`: Profile management statistics
+
+- **Profile Portal**
+  - GET `/api/profile/<profile_uuid>`: Load profile details
+  - GET `/api/profile/<profile_uuid>/news`: Profile-specific news feed
+  - GET `/api/profile/<profile_uuid>/shifts`: Profile shift assignments
 
 ## 🔒 Security Features
 
