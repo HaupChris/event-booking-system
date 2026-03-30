@@ -244,16 +244,21 @@ function ShiftMessagesTab({ formContent }: ShiftMessagesTabProps) {
                 <TextField
                   label="Kategorie (optional)"
                   value={form.category}
-                  onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, category: event.target.value }))
+                  }
                   fullWidth
                 />
 
                 <TextField
                   label="Inhalt (Markdown)"
                   value={form.content}
-                  onChange={(event) => setForm((prev) => ({ ...prev, content: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, content: event.target.value }))
+                  }
                   multiline
-                  minRows={8}
+                  rows={8}
+                  InputProps={{ inputComponent: 'textarea' }}
                   fullWidth
                   required
                 />
@@ -276,12 +281,18 @@ function ShiftMessagesTab({ formContent }: ShiftMessagesTabProps) {
                 <Typography variant="subtitle1" fontWeight={700}>
                   {form.title || 'Titel der Nachricht'}
                 </Typography>
-                {form.category && <Chip label={form.category} size="small" variant="outlined" sx={{ mt: 1 }} />}
+                {form.category && (
+                  <Chip label={form.category} size="small" variant="outlined" sx={{ mt: 1 }} />
+                )}
                 <Divider sx={{ my: 1.5 }} />
                 <MarkdownContent content={form.content || markdownHelpPlaceholder} />
               </CardContent>
             </Card>
-            <ShiftMessagesHistory groups={groups} loading={loading} onDeleteMessage={handleDeleteMessage} />
+            <ShiftMessagesHistory
+              groups={groups}
+              loading={loading}
+              onDeleteMessage={handleDeleteMessage}
+            />
           </Stack>
         </Grid>
       </Grid>

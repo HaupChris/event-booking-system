@@ -134,15 +134,28 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
         </Alert>
       )}
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} color={"text.primary"} spacing={1} sx={{ mb: 2 }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        color={'text.primary'}
+        spacing={1}
+        sx={{ mb: 2 }}
+      >
         <FormControlLabel
           control={
-            <Switch checked={showAssignments} onChange={(event) => setShowAssignments(event.target.checked)} />
+            <Switch
+              checked={showAssignments}
+              onChange={(event) => setShowAssignments(event.target.checked)}
+            />
           }
           label="Schichtangebote anzeigen"
         />
         <FormControlLabel
-          control={<Switch checked={showMessages} onChange={(event) => setShowMessages(event.target.checked)} />}
+          control={
+            <Switch
+              checked={showMessages}
+              onChange={(event) => setShowMessages(event.target.checked)}
+            />
+          }
           label="Nachrichten anzeigen"
         />
       </Stack>
@@ -155,108 +168,122 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
         </Alert>
       )}
 
-      {showAssignments && <Grid container spacing={3}>
-        {shifts.map((shift) => (
-          <Grid item xs={12} key={shift.assignment_id}>
-            <Card variant="outlined" sx={{ borderRadius: 2 }}>
-              <CardContent sx={cardContentSx}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                  <Typography variant="h6" color="primary" sx={{ flexGrow: 1 }}>
-                    {shift.workshift.title}
-                  </Typography>
-                  {getStatusChip(shift.status)}
-                </Box>
-
-                {shift.workshift.description && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {shift.workshift.description}
-                  </Typography>
-                )}
-
-                <Divider sx={{ my: 2 }} />
-
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <AccessTimeIcon sx={{ mr: 1, color: 'text.secondary' }} fontSize="small" />
-                  <Typography variant="body2">
-                    <strong>{shift.timeslot.title}</strong>
-                  </Typography>
-                </Box>
-
-                <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
-                  {shift.timeslot.start_time} - {shift.timeslot.end_time}
-                </Typography>
-
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2 }}>
-                  Zugewiesen am: {new Date(shift.assignment_date).toLocaleDateString('de-DE')}
-                </Typography>
-
-                {shift.response_date && (
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                    Beantwortet am: {new Date(shift.response_date).toLocaleDateString('de-DE')}
-                  </Typography>
-                )}
-
-                {shift.rejection_reason && (
-                  <Alert severity="info" sx={{ mt: 2 }}>
-                    <Typography variant="body2">
-                      <strong>Ablehnungsgrund:</strong> {shift.rejection_reason}
+      {showAssignments && (
+        <Grid container spacing={3}>
+          {shifts.map((shift) => (
+            <Grid item xs={12} key={shift.assignment_id}>
+              <Card variant="outlined" sx={{ borderRadius: 2 }}>
+                <CardContent sx={cardContentSx}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="h6" color="primary" sx={{ flexGrow: 1 }}>
+                      {shift.workshift.title}
                     </Typography>
-                    {shift.alternative_preferences && (
-                      <Typography variant="body2" sx={{ mt: 1 }}>
-                        <strong>Alternative Präferenzen:</strong> {shift.alternative_preferences}
+                    {getStatusChip(shift.status)}
+                  </Box>
+
+                  {shift.workshift.description && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      {shift.workshift.description}
+                    </Typography>
+                  )}
+
+                  <Divider sx={{ my: 2 }} />
+
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <AccessTimeIcon sx={{ mr: 1, color: 'text.secondary' }} fontSize="small" />
+                    <Typography variant="body2">
+                      <strong>{shift.timeslot.title}</strong>
+                    </Typography>
+                  </Box>
+
+                  <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
+                    {shift.timeslot.start_time} - {shift.timeslot.end_time}
+                  </Typography>
+
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: 'block', mt: 2 }}
+                  >
+                    Zugewiesen am: {new Date(shift.assignment_date).toLocaleDateString('de-DE')}
+                  </Typography>
+
+                  {shift.response_date && (
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                      Beantwortet am: {new Date(shift.response_date).toLocaleDateString('de-DE')}
+                    </Typography>
+                  )}
+
+                  {shift.rejection_reason && (
+                    <Alert severity="info" sx={{ mt: 2 }}>
+                      <Typography variant="body2">
+                        <strong>Ablehnungsgrund:</strong> {shift.rejection_reason}
                       </Typography>
-                    )}
-                  </Alert>
-                )}
+                      {shift.alternative_preferences && (
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                          <strong>Alternative Präferenzen:</strong> {shift.alternative_preferences}
+                        </Typography>
+                      )}
+                    </Alert>
+                  )}
 
-                {shift.admin_notes && (
-                  <Alert severity="info" sx={{ mt: 2 }}>
-                    <Typography variant="body2">
-                      <strong>Admin-Notizen:</strong> {shift.admin_notes}
-                    </Typography>
-                  </Alert>
-                )}
-              </CardContent>
+                  {shift.admin_notes && (
+                    <Alert severity="info" sx={{ mt: 2 }}>
+                      <Typography variant="body2">
+                        <strong>Admin-Notizen:</strong> {shift.admin_notes}
+                      </Typography>
+                    </Alert>
+                  )}
+                </CardContent>
 
-              {shift.status === 'pending' && (
-                <CardActions
-                  sx={{
-                    justifyContent: 'flex-end',
-                    px: { xs: 2.5, sm: 3 },
-                    pb: { xs: 2.5, sm: 3 },
-                    pt: 0,
-                  }}
-                >
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => handleDeclineClick(shift)}
-                    disabled={processing === shift.assignment_id}
+                {shift.status === 'pending' && (
+                  <CardActions
+                    sx={{
+                      justifyContent: 'flex-end',
+                      px: { xs: 2.5, sm: 3 },
+                      pb: { xs: 2.5, sm: 3 },
+                      pt: 0,
+                    }}
                   >
-                    Ablehnen
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => handleAcceptClick(shift)}
-                    disabled={processing === shift.assignment_id}
-                    startIcon={<CheckCircleIcon />}
-                  >
-                    Annehmen
-                  </Button>
-                </CardActions>
-              )}
-            </Card>
-          </Grid>
-        ))}
-      </Grid>}
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => handleDeclineClick(shift)}
+                      disabled={processing === shift.assignment_id}
+                    >
+                      Ablehnen
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => handleAcceptClick(shift)}
+                      disabled={processing === shift.assignment_id}
+                      startIcon={<CheckCircleIcon />}
+                    >
+                      Annehmen
+                    </Button>
+                  </CardActions>
+                )}
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
 
       {/* Decline Dialog */}
       <Dialog open={declineDialogOpen} onClose={handleDeclineCancel} maxWidth="sm" fullWidth>
         <DialogTitle>Schicht ablehnen</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Möchtest du uns mitteilen, warum du diese Schicht ablehnst? Das hilft uns bei der Planung.
+            Möchtest du uns mitteilen, warum du diese Schicht ablehnst? Das hilft uns bei der
+            Planung.
           </Typography>
 
           <TextField
@@ -265,6 +292,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
             label="Ablehnungsgrund (erforderlich, mind. 20 Zeichen)"
             multiline
             rows={3}
+            InputProps={{ inputComponent: 'textarea' }}
             value={rejectionReason}
             onChange={(e) => setRejectionReason(e.target.value)}
             placeholder="z.B. Zu dem Zeitpunkt nicht verfügbar..."
@@ -282,6 +310,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
             label="Alternative Präferenzen (optional)"
             multiline
             rows={3}
+            InputProps={{ inputComponent: 'textarea' }}
             value={alternativePreferences}
             onChange={(e) => setAlternativePreferences(e.target.value)}
             placeholder="z.B. Würde lieber am Samstag helfen..."

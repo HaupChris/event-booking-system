@@ -2,6 +2,7 @@
 import React from 'react';
 import type { TextFieldProps } from '@mui/material';
 import { TextField, InputAdornment, alpha, useTheme } from '@mui/material';
+import type { InputBaseComponentProps } from '@mui/material/InputBase';
 import { useThemeMode } from '../../styles/theme';
 
 interface FormFieldProps extends Omit<TextFieldProps, 'variant'> {
@@ -51,6 +52,9 @@ function FormField(props: FormFieldProps) {
       {...props}
       InputProps={{
         ...props.InputProps,
+        ...(props.multiline && !props.InputProps?.inputComponent
+          ? { inputComponent: 'textarea' as React.ElementType<InputBaseComponentProps> }
+          : {}),
         startAdornment: icon ? (
           <InputAdornment position="start">
             {React.cloneElement(icon as React.ReactElement, {

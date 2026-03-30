@@ -5,9 +5,24 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+if (process.env.NODE_ENV === 'development') {
+  window.addEventListener(
+    'error',
+    (event) => {
+      const message = event.message || (event.error as Error | undefined)?.message || '';
+      if (
+        message.includes('ResizeObserver loop completed with undelivered notifications') ||
+        message.includes('ResizeObserver loop limit exceeded')
+      ) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    },
+    true
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
     <App />
@@ -16,7 +31,7 @@ root.render(
 
 // Register service worker for PWA functionality
 serviceWorkerRegistration.register({
-  onSuccess: (registration) => {
+  onSuccess: (_registration) => {
     console.log('[PWA] Service worker registered successfully');
   },
   onUpdate: (registration) => {

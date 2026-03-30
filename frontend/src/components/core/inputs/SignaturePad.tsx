@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Box, Button, alpha } from '@mui/material';
 import { spacePalette } from '../../styles/theme';
@@ -54,14 +53,11 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
 
     // Initialize context settings
     ctx.strokeStyle = penColor;
-    ctx.lineJoin = "round";
+    ctx.lineJoin = 'round';
     ctx.lineWidth = 2;
 
     // Handle coordinates for both mouse and touch events
-    const getCoordinates = (
-      clientX: number,
-      clientY: number
-    ): { x: number, y: number } => {
+    const getCoordinates = (clientX: number, clientY: number): { x: number; y: number } => {
       if (!canvasRef.current) return { x: 0, y: 0 };
       const rect = canvasRef.current.getBoundingClientRect();
       const x = (clientX - rect.left) * (canvasRef.current.width / rect.width);
@@ -113,44 +109,46 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
     };
 
     // Add event listeners
-    canvas.addEventListener("mousedown", handleMouseDown);
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseup", handleEnd);
-    canvas.addEventListener("mouseleave", handleEnd);
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseup', handleEnd);
+    canvas.addEventListener('mouseleave', handleEnd);
 
-    canvas.addEventListener("touchstart", handleTouchStart, {passive: false});
-    canvas.addEventListener("touchmove", handleTouchMove, {passive: false});
-    canvas.addEventListener("touchend", handleEnd);
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', handleEnd);
+
+    let handleResize: (() => void) | undefined;
 
     // Handle window resize
     if (clearOnResize) {
-      const handleResize = () => {
+      handleResize = () => {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
         ctx?.clearRect(0, 0, canvas.width, canvas.height);
       };
-      window.addEventListener("resize", handleResize);
+      window.addEventListener('resize', handleResize);
     }
 
     // Clean up on unmount
     return () => {
-      canvas.removeEventListener("mousedown", handleMouseDown);
-      canvas.removeEventListener("mousemove", handleMouseMove);
-      canvas.removeEventListener("mouseup", handleEnd);
-      canvas.removeEventListener("mouseleave", handleEnd);
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('mouseup', handleEnd);
+      canvas.removeEventListener('mouseleave', handleEnd);
 
-      canvas.removeEventListener("touchstart", handleTouchStart);
-      canvas.removeEventListener("touchmove", handleTouchMove);
-      canvas.removeEventListener("touchend", handleEnd);
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      canvas.removeEventListener('touchmove', handleTouchMove);
+      canvas.removeEventListener('touchend', handleEnd);
 
-      if (clearOnResize) {
-        window.removeEventListener("resize", handleEnd);
+      if (handleResize) {
+        window.removeEventListener('resize', handleResize);
       }
     };
   }, [penColor, clearOnResize, updateCurrentSignature]);
 
   const clearSignature = () => {
-    updateCurrentSignature("");
+    updateCurrentSignature('');
   };
 
   return (
@@ -159,7 +157,7 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}
     >
       <Box
@@ -179,21 +177,17 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
         <canvas
           ref={canvasRef}
           style={{
-            touchAction: "none",
+            touchAction: 'none',
             width: '300px',
             height: '200px',
             border: `2px solid ${alpha(spacePalette.primary.main, 0.5)}`,
-            borderRadius: '10px'
+            borderRadius: '10px',
           }}
           width={300}
           height={200}
         />
       </Box>
-      <Button
-        color="primary"
-        onClick={clearSignature}
-        sx={{ mt: 2 }}
-      >
+      <Button color="primary" onClick={clearSignature} sx={{ mt: 2 }}>
         Löschen
       </Button>
     </Box>

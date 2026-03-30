@@ -109,13 +109,16 @@ function CustomSignaturePad(props: SignaturePadProps) {
     canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     canvas.addEventListener('touchend', handleEnd);
 
+    let handleResize: (() => void) | undefined;
+
     // Handle window resize
     if (clearOnResize) {
-      window.addEventListener('resize', () => {
+      handleResize = () => {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
         ctx?.clearRect(0, 0, canvas.width, canvas.height);
-      });
+      };
+      window.addEventListener('resize', handleResize);
     }
 
     // Clean up on unmount
@@ -129,8 +132,8 @@ function CustomSignaturePad(props: SignaturePadProps) {
       canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('touchend', handleEnd);
 
-      if (clearOnResize) {
-        window.removeEventListener('resize', handleEnd);
+      if (handleResize) {
+        window.removeEventListener('resize', handleResize);
       }
     };
   }, [props.onEnd, penColor, clearOnResize]);

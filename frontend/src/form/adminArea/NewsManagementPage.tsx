@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /**
  * News Management Page
  * ====================
@@ -31,22 +32,10 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import {
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Visibility as VisibilityIcon,
-} from '@mui/icons-material';
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { TokenContext } from '../../contexts/AuthContext';
-import type {
-  NewsItem,
-  CreateNewsRequest} from '../../services/adminNewsService';
-import {
-  getAllNews,
-  createNews,
-  updateNews,
-  deleteNews
-} from '../../services/adminNewsService';
+import type { NewsItem, CreateNewsRequest } from '../../services/adminNewsService';
+import { getAllNews, createNews, updateNews, deleteNews } from '../../services/adminNewsService';
 
 const NEWS_CATEGORIES = [
   { value: 'announcement', label: 'Ankündigung' },
@@ -75,8 +64,8 @@ const NewsManagementPage: React.FC = () => {
   }>({ open: false, message: '', severity: 'info' });
 
   useEffect(() => {
-    loadNews();
-  }, []);
+    loadNews().then();
+  });
 
   const loadNews = async () => {
     try {
@@ -129,7 +118,7 @@ const NewsManagementPage: React.FC = () => {
         showSnackbar('News created successfully', 'success');
       }
       handleCloseEditDialog();
-      loadNews();
+      loadNews().then();
     } catch (error) {
       console.error('Error saving news:', error);
       showSnackbar('Failed to save news', 'error');
@@ -153,7 +142,7 @@ const NewsManagementPage: React.FC = () => {
       await deleteNews(token, selectedNews.id, false); // Soft delete
       showSnackbar('News deactivated successfully', 'success');
       handleCloseDeleteDialog();
-      loadNews();
+      loadNews().then();
     } catch (error) {
       console.error('Error deleting news:', error);
       showSnackbar('Failed to delete news', 'error');
@@ -215,7 +204,12 @@ const NewsManagementPage: React.FC = () => {
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Chip label={getCategoryLabel(item.category)} size="small" color="primary" variant="outlined" />
+                  <Chip
+                    label={getCategoryLabel(item.category)}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
                 </TableCell>
                 <TableCell>{item.author || '-'}</TableCell>
                 <TableCell>{formatDate(item.published_date)}</TableCell>
@@ -231,7 +225,11 @@ const NewsManagementPage: React.FC = () => {
                     <IconButton size="small" onClick={() => handleOpenEditDialog(item)}>
                       <EditIcon fontSize="small" />
                     </IconButton>
-                    <IconButton size="small" color="error" onClick={() => handleOpenDeleteDialog(item)}>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleOpenDeleteDialog(item)}
+                    >
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </Box>
@@ -277,6 +275,7 @@ const NewsManagementPage: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               multiline
               rows={8}
+              InputProps={{ inputComponent: 'textarea' }}
               required
             />
           </Box>
@@ -298,8 +297,8 @@ const NewsManagementPage: React.FC = () => {
         <DialogTitle>Deactivate News</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to deactivate "{selectedNews?.title}"?
-            It will no longer be visible to users.
+            Are you sure you want to deactivate "{selectedNews?.title}"? It will no longer be
+            visible to users.
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -317,7 +316,10 @@ const NewsManagementPage: React.FC = () => {
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity}>
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
