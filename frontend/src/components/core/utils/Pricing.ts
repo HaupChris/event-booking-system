@@ -54,8 +54,5 @@ export function calculateTotalPriceArtist(booking: ArtistBooking, formContent: A
         total_price += foodOption.price;
     }
 
-    console.log(ticketOption, beverageOption, foodOption);
-
     return total_price;
 }
-

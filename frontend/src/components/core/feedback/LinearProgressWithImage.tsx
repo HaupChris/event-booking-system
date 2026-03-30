@@ -44,8 +44,6 @@ const LinearProgressWithImage: React.FC<LinearProgressWithImageProps> = ({
   };
 
   useEffect(() => {
-    let animationRequest: number;
-
     const updateImagePosition = () => {
       const percentage = ((activeStep + 1) / maxSteps) * 100;
       const containerWidth = progressContainerRef.current?.offsetWidth ?? 0;
@@ -53,12 +51,11 @@ const LinearProgressWithImage: React.FC<LinearProgressWithImageProps> = ({
       const imgElement = document.querySelector('.progress-image') as HTMLImageElement;
 
       if (imgElement && imageWidth && containerWidth) {
-        const verticalOffset = imageWidth / 10;
         imgElement.style.left = `calc(${percentage}% - ${imageWidth / 2}px)`;
       }
     };
 
-    animationRequest = requestAnimationFrame(updateImagePosition);
+    const animationRequest = requestAnimationFrame(updateImagePosition);
     return () => cancelAnimationFrame(animationRequest);
   }, [activeStep, imageWidth, maxSteps]);
 

@@ -2,7 +2,26 @@
  * Utility functions for workshift-related operations
  */
 
-import {TimeSlot} from "../../userArea/interface";
+interface TimeslotChoice {
+    id: number;
+    title?: string;
+    start_time?: string;
+    end_time?: string;
+}
+
+interface WorkshiftWithTimeslots {
+    title?: string;
+    time_slots: TimeslotChoice[];
+}
+
+interface BookingWithTimeslotPriorities {
+    first_name: string;
+    last_name: string;
+    amount_shifts: number;
+    timeslot_priority_1: number | null;
+    timeslot_priority_2: number | null;
+    timeslot_priority_3: number | null;
+}
 
 /**
  * Converts timeslot priority number to German text
@@ -17,16 +36,22 @@ export const timeslotPriorityToString = (priority: number): string => {
 /**
  * Finds the workshift that contains a specific timeslot
  */
-export const getWorkshiftForTimeslot = (timeslotId: number, workshifts: any[]) => {
+export const getWorkshiftForTimeslot = (
+    timeslotId: number,
+    workshifts: WorkshiftWithTimeslots[]
+): WorkshiftWithTimeslots | undefined => {
     return workshifts.find(shift =>
-        shift.time_slots.some((slot: any) => slot.id === timeslotId)
+        shift.time_slots.some((slot) => slot.id === timeslotId)
     );
 };
 
 /**
  * Calculates how many people are assigned to a specific timeslot
  */
-export const getTimeslotCount = (timeslotId: number, bookings: any[]): number => {
+export const getTimeslotCount = (
+    timeslotId: number,
+    bookings: BookingWithTimeslotPriorities[]
+): number => {
     return bookings.reduce((count, booking) => {
         return count + (
             [booking.timeslot_priority_1].includes(timeslotId) ||
@@ -40,7 +65,10 @@ export const getTimeslotCount = (timeslotId: number, bookings: any[]): number =>
 /**
  * Gets all timeslots assigned to a specific user with their priorities
  */
-export const getTimeslotsForUser = (booking: any, workshifts: any[]) => {
+export const getTimeslotsForUser = (
+    booking: BookingWithTimeslotPriorities,
+    workshifts: WorkshiftWithTimeslots[]
+) => {
     const timeslotIds = [
         booking.timeslot_priority_1,
         booking.timeslot_priority_2,
@@ -73,7 +101,10 @@ export const getTimeslotsForUser = (booking: any, workshifts: any[]) => {
 /**
  * Gets all users who selected a particular timeslot
  */
-export const getUsersForTimeslot = (timeslotId: number, bookings: any[]) => {
+export const getUsersForTimeslot = (
+    timeslotId: number,
+    bookings: BookingWithTimeslotPriorities[]
+) => {
     return bookings
         .filter(booking =>
             [booking.timeslot_priority_1, booking.timeslot_priority_2, booking.timeslot_priority_3].includes(timeslotId)

@@ -24,7 +24,6 @@ const OfflineIndicator: React.FC = () => {
 
     // Handle online/offline events
     const handleOnline = () => {
-      console.log('[OfflineIndicator] Connection restored');
       setIsOnline(true);
       setShowIndicator(true);
 
@@ -35,7 +34,6 @@ const OfflineIndicator: React.FC = () => {
     };
 
     const handleOffline = () => {
-      console.log('[OfflineIndicator] Connection lost');
       setIsOnline(false);
       setShowIndicator(true);
     };

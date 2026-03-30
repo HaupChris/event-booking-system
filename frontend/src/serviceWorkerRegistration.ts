@@ -11,6 +11,17 @@ type Config = {
   onUpdate?: (registration: ServiceWorkerRegistration) => void;
 };
 
+export interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+}
+
+declare global {
+  interface Window {
+    deferredPrompt?: BeforeInstallPromptEvent | null;
+  }
+}
+
 export function register(config?: Config) {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
@@ -26,13 +37,6 @@ export function register(config?: Config) {
       if (isLocalhost) {
         // This is running on localhost. Check if a service worker still exists or not.
         checkValidServiceWorker(swUrl, config);
-
-        // Add some additional logging to localhost
-        navigator.serviceWorker.ready.then(() => {
-          console.log(
-            '[SW] This web app is being served cache-first by a service worker.'
-          );
-        });
       } else {
         // Is not localhost. Just register service worker
         registerValidSW(swUrl, config);
@@ -45,27 +49,19 @@ function registerValidSW(swUrl: string, config?: Config) {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
-      console.log('[SW] Service Worker registered:', registration);
-
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
-        if (installingWorker == null) {
+        if (installingWorker === null) {
           return;
         }
         installingWorker.onstatechange = () => {
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
-              // New content is available; please refresh
-              console.log('[SW] New content is available; please refresh.');
-
               // Execute callback
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
               }
             } else {
-              // Content is cached for offline use
-              console.log('[SW] Content is cached for offline use.');
-
               // Execute callback
               if (config && config.onSuccess) {
                 config.onSuccess(registration);
@@ -75,9 +71,7 @@ function registerValidSW(swUrl: string, config?: Config) {
         };
       };
     })
-    .catch((error) => {
-      console.error('[SW] Error during service worker registration:', error);
-    });
+    .catch(() => {});
 }
 
 function checkValidServiceWorker(swUrl: string, config?: Config) {
@@ -90,7 +84,7 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
       const contentType = response.headers.get('content-type');
       if (
         response.status === 404 ||
-        (contentType != null && contentType.indexOf('javascript') === -1)
+        (contentType !== null && contentType.indexOf('javascript') === -1)
       ) {
         // No service worker found. Reload the page.
         navigator.serviceWorker.ready.then((registration) => {
@@ -103,9 +97,7 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
         registerValidSW(swUrl, config);
       }
     })
-    .catch(() => {
-      console.log('[SW] No internet connection found. App is running in offline mode.');
-    });
+    .catch(() => {});
 }
 
 export function unregister() {
@@ -114,16 +106,13 @@ export function unregister() {
       .then((registration) => {
         registration.unregister();
       })
-      .catch((error) => {
-        console.error(error.message);
-      });
+      .catch(() => {});
   }
 }
 
 // Request notification permission
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
   if (!('Notification' in window)) {
-    console.log('[SW] This browser does not support notifications.');
     return 'denied';
   }
 
@@ -142,7 +131,6 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
 // Subscribe to push notifications
 export async function subscribeToPushNotifications(): Promise<PushSubscription | null> {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    console.log('[SW] Push notifications are not supported.');
     return null;
   }
 
@@ -156,10 +144,8 @@ export async function subscribeToPushNotifications(): Promise<PushSubscription |
       ),
     });
 
-    console.log('[SW] Push notification subscription:', subscription);
     return subscription;
-  } catch (error) {
-    console.error('[SW] Failed to subscribe to push notifications:', error);
+  } catch {
     return null;
   }
 }
@@ -180,25 +166,21 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 
 // Check if app is installed as PWA
 export function isPWA(): boolean {
+  const maybeStandaloneNavigator = window.navigator as Navigator & { standalone?: boolean };
   return window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as any).standalone === true ||
+    maybeStandaloneNavigator.standalone === true ||
     document.referrer.includes('android-app://');
 }
 
 // Prompt user to install PWA
 export function promptInstall() {
   // This will be set by the beforeinstallprompt event
-  const deferredPrompt = (window as any).deferredPrompt;
+  const deferredPrompt = window.deferredPrompt;
 
   if (deferredPrompt) {
     deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult: any) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('[SW] User accepted the install prompt');
-      } else {
-        console.log('[SW] User dismissed the install prompt');
-      }
-      (window as any).deferredPrompt = null;
+    deferredPrompt.userChoice.then(() => {
+      window.deferredPrompt = null;
     });
   }
 }

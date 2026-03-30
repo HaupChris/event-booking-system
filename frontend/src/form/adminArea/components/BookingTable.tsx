@@ -6,8 +6,7 @@ import {
 import {
   MoreHoriz as MoreHorizIcon,
   ContentCopy as CopyIcon,
-  Visibility as VisibilityIcon,
-  Link as LinkIcon
+  Visibility as VisibilityIcon
 } from '@mui/icons-material';
 import type { CombinedBooking } from "../interface";
 import type { FormContent } from "../../userArea/interface";

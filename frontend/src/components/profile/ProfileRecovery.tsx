@@ -27,6 +27,19 @@ const ProfileRecovery: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const getErrorStatus = (errorValue: unknown): number | undefined => {
+    if (!errorValue || typeof errorValue !== 'object') {
+      return undefined;
+    }
+
+    const maybeResponse = (errorValue as { response?: { status?: unknown } }).response;
+    if (!maybeResponse) {
+      return undefined;
+    }
+
+    return typeof maybeResponse.status === 'number' ? maybeResponse.status : undefined;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -44,12 +57,13 @@ const ProfileRecovery: React.FC = () => {
       await recoverProfile(email);
       setSuccess(true);
       setEmail('');
-    } catch (err: any) {
+    } catch (err) {
+      const status = getErrorStatus(err);
       // Don't expose whether email exists (security best practice)
       // But show technical errors
-      if (err.response?.status === 429) {
+      if (status === 429) {
         setError('Zu viele Anfragen. Bitte versuche es in einer Stunde erneut.');
-      } else if (err.response?.status >= 500) {
+      } else if (typeof status === 'number' && status >= 500) {
         setError('Serverfehler. Bitte versuche es später erneut.');
       } else {
         // Generic success message even on error (security)

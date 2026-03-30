@@ -5,6 +5,10 @@
 import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 
+type ErrorResponse = {
+    message?: string;
+};
+
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
     baseURL: process.env.REACT_APP_API_BASE_URL || '',
@@ -45,7 +49,7 @@ apiClient.interceptors.response.use(
         // Handle common error scenarios
         if (error.response) {
             const status = error.response.status;
-            const message = (error.response.data as any)?.message || error.message;
+            const message = (error.response.data as ErrorResponse | undefined)?.message || error.message;
 
             switch (status) {
                 case 401:

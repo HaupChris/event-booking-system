@@ -18,7 +18,7 @@ interface FormManagementOptions<T> {
    * Each key maps to a function that returns an error message string (or empty string if valid)
    */
   validationRules?: {
-    [K in keyof T]?: (value: any) => string;
+    [K in keyof T]?: (value: T[K]) => string;
   };
   /** LocalStorage key to persist form state */
   storageKey?: string;
@@ -45,7 +45,7 @@ interface FormManagementReturn<T> {
   handlePrevious: () => void;
 }
 
-export function useFormManagement<T extends Record<string, any>>({
+export function useFormManagement<T extends Record<string, unknown>>({
   initialState,
   validationRules = {},
   storageKey,

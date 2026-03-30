@@ -48,13 +48,11 @@ export const getTimeslotWithWorkshift = (id: number, formContent: FormContent) =
  */
 export function calculateTotalPrice(
     booking: CombinedBooking,
-    field: string,
-    value: any,
+    _field: string,
+    _value: unknown,
     formContent: FormContent,
     artistFormContent: ArtistFormContent
 ): number {
-    const options = booking.bookingType === 'artist' ? artistFormContent : formContent;
-    const totalPrice = 0;
     if (booking.bookingType === "artist") {
         return calculateTotalPriceArtist(booking as ArtistBooking, artistFormContent);
     }

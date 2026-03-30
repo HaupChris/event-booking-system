@@ -1,30 +1,5 @@
-/**
- * Work Shifts
- * ===========
- * Component for managing work shift assignments with accept/decline functionality
- */
-
 import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-  Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Alert,
-  Grid,
-  Divider,
-  FormControlLabel,
-  Stack,
-  Switch,
-} from '@mui/material';
+import { Box, Typography, Card, CardContent, CardActions, Button, Chip, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, Grid, Divider, FormControlLabel, Stack, Switch } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import PendingIcon from '@mui/icons-material/Pending';
@@ -57,16 +32,17 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
   const [processing, setProcessing] = useState<number | null>(null);
   const [showAssignments, setShowAssignments] = useState(true);
   const [showMessages, setShowMessages] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
 
   const handleAcceptClick = async (shift: ShiftAssignment) => {
     try {
+      setErrorMessage(null);
       setProcessing(shift.assignment_id);
       await onAccept(shift.assignment_id);
       await onRefresh();
-    } catch (error) {
-      console.error('Error accepting shift:', error);
-      alert('Fehler beim Annehmen der Schicht. Bitte versuche es erneut.');
+    } catch {
+      setErrorMessage('Fehler beim Annehmen der Schicht. Bitte versuche es erneut.');
     } finally {
       setProcessing(null);
     }
@@ -85,7 +61,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
     const trimmedReason = rejectionReason.trim();
 
     if (!trimmedReason || trimmedReason.length < MIN_REASON_LENGTH) {
-      alert(
+      setErrorMessage(
         `Bitte gib einen Ablehnungsgrund von mindestens ${MIN_REASON_LENGTH} Zeichen an. ` +
           `Das hilft uns bei der Planung. Noch ${MIN_REASON_LENGTH - trimmedReason.length} Zeichen benötigt.`
       );
@@ -93,6 +69,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
     }
 
     try {
+      setErrorMessage(null);
       setProcessing(selectedShift.assignment_id);
       await onDecline(selectedShift.assignment_id, trimmedReason, alternativePreferences);
       setDeclineDialogOpen(false);
@@ -100,9 +77,8 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
       setAlternativePreferences('');
       setSelectedShift(null);
       await onRefresh();
-    } catch (error) {
-      console.error('Error declining shift:', error);
-      alert('Fehler beim Ablehnen der Schicht. Bitte versuche es erneut.');
+    } catch {
+      setErrorMessage('Fehler beim Ablehnen der Schicht. Bitte versuche es erneut.');
     } finally {
       setProcessing(null);
     }
@@ -113,6 +89,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
     setRejectionReason('');
     setAlternativePreferences('');
     setSelectedShift(null);
+    setErrorMessage(null);
   };
 
   const getStatusChip = (status: string) => {
@@ -131,6 +108,12 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
       {!isOnline && (
         <Alert severity="warning" sx={{ mb: 3 }}>
           Du bist offline. Änderungen werden synchronisiert, sobald du wieder online bist.
+        </Alert>
+      )}
+
+      {errorMessage && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {errorMessage}
         </Alert>
       )}
 

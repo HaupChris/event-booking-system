@@ -111,7 +111,7 @@ export function getDummyFormContent(): FormContent {
 
 // Form props interface
 export interface FormProps {
-    updateBooking: (key: keyof Booking, value: any) => void;
+    updateBooking: (key: keyof Booking, value: unknown) => void;
     currentBooking: Booking;
     formValidation: { [key in keyof Booking]?: string };
     formContent: FormContent;

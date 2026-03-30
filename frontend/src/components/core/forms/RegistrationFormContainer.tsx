@@ -134,7 +134,6 @@ export function RegistrationFormContainer<
   // Calculate total price when dependencies change
   useEffect(() => {
     const total_price = config.calculateTotalPrice(booking, formContent);
-    console.log(total_price);
     updateField('total_price' as keyof TBooking, total_price as any);
   }, [...config.priceDependencies.map((dep) => booking[dep]), formContent]);
 

@@ -1,0 +1,208 @@
+import React from 'react';
+import {
+  alpha,
+  Box,
+  Button,
+  Chip,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
+import { ConfirmationNumber, LocalDining, Paid, SportsBar } from '@mui/icons-material';
+import FormCard from '../../../components/core/display/FormCard';
+import { spacePalette } from '../../../components/styles/theme';
+import type { ViewFilterType } from '../utils/optionsUtils';
+
+type CategoryTotals = Record<string, { count: number; total: number; isArtist: boolean }>;
+
+interface FinancialDetailTablesProps {
+  ticketTotals: CategoryTotals;
+  beverageTotals: CategoryTotals;
+  foodTotals: CategoryTotals;
+  grandTotal: number;
+  viewType: ViewFilterType;
+}
+
+const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
+  ticketTotals,
+  beverageTotals,
+  foodTotals,
+  grandTotal,
+  viewType,
+}) => {
+  return (
+    <Grid container spacing={3}>
+      <Grid item xs={12} md={4}>
+        <FormCard title="Ticket Sales" icon={<ConfirmationNumber />}>
+          <Box sx={{ p: 2 }}>
+            <TableContainer component={Paper} variant="outlined">
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: alpha(spacePalette.primary.main, 0.05) }}>
+                    <TableCell>Ticket Type</TableCell>
+                    <TableCell align="right">Count</TableCell>
+                    <TableCell align="right">Total (EUR)</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Object.entries(ticketTotals).map(([key, { count, total, isArtist }]) => (
+                    <TableRow
+                      key={key}
+                      sx={{ bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent' }}
+                    >
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          {isArtist && <Chip label="A" color="primary" size="small" sx={{ mr: 1 }} />}
+                          {key.split('-')[1]}
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">{count}</TableCell>
+                      <TableCell align="right">{total.toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha('#000', 0.04) } }}>
+                    <TableCell>Total Tickets</TableCell>
+                    <TableCell align="right">
+                      {Object.values(ticketTotals).reduce((sum, { count }) => sum + count, 0)}
+                    </TableCell>
+                    <TableCell align="right">
+                      {Object.values(ticketTotals).reduce((sum, { total }) => sum + total, 0).toFixed(2)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </FormCard>
+      </Grid>
+
+      <Grid item xs={12} md={4}>
+        <FormCard title="Beverage Sales" icon={<SportsBar />}>
+          <Box sx={{ p: 2 }}>
+            <TableContainer component={Paper} variant="outlined">
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: alpha(spacePalette.primary.main, 0.05) }}>
+                    <TableCell>Beverage Type</TableCell>
+                    <TableCell align="right">Count</TableCell>
+                    <TableCell align="right">Total (EUR)</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Object.entries(beverageTotals).map(([key, { count, total, isArtist }]) => (
+                    <TableRow
+                      key={key}
+                      sx={{ bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent' }}
+                    >
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          {isArtist && <Chip label="A" color="primary" size="small" sx={{ mr: 1 }} />}
+                          {key.split('-')[1]}
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">{count}</TableCell>
+                      <TableCell align="right">{total.toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha('#000', 0.04) } }}>
+                    <TableCell>Total Beverages</TableCell>
+                    <TableCell align="right">
+                      {Object.values(beverageTotals).reduce((sum, { count }) => sum + count, 0)}
+                    </TableCell>
+                    <TableCell align="right">
+                      {Object.values(beverageTotals).reduce((sum, { total }) => sum + total, 0).toFixed(2)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </FormCard>
+      </Grid>
+
+      <Grid item xs={12} md={4}>
+        <FormCard title="Food Sales" icon={<LocalDining />}>
+          <Box sx={{ p: 2 }}>
+            <TableContainer component={Paper} variant="outlined">
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: alpha(spacePalette.primary.main, 0.05) }}>
+                    <TableCell>Food Type</TableCell>
+                    <TableCell align="right">Count</TableCell>
+                    <TableCell align="right">Total (EUR)</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Object.entries(foodTotals).map(([key, { count, total, isArtist }]) => (
+                    <TableRow
+                      key={key}
+                      sx={{ bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent' }}
+                    >
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          {isArtist && <Chip label="A" color="primary" size="small" sx={{ mr: 1 }} />}
+                          {key.split('-')[1]}
+                          <br />
+                          {key.split('-')[2]}
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">{count}</TableCell>
+                      <TableCell align="right">{total.toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha('#000', 0.04) } }}>
+                    <TableCell>Total Food</TableCell>
+                    <TableCell align="right">
+                      {Object.values(foodTotals).reduce((sum, { count }) => sum + count, 0)}
+                    </TableCell>
+                    <TableCell align="right">
+                      {Object.values(foodTotals).reduce((sum, { total }) => sum + total, 0).toFixed(2)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </FormCard>
+      </Grid>
+
+      <Grid item xs={12}>
+        <Paper
+          sx={{
+            p: 3,
+            bgcolor: alpha(spacePalette.primary.main, 0.1),
+            borderRadius: 2,
+            border: `1px solid ${alpha(spacePalette.primary.main, 0.2)}`,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 2,
+            }}
+          >
+            <Typography variant="h5" color="primary.main" fontWeight="medium">
+              Total Revenue: EUR{grandTotal.toFixed(2)}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button variant="outlined" color="primary" startIcon={<Paid />}>
+                {viewType === 'all' ? 'All' : viewType === 'regular' ? 'Regular' : 'Artist'} Payments
+              </Button>
+            </Box>
+          </Box>
+        </Paper>
+      </Grid>
+    </Grid>
+  );
+};
+
+export default FinancialDetailTables;

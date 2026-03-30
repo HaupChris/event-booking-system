@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import type { BeforeInstallPromptEvent } from './serviceWorkerRegistration';
 
 if (process.env.NODE_ENV === 'development') {
   window.addEventListener(
@@ -31,11 +32,8 @@ root.render(
 
 // Register service worker for PWA functionality
 serviceWorkerRegistration.register({
-  onSuccess: (_registration) => {
-    console.log('[PWA] Service worker registered successfully');
-  },
+  onSuccess: () => {},
   onUpdate: (registration) => {
-    console.log('[PWA] New content available, please refresh');
     // Dispatch custom event that can be caught by a component
     const event = new CustomEvent('swUpdated', { detail: registration });
     window.dispatchEvent(event);
@@ -45,7 +43,7 @@ serviceWorkerRegistration.register({
 // Store beforeinstallprompt event for later use
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
-  (window as any).deferredPrompt = e;
+  window.deferredPrompt = e as BeforeInstallPromptEvent;
 
   // Dispatch custom event for install prompt
   const event = new CustomEvent('showInstallPrompt');

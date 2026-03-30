@@ -16,7 +16,7 @@ import { useState } from 'react';
  * // Close modal and clear selection
  * close();
  */
-export function useModal<T = any>() {
+export function useModal<T = unknown>() {
     const [selectedItem, setSelectedItem] = useState<T | null>(null);
     const [isOpen, setIsOpen] = useState(false);
 

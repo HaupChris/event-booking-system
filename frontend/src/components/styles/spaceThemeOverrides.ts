@@ -1,9 +1,24 @@
 import type { Components, Theme } from '@mui/material/styles';
 import { alpha } from '@mui/material';
 
+interface SpacePalette {
+  primary: {
+    main: string;
+    dark: string;
+    light: string;
+  };
+  text: {
+    primary: string;
+  };
+  background: {
+    card: string;
+    paper: string;
+  };
+}
+
 // Component overrides factory function for space themes (dark/light)
 export const getComponentOverrides = (
-  palette: any,
+  palette: SpacePalette,
   mode: 'dark' | 'light'
 ): Components<Omit<Theme, 'components'>> => {
   const isDark = mode === 'dark';

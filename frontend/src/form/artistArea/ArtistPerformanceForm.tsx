@@ -23,20 +23,6 @@ function ArtistPerformanceForm(props: ArtistFormProps) {
         props.updateBooking('performance_details', JSON.stringify(updatedDetails));
     };
 
-    // Define select options
-    const dayOptions = [
-        { value: 'Donnerstag', label: 'Donnerstag' },
-        { value: 'Freitag', label: 'Freitag' },
-        { value: 'Samstag', label: 'Samstag' }
-    ];
-
-    const timeOptions = [
-        { value: 'Nachmittag', label: 'Nachmittag' },
-        { value: 'Früher Abend', label: 'Früher Abend' },
-        { value: 'Hauptprogramm', label: 'Hauptprogramm' },
-        { value: 'Nacht', label: 'Nacht' }
-    ];
-
     const durationOptions = [
         { value: '30', label: '30 Minuten' },
         { value: '45', label: '45 Minuten' },

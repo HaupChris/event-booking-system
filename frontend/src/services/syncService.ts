@@ -38,14 +38,12 @@ export class SyncService {
   private setupEventListeners() {
     // Listen for online event to trigger sync
     window.addEventListener('online', () => {
-      console.log('[SyncService] Connection restored, starting sync...');
       this.syncAll();
     });
 
     // Listen for visibility change to sync when app comes to foreground
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && navigator.onLine) {
-        console.log('[SyncService] App visible and online, checking for updates...');
         this.syncAll();
       }
     });
@@ -56,20 +54,16 @@ export class SyncService {
    */
   async syncAll(token?: string): Promise<void> {
     if (this.syncInProgress) {
-      console.log('[SyncService] Sync already in progress, skipping...');
       return;
     }
 
     if (!navigator.onLine) {
-      console.log('[SyncService] Offline, skipping sync');
       return;
     }
 
     this.syncInProgress = true;
 
     try {
-      console.log('[SyncService] Starting full sync...');
-
       // Process pending operations first
       await this.processSyncQueue(token);
 
@@ -83,9 +77,7 @@ export class SyncService {
         })
       );
 
-      console.log('[SyncService] Sync completed successfully');
-    } catch (error) {
-      console.error('[SyncService] Sync failed:', error);
+    } catch {
     } finally {
       this.syncInProgress = false;
     }
@@ -108,11 +100,9 @@ export class SyncService {
 
       const profileData: ProfileData = await response.json();
       await ProfileDB.save(profileData);
-      console.log('[SyncService] Profile synced successfully');
 
       return profileData;
-    } catch (error) {
-      console.error('[SyncService] Failed to sync profile:', error);
+    } catch {
 
       // Return cached data if available
       return await ProfileDB.get(userId);
@@ -136,11 +126,9 @@ export class SyncService {
 
       const bookingData: BookingData = await response.json();
       await BookingDB.save(bookingData);
-      console.log('[SyncService] Booking synced successfully');
 
       return bookingData;
-    } catch (error) {
-      console.error('[SyncService] Failed to sync booking:', error);
+    } catch {
 
       // Return cached data if available
       return await BookingDB.get(userId);
@@ -164,11 +152,9 @@ export class SyncService {
 
       const newsItems: NewsFeedItem[] = await response.json();
       await NewsFeedDB.saveItems(newsItems);
-      console.log('[SyncService] News feed synced successfully');
 
       return newsItems;
-    } catch (error) {
-      console.error('[SyncService] Failed to sync news feed:', error);
+    } catch {
 
       // Return cached data if available
       return await NewsFeedDB.getAll();
@@ -182,7 +168,6 @@ export class SyncService {
     if (navigator.onLine) {
       return await this.syncProfile(userId, token);
     } else {
-      console.log('[SyncService] Offline, returning cached profile');
       return await ProfileDB.get(userId);
     }
   }
@@ -194,7 +179,6 @@ export class SyncService {
     if (navigator.onLine) {
       return await this.syncBooking(userId, token);
     } else {
-      console.log('[SyncService] Offline, returning cached booking');
       return await BookingDB.get(userId);
     }
   }
@@ -206,7 +190,6 @@ export class SyncService {
     if (navigator.onLine) {
       return await this.syncNewsFeed(token);
     } else {
-      console.log('[SyncService] Offline, returning cached news feed');
       return await NewsFeedDB.getAll();
     }
   }
@@ -216,10 +199,9 @@ export class SyncService {
    */
   async queueOperation(
     type: SyncOperation['type'],
-    payload: any
+    payload: SyncOperation['payload']
   ): Promise<string> {
     const operationId = await SyncQueueDB.add({ type, payload });
-    console.log(`[SyncService] Operation queued: ${type}`);
 
     // If online, try to sync immediately
     if (navigator.onLine) {
@@ -236,26 +218,20 @@ export class SyncService {
     const pendingOps = await SyncQueueDB.getPending();
 
     if (pendingOps.length === 0) {
-      console.log('[SyncService] No pending operations to sync');
       return;
     }
-
-    console.log(`[SyncService] Processing ${pendingOps.length} pending operations...`);
 
     for (const operation of pendingOps) {
       try {
         await SyncQueueDB.updateStatus(operation.id, 'processing');
         await this.executeOperation(operation, token);
         await SyncQueueDB.remove(operation.id);
-        console.log(`[SyncService] Operation ${operation.id} completed successfully`);
       } catch (error) {
-        console.error(`[SyncService] Operation ${operation.id} failed:`, error);
 
         // Update retry count
         const newRetries = operation.retries + 1;
 
         if (newRetries >= MAX_RETRIES) {
-          console.error(`[SyncService] Operation ${operation.id} failed after ${MAX_RETRIES} retries`);
           await SyncQueueDB.updateStatus(operation.id, 'failed', newRetries);
 
           // Dispatch event for failed operation
@@ -285,37 +261,38 @@ export class SyncService {
 
     let url = '';
     let method = 'POST';
-    let body: any = null;
+    let body: string | null = null;
+    const payload = operation.payload;
 
     switch (operation.type) {
       case 'ACCEPT_SHIFT':
-        url = `${API_BASE_URL}/api/shifts/${operation.payload.shiftId}/accept`;
-        body = JSON.stringify({ userId: operation.payload.userId });
+        url = `${API_BASE_URL}/api/shifts/${String(payload.shiftId)}/accept`;
+        body = JSON.stringify({ userId: payload.userId });
         break;
 
       case 'DECLINE_SHIFT':
-        url = `${API_BASE_URL}/api/shifts/${operation.payload.shiftId}/decline`;
+        url = `${API_BASE_URL}/api/shifts/${String(payload.shiftId)}/decline`;
         body = JSON.stringify({
-          userId: operation.payload.userId,
-          reason: operation.payload.reason,
+          userId: payload.userId,
+          reason: payload.reason,
         });
         break;
 
       case 'UPDATE_PROFILE':
-        url = `${API_BASE_URL}/api/profile/${operation.payload.userId}`;
+        url = `${API_BASE_URL}/api/profile/${String(payload.userId)}`;
         method = 'PUT';
-        body = JSON.stringify(operation.payload.data);
+        body = JSON.stringify(payload.data);
         break;
 
       case 'UPDATE_BOOKING':
-        url = `${API_BASE_URL}/api/bookings/${operation.payload.userId}`;
+        url = `${API_BASE_URL}/api/bookings/${String(payload.userId)}`;
         method = 'PUT';
-        body = JSON.stringify(operation.payload.data);
+        body = JSON.stringify(payload.data);
         break;
 
       case 'MARK_NEWS_READ':
-        url = `${API_BASE_URL}/api/news/${operation.payload.newsId}/read`;
-        body = JSON.stringify({ userId: operation.payload.userId });
+        url = `${API_BASE_URL}/api/news/${String(payload.newsId)}/read`;
+        body = JSON.stringify({ userId: payload.userId });
         break;
 
       default:
@@ -362,7 +339,6 @@ export class SyncService {
     await BookingDB.delete('current');
     await NewsFeedDB.clear();
     await SyncQueueDB.clear();
-    console.log('[SyncService] All sync data cleared');
   }
 }
 

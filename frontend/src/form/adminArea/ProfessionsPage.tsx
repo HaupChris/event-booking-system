@@ -21,7 +21,7 @@ const ProfessionsPage: React.FC = () => {
 
   // State
   const [activeTab, setActiveTab] = useState('professions');
-  const [peopleSortOrder, setPeopleSortOrder] = useState<'asc' | 'desc'>('asc');
+  const peopleSortOrder: 'asc' | 'desc' = 'asc';
   const [viewType, setViewType] = useState<ViewFilterType>('all');
   const [viewTypeAnchorEl, setViewTypeAnchorEl] = useState<null | HTMLElement>(null);
 

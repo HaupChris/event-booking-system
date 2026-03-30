@@ -26,11 +26,11 @@ export interface ProfileData {
 
 export interface BookingData {
   userId: string;
-  tickets: any[];
-  food: any[];
-  beverages: any[];
-  workShifts: any[];
-  materials: any[];
+  tickets: unknown[];
+  food: unknown[];
+  beverages: unknown[];
+  workShifts: unknown[];
+  materials: unknown[];
   lastSync: string;
 }
 
@@ -45,7 +45,7 @@ export interface NewsFeedItem {
 export interface SyncOperation {
   id: string;
   type: 'ACCEPT_SHIFT' | 'DECLINE_SHIFT' | 'UPDATE_PROFILE' | 'UPDATE_BOOKING' | 'MARK_NEWS_READ';
-  payload: any;
+  payload: Record<string, unknown>;
   timestamp: string;
   retries: number;
   status: 'pending' | 'processing' | 'failed';
@@ -57,18 +57,15 @@ export function initDB(): Promise<IDBDatabase> {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () => {
-      console.error('[IndexedDB] Error opening database:', request.error);
       reject(request.error);
     };
 
     request.onsuccess = () => {
-      console.log('[IndexedDB] Database opened successfully');
       resolve(request.result);
     };
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
-      console.log('[IndexedDB] Upgrading database...');
 
       // Create object stores if they don't exist
       if (!db.objectStoreNames.contains(STORES.PROFILES)) {
@@ -95,7 +92,6 @@ export function initDB(): Promise<IDBDatabase> {
         db.createObjectStore(STORES.METADATA, { keyPath: 'key' });
       }
 
-      console.log('[IndexedDB] Database upgrade complete');
     };
   });
 }
@@ -114,12 +110,10 @@ export async function getItem<T>(storeName: string, key: string): Promise<T | nu
       };
 
       request.onerror = () => {
-        console.error(`[IndexedDB] Error getting item from ${storeName}:`, request.error);
         reject(request.error);
       };
     });
-  } catch (error) {
-    console.error('[IndexedDB] Error in getItem:', error);
+  } catch {
     return null;
   }
 }
@@ -138,12 +132,10 @@ export async function putItem<T>(storeName: string, item: T): Promise<void> {
       };
 
       request.onerror = () => {
-        console.error(`[IndexedDB] Error putting item to ${storeName}:`, request.error);
         reject(request.error);
       };
     });
   } catch (error) {
-    console.error('[IndexedDB] Error in putItem:', error);
     throw error;
   }
 }
@@ -162,12 +154,10 @@ export async function deleteItem(storeName: string, key: string): Promise<void> 
       };
 
       request.onerror = () => {
-        console.error(`[IndexedDB] Error deleting item from ${storeName}:`, request.error);
         reject(request.error);
       };
     });
   } catch (error) {
-    console.error('[IndexedDB] Error in deleteItem:', error);
     throw error;
   }
 }
@@ -186,12 +176,10 @@ export async function getAllItems<T>(storeName: string): Promise<T[]> {
       };
 
       request.onerror = () => {
-        console.error(`[IndexedDB] Error getting all items from ${storeName}:`, request.error);
         reject(request.error);
       };
     });
-  } catch (error) {
-    console.error('[IndexedDB] Error in getAllItems:', error);
+  } catch {
     return [];
   }
 }
@@ -206,17 +194,14 @@ export async function clearStore(storeName: string): Promise<void> {
       const request = store.clear();
 
       request.onsuccess = () => {
-        console.log(`[IndexedDB] Cleared store: ${storeName}`);
         resolve();
       };
 
       request.onerror = () => {
-        console.error(`[IndexedDB] Error clearing store ${storeName}:`, request.error);
         reject(request.error);
       };
     });
   } catch (error) {
-    console.error('[IndexedDB] Error in clearStore:', error);
     throw error;
   }
 }
@@ -298,7 +283,6 @@ export const SyncQueueDB = {
     };
 
     await putItem(STORES.SYNC_QUEUE, syncOp);
-    console.log('[SyncQueue] Added operation:', syncOp);
     return id;
   },
 
@@ -333,17 +317,21 @@ export const SyncQueueDB = {
 
 // Metadata operations (for storing app state, last sync times, etc.)
 export const MetadataDB = {
-  async set(key: string, value: any): Promise<void> {
+  async set(key: string, value: unknown): Promise<void> {
     return putItem(STORES.METADATA, { key, value, timestamp: new Date().toISOString() });
   },
 
-  async get(key: string): Promise<any> {
-    const result = await getItem<{ key: string; value: any; timestamp: string }>(STORES.METADATA, key);
+  async get(key: string): Promise<unknown> {
+    const result = await getItem<{ key: string; value: unknown; timestamp: string }>(
+      STORES.METADATA,
+      key
+    );
     return result?.value || null;
   },
 
   async getLastSyncTime(): Promise<string | null> {
-    return this.get('lastSyncTime');
+    const value = await this.get('lastSyncTime');
+    return typeof value === 'string' ? value : null;
   },
 
   async setLastSyncTime(time: string): Promise<void> {
@@ -358,5 +346,4 @@ export async function clearAllData(): Promise<void> {
   await clearStore(STORES.NEWS_FEED);
   await clearStore(STORES.SYNC_QUEUE);
   await clearStore(STORES.METADATA);
-  console.log('[IndexedDB] All data cleared');
 }

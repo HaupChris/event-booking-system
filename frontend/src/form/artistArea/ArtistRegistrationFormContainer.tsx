@@ -100,7 +100,7 @@ export function getDummyArtistFormContent(): ArtistFormContent {
 }
 
 export interface ArtistFormProps {
-    updateBooking: (key: keyof ArtistBooking, value: any) => void;
+    updateBooking: (key: keyof ArtistBooking, value: unknown) => void;
     currentBooking: ArtistBooking;
     formValidation: { [key in keyof ArtistBooking]?: string };
     formContent: ArtistFormContent;

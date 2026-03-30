@@ -12,8 +12,8 @@ import type { ArtistFormContent } from '../form/artistArea/interface';
 export const bookingApi = {
     getAll: () => apiClient.get('/api/data'),
     getById: (id: number) => apiClient.get(`/api/booking/${id}`),
-    create: (data: any) => apiClient.post('/api/booking', data),
-    update: (id: number, data: any) => apiClient.put(`/api/booking/${id}`, data),
+    create: (data: unknown) => apiClient.post('/api/booking', data),
+    update: (id: number, data: unknown) => apiClient.put(`/api/booking/${id}`, data),
     delete: (id: number) => apiClient.delete(`/api/booking/${id}`),
     updatePaymentStatus: (id: number, paymentReceived: boolean) =>
         apiClient.put(`/api/booking/${id}`, { payment_received: paymentReceived }),
@@ -25,8 +25,8 @@ export const bookingApi = {
 export const artistBookingApi = {
     getAll: () => apiClient.get('/api/artist/data'),
     getById: (id: number) => apiClient.get(`/api/artist/booking/${id}`),
-    create: (data: any) => apiClient.post('/api/artist/booking', data),
-    update: (id: number, data: any) => apiClient.put(`/api/artist/booking/${id}`, data),
+    create: (data: unknown) => apiClient.post('/api/artist/booking', data),
+    update: (id: number, data: unknown) => apiClient.put(`/api/artist/booking/${id}`, data),
     delete: (id: number) => apiClient.delete(`/api/artist/booking/${id}`),
     updatePaymentStatus: (id: number, paymentReceived: boolean) =>
         apiClient.put(`/api/artist/booking/${id}`, { payment_received: paymentReceived }),
@@ -54,10 +54,10 @@ export const exportApi = {
  */
 export const shiftAssignmentApi = {
     getAll: () => apiClient.get('/api/shift-assignments'),
-    assign: (data: any) => apiClient.post('/api/shift-assignments', data),
-    update: (id: number, data: any) => apiClient.put(`/api/shift-assignments/${id}`, data),
+    assign: (data: unknown) => apiClient.post('/api/shift-assignments', data),
+    update: (id: number, data: unknown) => apiClient.put(`/api/shift-assignments/${id}`, data),
     delete: (id: number) => apiClient.delete(`/api/shift-assignments/${id}`),
-    assignBulk: (data: any) => apiClient.post('/api/shift-assignments/bulk', data),
+    assignBulk: (data: unknown) => apiClient.post('/api/shift-assignments/bulk', data),
 };
 
 /**

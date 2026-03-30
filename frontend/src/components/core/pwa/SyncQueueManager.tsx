@@ -12,6 +12,7 @@ import {
   Button,
   CircularProgress,
   Divider,
+  Alert,
   alpha,
 } from '@mui/material';
 import SyncIcon from '@mui/icons-material/Sync';
@@ -31,6 +32,7 @@ const SyncQueueManager: React.FC = () => {
   const [pendingOps, setPendingOps] = useState<SyncOperation[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   const open = Boolean(anchorEl);
 
@@ -75,17 +77,17 @@ const SyncQueueManager: React.FC = () => {
 
   const handleSync = async () => {
     if (!isOnline) {
-      alert('Cannot sync while offline. Please check your connection.');
+      setSyncError('Cannot sync while offline. Please check your connection.');
       return;
     }
 
     setIsSyncing(true);
+    setSyncError(null);
     try {
       await syncService.syncAll();
       await loadPendingOps();
-    } catch (error) {
-      console.error('[SyncQueueManager] Sync failed:', error);
-      alert('Sync failed. Please try again.');
+    } catch {
+      setSyncError('Sync failed. Please try again.');
     } finally {
       setIsSyncing(false);
     }
@@ -184,6 +186,13 @@ const SyncQueueManager: React.FC = () => {
           </Box>
 
           <List>
+            {syncError && (
+              <ListItem>
+                <Alert severity="error" sx={{ width: '100%' }}>
+                  {syncError}
+                </Alert>
+              </ListItem>
+            )}
             {pendingOps.map((op, index) => (
               <React.Fragment key={op.id}>
                 {index > 0 && <Divider />}
