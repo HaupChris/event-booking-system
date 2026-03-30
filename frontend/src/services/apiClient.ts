@@ -4,6 +4,7 @@
 
 import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/env';
 
 type ErrorResponse = {
     message?: string;
@@ -11,7 +12,7 @@ type ErrorResponse = {
 
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || '',
+    baseURL: API_BASE_URL,
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',

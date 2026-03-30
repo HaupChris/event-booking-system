@@ -1,5 +1,7 @@
 // Service Worker registration for Wiesenwahn PWA
 
+import { VAPID_PUBLIC_KEY } from './config/env';
+
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
     window.location.hostname === '[::1]' ||
@@ -23,16 +25,16 @@ declare global {
 }
 
 export function register(config?: Config) {
-  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+  if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
-    const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
+    const publicUrl = new URL(import.meta.env.BASE_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {
       // Service worker won't work if PUBLIC_URL is on a different origin
       return;
     }
 
     window.addEventListener('load', () => {
-      const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
+      const swUrl = `${import.meta.env.BASE_URL}service-worker.js`;
 
       if (isLocalhost) {
         // This is running on localhost. Check if a service worker still exists or not.
@@ -139,9 +141,7 @@ export async function subscribeToPushNotifications(): Promise<PushSubscription |
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       // Replace with your VAPID public key when implementing push notifications
-      applicationServerKey: urlBase64ToUint8Array(
-        process.env.REACT_APP_VAPID_PUBLIC_KEY || ''
-      ),
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     });
 
     return subscription;
@@ -151,7 +151,7 @@ export async function subscribeToPushNotifications(): Promise<PushSubscription |
 }
 
 // Helper function to convert VAPID key
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
 
@@ -161,7 +161,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i);
   }
-  return outputArray;
+  return outputArray.buffer as ArrayBuffer;
 }
 
 // Check if app is installed as PWA

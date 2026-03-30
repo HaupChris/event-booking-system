@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from '@mui/material';
+import { Box } from '@mui/material';
 import StatsCard from '../../components/StatsCard';
 import {
   Assignment as AssignmentIcon,
@@ -38,8 +38,18 @@ const StatisticsGrid: React.FC<StatisticsGridProps> = ({
     : 0;
 
   return (
-    <Grid container spacing={3} sx={{ mb: 3 }}>
-      <Grid item xs={12} sm={6} md={3}>
+    <Box
+      sx={{
+        mb: 3,
+        display: 'grid',
+        gap: 3,
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, minmax(0, 1fr))',
+          lg: 'repeat(5, minmax(0, 1fr))',
+        },
+      }}
+    >
         <StatsCard
           title="Total Users"
           value={totalUsers}
@@ -47,48 +57,44 @@ const StatisticsGrid: React.FC<StatisticsGridProps> = ({
           color="primary"
           subtitle={`${fullyAssignedUsers} fully assigned`}
           progress={(fullyAssignedUsers / totalUsers) * 100}
+          fullHeight
         />
-      </Grid>
-      <Grid item xs={12} sm={6} md={3}>
-        <StatsCard
-          title="Shifts Progress"
-          value={`${totalShiftsAssigned}/${totalShiftsWanted}`}
-          icon={<AssignmentIcon fontSize="large" />}
-          color="info"
-          subtitle="Assigned vs Requested"
-          progress={(totalShiftsAssigned / totalShiftsWanted) * 100}
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={3}>
-        <StatsCard
-          title="Timeslots"
-          value={totalTimeslots}
-          icon={<ScheduleIcon fontSize="large" />}
-          color="primary"
-          subtitle={`${totalCapacity} total capacity`}
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={3}>
-        <StatsCard
-          title="Completion Rate"
-          value={`${Math.round((fullyAssignedUsers / totalUsers) * 100)}%`}
-          icon={<CheckCircleIcon fontSize="large" />}
-          color="success"
-          subtitle="Users fully assigned"
-          progress={(fullyAssignedUsers / totalUsers) * 100}
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={3}>
-        <StatsCard
-          title="Acceptance Rate"
-          value={`${acceptanceRate}%`}
-          icon={<ThumbUpIcon fontSize="large" />}
-          color="success"
-          subtitle={`✓ ${acceptedCount} | ⏳ ${pendingCount} | ✗ ${declinedCount}`}
-          progress={acceptanceRate}
-        />
-      </Grid>
-    </Grid>
+      <StatsCard
+        title="Shifts Progress"
+        value={`${totalShiftsAssigned}/${totalShiftsWanted}`}
+        icon={<AssignmentIcon fontSize="large" />}
+        color="info"
+        subtitle="Assigned vs Requested"
+        progress={(totalShiftsAssigned / totalShiftsWanted) * 100}
+        fullHeight
+      />
+      <StatsCard
+        title="Timeslots"
+        value={totalTimeslots}
+        icon={<ScheduleIcon fontSize="large" />}
+        color="primary"
+        subtitle={`${totalCapacity} total capacity`}
+        fullHeight
+      />
+      <StatsCard
+        title="Completion Rate"
+        value={`${Math.round((fullyAssignedUsers / totalUsers) * 100)}%`}
+        icon={<CheckCircleIcon fontSize="large" />}
+        color="success"
+        subtitle="Users fully assigned"
+        progress={(fullyAssignedUsers / totalUsers) * 100}
+        fullHeight
+      />
+      <StatsCard
+        title="Acceptance Rate"
+        value={`${acceptanceRate}%`}
+        icon={<ThumbUpIcon fontSize="large" />}
+        color="success"
+        subtitle={`✓ ${acceptedCount} | ⏳ ${pendingCount} | ✗ ${declinedCount}`}
+        progress={acceptanceRate}
+        fullHeight
+      />
+    </Box>
   );
 };
 

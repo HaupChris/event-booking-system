@@ -9,12 +9,17 @@ const INLINE_REGEX = /(\[[^\]]+\]\([^)]+\)|`[^`]+`|\*\*[^*]+\*\*|_[^_]+_|\*[^*]+
 
 const renderInline = (text: string): React.ReactNode[] => {
   const parts = text.split(INLINE_REGEX).filter(Boolean);
-  return parts.map((part, index) => {
+  let offset = 0;
+
+  return parts.map((part) => {
+    const key = `inline-${offset}-${part}`;
+    offset += part.length;
+
     if (part.startsWith('[') && part.includes('](') && part.endsWith(')')) {
       const match = part.match(/^\[([^\]]+)]\(([^)]+)\)$/);
       if (match) {
         return (
-          <Link key={`inline-${index}`} href={match[2]} target="_blank" rel="noopener noreferrer">
+          <Link key={key} href={match[2]} target="_blank" rel="noopener noreferrer">
             {match[1]}
           </Link>
         );
@@ -24,7 +29,7 @@ const renderInline = (text: string): React.ReactNode[] => {
     if (part.startsWith('`') && part.endsWith('`')) {
       return (
         <Box
-          key={`inline-${index}`}
+          key={key}
           component="code"
           sx={{ bgcolor: 'action.hover', px: 0.5, py: 0.1, borderRadius: 0.5, fontFamily: 'monospace' }}
         >
@@ -34,17 +39,17 @@ const renderInline = (text: string): React.ReactNode[] => {
     }
 
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={`inline-${index}`}>{part.slice(2, -2)}</strong>;
+      return <strong key={key}>{part.slice(2, -2)}</strong>;
     }
 
     if (
       (part.startsWith('*') && part.endsWith('*')) ||
       (part.startsWith('_') && part.endsWith('_'))
     ) {
-      return <em key={`inline-${index}`}>{part.slice(1, -1)}</em>;
+      return <em key={key}>{part.slice(1, -1)}</em>;
     }
 
-    return <React.Fragment key={`inline-${index}`}>{part}</React.Fragment>;
+    return <React.Fragment key={key}>{part}</React.Fragment>;
   });
 };
 
@@ -75,8 +80,8 @@ const MarkdownContent: React.FC<MarkdownContentProps> = ({ content }) => {
 
     blocks.push(
       <Box key={`ul-${blocks.length}`} component="ul" sx={{ mt: 0.5, mb: 1.5, pl: 3 }}>
-        {listBuffer.map((item, index) => (
-          <li key={`li-${index}`}>
+        {listBuffer.map((item) => (
+          <li key={`li-${item}`}>
             <Typography variant="body2">{renderInline(item)}</Typography>
           </li>
         ))}

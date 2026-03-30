@@ -28,33 +28,34 @@ interface MaterialsTextProps {
   bringingItems: (count: number) => string;
 }
 
-interface MaterialsFormBaseProps {
-  currentBooking: {
-    [key: string]: any; // Add index signature for dynamic property access
-  };
-  updateBooking: (key: any, value: any) => void;
+interface MaterialsFormBaseProps<TMaterialsField extends string = 'material_ids'> {
+  currentBooking: { [K in TMaterialsField]: number[] };
+  updateBooking: (key: TMaterialsField, value: number[]) => void;
   formContent: {
     materials?: Material[];
-    [key: string]: any; // Allow other properties
   };
   texts: MaterialsTextProps;
-  materialsPropName?: string;
+  materialsPropName?: TMaterialsField;
 }
 
-function MaterialsFormBase(props: MaterialsFormBaseProps) {
-  const { texts, materialsPropName = 'material_ids' } = props;
+function MaterialsFormBase<TMaterialsField extends string = 'material_ids'>(
+  props: MaterialsFormBaseProps<TMaterialsField>
+) {
+  const { texts } = props;
+  const materialsPropName = (props.materialsPropName ?? 'material_ids') as TMaterialsField;
   const theme = useTheme();
+  const selectedMaterialIds = (props.currentBooking[materialsPropName] as number[] | undefined) ?? [];
 
   function handleToggle(material_id: number) {
-    if (props.currentBooking[materialsPropName].indexOf(material_id) === -1) {
+    if (!selectedMaterialIds.includes(material_id)) {
       props.updateBooking(materialsPropName, [
-        ...props.currentBooking[materialsPropName],
+        ...selectedMaterialIds,
         material_id,
       ]);
     } else {
       props.updateBooking(
         materialsPropName,
-        props.currentBooking[materialsPropName].filter((id: number) => id !== material_id)
+        selectedMaterialIds.filter((id) => id !== material_id)
       );
     }
   }
@@ -70,17 +71,17 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
         title={texts.materialsTitle}
         icon={<BackpackIcon sx={{ color: theme.palette.primary.main, mr: 1, fontSize: '1.5rem' }} />}
       >
-        {props.currentBooking[materialsPropName].length > 0 && (
+        {selectedMaterialIds.length > 0 && (
           <FormCard
             selected={true}
             icon={
               <InventoryIcon sx={{ color: theme.palette.primary.main, fontSize: '1.2rem', mr: 1 }} />
             }
-            title={texts.bringingItems(props.currentBooking[materialsPropName].length)}
+            title={texts.bringingItems(selectedMaterialIds.length)}
           >
             <Box sx={{ paddingX: 2 }}>
               {materials
-                .filter((material) => props.currentBooking[materialsPropName].includes(material.id))
+                .filter((material) => selectedMaterialIds.includes(material.id))
                 .map((material) => (
                   <Chip
                     key={material.id}
@@ -107,13 +108,12 @@ function MaterialsFormBase(props: MaterialsFormBaseProps) {
             .filter(
               (material) =>
                 material.num_needed > material.num_booked ||
-                props.currentBooking[materialsPropName].includes(material.id)
+                selectedMaterialIds.includes(material.id)
             )
             .sort((a, b) => b.num_needed - b.num_booked - (a.num_needed - a.num_booked))
             .map((material: Material) => {
               const labelId = `checkbox-list-secondary-label-${material.id}`;
-              const isSelected =
-                props.currentBooking[materialsPropName].indexOf(material.id) !== -1;
+              const isSelected = selectedMaterialIds.includes(material.id);
               const num_booked = material.num_booked + (isSelected ? 1 : 0);
 
               return (

@@ -49,6 +49,7 @@ import ProfessionsPage from "./ProfessionsPage";
 import ShiftAssignmentsPage from "./ShiftAssignments";
 import NewsManagementPage from "./NewsManagementPage";
 import FAQManagementPage from "./FAQManagementPage";
+import ProfileManagementPage from './ProfileManagementPage';
 
 
 // Define all possible dashboard tabs
@@ -136,6 +137,8 @@ function Dashboard() {
                 return <NewsManagementPage/>;
             case 'faqs':
                 return <FAQManagementPage/>;
+            case 'profiles':
+                return <ProfileManagementPage/>;
             default:
                 return <HomePage/>;
         }

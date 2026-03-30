@@ -93,7 +93,7 @@ const PaymentConfirmationsPage: React.FC = () => {
     setEditedBooking(null);
   };
 
-  const handleInputChange = (field: keyof Booking, value: any) => {
+  const handleInputChange = (field: keyof Booking, value: Booking[keyof Booking]) => {
     if (editedBooking) {
       setEditedBooking({
         ...editedBooking,
@@ -169,22 +169,36 @@ const PaymentConfirmationsPage: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Zahlungen
       </Typography>
-
       {/* Statistics Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 3
+          }}>
           <Paper sx={{ p: 2, bgcolor: 'primary', color: 'white' }}>
             <Typography variant="h6">Erwarteter Gesamtbetrag</Typography>
             <Typography variant="h4">€{totalExpected.toFixed(2)}</Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 3
+          }}>
           <Paper sx={{ p: 2, bgcolor: 'success.light', color: 'white' }}>
             <Typography variant="h6">Empfangener Gesamtbetrag</Typography>
             <Typography variant="h4">€{totalReceived.toFixed(2)}</Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 3
+          }}>
           <Paper sx={{ p: 2, bgcolor: 'info.light', color: 'white' }}>
             <Typography variant="h6">Bezahlte Buchungen</Typography>
             <Typography variant="h4">
@@ -192,7 +206,12 @@ const PaymentConfirmationsPage: React.FC = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 3
+          }}>
           <Paper
             sx={{
               p: 2,
@@ -205,7 +224,6 @@ const PaymentConfirmationsPage: React.FC = () => {
           </Paper>
         </Grid>
       </Grid>
-
       {/* Filters and Sorting */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <FormControl sx={{ minWidth: 150 }}>
@@ -245,7 +263,6 @@ const PaymentConfirmationsPage: React.FC = () => {
           ></Button>
         </Box>
       </Box>
-
       {/* Payments Table */}
       <TableContainer component={Paper}>
         <Table>
@@ -262,9 +279,9 @@ const PaymentConfirmationsPage: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedBookings.map((booking, idx) => (
+            {sortedBookings.map((booking) => (
               <TableRow
-                key={idx}
+                key={`${booking.bookingType}-${booking.id}`}
                 sx={{
                   bgcolor: booking.is_paid
                     ? 'rgba(76, 175, 80, 0.1)' // Light green for paid
@@ -306,7 +323,6 @@ const PaymentConfirmationsPage: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
       {/* Payment Management Modal */}
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
@@ -337,7 +353,7 @@ const PaymentConfirmationsPage: React.FC = () => {
               </Typography>
 
               <Grid container spacing={2} sx={{ mt: 2 }}>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <FormControlLabel
                     control={
                       <Switch
@@ -354,7 +370,11 @@ const PaymentConfirmationsPage: React.FC = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6
+                  }}>
                   <TextField
                     fullWidth
                     label="Paid Amount"
@@ -370,7 +390,11 @@ const PaymentConfirmationsPage: React.FC = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6
+                  }}>
                   <TextField
                     fullWidth
                     label="Payment Date"
@@ -388,7 +412,7 @@ const PaymentConfirmationsPage: React.FC = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField
                     fullWidth
                     label="Payment Notes"
@@ -424,7 +448,6 @@ const PaymentConfirmationsPage: React.FC = () => {
           )}
         </Box>
       </Modal>
-
       <Snackbar
         open={showSnackbar}
         autoHideDuration={6000}

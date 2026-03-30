@@ -25,6 +25,15 @@ interface ArtistSummaryProps {
     formContent: ArtistFormContent;
 }
 
+interface PerformanceDetails {
+    preferredDay?: string;
+    preferredTime?: string;
+    duration?: string | number;
+    genre?: string;
+    description?: string;
+    bandMembers?: string | number;
+}
+
 function ArtistSummaryForm({currentBooking, formContent}: ArtistSummaryProps) {
     const {
         first_name,
@@ -45,7 +54,7 @@ function ArtistSummaryForm({currentBooking, formContent}: ArtistSummaryProps) {
     const beverage = findItemById(formContent.beverage_options, beverage_id);
     const food = findItemById(formContent.food_options, food_id);
 
-    let parsedPerformanceDetails: any = {};
+    let parsedPerformanceDetails: PerformanceDetails = {};
     try {
         if (performance_details) {
             parsedPerformanceDetails = JSON.parse(performance_details);
@@ -243,8 +252,8 @@ function ArtistSummaryForm({currentBooking, formContent}: ArtistSummaryProps) {
                         border: '1px solid',
                         borderColor: alpha(spacePalette.primary.main, 0.2)
                     }}>
-                        {artistMaterials.map((material, index) => (
-                            <Box key={index} sx={{
+                        {artistMaterials.map((material) => (
+                            <Box key={material.id} sx={{
                                 bgcolor: alpha(spacePalette.primary.main, 0.1),
                                 border: '1px solid',
                                 borderColor: alpha(spacePalette.primary.main, 0.3),

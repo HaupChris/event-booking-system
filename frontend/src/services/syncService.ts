@@ -15,8 +15,9 @@ import {
   SyncQueueDB,
   MetadataDB
 } from '../utils/indexedDB';
+import { API_URL } from '../config/env';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+const API_BASE_URL = API_URL;
 const MAX_RETRIES = 3;
 
 export class SyncService {

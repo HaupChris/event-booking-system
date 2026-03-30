@@ -13,16 +13,28 @@ import type {ProgressItem} from '../components/ProgressList';
 import type {Person} from '../components/PeopleList';
 import type {ViewFilterType} from '../utils/optionsUtils';
 import {getMaterialCount, getUsersForMaterial} from '../utils/materialUtils';
+import type { FormContent, Material } from '../../userArea/interface';
+import type { ArtistFormContent, ArtistMaterial } from '../../artistArea/interface';
+
+type MaterialLike = Material | ArtistMaterial;
+
+interface MaterialBooking {
+    id: number;
+    first_name: string;
+    last_name: string;
+    material_ids?: number[];
+    artist_material_ids?: number[];
+}
 
 interface MaterialTransformConfig {
-    regularBookings: any[];
-    artistBookings: any[];
-    formContent: any;
-    artistFormContent: any;
+    regularBookings: MaterialBooking[];
+    artistBookings: MaterialBooking[];
+    formContent: FormContent;
+    artistFormContent: ArtistFormContent;
     viewType: ViewFilterType;
     sortBy: 'progress' | 'name';
     sortOrder: 'asc' | 'desc';
-    onMaterialClick: (material: any, materialType: 'regular' | 'artist') => void;
+    onMaterialClick: (material: MaterialLike, materialType: 'regular' | 'artist') => void;
 }
 
 /**
@@ -39,7 +51,7 @@ export const transformMaterialsToProgressItems = ({
     onMaterialClick
 }: MaterialTransformConfig): ProgressItem[] => {
     const regularMaterials = viewType === 'all' || viewType === 'regular'
-        ? formContent.materials.map((material: any) => ({
+        ? formContent.materials.map((material) => ({
             id: `regular-${material.id}`,
             title: material.title,
             currentCount: getMaterialCount(material.id, 'regular', regularBookings, artistBookings),
@@ -52,7 +64,7 @@ export const transformMaterialsToProgressItems = ({
         : [];
 
     const artistMaterials = viewType === 'all' || viewType === 'artist'
-        ? artistFormContent.artist_materials.map((material: any) => ({
+        ? artistFormContent.artist_materials.map((material) => ({
             id: `artist-${material.id}`,
             title: material.title,
             currentCount: getMaterialCount(material.id, 'artist', regularBookings, artistBookings),
@@ -103,10 +115,10 @@ export const transformMaterialsToProgressItems = ({
 };
 
 interface PeopleTransformConfig {
-    regularBookings: any[];
-    artistBookings: any[];
-    formContent: any;
-    artistFormContent: any;
+    regularBookings: MaterialBooking[];
+    artistBookings: MaterialBooking[];
+    formContent: FormContent;
+    artistFormContent: ArtistFormContent;
     viewType: ViewFilterType;
     sortBy: 'name' | 'materials';
     sortOrder: 'asc' | 'desc';
@@ -140,7 +152,7 @@ export const transformBookingsToPeopleItems = ({
                         </Typography>
                         <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1}}>
                             {booking.material_ids?.map((materialId: number) => {
-                                const material = formContent.materials.find((m: any) => m.id === materialId);
+                                const material = formContent.materials.find((m) => m.id === materialId);
                                 return material ? (
                                     <Chip
                                         key={materialId}
@@ -172,7 +184,7 @@ export const transformBookingsToPeopleItems = ({
                         </Typography>
                         <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1}}>
                             {booking.artist_material_ids?.map((materialId: number) => {
-                                const material = artistFormContent.artist_materials.find((m: any) => m.id === materialId);
+                                const material = artistFormContent.artist_materials.find((m) => m.id === materialId);
                                 return material ? (
                                     <Chip
                                         key={materialId}

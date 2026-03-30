@@ -54,8 +54,8 @@ const ErrorView: React.FC<ErrorViewProps> = ({onRetry}) => {
                     mb: 1,
                 }
             }}>
-                {userAreaTexts.confirmationForm.errorView.reasons.map((reason, index) => (
-                    <li key={index}>{reason}</li>
+                {userAreaTexts.confirmationForm.errorView.reasons.map((reason) => (
+                    <li key={reason}>{reason}</li>
                 ))}
             </Box>
         </FormCard>

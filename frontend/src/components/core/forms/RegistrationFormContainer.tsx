@@ -15,8 +15,8 @@ import rocketImage from '../../../img/rocket.png';
  * Configuration for the registration form container
  */
 export interface RegistrationFormConfig<
-  TBooking extends Record<string, any>,
-  TFormContent extends Record<string, any>,
+  TBooking extends object,
+  TFormContent extends object,
   _TFormSteps extends number = number,
 > {
   // Type factories
@@ -37,20 +37,13 @@ export interface RegistrationFormConfig<
   };
 
   // Validation and form configuration
-  validationRules: { [K in keyof Partial<TBooking>]: (value: any) => string };
+  validationRules: { [K in keyof Partial<TBooking>]: (value: TBooking[K]) => string };
   stepTitles: { [key: number]: string };
   requiredFields: { [key: number]: (keyof TBooking)[] };
 
   // Step components mapping
   stepComponents: {
-    [key: number]:
-      | React.ComponentType<{
-          updateBooking: (key: keyof TBooking, value: any) => void;
-          currentBooking: TBooking;
-          formValidation: { [key in keyof TBooking]?: string };
-          formContent: TFormContent;
-        }>
-      | React.ComponentType<any>;
+    [key: number]: React.ElementType;
   };
 
   // Pricing configuration
@@ -74,8 +67,8 @@ export interface BookingState {
  * Generic registration form container props
  */
 interface RegistrationFormContainerProps<
-  TBooking extends Record<string, any>,
-  TFormContent extends Record<string, any>,
+  TBooking extends object,
+  TFormContent extends object,
   TFormSteps extends number,
 > {
   config: RegistrationFormConfig<TBooking, TFormContent, TFormSteps>;
@@ -85,8 +78,8 @@ interface RegistrationFormContainerProps<
  * Generic registration form container component
  */
 export function RegistrationFormContainer<
-  TBooking extends Record<string, any>,
-  TFormContent extends Record<string, any>,
+  TBooking extends object,
+  TFormContent extends object,
   TFormSteps extends number,
 >({ config }: RegistrationFormContainerProps<TBooking, TFormContent, TFormSteps>) {
   // Use form management hook
@@ -94,6 +87,7 @@ export function RegistrationFormContainer<
     formState: booking,
     validation: formValidation,
     currentError,
+    setCurrentError,
     updateField,
     activeStep,
     handleNext,
@@ -124,24 +118,37 @@ export function RegistrationFormContainer<
       })
       .then((response) => {
         setFormContent(response.data);
+        setCurrentError('');
       })
-      .catch(() => {
-        setAuth(false);
-        setToken('');
+      .catch((error) => {
+        const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+        if (status === 401) {
+          setAuth(false);
+          setToken('');
+          return;
+        }
+
+        setCurrentError('Server nicht erreichbar. Bitte pruefe, ob das Backend laeuft.');
       });
-  }, [setAuth, setToken, token]);
+  }, [config.apiEndpoints.formContent, setAuth, setCurrentError, setToken, token]);
 
   // Calculate total price when dependencies change
   useEffect(() => {
     const total_price = config.calculateTotalPrice(booking, formContent);
-    updateField('total_price' as keyof TBooking, total_price as any);
-  }, [...config.priceDependencies.map((dep) => booking[dep]), formContent]);
+
+    const currentTotalPrice = (booking as Record<string, unknown>).total_price;
+    if (currentTotalPrice === total_price) {
+      return;
+    }
+
+    updateField('total_price' as keyof TBooking, total_price as unknown as TBooking[keyof TBooking]);
+  }, [booking, config, formContent, updateField]);
 
   const handleStepNext = () => {
     handleNext(config.requiredFields[activeStep]);
   };
 
-  const updateBooking = (key: keyof TBooking, value: any) => {
+  const updateBooking = (key: keyof TBooking, value: TBooking[keyof TBooking]) => {
     updateField(key, value);
   };
 
@@ -170,7 +177,9 @@ export function RegistrationFormContainer<
         );
       })
       .catch((error) => {
-        if (error.status === 401) {
+        const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+
+        if (status === 401) {
           setToken('');
           setAuth(false);
         } else {
@@ -179,11 +188,7 @@ export function RegistrationFormContainer<
             isSubmitted: true,
             isSubmitting: false,
           });
-
-          setTimeout(() => {
-            setToken('');
-            setAuth(false);
-          }, 1000 * 10);
+          setCurrentError('Absenden fehlgeschlagen. Bitte pruefe die Serververbindung und versuche es erneut.');
         }
       });
   };
@@ -197,7 +202,11 @@ export function RegistrationFormContainer<
     }
 
     // Check if component needs form props
-    const componentName = StepComponent.displayName || StepComponent.name;
+    const componentName = typeof StepComponent === 'string'
+      ? StepComponent
+      : ((StepComponent as { displayName?: string; name?: string }).displayName ||
+        (StepComponent as { displayName?: string; name?: string }).name ||
+        '');
     const needsFormProps =
       !componentName?.includes('Confirmation') &&
       !componentName?.includes('Summary') &&
@@ -215,7 +224,13 @@ export function RegistrationFormContainer<
     } else {
       // Special handling for confirmation, summary, and awareness code forms
       // Pass all possible props and let the component use what it needs
-      const SpecialComponent = StepComponent as any;
+      const SpecialComponent = StepComponent as React.ComponentType<{
+        currentBooking: TBooking;
+        booking: TBooking;
+        formContent: TFormContent;
+        submitBooking: () => void;
+        bookingState: BookingState;
+      }>;
       return (
         <SpecialComponent
           currentBooking={booking}

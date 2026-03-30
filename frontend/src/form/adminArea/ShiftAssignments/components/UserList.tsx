@@ -148,7 +148,7 @@ const UserList: React.FC<UserListProps> = ({
 
                 {/* Compact Filter Grid */}
                 <Grid container spacing={1} sx={{mb: 1.5}}>
-                    <Grid item xs={6}>
+                    <Grid size={6}>
                         <FormControl fullWidth size="small">
                             <InputLabel>Assignment</InputLabel>
                             <Select
@@ -166,7 +166,7 @@ const UserList: React.FC<UserListProps> = ({
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid size={6}>
                         <FormControl fullWidth size="small">
                             <InputLabel>Acceptance</InputLabel>
                             <Select
@@ -184,7 +184,7 @@ const UserList: React.FC<UserListProps> = ({
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                         <FormControl fullWidth size="small">
                             <InputLabel>Sort</InputLabel>
                             <Select
@@ -199,7 +199,7 @@ const UserList: React.FC<UserListProps> = ({
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid size={4}>
                         <FormControl fullWidth size="small">
                             <InputLabel>Day</InputLabel>
                             <Select
@@ -217,7 +217,7 @@ const UserList: React.FC<UserListProps> = ({
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid size={4}>
                         <FormControl fullWidth size="small">
                             <InputLabel>Days #</InputLabel>
                             <Select
@@ -235,7 +235,7 @@ const UserList: React.FC<UserListProps> = ({
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid size={4}>
                         <FormControl fullWidth size="small">
                             <InputLabel>Shifts</InputLabel>
                             <Select
@@ -255,7 +255,6 @@ const UserList: React.FC<UserListProps> = ({
                     </Grid>
                 </Grid>
             </Box>
-
             {/* Scrollable User List */}
             <Box sx={{
                 flexGrow: 1,

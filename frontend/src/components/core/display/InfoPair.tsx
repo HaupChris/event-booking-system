@@ -13,8 +13,10 @@ const InfoPair: React.FC<InfoPairProps> = ({ label, value, icon }) => {
   return (
     <Box sx={{ display: 'flex', mb: 1.5, alignItems: 'flex-start' }}>
       {icon &&
-        React.cloneElement(icon as React.ReactElement, {
+        React.isValidElement<{ sx?: object }>(icon) &&
+        React.cloneElement(icon, {
           sx: {
+            ...(icon.props.sx ?? {}),
             mr: 1,
             color: '#64b5f6',
             fontSize: '1.2rem',

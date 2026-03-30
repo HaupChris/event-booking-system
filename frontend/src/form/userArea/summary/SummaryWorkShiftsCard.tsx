@@ -39,7 +39,6 @@ function SummaryWorkShiftsCard({
       >
         {userAreaTexts.summaryForm.supportPriorities}
       </Typography>
-
       {shiftSlot1?.shift && shiftSlot1?.timeslot && (
         <PriorityTimeSlot
           priority={PRIORITIES.FIRST}
@@ -50,7 +49,6 @@ function SummaryWorkShiftsCard({
           endTime={shiftSlot1.timeslot.end_time}
         />
       )}
-
       {shiftSlot2?.shift && shiftSlot2?.timeslot && (
         <PriorityTimeSlot
           priority={PRIORITIES.SECOND}
@@ -61,7 +59,6 @@ function SummaryWorkShiftsCard({
           endTime={shiftSlot2.timeslot.end_time}
         />
       )}
-
       {shiftSlot3?.shift && shiftSlot3?.timeslot && (
         <PriorityTimeSlot
           priority={PRIORITIES.THIRD}
@@ -72,7 +69,6 @@ function SummaryWorkShiftsCard({
           endTime={shiftSlot3.timeslot.end_time}
         />
       )}
-
       {/* Support info */}
       <Box
         sx={{
@@ -95,13 +91,21 @@ function SummaryWorkShiftsCard({
         </Box>
 
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <InfoPair
               label="Supporter Buddy"
               value={supporterBuddy || userAreaTexts.summaryForm.noSupportBuddy}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <InfoPair
               label={userAreaTexts.summaryForm.shiftsCount}
               value={

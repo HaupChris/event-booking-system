@@ -20,11 +20,24 @@ import {
     getWorkshiftForTimeslot,
     timeslotPriorityToString
 } from '../utils/workshiftUtils';
-import type {TimeSlot} from "../../userArea/interface";
+import type { TimeSlot, WorkShift as WorkShiftType } from '../../userArea/interface';
+
+interface BookingForWorkshift {
+    id: number;
+    first_name: string;
+    last_name: string;
+    supporter_buddy?: string;
+    amount_shifts: number;
+    timeslot_priority_1: number | null;
+    timeslot_priority_2: number | null;
+    timeslot_priority_3: number | null;
+}
+
+type TimeslotWithPriority = TimeSlot & { priority: number };
 
 interface WorkshiftTransformConfig {
-    workshifts: any[];
-    bookings: any[];
+    workshifts: WorkShiftType[];
+    bookings: BookingForWorkshift[];
     sortBy: 'progress' | 'name';
     sortOrder: 'asc' | 'desc';
     onTimeslotClick: (timeslot: TimeSlot) => void;
@@ -41,8 +54,8 @@ export const transformWorkshiftsToProgressItems = ({
     onTimeslotClick
 }: WorkshiftTransformConfig): ProgressItem[] => {
     const items = workshifts.map(workshift => {
-        const totalNeeded = workshift.time_slots.reduce((acc: number, ts: any) => acc + ts.num_needed, 0);
-        const totalBooked = workshift.time_slots.reduce((acc: number, ts: any) => {
+        const totalNeeded = workshift.time_slots.reduce((acc: number, ts: TimeSlot) => acc + ts.num_needed, 0);
+        const totalBooked = workshift.time_slots.reduce((acc: number, ts: TimeSlot) => {
             const timeslotCount = getTimeslotCount(ts.id, bookings);
             return acc + timeslotCount;
         }, 0);
@@ -57,14 +70,19 @@ export const transformWorkshiftsToProgressItems = ({
             children: (
                 <Box sx={{pl: 2}}>
                     <Grid container spacing={2}>
-                        {workshift.time_slots.map((timeslot: any) => {
+                        {workshift.time_slots.map((timeslot: TimeSlot) => {
                             const timeslotCount = getTimeslotCount(timeslot.id, bookings);
                             const progress = timeslot.num_needed > 0
                                 ? (timeslotCount / timeslot.num_needed) * 100
                                 : 0;
 
                             return (
-                                <Grid item xs={12} sm={6} key={timeslot.id}>
+                                <Grid
+                                    key={timeslot.id}
+                                    size={{
+                                        xs: 12,
+                                        sm: 6
+                                    }}>
                                     <Paper
                                         elevation={1}
                                         sx={{
@@ -138,8 +156,8 @@ export const transformWorkshiftsToProgressItems = ({
 };
 
 interface PeopleTransformConfig {
-    bookings: any[];
-    workshifts: any[];
+    bookings: BookingForWorkshift[];
+    workshifts: WorkShiftType[];
     sortBy: 'name' | 'shifts';
     sortOrder: 'asc' | 'desc';
 }
@@ -154,7 +172,7 @@ export const transformBookingsToPeopleItems = ({
     sortOrder
 }: PeopleTransformConfig): Person[] => {
     const items = bookings.map(booking => {
-        const timeslots = getTimeslotsForUser(booking, workshifts);
+        const timeslots = getTimeslotsForUser(booking, workshifts) as TimeslotWithPriority[];
         return {
             id: booking.id,
             name: `${booking.first_name} ${booking.last_name}`,
@@ -173,11 +191,11 @@ export const transformBookingsToPeopleItems = ({
                         Assigned Timeslots:
                     </Typography>
 
-                    {timeslots.map((timeslot: any, idx: number) => {
+                    {timeslots.map((timeslot) => {
                         const workshift = getWorkshiftForTimeslot(timeslot.id, workshifts);
                         return (
                             <Paper
-                                key={idx}
+                                key={timeslot.id}
                                 sx={{
                                     p: 1.5,
                                     mb: 1,

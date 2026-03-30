@@ -17,7 +17,7 @@ interface SignatureTextProps {
 }
 
 interface SignatureFormBaseProps {
-  updateBooking: (key: any, value: any) => void;
+  updateBooking: (key: 'signature', value: string) => void;
   currentBooking: {
     signature: string;
   };

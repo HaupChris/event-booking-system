@@ -21,9 +21,11 @@ import {useModal} from '../../hooks/useModal';
 import {useSort} from '../../hooks/useSort';
 import {transformMaterialsToProgressItems, transformBookingsToPeopleItems} from './transformers/materialTransformers';
 import {getUsersForMaterial} from './utils/materialUtils';
+import type { Material } from '../userArea/interface';
+import type { ArtistMaterial } from '../artistArea/interface';
 
 interface MaterialModalData {
-    material: any;
+    material: Material | ArtistMaterial;
     materialType: 'regular' | 'artist';
 }
 
@@ -57,7 +59,10 @@ const MaterialsPage: React.FC = () => {
     } = useSort<'name' | 'materials'>('name', 'asc');
 
     // Modal handler
-    const handleOpenMaterialModal = (material: any, materialType: 'regular' | 'artist') => {
+    const handleOpenMaterialModal = (
+        material: Material | ArtistMaterial,
+        materialType: 'regular' | 'artist'
+    ) => {
         openModal({material, materialType});
     };
 
@@ -119,7 +124,7 @@ const MaterialsPage: React.FC = () => {
                             {value: 'artist', label: 'Artist', icon: <Mic/>}
                         ]}
                         currentTab={viewType}
-                        onChange={setViewType as any}
+                        onChange={(value) => setViewType(value as ViewFilterType)}
                     />
                 </Box>
             </FormCard>
@@ -231,8 +236,8 @@ const MaterialsPage: React.FC = () => {
                                             selectedMaterialData.materialType,
                                             regularBookings,
                                             artistBookings
-                                        ).map((user, index) => (
-                                            <TableRow key={index}>
+                                        ).map((user) => (
+                                            <TableRow key={`${user.first_name}-${user.last_name}-${user.is_artist}`}>
                                                 <TableCell>
                                                     {user.first_name} {user.last_name}
                                                 </TableCell>

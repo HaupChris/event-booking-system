@@ -9,7 +9,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 interface WorkShiftProps {
     workShift: WorkShiftType;
     currentBooking: Booking;
-    updateBooking: (key: keyof Booking, value: any) => void;
+    updateBooking: (key: keyof Booking, value: number) => void;
     availablePriorities: string[];
 }
 

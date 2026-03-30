@@ -40,9 +40,9 @@ function SummaryMaterialsCard({ materials }: SummaryMaterialsCardProps) {
               borderColor: alpha(theme.palette.primary.main, 0.2),
             }}
           >
-            {validMaterials.map((material, index) => (
+            {validMaterials.map((material) => (
               <Chip
-                key={index}
+                key={material.id}
                 label={material.title}
                 variant="outlined"
                 sx={{

@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { syncService } from '../services/syncService';
-import type { ProfileData, BookingData, NewsFeedItem } from '../utils/indexedDB';
+import type { ProfileData, BookingData, NewsFeedItem, SyncOperation } from '../utils/indexedDB';
 
 export interface UseOfflineDataOptions {
   userId?: string;
@@ -37,7 +37,7 @@ export interface UseOfflineDataReturn {
   refreshProfile: () => Promise<void>;
   refreshBooking: () => Promise<void>;
   refreshNews: () => Promise<void>;
-  queueOperation: (type: any, payload: any) => Promise<string>;
+  queueOperation: (type: SyncOperation['type'], payload: SyncOperation['payload']) => Promise<string>;
   syncNow: () => Promise<void>;
 
   // Sync queue
@@ -69,34 +69,6 @@ export function useOfflineData(options: UseOfflineDataOptions = {}): UseOfflineD
   const [newsFeed, setNewsFeed] = useState<NewsFeedItem[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(false);
   const [newsError, setNewsError] = useState<Error | null>(null);
-
-  // Handle online/offline events
-  useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      if (autoSync) {
-        syncNow();
-      }
-    };
-
-    const handleOffline = () => {
-      setIsOnline(false);
-    };
-
-    const handleDataSynced = () => {
-      updatePendingCount();
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    window.addEventListener('datasynced', handleDataSynced);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-      window.removeEventListener('datasynced', handleDataSynced);
-    };
-  }, [autoSync]);
 
   // Update pending operations count
   const updatePendingCount = useCallback(async () => {
@@ -159,7 +131,10 @@ export function useOfflineData(options: UseOfflineDataOptions = {}): UseOfflineD
   }, [token]);
 
   // Queue an operation
-  const queueOperation = useCallback(async (type: any, payload: any): Promise<string> => {
+  const queueOperation = useCallback(async (
+    type: SyncOperation['type'],
+    payload: SyncOperation['payload']
+  ): Promise<string> => {
     const operationId = await syncService.queueOperation(type, payload);
     await updatePendingCount();
     return operationId;
@@ -185,6 +160,34 @@ export function useOfflineData(options: UseOfflineDataOptions = {}): UseOfflineD
       setIsSyncing(false);
     }
   }, [token, refreshProfile, refreshBooking, refreshNews, updatePendingCount]);
+
+  // Handle online/offline events
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      if (autoSync) {
+        syncNow();
+      }
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
+
+    const handleDataSynced = () => {
+      updatePendingCount();
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('datasynced', handleDataSynced);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('datasynced', handleDataSynced);
+    };
+  }, [autoSync, syncNow, updatePendingCount]);
 
   // Initial load
   useEffect(() => {

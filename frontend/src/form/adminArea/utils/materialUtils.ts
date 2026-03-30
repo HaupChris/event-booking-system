@@ -2,15 +2,31 @@
  * Utility functions for material-related operations
  */
 
+import type { FormContent, Material } from '../../userArea/interface';
+import type { ArtistFormContent, ArtistMaterial } from '../../artistArea/interface';
+
+interface MaterialBooking {
+    first_name: string;
+    last_name: string;
+    material_ids?: number[];
+    artist_material_ids?: number[];
+}
+
+interface MaterialUser {
+    first_name: string;
+    last_name: string;
+    is_artist: boolean;
+}
+
 /**
  * Gets all users who selected a particular material
  */
 export const getUsersForMaterial = (
     materialId: number,
     materialType: 'regular' | 'artist',
-    regularBookings: any[],
-    artistBookings: any[]
-) => {
+    regularBookings: MaterialBooking[],
+    artistBookings: MaterialBooking[]
+): MaterialUser[] => {
     if (materialType === 'regular') {
         return regularBookings
             .filter(booking => booking.material_ids?.includes(materialId))
@@ -36,8 +52,8 @@ export const getUsersForMaterial = (
 export const getMaterialCount = (
     materialId: number,
     materialType: 'regular' | 'artist',
-    regularBookings: any[],
-    artistBookings: any[]
+    regularBookings: MaterialBooking[],
+    artistBookings: MaterialBooking[]
 ): number => {
     if (materialType === 'regular') {
         return regularBookings.reduce((count, booking) => {
@@ -54,18 +70,18 @@ export const getMaterialCount = (
  * Gets all materials assigned to a specific user
  */
 export const getMaterialsForUser = (
-    booking: any,
+    booking: MaterialBooking,
     bookingType: 'regular' | 'artist',
-    formContent: any,
-    artistFormContent: any
-) => {
+    formContent: FormContent,
+    artistFormContent: ArtistFormContent
+): Array<Material | ArtistMaterial> => {
     if (bookingType === 'regular') {
-        return booking.material_ids?.map((materialId: number) => {
-            return formContent.materials.find((m: any) => m.id === materialId);
-        }).filter(Boolean) || [];
+        return (booking.material_ids?.map((materialId: number) => {
+            return formContent.materials.find((m) => m.id === materialId);
+        }).filter((material): material is Material => material !== undefined) || []);
     } else {
-        return booking.artist_material_ids?.map((materialId: number) => {
-            return artistFormContent.artist_materials.find((m: any) => m.id === materialId);
-        }).filter(Boolean) || [];
+        return (booking.artist_material_ids?.map((materialId: number) => {
+            return artistFormContent.artist_materials.find((m) => m.id === materialId);
+        }).filter((material): material is ArtistMaterial => material !== undefined) || []);
     }
 };

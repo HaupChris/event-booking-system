@@ -79,6 +79,7 @@ export interface Booking {
     paid_amount: number;
     payment_notes: string;
     payment_date: string;
+    profile_uuid: string;
     profession_ids: Array<number>;
 }
 

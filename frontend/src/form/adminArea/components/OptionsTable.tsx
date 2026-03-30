@@ -253,13 +253,13 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
         <>
             {isMobile ? (
                 // Mobile card view
-                <Box>
+                (<Box>
                     {regularOptions.length > 0 && renderMobileCards(regularOptions, 'Regular Participants')}
                     {artistOptions.length > 0 && renderMobileCards(artistOptions, 'Artists')}
-                </Box>
+                </Box>)
             ) : (
                 // Desktop table view
-                <TableContainer component={Paper} elevation={0} variant="outlined">
+                (<TableContainer component={Paper} elevation={0} variant="outlined">
                     <Table size="small">
                         <TableHead>
                             <TableRow>
@@ -285,9 +285,8 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
                             {artistOptions.length > 0 && renderTableSection(artistOptions, 'Artists')}
                         </TableBody>
                     </Table>
-                </TableContainer>
+                </TableContainer>)
             )}
-
             {selectedItem && (
                 <OptionItemModal
                     open={isOpen}

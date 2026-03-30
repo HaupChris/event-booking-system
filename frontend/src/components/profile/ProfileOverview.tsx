@@ -37,10 +37,13 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
       <Typography variant="h5" color={"text.primary"} sx={{ mb: 2 }}>
         Profil Übersicht
       </Typography>
-
       <Grid container spacing={3}>
         {/* User Info */}
-        <Grid item xs={12} md={6}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 6
+          }}>
           <Card variant="outlined" sx={cardSx}>
             <CardContent sx={cardContentSx}>
               <Typography variant="h6" gutterBottom color="primary">
@@ -72,7 +75,11 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
         </Grid>
 
         {/* Payment Status */}
-        <Grid item xs={12} md={6}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 6
+          }}>
           <Card variant="outlined" sx={cardSx}>
             <CardContent sx={cardContentSx}>
               <Typography variant="h6" gutterBottom color="primary">
@@ -100,12 +107,12 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
               <Divider sx={{ my: 2 }} />
 
               <Grid container spacing={1}>
-                <Grid item xs={6}>
+                <Grid size={6}>
                   <Typography variant="body2" color="text.secondary">
                     Gesamtbetrag:
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid size={6}>
                   <Typography variant="body2" fontWeight="bold">
                     {booking.total_price.toFixed(2)} €
                   </Typography>
@@ -113,12 +120,12 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
 
                 {payment.paid_amount > 0 && (
                   <>
-                    <Grid item xs={6}>
+                    <Grid size={6}>
                       <Typography variant="body2" color="text.secondary">
                         Gezahlt:
                       </Typography>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid size={6}>
                       <Typography variant="body2" fontWeight="bold">
                         {payment.paid_amount.toFixed(2)} €
                       </Typography>
@@ -128,12 +135,12 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
 
                 {payment.payment_date && (
                   <>
-                    <Grid item xs={6}>
+                    <Grid size={6}>
                       <Typography variant="body2" color="text.secondary">
                         Zahlungsdatum:
                       </Typography>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid size={6}>
                       <Typography variant="body2">
                         {new Date(payment.payment_date).toLocaleDateString('de-DE')}
                       </Typography>
@@ -152,7 +159,7 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
         </Grid>
 
         {/* Booking Summary */}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Card variant="outlined" sx={cardSx}>
             <CardContent sx={cardContentSx}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -164,7 +171,12 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
 
               <Grid container spacing={2}>
                 {booking.ticket && (
-                  <Grid item xs={12} sm={6} md={3}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                      md: 3
+                    }}>
                     <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Ticket
@@ -180,7 +192,12 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
                 )}
 
                 {booking.food && (
-                  <Grid item xs={12} sm={6} md={3}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                      md: 3
+                    }}>
                     <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Essen
@@ -196,7 +213,12 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
                 )}
 
                 {booking.beverage && (
-                  <Grid item xs={12} sm={6} md={3}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                      md: 3
+                    }}>
                     <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Getränke
@@ -212,7 +234,12 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
                 )}
 
                 {booking.amount_shifts !== undefined && (
-                  <Grid item xs={12} sm={6} md={3}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                      md: 3
+                    }}>
                     <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Schichten
@@ -243,7 +270,7 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
           </Card>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Typography color="text.primary" variant="h6" sx={{ mb: 2 }}>
             Weitere Buchungsdetails
           </Typography>

@@ -115,8 +115,8 @@ first_name: booking.first_name,
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {getArtistsForMaterial(selectedMaterial).map((artist, index) => (
-                    <TableRow key={index}>
+                  {getArtistsForMaterial(selectedMaterial).map((artist) => (
+                    <TableRow key={`${artist.email}-${artist.first_name}-${artist.last_name}`}>
                       <TableCell>{artist.first_name} {artist.last_name}</TableCell>
                       <TableCell>{artist.email}</TableCell>
                     </TableRow>

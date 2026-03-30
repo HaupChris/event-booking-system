@@ -6,7 +6,7 @@
 import type {BookingWithTimestamp, FormContent} from '../../userArea/interface';
 import type {ArtistBookingWithTimestamp, ArtistFormContent} from '../../artistArea/interface';
 
-type ExportData = Record<string, any>;
+type ExportData = Record<string, unknown>;
 
 /**
  * Transforms bookings data into export format

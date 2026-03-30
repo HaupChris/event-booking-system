@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import type {FormProps} from "./UserRegistrationFormContainer";
 import WorkShift from "../../components/core/inputs/workShift";
 import type {WorkShift as WorkShiftType} from '../userArea/interface';
@@ -29,6 +29,7 @@ function HelpIcon() {
 
 function WorkShiftForm(props: FormProps) {
     const theme = useTheme();
+    const { currentBooking, updateBooking, formValidation, formContent } = props;
     const [availablePriorities, setAvailablePriorities] = useState<string[]>([
         PRIORITIES.FIRST,
         PRIORITIES.SECOND,
@@ -36,8 +37,8 @@ function WorkShiftForm(props: FormProps) {
         "",
     ]);
 
-    const [supporterBuddyFirstName, setSupporterBuddyFirstName] = useState(props.currentBooking.supporter_buddy.split(" ")[0]);
-    const [supporterBuddyLastName, setSupporterBuddyLastName] = useState(props.currentBooking.supporter_buddy.split(" ")[1] || "");
+    const [supporterBuddyFirstName, setSupporterBuddyFirstName] = useState(currentBooking.supporter_buddy.split(" ")[0]);
+    const [supporterBuddyLastName, setSupporterBuddyLastName] = useState(currentBooking.supporter_buddy.split(" ")[1] || "");
 
     const numberOfShiftsOptions = [
         {value: 1, label: "1 Schicht"},
@@ -47,44 +48,35 @@ function WorkShiftForm(props: FormProps) {
 
 
     useEffect(() => {
-        props.updateBooking("supporter_buddy", supporterBuddyFirstName + " " + supporterBuddyLastName);
-    }, [supporterBuddyFirstName, supporterBuddyLastName]);
+        updateBooking("supporter_buddy", supporterBuddyFirstName + " " + supporterBuddyLastName);
+    }, [supporterBuddyFirstName, supporterBuddyLastName, updateBooking]);
 
-    useEffect(() => {
-        updateAvailablePriorities();
-    }, [
-        props.currentBooking.timeslot_priority_1,
-        props.currentBooking.timeslot_priority_2,
-        props.currentBooking.timeslot_priority_3,
-    ]);
-
-    function updateAvailablePriorities() {
-        const availablePriorities = [
+    const updateAvailablePriorities = useCallback(() => {
+        const available = [
             PRIORITIES.FIRST,
             PRIORITIES.SECOND,
             PRIORITIES.THIRD,
         ];
-        if (props.currentBooking.timeslot_priority_1 !== -1) {
-            availablePriorities.splice(
-                availablePriorities.indexOf(PRIORITIES.FIRST),
-                1
-            );
+        if (currentBooking.timeslot_priority_1 !== -1) {
+            available.splice(available.indexOf(PRIORITIES.FIRST), 1);
         }
-        if (props.currentBooking.timeslot_priority_2 !== -1) {
-            availablePriorities.splice(
-                availablePriorities.indexOf(PRIORITIES.SECOND),
-                1
-            );
+        if (currentBooking.timeslot_priority_2 !== -1) {
+            available.splice(available.indexOf(PRIORITIES.SECOND), 1);
         }
-        if (props.currentBooking.timeslot_priority_3 !== -1) {
-            availablePriorities.splice(
-                availablePriorities.indexOf(PRIORITIES.THIRD),
-                1
-            );
+        if (currentBooking.timeslot_priority_3 !== -1) {
+            available.splice(available.indexOf(PRIORITIES.THIRD), 1);
         }
 
-        setAvailablePriorities(availablePriorities);
-    }
+        setAvailablePriorities(available);
+    }, [
+        currentBooking.timeslot_priority_1,
+        currentBooking.timeslot_priority_2,
+        currentBooking.timeslot_priority_3,
+    ]);
+
+    useEffect(() => {
+        updateAvailablePriorities();
+    }, [updateAvailablePriorities]);
 
 
     const faqItems = [
@@ -101,7 +93,7 @@ function WorkShiftForm(props: FormProps) {
         if (newValue === null || newValue === undefined) {
             return
         } else {
-            props.updateBooking("amount_shifts", newValue as number)
+            updateBooking("amount_shifts", newValue as number)
         }
     }
 
@@ -146,7 +138,7 @@ function WorkShiftForm(props: FormProps) {
             <Box display="flex" alignItems="center" justifyContent="center" sx={{paddingX: 2}}>
                 <WWSelect
                     options={numberOfShiftsOptions}
-                    value={props.currentBooking.amount_shifts}
+                    value={currentBooking.amount_shifts}
                     onChange={updateAmountShifts}
                 />
             </Box>
@@ -164,7 +156,7 @@ function WorkShiftForm(props: FormProps) {
                 gap: 2
             }}>
                 <FormField
-                    error={!!props.formValidation.supporter_buddy}
+                    error={!!formValidation.supporter_buddy}
                     id="first_name"
                     label="Vorname"
                     name="first_name"
@@ -172,7 +164,7 @@ function WorkShiftForm(props: FormProps) {
                     onChange={(e) => setSupporterBuddyFirstName(e.target.value)}
                 />
                 <FormField
-                    error={!!props.formValidation.supporter_buddy}
+                    error={!!formValidation.supporter_buddy}
                     id="first_name"
                     label="Nachname"
                     name="first_name"
@@ -206,18 +198,18 @@ function WorkShiftForm(props: FormProps) {
 
         {/* Work Shifts List */}
         <List>
-            {props.formContent.work_shifts.filter((workshift) => workshift.title.toLowerCase() !== "already employed")
+            {formContent.work_shifts.filter((workshift) => workshift.title.toLowerCase() !== "already employed")
                 .sort(compareWorkshiftsByNumBooked)
-                .concat(props.formContent.work_shifts.filter((workshift) => workshift.title.toLowerCase() === "already employed"))
+                .concat(formContent.work_shifts.filter((workshift) => workshift.title.toLowerCase() === "already employed"))
                 .map((workShift, index) => (
                     <React.Fragment key={workShift.id}>
                         <WorkShift
                             workShift={workShift}
                             availablePriorities={availablePriorities}
-                            currentBooking={props.currentBooking}
-                            updateBooking={props.updateBooking}
+                            currentBooking={currentBooking}
+                            updateBooking={updateBooking}
                         />
-                        {index < props.formContent.work_shifts.length - 1 && (
+                        {index < formContent.work_shifts.length - 1 && (
                             <Divider
                                 sx={{
                                     my: 3,

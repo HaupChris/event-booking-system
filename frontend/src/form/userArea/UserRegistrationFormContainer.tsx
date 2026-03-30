@@ -58,6 +58,7 @@ function getEmptyBooking(): Booking {
         paid_amount: 0,
         payment_date: "",
         payment_notes: "",
+        profile_uuid: "",
         profession_ids: []
     }
 }
@@ -155,7 +156,7 @@ export function UserRegistrationFormContainer() {
                 storageConfig: {
                     storageKey: 'booking',
                     versionKey: 'formVersion',
-                    currentVersion: '1.2'
+                    currentVersion: '1.3'
                 },
 
                 // Validation and form configuration

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { SxProps, Theme } from '@mui/material/styles';
+import type { CSSProperties } from 'react';
 
 // Define the prop types
 interface CustomPngIconProps {
@@ -20,7 +20,7 @@ interface CustomPngIconProps {
   /**
    * MUI system sx prop for advanced styling
    */
-  sx?: SxProps<Theme>;
+  sx?: CSSProperties;
   /**
    * Additional className
    */
@@ -71,7 +71,7 @@ const CustomPngIcon: React.FC<CustomPngIconProps> = ({
         width: size,
         height: size,
         color: color, // This won't affect PNG directly but maintains API consistency
-        ...(sx as any)?.style, // Extract style from sx if exists
+        ...(sx ?? {}),
       }}
       onClick={onClick}
       {...otherProps}

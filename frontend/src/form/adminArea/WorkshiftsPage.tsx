@@ -200,8 +200,8 @@ const WorkshiftsPage: React.FC = () => {
                                     <TableBody>
                                         {getUsersForTimeslot(selectedTimeslot.id, regularBookings)
                                             .sort((a, b) => a.priority - b.priority)
-                                            .map((user, index) => (
-                                                <TableRow key={index}>
+                                            .map((user) => (
+                                                <TableRow key={`${user.first_name}-${user.last_name}-${user.priority}`}>
                                                     <TableCell>
                                                         {user.first_name} {user.last_name}
                                                     </TableCell>

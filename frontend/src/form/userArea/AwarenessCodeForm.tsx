@@ -40,7 +40,7 @@ function AwarenessCodeForm() {
         <List sx={{width: '100%'}}>
             {userAreaTexts.awarenessCodeForm.codeRules.map((item, index) => (
                 <FormCard
-                    key={index}
+                    key={item.title}
                     sx={{mt: 2, pl:0, pr: 2}}
                 >
                     {/* Circuit background decoration */}
@@ -69,6 +69,7 @@ function AwarenessCodeForm() {
                         }}
                     >
                         <ListItemText
+                            disableTypography
                             sx={{ml: 2}}
                             primary={
                                 <Typography

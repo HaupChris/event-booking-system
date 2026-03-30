@@ -97,8 +97,8 @@ const OptionItemModal: React.FC<OptionItemModalProps> = ({
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user, index) => (
-                <TableRow key={index} sx={{
+              {users.map((user) => (
+                <TableRow key={`${user.first_name}-${user.last_name}-${user.email}`} sx={{
                   bgcolor: user.bookingType === 'artist'
                     ? alpha(spacePalette.primary.main, 0.05)
                     : 'transparent'

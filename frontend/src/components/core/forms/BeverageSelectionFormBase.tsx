@@ -25,7 +25,7 @@ interface BeverageSelectionFormBaseProps {
   currentBooking: {
     beverage_id: number;
   };
-  updateBooking: (key: any, value: any) => void;
+  updateBooking: (key: 'beverage_id', value: number) => void;
   formContent: {
     beverage_options: BeverageOption[];
   };

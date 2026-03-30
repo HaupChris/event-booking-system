@@ -16,29 +16,29 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
   clearOnResize = false,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  let ctx: CanvasRenderingContext2D | undefined | null = undefined;
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const drawing = useRef(false);
 
   // Draw existing signature when the component mounts
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    ctxRef.current = canvas.getContext('2d');
+    if (!ctxRef.current) return;
 
     // Clear the canvas
     const width = canvas.width;
     const height = canvas.height;
-    ctx.clearRect(0, 0, width, height);
+    ctxRef.current.clearRect(0, 0, width, height);
 
     // Start a new path
-    ctx.beginPath();
+    ctxRef.current.beginPath();
 
     if (currentSignature) {
       // Draw the image if signature exists
       const img = new Image();
       img.onload = () => {
-        ctx?.drawImage(img, 0, 0);
+        ctxRef.current?.drawImage(img, 0, 0);
       };
       img.src = currentSignature;
     }
@@ -48,13 +48,13 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    ctxRef.current = canvas.getContext('2d');
+    if (!ctxRef.current) return;
 
     // Initialize context settings
-    ctx.strokeStyle = penColor;
-    ctx.lineJoin = 'round';
-    ctx.lineWidth = 2;
+    ctxRef.current.strokeStyle = penColor;
+    ctxRef.current.lineJoin = 'round';
+    ctxRef.current.lineWidth = 2;
 
     // Handle coordinates for both mouse and touch events
     const getCoordinates = (clientX: number, clientY: number): { x: number; y: number } => {
@@ -68,14 +68,14 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
     const handleStart = (clientX: number, clientY: number) => {
       drawing.current = true;
       const { x, y } = getCoordinates(clientX, clientY);
-      ctx?.moveTo(x, y);
+      ctxRef.current?.moveTo(x, y);
     };
 
     const handleMove = (clientX: number, clientY: number) => {
       if (!drawing.current) return;
       const { x, y } = getCoordinates(clientX, clientY);
-      ctx?.lineTo(x, y);
-      ctx?.stroke();
+      ctxRef.current?.lineTo(x, y);
+      ctxRef.current?.stroke();
     };
 
     const handleEnd = () => {
@@ -125,7 +125,7 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
       handleResize = () => {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
-        ctx?.clearRect(0, 0, canvas.width, canvas.height);
+        ctxRef.current?.clearRect(0, 0, canvas.width, canvas.height);
       };
       window.addEventListener('resize', handleResize);
     }

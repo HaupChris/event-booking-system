@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 
 interface SignaturePadProps {
   onEnd?: (dataURL: string) => void;
@@ -8,11 +8,15 @@ interface SignaturePadProps {
 }
 
 function CustomSignaturePad(props: SignaturePadProps) {
-  const penColor = props.penColor || 'black';
-  const clearOnResize = props.clearOnResize || false;
+  const {
+    onEnd,
+    penColor = 'black',
+    clearOnResize = false,
+    existingSignature,
+  } = props;
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  let ctx: CanvasRenderingContext2D | undefined | null = undefined;
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const drawing = useRef(false);
 
   const handleStart = (clientX: number, clientY: number) => {
@@ -22,7 +26,7 @@ function CustomSignaturePad(props: SignaturePadProps) {
     const y = (clientY - rect.top) * (canvasRef.current.height / rect.height);
     drawing.current = true;
     // onBegin?.();
-    ctx?.moveTo(x, y);
+    ctxRef.current?.moveTo(x, y);
   };
 
   const handleMove = (clientX: number, clientY: number) => {
@@ -31,50 +35,50 @@ function CustomSignaturePad(props: SignaturePadProps) {
     const rect = canvasRef.current.getBoundingClientRect();
     const x = (clientX - rect.left) * (canvasRef.current.width / rect.width);
     const y = (clientY - rect.top) * (canvasRef.current.height / rect.height);
-    ctx?.lineTo(x, y);
-    ctx?.stroke();
+    ctxRef.current?.lineTo(x, y);
+    ctxRef.current?.stroke();
   };
 
-  const handleEnd = () => {
+  const handleEnd = useCallback(() => {
     drawing.current = false;
-    if (!ctx || !canvasRef.current || typeof props.onEnd !== 'function') return;
+    if (!ctxRef.current || !canvasRef.current || typeof onEnd !== 'function') return;
     const dataURL = canvasRef.current.toDataURL();
-    props.onEnd(dataURL);
-  };
+    onEnd(dataURL);
+  }, [onEnd]);
 
   // Draw existing signature when the component mounts
   useEffect(() => {
     const canvas = canvasRef.current;
-    ctx = canvas?.getContext('2d');
-    if (!ctx) return;
+    ctxRef.current = canvas?.getContext('2d') ?? null;
+    if (!ctxRef.current) return;
 
     // Clear the canvas
     const width = canvas ? canvas.width : 0;
     const height = canvas ? canvas.height : 0;
-    ctx.clearRect(0, 0, width, height);
+    ctxRef.current.clearRect(0, 0, width, height);
 
     // Start a new path
-    ctx.beginPath();
+    ctxRef.current.beginPath();
 
-    if (!props.existingSignature) return; // Don't try to draw if the signature is empty
+    if (!existingSignature) return; // Don't try to draw if the signature is empty
 
     // Draw the image
     const img = new Image();
     img.onload = () => {
-      ctx?.drawImage(img, 0, 0);
+      ctxRef.current?.drawImage(img, 0, 0);
     };
-    img.src = props.existingSignature;
-  }, [props.existingSignature]);
+    img.src = existingSignature;
+  }, [existingSignature]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    ctxRef.current = canvas.getContext('2d');
+    if (!ctxRef.current) return;
 
-    ctx.strokeStyle = penColor;
-    ctx.lineJoin = 'round';
-    ctx.lineWidth = 2;
+    ctxRef.current.strokeStyle = penColor;
+    ctxRef.current.lineJoin = 'round';
+    ctxRef.current.lineWidth = 2;
 
     // Handle normal mouse events
     const handleMouseDown = (event: MouseEvent) => {
@@ -116,7 +120,7 @@ function CustomSignaturePad(props: SignaturePadProps) {
       handleResize = () => {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
-        ctx?.clearRect(0, 0, canvas.width, canvas.height);
+        ctxRef.current?.clearRect(0, 0, canvas.width, canvas.height);
       };
       window.addEventListener('resize', handleResize);
     }
@@ -136,7 +140,7 @@ function CustomSignaturePad(props: SignaturePadProps) {
         window.removeEventListener('resize', handleResize);
       }
     };
-  }, [props.onEnd, penColor, clearOnResize]);
+  }, [clearOnResize, handleEnd, penColor]);
 
   return (
     <canvas

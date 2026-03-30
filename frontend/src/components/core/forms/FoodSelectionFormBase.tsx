@@ -25,7 +25,7 @@ interface FoodSelectionFormBaseProps {
   currentBooking: {
     food_id: number;
   };
-  updateBooking: (key: any, value: any) => void;
+  updateBooking: (key: 'food_id', value: number) => void;
   formContent: {
     food_options: FoodOption[];
   };

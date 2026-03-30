@@ -5,7 +5,7 @@
  * Admin page for managing news items
  */
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -63,11 +63,11 @@ const NewsManagementPage: React.FC = () => {
     severity: 'success' | 'error' | 'info';
   }>({ open: false, message: '', severity: 'info' });
 
-  useEffect(() => {
-    loadNews().then();
-  });
+  const showSnackbar = useCallback((message: string, severity: 'success' | 'error' | 'info') => {
+    setSnackbar({ open: true, message, severity });
+  }, []);
 
-  const loadNews = async () => {
+  const loadNews = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getAllNews(token, true); // Include inactive
@@ -78,11 +78,11 @@ const NewsManagementPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showSnackbar, token]);
 
-  const showSnackbar = (message: string, severity: 'success' | 'error' | 'info') => {
-    setSnackbar({ open: true, message, severity });
-  };
+  useEffect(() => {
+    loadNews().then();
+  }, [loadNews]);
 
   const handleOpenCreateDialog = () => {
     setSelectedNews(null);

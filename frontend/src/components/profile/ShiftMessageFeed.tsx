@@ -23,7 +23,7 @@ function ShiftMessageFeed({ shiftMessages }: ShiftMessageFeedProps) {
       </Typography>
       <Grid container spacing={2}>
         {shiftMessages.map((message) => (
-          <Grid item xs={12} key={message.id}>
+          <Grid key={message.id} size={12}>
             <Card variant="outlined" sx={{ borderRadius: 2, borderLeft: '4px solid', borderLeftColor: 'primary.main' }}>
               <CardContent sx={cardContentSx}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 1 }}>

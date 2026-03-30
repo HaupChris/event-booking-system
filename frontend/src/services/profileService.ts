@@ -5,8 +5,9 @@
  */
 
 import axios from 'axios';
+import { API_URL } from '../config/env';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const API_BASE_URL = API_URL || 'http://localhost:5001/api';
 
 // Types
 export interface User {

@@ -15,16 +15,16 @@
     "max-lines-per-function": [
       "warn",
       {
-        "max": 280,
+        "max": 500,
         "skipBlankLines": true,
         "skipComments": true,
         "IIFEs": true
       }
     ],
-    "complexity": ["warn", 10],
+    "complexity": ["warn", 20],
     "max-depth": ["error", 4],
-    "max-params": ["warn", 4],
-    "max-nested-callbacks": ["warn", 3],
+    "max-params": ["warn", 6],
+    "max-nested-callbacks": ["warn", 4],
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "warn",

@@ -9,6 +9,8 @@ import { useFetchData } from '../useFetchData';
 import OptionsTable from './OptionsTable';
 import FilterControls from './FilterControls';
 import type { CombinedBooking } from '../interface';
+import type { FormContent } from '../../userArea/interface';
+import type { ArtistFormContent } from '../../artistArea/interface';
 import { useAdminPageFilters } from '../../../hooks/useAdminPageFilters';
 
 interface OptionItem {
@@ -25,8 +27,8 @@ interface OptionsPageConfig {
     /**
      * Function to extract options from form content
      */
-    getRegularOptions: (formContent: any) => OptionItem[];
-    getArtistOptions: (artistFormContent: any) => OptionItem[];
+    getRegularOptions: (formContent: FormContent) => OptionItem[];
+    getArtistOptions: (artistFormContent: ArtistFormContent) => OptionItem[];
     /**
      * Field name in the booking object (e.g., 'ticket_id', 'beverage_id', 'food_id')
      */
@@ -68,7 +70,7 @@ const GenericOptionsPage: React.FC<GenericOptionsPageProps> = ({ config }) => {
         const regularOptions = viewType === 'all' || viewType === 'regular'
             ? config.getRegularOptions(formContent).map(option => {
                 const count = regularBookingsWithType.filter(
-                    b => (b as any)[config.bookingFieldName] === option.id
+                    b => b[config.bookingFieldName as keyof CombinedBooking] === option.id
                 ).length;
                 return {
                     id: option.id,
@@ -84,7 +86,7 @@ const GenericOptionsPage: React.FC<GenericOptionsPageProps> = ({ config }) => {
         const artistOptions = viewType === 'all' || viewType === 'artist'
             ? config.getArtistOptions(artistFormContent).map(option => {
                 const count = artistBookingsWithType.filter(
-                    b => (b as any)[config.bookingFieldName] === option.id
+                    b => b[config.bookingFieldName as keyof CombinedBooking] === option.id
                 ).length;
                 return {
                     id: option.id,

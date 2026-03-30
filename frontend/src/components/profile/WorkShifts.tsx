@@ -110,13 +110,11 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
           Du bist offline. Änderungen werden synchronisiert, sobald du wieder online bist.
         </Alert>
       )}
-
       {errorMessage && (
         <Alert severity="error" sx={{ mb: 3 }}>
           {errorMessage}
         </Alert>
       )}
-
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         color={'text.primary'}
@@ -142,19 +140,16 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
           label="Nachrichten anzeigen"
         />
       </Stack>
-
       {showMessages && <ShiftMessageFeed shiftMessages={shiftMessages} />}
-
       {showAssignments && shifts.length === 0 && (
         <Alert severity="info" sx={{ mb: 2 }}>
           Dir wurden noch keine Schichten zugewiesen. Schau später wieder vorbei!
         </Alert>
       )}
-
       {showAssignments && (
         <Grid container spacing={3}>
           {shifts.map((shift) => (
-            <Grid item xs={12} key={shift.assignment_id}>
+            <Grid key={shift.assignment_id} size={12}>
               <Card variant="outlined" sx={{ borderRadius: 2 }}>
                 <CardContent sx={cardContentSx}>
                   <Box
@@ -259,7 +254,6 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
           ))}
         </Grid>
       )}
-
       {/* Decline Dialog */}
       <Dialog open={declineDialogOpen} onClose={handleDeclineCancel} maxWidth="sm" fullWidth>
         <DialogTitle>Schicht ablehnen</DialogTitle>

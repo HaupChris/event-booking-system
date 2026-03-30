@@ -40,7 +40,6 @@ function ArtistPerformanceForm(props: ArtistFormProps) {
                 title={artistAreaTexts.performanceDetailsForm.title}
                 icon={<MusicNoteIcon />}
             />
-
             <Grid container spacing={3}>
                 {/*<Grid item xs={12} sm={6}>*/}
                 {/*    <Box sx={{ mb: 3 }}>*/}
@@ -72,7 +71,11 @@ function ArtistPerformanceForm(props: ArtistFormProps) {
                 {/*    </Box>*/}
                 {/*</Grid>*/}
 
-                <Grid item xs={12} sm={6}>
+                <Grid
+                    size={{
+                        xs: 12,
+                        sm: 6
+                    }}>
                     <Box sx={{ mb: 3 }}>
                         <Typography variant="subtitle1" sx={{ mb: 1 }}>
                             {artistAreaTexts.performanceDetailsForm.durationLabel}
@@ -87,7 +90,11 @@ function ArtistPerformanceForm(props: ArtistFormProps) {
                     </Box>
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid
+                    size={{
+                        xs: 12,
+                        sm: 6
+                    }}>
                     <FormField
                         label={artistAreaTexts.performanceDetailsForm.genreLabel}
                         value={performanceDetails.genre}
@@ -95,7 +102,7 @@ function ArtistPerformanceForm(props: ArtistFormProps) {
                     />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={12}>
                     <FormField
                         label={artistAreaTexts.performanceDetailsForm.descriptionLabel}
                         multiline
@@ -106,7 +113,7 @@ function ArtistPerformanceForm(props: ArtistFormProps) {
                     />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={12}>
                     <FormField
                         label={artistAreaTexts.performanceDetailsForm.bandMembersLabel}
                         multiline

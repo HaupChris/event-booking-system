@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Chip,
-  Grid,
   Paper,
   Table,
   TableBody,
@@ -37,9 +36,18 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
   viewType,
 }) => {
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={12} md={4}>
-        <FormCard title="Ticket Sales" icon={<ConfirmationNumber />}>
+    <Box>
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: {
+            xs: '1fr',
+            lg: 'repeat(3, minmax(0, 1fr))',
+          },
+        }}
+      >
+        <FormCard sx={{ height: '100%' }} title="Ticket Sales" icon={<ConfirmationNumber />}>
           <Box sx={{ p: 2 }}>
             <TableContainer component={Paper} variant="outlined">
               <Table size="small">
@@ -80,10 +88,7 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
             </TableContainer>
           </Box>
         </FormCard>
-      </Grid>
-
-      <Grid item xs={12} md={4}>
-        <FormCard title="Beverage Sales" icon={<SportsBar />}>
+        <FormCard sx={{ height: '100%' }} title="Beverage Sales" icon={<SportsBar />}>
           <Box sx={{ p: 2 }}>
             <TableContainer component={Paper} variant="outlined">
               <Table size="small">
@@ -124,10 +129,7 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
             </TableContainer>
           </Box>
         </FormCard>
-      </Grid>
-
-      <Grid item xs={12} md={4}>
-        <FormCard title="Food Sales" icon={<LocalDining />}>
+        <FormCard sx={{ height: '100%' }} title="Food Sales" icon={<LocalDining />}>
           <Box sx={{ p: 2 }}>
             <TableContainer component={Paper} variant="outlined">
               <Table size="small">
@@ -170,38 +172,36 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
             </TableContainer>
           </Box>
         </FormCard>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Paper
+      </Box>
+      <Paper
+        sx={{
+          mt: 3,
+          p: 3,
+          bgcolor: alpha(spacePalette.primary.main, 0.1),
+          borderRadius: 2,
+          border: `1px solid ${alpha(spacePalette.primary.main, 0.2)}`,
+        }}
+      >
+        <Box
           sx={{
-            p: 3,
-            bgcolor: alpha(spacePalette.primary.main, 0.1),
-            borderRadius: 2,
-            border: `1px solid ${alpha(spacePalette.primary.main, 0.2)}`,
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            justifyContent: 'space-between',
+            alignItems: { xs: 'flex-start', md: 'center' },
+            gap: 2,
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: 2,
-            }}
-          >
-            <Typography variant="h5" color="primary.main" fontWeight="medium">
-              Total Revenue: EUR{grandTotal.toFixed(2)}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button variant="outlined" color="primary" startIcon={<Paid />}>
-                {viewType === 'all' ? 'All' : viewType === 'regular' ? 'Regular' : 'Artist'} Payments
-              </Button>
-            </Box>
+          <Typography variant="h5" color="primary.main" fontWeight="medium">
+            Total Revenue: EUR{grandTotal.toFixed(2)}
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button variant="outlined" color="primary" startIcon={<Paid />}>
+              {viewType === 'all' ? 'All' : viewType === 'regular' ? 'Regular' : 'Artist'} Payments
+            </Button>
           </Box>
-        </Paper>
-      </Grid>
-    </Grid>
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 

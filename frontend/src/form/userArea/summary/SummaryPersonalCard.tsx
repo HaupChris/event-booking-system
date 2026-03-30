@@ -20,7 +20,11 @@ function SummaryPersonalCard({ firstName, lastName, email, phone }: SummaryPerso
   return (
     <FormCard title={userAreaTexts.summaryForm.personalData} icon={<PersonIcon />}>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <Box sx={{ display: 'flex', mb: 1.5 }}>
             <Typography
               variant="subtitle1"
@@ -72,7 +76,11 @@ function SummaryPersonalCard({ firstName, lastName, email, phone }: SummaryPerso
           </Box>
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <InfoPair label="Email" value={email} icon={<EmailIcon />} />
           <InfoPair label="Telefon" value={phone} icon={<PhoneIcon />} />
         </Grid>

@@ -15,7 +15,7 @@ interface TicketSelectionFormBaseProps {
   currentBooking: {
     ticket_id: number;
   };
-  updateBooking: (key: any, value: any) => void;
+  updateBooking: (key: 'ticket_id', value: number) => void;
   formContent: {
     ticket_options: TicketOption[];
   };

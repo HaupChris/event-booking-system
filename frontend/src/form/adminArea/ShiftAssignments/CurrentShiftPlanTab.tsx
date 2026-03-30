@@ -5,7 +5,6 @@ import {
   CardContent,
   Divider,
   Chip,
-  Grid,
   LinearProgress,
   List,
   ListItem,
@@ -124,8 +123,18 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
 
   return (
     <Box sx={{ p: 2 }}>
-      <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12} sm={6} md={3}>
+      <Box
+        sx={{
+          mb: 2,
+          display: 'grid',
+          gap: 2,
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, minmax(0, 1fr))',
+            lg: 'repeat(4, minmax(0, 1fr))',
+          },
+        }}
+      >
           <Card variant="outlined">
             <CardContent sx={{ p: 2 }}>
               <Typography variant="body2" color="text.secondary">
@@ -136,9 +145,7 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
           <Card variant="outlined">
             <CardContent sx={{ p: 2 }}>
               <Typography variant="body2" color="text.secondary">
@@ -149,9 +156,7 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
           <Card variant="outlined">
             <CardContent sx={{ p: 2 }}>
               <Typography variant="body2" color="text.secondary">
@@ -162,9 +167,7 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
           <Card variant="outlined">
             <CardContent sx={{ p: 2 }}>
               <Typography variant="body2" color="text.secondary">
@@ -175,9 +178,7 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>
-
+      </Box>
       <Stack spacing={2}>
         {workshiftPlan.map((workshift) => (
           <Card key={workshift.id} variant="outlined">
@@ -224,8 +225,17 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
 
                       <Divider sx={{ my: 1.5 }} />
 
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} md={6}>
+                      <Box
+                        sx={{
+                          display: 'grid',
+                          gap: 2,
+                          gridTemplateColumns: {
+                            xs: '1fr',
+                            md: 'repeat(2, minmax(0, 1fr))',
+                          },
+                        }}
+                      >
+                        <Box>
                           <Typography variant="subtitle2" sx={{ mb: 1, color: 'success.dark' }}>
                             Bestaetigt ({timeslot.confirmedPeople.length})
                           </Typography>
@@ -245,9 +255,9 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
                               ))}
                             </List>
                           )}
-                        </Grid>
+                        </Box>
 
-                        <Grid item xs={12} md={6}>
+                        <Box>
                           <Typography variant="subtitle2" sx={{ mb: 1, color: 'warning.dark' }}>
                             Angeboten / Offen ({timeslot.offeredPeople.length})
                           </Typography>
@@ -267,8 +277,8 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
                               ))}
                             </List>
                           )}
-                        </Grid>
-                      </Grid>
+                        </Box>
+                      </Box>
                     </CardContent>
                   </Card>
                 ))}

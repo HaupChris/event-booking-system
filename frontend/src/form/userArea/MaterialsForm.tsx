@@ -4,9 +4,9 @@ import {userAreaTexts} from "../constants/texts";
 import MaterialsFormBase from "../../components/core/forms/MaterialsFormBase";
 
 function MaterialsForm(props: FormProps) {
-    return <MaterialsFormBase
+    return <MaterialsFormBase<'material_ids'>
         currentBooking={props.currentBooking}
-        updateBooking={props.updateBooking}
+        updateBooking={(key, value) => props.updateBooking(key, value)}
         formContent={props.formContent}
         texts={userAreaTexts.materialsForm}
     />;

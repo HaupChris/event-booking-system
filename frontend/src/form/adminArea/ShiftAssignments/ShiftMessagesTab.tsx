@@ -11,7 +11,6 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
-  Grid,
   MenuItem,
   Stack,
   TextField,
@@ -179,8 +178,16 @@ function ShiftMessagesTab({ formContent }: ShiftMessagesTabProps) {
 
   return (
     <Box sx={{ p: 2 }}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} lg={5}>
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: {
+            xs: '1fr',
+            lg: 'minmax(320px, 5fr) minmax(420px, 7fr)',
+          },
+        }}
+      >
           <Card variant="outlined">
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
@@ -269,9 +276,7 @@ function ShiftMessagesTab({ formContent }: ShiftMessagesTabProps) {
               </Stack>
             </CardContent>
           </Card>
-        </Grid>
 
-        <Grid item xs={12} lg={7}>
           <Stack spacing={2}>
             <Card variant="outlined">
               <CardContent sx={{ p: 3 }}>
@@ -294,9 +299,7 @@ function ShiftMessagesTab({ formContent }: ShiftMessagesTabProps) {
               onDeleteMessage={handleDeleteMessage}
             />
           </Stack>
-        </Grid>
-      </Grid>
-
+      </Box>
       {error && (
         <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>
           {error}

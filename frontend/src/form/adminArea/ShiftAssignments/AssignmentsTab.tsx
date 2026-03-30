@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Box, Grid, Paper, Typography } from '@mui/material';
+import { Alert, Box, Paper, Typography } from '@mui/material';
 import type { BookingWithTimestamp, FormContent } from '../../userArea/interface';
 import type { ShiftAssignment } from './types';
 import UserList from './components/UserList';
@@ -69,7 +69,6 @@ function AssignmentsTab({
         totalCapacity={totalCapacity}
         assignments={assignments}
       />
-
       {error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={onClearError}>
           {error}
@@ -80,10 +79,18 @@ function AssignmentsTab({
           {success}
         </Alert>
       )}
-
-      <Box sx={{ height: '90vh' }}>
-        <Grid container spacing={2} sx={{ height: '100%' }}>
-          <Grid item xs={12} md={5} sx={{ height: '100%' }}>
+      <Box sx={{ minHeight: { xs: 'auto', lg: '72vh' } }}>
+        <Box
+          sx={{
+            height: '100%',
+            display: 'grid',
+            gap: 2,
+            gridTemplateColumns: {
+              xs: '1fr',
+              lg: 'minmax(320px, 5fr) minmax(220px, 2fr) minmax(320px, 5fr)',
+            },
+          }}
+        >
             <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
                 <Typography variant="h6">Participants</Typography>
@@ -97,9 +104,7 @@ function AssignmentsTab({
                 assignments={assignments}
               />
             </Paper>
-          </Grid>
 
-          <Grid item xs={12} md={2} sx={{ height: '100%' }}>
             <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
                 <Typography variant="h6">Actions</Typography>
@@ -115,9 +120,7 @@ function AssignmentsTab({
                 onExportShiftAssignments={onExportShiftAssignments}
               />
             </Paper>
-          </Grid>
 
-          <Grid item xs={12} md={5} sx={{ height: '100%' }}>
             <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
                 <Typography variant="h6">Workshifts</Typography>
@@ -130,8 +133,7 @@ function AssignmentsTab({
                 bookings={regularBookings}
               />
             </Paper>
-          </Grid>
-        </Grid>
+        </Box>
       </Box>
     </Box>
   );

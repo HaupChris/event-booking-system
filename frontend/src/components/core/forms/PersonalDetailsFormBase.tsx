@@ -31,24 +31,24 @@ interface PersonalDetailsTextProps {
   selectedProfessions: (count: number) => string;
 }
 
+type PersonalFieldKey = 'first_name' | 'last_name' | 'email' | 'phone';
+
 interface PersonalDetailsFormBaseProps {
-  updateBooking: (key: any, value: any) => void;
+  updateBooking: (key: PersonalFieldKey | 'profession_ids', value: string | number[]) => void;
   currentBooking: {
     first_name: string;
     last_name: string;
     email: string;
     phone: string;
     profession_ids: number[];
-    [key: string]: any;
   };
   formValidation: { [key: string]: string | undefined };
   texts: PersonalDetailsTextProps;
   formContent: {
     professions: Profession[];
-    [key: string]: any;
   };
   icon?: React.ReactNode;
-  professionIdsField?: string;
+  professionIdsField?: 'profession_ids';
 }
 
 function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
@@ -56,13 +56,15 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
     texts,
     icon = <PersonIcon />,
     formContent,
-    professionIdsField = 'profession_ids',
   } = props;
+  const professionIdsField = props.professionIdsField ?? 'profession_ids';
 
   const theme = useTheme();
+  const selectedProfessionIds =
+    (props.currentBooking[professionIdsField] as number[] | undefined) ?? [];
 
   const handleProfessionToggle = (professionId: number) => {
-    const currentIds = [...props.currentBooking[professionIdsField]];
+    const currentIds = [...selectedProfessionIds];
     const index = currentIds.indexOf(professionId);
 
     if (index === -1) {
@@ -76,7 +78,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
   };
 
   const selectedProfessions = (formContent.professions || []).filter((profession) =>
-    props.currentBooking[professionIdsField].includes(profession.id)
+    selectedProfessionIds.includes(profession.id)
   );
 
   return (
@@ -183,13 +185,11 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
                     mb: 1,
                     p: 1,
                     borderRadius: '8px',
-                    backgroundColor: props.currentBooking[professionIdsField].includes(
-                      profession.id
-                    )
+                    backgroundColor: selectedProfessionIds.includes(profession.id)
                       ? alpha(theme.palette.primary.main, 0.15)
                       : alpha(theme.palette.background.paper, 0.7),
                     border: '1px solid',
-                    borderColor: props.currentBooking[professionIdsField].includes(profession.id)
+                    borderColor: selectedProfessionIds.includes(profession.id)
                       ? alpha(theme.palette.primary.main, 0.5)
                       : alpha(theme.palette.primary.main, 0.2),
                     transition: 'all 0.2s ease',
@@ -198,7 +198,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={props.currentBooking[professionIdsField].includes(profession.id)}
+                        checked={selectedProfessionIds.includes(profession.id)}
                         onChange={() => handleProfessionToggle(profession.id)}
                         color="primary"
                       />
@@ -208,9 +208,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
                         variant="body1"
                         sx={{
                           color: theme.palette.text.primary,
-                          fontWeight: props.currentBooking[professionIdsField].includes(
-                            profession.id
-                          )
+                          fontWeight: selectedProfessionIds.includes(profession.id)
                             ? 'medium'
                             : 'normal',
                         }}

@@ -45,7 +45,7 @@ interface FormManagementReturn<T> {
   handlePrevious: () => void;
 }
 
-export function useFormManagement<T extends Record<string, unknown>>({
+export function useFormManagement<T extends object>({
   initialState,
   validationRules = {},
   storageKey,

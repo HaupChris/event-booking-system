@@ -20,7 +20,7 @@ import CircularProgressWithLabel from "../feedback/CircularProgressWithLabel";
 interface TimeSlotProps {
     timeSlot: TimeSlotType;
     selectedPriority: string;
-    updateBooking: (key: keyof Booking, value: any) => void;
+    updateBooking: (key: keyof Booking, value: number) => void;
     availablePriorities: string[];
     currentBooking: Booking;
 }

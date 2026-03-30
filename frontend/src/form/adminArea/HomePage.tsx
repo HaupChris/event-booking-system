@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    Box, Typography, Grid,
+    Box, Typography,
     List, ListItem, ListItemText, Divider, alpha
 } from '@mui/material';
 import {
@@ -142,59 +142,74 @@ function HomePage() {
     return (
         <Box sx={{p: 2}}>
             {/* Overview Stats */}
-            <Grid container spacing={3} sx={{mb: 3}}>
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatsCard
-                        title="Regular Participants"
-                        value={totalVisitors}
-                        icon={<PeopleIcon fontSize="large"/>}
-                        color="primary"
-                        subtitle={`${Math.round((totalVisitors / maxVisitorsPerDay) * 100)}% of total participants`}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatsCard
-                        title="Artists"
-                        value={totalArtists}
-                        icon={<MusicNoteIcon fontSize="large"/>}
-                        color="info"
-                        subtitle={`${Math.round((totalArtists / maxArtistsPerDay) * 100)}% of total artists`}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatsCard
-                        title="Payment Status"
-                        value={`${paidCount}/${totalNumBookings}`}
-                        icon={<PaidIcon fontSize="large"/>}
-                        color={paidCount === totalNumBookings ? "success" : "warning"}
-                        progress={(paidCount / totalNumBookings) * 100}
-                        subtitle={`${unpaidCount} unpaid registrations`}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatsCard
-                        title="Revenue"
-                        value={`€${totalRevenue.toFixed(2)}`}
-                        icon={<PaidIcon fontSize="large"/>}
-                        color="success"
-                        progress={paymentProgress}
-                        subtitle={`€${paidRevenue.toFixed(2)} received (${Math.round(paymentProgress)}%)`}
-                    />
-                </Grid>
-            </Grid>
-
+            <Box
+                sx={{
+                    mb: 3,
+                    display: 'grid',
+                    gap: 3,
+                    gridTemplateColumns: {
+                        xs: '1fr',
+                        sm: 'repeat(2, minmax(0, 1fr))',
+                        lg: 'repeat(4, minmax(0, 1fr))'
+                    }
+                }}
+            >
+                <StatsCard
+                    title="Regular Participants"
+                    value={totalVisitors}
+                    icon={<PeopleIcon fontSize="large"/>}
+                    color="primary"
+                    subtitle={`${Math.round((totalVisitors / maxVisitorsPerDay) * 100)}% of total participants`}
+                    fullHeight
+                />
+                <StatsCard
+                    title="Artists"
+                    value={totalArtists}
+                    icon={<MusicNoteIcon fontSize="large"/>}
+                    color="info"
+                    subtitle={`${Math.round((totalArtists / maxArtistsPerDay) * 100)}% of total artists`}
+                    fullHeight
+                />
+                <StatsCard
+                    title="Payment Status"
+                    value={`${paidCount}/${totalNumBookings}`}
+                    icon={<PaidIcon fontSize="large"/>}
+                    color={paidCount === totalNumBookings ? "success" : "warning"}
+                    progress={(paidCount / totalNumBookings) * 100}
+                    subtitle={`${unpaidCount} unpaid registrations`}
+                    fullHeight
+                />
+                <StatsCard
+                    title="Revenue"
+                    value={`€${totalRevenue.toFixed(2)}`}
+                    icon={<PaidIcon fontSize="large"/>}
+                    color="success"
+                    progress={paymentProgress}
+                    subtitle={`€${paidRevenue.toFixed(2)} received (${Math.round(paymentProgress)}%)`}
+                    fullHeight
+                />
+            </Box>
             {/* Main content grid */}
-            <Grid container spacing={3}>
+            <Box
+                sx={{
+                    display: 'grid',
+                    gap: 3,
+                    gridTemplateColumns: {
+                        xs: '1fr',
+                        md: 'repeat(3, minmax(0, 1fr))'
+                    }
+                }}
+            >
                 {/* Tickets */}
-                <Grid item xs={12} md={4}>
-                    <FormCard
-                        title="Ticket Bookings"
-                        icon={<LocalActivityIcon/>}
-                        description="Regular / Artists"
-                    >
+                <FormCard
+                    sx={{height: '100%'}}
+                    title="Ticket Bookings"
+                    icon={<LocalActivityIcon/>}
+                    description="Regular / Artists"
+                >
                         <List>
                             {ticketStats.map((stat, index) => (
-                                <React.Fragment key={index}>
+                                <React.Fragment key={`ticket-${stat.title}`}>
                                     <ListItem sx={{
                                         bgcolor: index % 2 === 0 ? alpha('#000', 0.03) : 'transparent',
                                         py: 1
@@ -216,19 +231,18 @@ function HomePage() {
                                 </React.Fragment>
                             ))}
                         </List>
-                    </FormCard>
-                </Grid>
+                </FormCard>
 
                 {/* Beverages */}
-                <Grid item xs={12} md={4}>
-                    <FormCard
-                        title="Beer Bookings"
-                        icon={<SportsBarIcon/>}
-                        description="Regular / Artists"
-                    >
+                <FormCard
+                    sx={{height: '100%'}}
+                    title="Beer Bookings"
+                    icon={<SportsBarIcon/>}
+                    description="Regular / Artists"
+                >
                         <List>
                             {beverageStats.map((stat, index) => (
-                                <React.Fragment key={index}>
+                                <React.Fragment key={`beverage-${stat.title}`}>
                                     <ListItem sx={{
                                         bgcolor: index % 2 === 0 ? alpha('#000', 0.03) : 'transparent',
                                         py: 1
@@ -250,19 +264,18 @@ function HomePage() {
                                 </React.Fragment>
                             ))}
                         </List>
-                    </FormCard>
-                </Grid>
+                </FormCard>
 
                 {/* Food */}
-                <Grid item xs={12} md={4}>
-                    <FormCard
-                        title="Food Bookings"
-                        icon={<RestaurantIcon/>}
-                        description="Regular / Artists"
-                    >
+                <FormCard
+                    sx={{height: '100%'}}
+                    title="Food Bookings"
+                    icon={<RestaurantIcon/>}
+                    description="Regular / Artists"
+                >
                         <List>
                             {foodStats.map((stat, index) => (
-                                <React.Fragment key={index}>
+                                <React.Fragment key={`food-${stat.title}`}>
                                     <ListItem sx={{
                                         bgcolor: index % 2 === 0 ? alpha('#000', 0.03) : 'transparent',
                                         py: 1
@@ -284,9 +297,8 @@ function HomePage() {
                                 </React.Fragment>
                             ))}
                         </List>
-                    </FormCard>
-                </Grid>
-            </Grid>
+                </FormCard>
+            </Box>
         </Box>
     );
 }

@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import type { BeforeInstallPromptEvent } from './serviceWorkerRegistration';
 
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.DEV) {
   window.addEventListener(
     'error',
     (event) => {

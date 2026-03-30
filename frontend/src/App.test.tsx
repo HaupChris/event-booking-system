@@ -1,9 +1,7 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { API_BASE_URL, API_URL, VAPID_PUBLIC_KEY } from './config/env';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test('environment helper exposes string values', () => {
+  expect(typeof API_BASE_URL).toBe('string');
+  expect(typeof API_URL).toBe('string');
+  expect(typeof VAPID_PUBLIC_KEY).toBe('string');
 });

@@ -88,7 +88,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
     setEditMode((prev) => !prev);
   };
 
-  const handleInputChange = (field: keyof CombinedBooking, value: any) => {
+  const handleInputChange = (field: keyof CombinedBooking, value: CombinedBooking[keyof CombinedBooking]) => {
     if (!editedBooking) return;
 
     // Create updated booking
@@ -186,7 +186,11 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
           <Box>
             <Grid container spacing={2}>
               {/* Common fields for both booking types */}
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <TextField
                   fullWidth
                   label="First Name"
@@ -196,7 +200,11 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                   margin="normal"
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <TextField
                   fullWidth
                   label="Last Name"
@@ -206,7 +214,11 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                   margin="normal"
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <TextField
                   fullWidth
                   label="Email"
@@ -216,7 +228,11 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                   margin="normal"
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <TextField
                   fullWidth
                   label="Phone"
@@ -226,7 +242,11 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                   margin="normal"
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel>Ticket</InputLabel>
                   <Select
@@ -246,7 +266,11 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel>Beverage</InputLabel>
                   <Select
@@ -267,7 +291,11 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel>Food</InputLabel>
                   <Select
@@ -288,7 +316,11 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <TextField
                   fullWidth
                   label="Total Price"
@@ -320,7 +352,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
               {/* Booking type specific fields */}
               {editedBooking.bookingType === 'regular' && (
                 <>
-                  <Grid item xs={12}>
+                  <Grid size={12}>
                     <FormCard title="Support Shift Preferences" sx={{ mt: 2 }}>
                       {['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3'].map(
                         (priority, index) => {
@@ -329,7 +361,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                           ] as number;
                           const timeslotInfo = getTimeslotWithWorkshift(timeslotValue, formContent);
                           return (
-                            <Typography key={index} variant="body2" sx={{ mb: 1 }}>
+                            <Typography key={priority} variant="body2" sx={{ mb: 1 }}>
                               <strong>{`Priority ${index + 1}:`}</strong>{' '}
                               {timeslotInfo.workshiftTitle} - {timeslotInfo.timeslotTitle}
                               {timeslotInfo.timeslotStart && timeslotInfo.timeslotEnd
@@ -341,7 +373,11 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                       )}
                     </FormCard>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <TextField
                       fullWidth
                       label="Number of Shifts"
@@ -352,7 +388,11 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                       margin="normal"
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <TextField
                       fullWidth
                       label="Supporter Buddy"
@@ -367,7 +407,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
 
               {editedBooking.bookingType === 'artist' && (
                 <>
-                  <Grid item xs={12}>
+                  <Grid size={12}>
                     <FormCard title="Artist Information" sx={{ mt: 2 }}>
                       <TextField
                         fullWidth
@@ -408,7 +448,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
               )}
 
               {/* Payment information for all booking types */}
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <FormCard title="Payment Status" sx={{ mt: 2 }}>
                   <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 2 }}>
                     <FormControl fullWidth margin="normal">
