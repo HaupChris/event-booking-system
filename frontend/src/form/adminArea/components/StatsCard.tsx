@@ -2,8 +2,14 @@
 
 import React from 'react';
 import {
-  Box, Card, CardContent, Typography, LinearProgress,
-  alpha, useMediaQuery, useTheme
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  LinearProgress,
+  alpha,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { spacePalette } from '../../../components/styles/theme';
 
@@ -26,7 +32,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
   color = 'primary',
   progress,
   footer,
-  fullHeight = false
+  fullHeight = false,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -34,55 +40,68 @@ const StatsCard: React.FC<StatsCardProps> = ({
   // Get color based on the specified theme
   const getColor = () => {
     switch (color) {
-      case 'success': return spacePalette.status.success;
-      case 'warning': return spacePalette.status.warning;
-      case 'error': return spacePalette.status.error;
-      case 'info': return spacePalette.status.info;
-      default: return spacePalette.primary.main;
+      case 'success':
+        return spacePalette.status.success;
+      case 'warning':
+        return spacePalette.status.warning;
+      case 'error':
+        return spacePalette.status.error;
+      case 'info':
+        return spacePalette.status.info;
+      default:
+        return spacePalette.primary.main;
     }
   };
 
   const mainColor = getColor();
 
   return (
-    <Card sx={{
-      height: fullHeight ? '100%' : 'auto',
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden',
-      bgcolor: alpha(mainColor, 0.05),
-      border: `1px solid ${alpha(mainColor, 0.2)}`,
-      borderRadius: 2
-    }}>
-      <CardContent sx={{
-        padding: 2,
-        paddingBottom: footer ? 1 : 2,
-        flexGrow: 1,
+    <Card
+      sx={{
+        height: fullHeight ? '100%' : 'auto',
         display: 'flex',
-        flexDirection: 'column'
-      }}>
-        <Box sx={{
+        flexDirection: 'column',
+        overflow: 'hidden',
+        bgcolor: alpha(mainColor, 0.05),
+        border: `1px solid ${alpha(mainColor, 0.2)}`,
+        borderRadius: 2,
+      }}
+    >
+      <CardContent
+        sx={{
+          padding: 2,
+          paddingBottom: footer ? 1 : 2,
+          flexGrow: 1,
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 2
-        }}>
+          flexDirection: 'column',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 2,
+          }}
+        >
           <Typography
             variant="h6"
             sx={{
               color: alpha('#fff', 0.9),
               fontSize: isMobile ? '1rem' : '1.125rem',
-              fontWeight: 'medium'
+              fontWeight: 'medium',
             }}
           >
             {title}
           </Typography>
           {icon && (
-            <Box sx={{
-              color: mainColor,
-              display: 'flex',
-              alignItems: 'center'
-            }}>
+            <Box
+              sx={{
+                color: mainColor,
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
               {icon}
             </Box>
           )}
@@ -95,7 +114,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
             mb: subtitle ? 1 : 2,
             color: mainColor,
             fontWeight: 'bold',
-            fontSize: isMobile ? '1.75rem' : '2.25rem'
+            fontSize: isMobile ? '1.75rem' : '2.25rem',
           }}
         >
           {value}
@@ -106,7 +125,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
             variant="body2"
             sx={{
               color: alpha('#fff', 0.7),
-              mb: 2
+              mb: 2,
             }}
           >
             {subtitle}
@@ -125,7 +144,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
                 '& .MuiLinearProgress-bar': {
                   borderRadius: 4,
                   backgroundColor: mainColor,
-                }
+                },
               }}
             />
             <Typography
@@ -134,7 +153,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
                 display: 'block',
                 textAlign: 'right',
                 mt: 0.5,
-                color: alpha(mainColor, 0.9)
+                color: alpha(mainColor, 0.9),
               }}
             >
               {`${Math.round(progress)}%`}
@@ -144,11 +163,13 @@ const StatsCard: React.FC<StatsCardProps> = ({
       </CardContent>
 
       {footer && (
-        <Box sx={{
-          borderTop: `1px solid ${alpha(mainColor, 0.2)}`,
-          bgcolor: alpha(mainColor, 0.08),
-          padding: 2
-        }}>
+        <Box
+          sx={{
+            borderTop: `1px solid ${alpha(mainColor, 0.2)}`,
+            bgcolor: alpha(mainColor, 0.08),
+            padding: 2,
+          }}
+        >
           {footer}
         </Box>
       )}

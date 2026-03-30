@@ -2,13 +2,21 @@
 
 import React, { useState } from 'react';
 import {
-    List, ListItemButton, ListItemText, Collapse,
-    Typography, Box, Chip, IconButton, alpha, Badge
+  List,
+  ListItemButton,
+  ListItemText,
+  Collapse,
+  Typography,
+  Box,
+  Chip,
+  IconButton,
+  alpha,
+  Badge,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
-  MoreHoriz as MoreHorizIcon
+  MoreHoriz as MoreHorizIcon,
 } from '@mui/icons-material';
 import { spacePalette } from '../../../components/styles/theme';
 
@@ -27,10 +35,7 @@ interface PeopleListProps {
   onPersonDetails?: (person: Person) => void;
 }
 
-const PeopleList: React.FC<PeopleListProps> = ({
-  people,
-  onPersonDetails,
-}) => {
+const PeopleList: React.FC<PeopleListProps> = ({ people, onPersonDetails }) => {
   const [expanded, setExpanded] = useState<string | number | null>(null);
 
   const toggleExpanded = (id: string | number) => {
@@ -44,28 +49,25 @@ const PeopleList: React.FC<PeopleListProps> = ({
           <ListItemButton
             onClick={() => toggleExpanded(person.id)}
             sx={{
-              bgcolor: person.type === 'artist'
-                ? alpha(spacePalette.primary.main, 0.08)
-                : 'background.paper',
+              bgcolor:
+                person.type === 'artist'
+                  ? alpha(spacePalette.primary.main, 0.08)
+                  : 'background.paper',
               borderRadius: 1,
               '&:hover': {
-                bgcolor: person.type === 'artist'
-                  ? alpha(spacePalette.primary.main, 0.12)
-                  : alpha('#fff', 0.1)
+                bgcolor:
+                  person.type === 'artist'
+                    ? alpha(spacePalette.primary.main, 0.12)
+                    : alpha('#fff', 0.1),
               },
-              boxShadow: 1
+              boxShadow: 1,
             }}
           >
             <ListItemText
               primary={
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   {person.type === 'artist' && (
-                    <Chip
-                      label="Artist"
-                      color="primary"
-                      size="small"
-                      sx={{ mr: 1 }}
-                    />
+                    <Chip label="Artist" color="primary" size="small" sx={{ mr: 1 }} />
                   )}
                   <Typography
                     variant="subtitle1"
@@ -85,11 +87,7 @@ const PeopleList: React.FC<PeopleListProps> = ({
             />
 
             {person.badgeContent !== undefined && person.badgeIcon && (
-              <Badge
-                badgeContent={person.badgeContent}
-                color="primary"
-                sx={{ mr: 1 }}
-              >
+              <Badge badgeContent={person.badgeContent} color="primary" sx={{ mr: 1 }}>
                 {person.badgeIcon}
               </Badge>
             )}
@@ -103,7 +101,7 @@ const PeopleList: React.FC<PeopleListProps> = ({
                 }}
                 sx={{
                   mr: 1,
-                  color: spacePalette.primary.main
+                  color: spacePalette.primary.main,
                 }}
               >
                 <MoreHorizIcon />
@@ -114,9 +112,7 @@ const PeopleList: React.FC<PeopleListProps> = ({
           </ListItemButton>
 
           <Collapse in={expanded === person.id} timeout="auto" unmountOnExit>
-            <Box sx={{ pl: 2, pr: 2, pt: 1, pb: 2 }}>
-              {person.children}
-            </Box>
+            <Box sx={{ pl: 2, pr: 2, pt: 1, pb: 2 }}>{person.children}</Box>
           </Collapse>
         </Box>
       ))}

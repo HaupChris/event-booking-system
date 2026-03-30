@@ -1,9 +1,7 @@
 // src/form/adminArea/components/FilterControls.tsx
 
 import React from 'react';
-import {
-  Box, Button, Menu, MenuItem, Tabs, Tab, useMediaQuery, useTheme
-} from '@mui/material';
+import { Box, Button, Menu, MenuItem, Tabs, Tab, useMediaQuery, useTheme } from '@mui/material';
 import { FilterAlt as FilterAltIcon } from '@mui/icons-material';
 import type { ViewFilterType } from '../utils/optionsUtils';
 
@@ -18,7 +16,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   viewType,
   setViewType,
   anchorEl,
-  setAnchorEl
+  setAnchorEl,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -41,11 +39,13 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   };
 
   return (
-    <Box sx={{
-      display: 'flex',
-      justifyContent: 'flex-start',
-      mb: 3
-    }}>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'flex-start',
+        mb: 3,
+      }}
+    >
       {isMobile ? (
         <>
           <Button
@@ -54,25 +54,18 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             endIcon={<FilterAltIcon />}
             size="small"
           >
-            {viewType === 'all' ? 'All' :
-             viewType === 'regular' ? 'Regular' : 'Artists'}
+            {viewType === 'all' ? 'All' : viewType === 'regular' ? 'Regular' : 'Artists'}
           </Button>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleViewTypeMenuClose}
-          >
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleViewTypeMenuClose}>
             <MenuItem onClick={() => handleViewTypeSelect('all')}>All</MenuItem>
-            <MenuItem onClick={() => handleViewTypeSelect('regular')}>Regular Participants</MenuItem>
+            <MenuItem onClick={() => handleViewTypeSelect('regular')}>
+              Regular Participants
+            </MenuItem>
             <MenuItem onClick={() => handleViewTypeSelect('artist')}>Artists</MenuItem>
           </Menu>
         </>
       ) : (
-        <Tabs
-          value={viewType}
-          onChange={handleViewChange}
-          sx={{ minWidth: '300px' }}
-        >
+        <Tabs value={viewType} onChange={handleViewChange} sx={{ minWidth: '300px' }}>
           <Tab label="All" value="all" />
           <Tab label="Regular Participants" value="regular" />
           <Tab label="Artists" value="artist" />

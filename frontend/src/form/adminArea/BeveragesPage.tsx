@@ -13,7 +13,7 @@ const BeveragesPage: React.FC = () => {
         icon: <SportsBarIcon />,
         getRegularOptions: (formContent) => formContent.beverage_options,
         getArtistOptions: (artistFormContent) => artistFormContent.beverage_options,
-        bookingFieldName: 'beverage_id'
+        bookingFieldName: 'beverage_id',
       }}
     />
   );

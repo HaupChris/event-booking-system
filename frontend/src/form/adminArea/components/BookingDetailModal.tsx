@@ -88,7 +88,10 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
     setEditMode((prev) => !prev);
   };
 
-  const handleInputChange = (field: keyof CombinedBooking, value: CombinedBooking[keyof CombinedBooking]) => {
+  const handleInputChange = (
+    field: keyof CombinedBooking,
+    value: CombinedBooking[keyof CombinedBooking]
+  ) => {
     if (!editedBooking) return;
 
     // Create updated booking
@@ -189,8 +192,9 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
               <Grid
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <TextField
                   fullWidth
                   label="First Name"
@@ -203,8 +207,9 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
               <Grid
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <TextField
                   fullWidth
                   label="Last Name"
@@ -217,8 +222,9 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
               <Grid
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <TextField
                   fullWidth
                   label="Email"
@@ -231,8 +237,9 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
               <Grid
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <TextField
                   fullWidth
                   label="Phone"
@@ -245,8 +252,9 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
               <Grid
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <FormControl fullWidth margin="normal">
                   <InputLabel>Ticket</InputLabel>
                   <Select
@@ -269,8 +277,9 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
               <Grid
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <FormControl fullWidth margin="normal">
                   <InputLabel>Beverage</InputLabel>
                   <Select
@@ -294,8 +303,9 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
               <Grid
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <FormControl fullWidth margin="normal">
                   <InputLabel>Food</InputLabel>
                   <Select
@@ -319,8 +329,9 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
               <Grid
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <TextField
                   fullWidth
                   label="Total Price"
@@ -376,8 +387,9 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                   <Grid
                     size={{
                       xs: 12,
-                      sm: 6
-                    }}>
+                      sm: 6,
+                    }}
+                  >
                     <TextField
                       fullWidth
                       label="Number of Shifts"
@@ -391,8 +403,9 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                   <Grid
                     size={{
                       xs: 12,
-                      sm: 6
-                    }}>
+                      sm: 6,
+                    }}
+                  >
                     <TextField
                       fullWidth
                       label="Supporter Buddy"

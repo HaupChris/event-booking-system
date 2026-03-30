@@ -20,7 +20,8 @@ const FinancialsOverviewPage: React.FC = () => {
     const filteredBookings = getFilteredBookings();
 
     const ticketTotals: { [key: string]: { count: number; total: number; isArtist: boolean } } = {};
-    const beverageTotals: { [key: string]: { count: number; total: number; isArtist: boolean } } = {};
+    const beverageTotals: { [key: string]: { count: number; total: number; isArtist: boolean } } =
+      {};
     const foodTotals: { [key: string]: { count: number; total: number; isArtist: boolean } } = {};
 
     let grandTotal = 0;

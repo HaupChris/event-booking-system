@@ -188,117 +188,113 @@ function ShiftMessagesTab({ formContent }: ShiftMessagesTabProps) {
           },
         }}
       >
+        <Card variant="outlined">
+          <CardContent sx={{ p: 3 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Neue Nachricht erstellen
+            </Typography>
+            <Stack spacing={2}>
+              <TextField
+                select
+                label="Schicht"
+                value={selectedWorkshiftId}
+                onChange={(event) => setSelectedWorkshiftId(Number(event.target.value))}
+                fullWidth
+                required
+              >
+                <MenuItem value={-1} disabled>
+                  Bitte Schicht auswählen
+                </MenuItem>
+                {formContent.work_shifts.map((workshift) => (
+                  <MenuItem key={workshift.id} value={workshift.id}>
+                    {workshift.title}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <Card variant="outlined" sx={{ borderRadius: 1.5 }}>
+                <CardContent sx={{ p: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                    Timeslots
+                  </Typography>
+                  {availableTimeslots.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">
+                      Bitte zuerst eine Schicht auswählen.
+                    </Typography>
+                  ) : (
+                    <FormGroup>
+                      {availableTimeslots.map((timeslot) => (
+                        <FormControlLabel
+                          key={timeslot.id}
+                          control={
+                            <Checkbox
+                              checked={selectedTimeslotIds.includes(timeslot.id)}
+                              onChange={() => handleTimeslotToggle(timeslot.id)}
+                            />
+                          }
+                          label={`${timeslot.title} (${formatTime(timeslot.start_time)} - ${formatTime(timeslot.end_time)})`}
+                        />
+                      ))}
+                    </FormGroup>
+                  )}
+                </CardContent>
+              </Card>
+
+              <TextField
+                label="Titel"
+                value={form.title}
+                onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
+                fullWidth
+                required
+              />
+
+              <TextField
+                label="Kategorie (optional)"
+                value={form.category}
+                onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))}
+                fullWidth
+              />
+
+              <TextField
+                label="Inhalt (Markdown)"
+                value={form.content}
+                onChange={(event) => setForm((prev) => ({ ...prev, content: event.target.value }))}
+                multiline
+                rows={8}
+                InputProps={{ inputComponent: 'textarea' }}
+                fullWidth
+                required
+              />
+
+              <Button variant="contained" onClick={handleCreateMessage} disabled={loading}>
+                Nachricht versenden
+              </Button>
+            </Stack>
+          </CardContent>
+        </Card>
+
+        <Stack spacing={2}>
           <Card variant="outlined">
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Neue Nachricht erstellen
+                Live-Preview
               </Typography>
-              <Stack spacing={2}>
-                <TextField
-                  select
-                  label="Schicht"
-                  value={selectedWorkshiftId}
-                  onChange={(event) => setSelectedWorkshiftId(Number(event.target.value))}
-                  fullWidth
-                  required
-                >
-                  <MenuItem value={-1} disabled>
-                    Bitte Schicht auswählen
-                  </MenuItem>
-                  {formContent.work_shifts.map((workshift) => (
-                    <MenuItem key={workshift.id} value={workshift.id}>
-                      {workshift.title}
-                    </MenuItem>
-                  ))}
-                </TextField>
-
-                <Card variant="outlined" sx={{ borderRadius: 1.5 }}>
-                  <CardContent sx={{ p: 2 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                      Timeslots
-                    </Typography>
-                    {availableTimeslots.length === 0 ? (
-                      <Typography variant="body2" color="text.secondary">
-                        Bitte zuerst eine Schicht auswählen.
-                      </Typography>
-                    ) : (
-                      <FormGroup>
-                        {availableTimeslots.map((timeslot) => (
-                          <FormControlLabel
-                            key={timeslot.id}
-                            control={
-                              <Checkbox
-                                checked={selectedTimeslotIds.includes(timeslot.id)}
-                                onChange={() => handleTimeslotToggle(timeslot.id)}
-                              />
-                            }
-                            label={`${timeslot.title} (${formatTime(timeslot.start_time)} - ${formatTime(timeslot.end_time)})`}
-                          />
-                        ))}
-                      </FormGroup>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <TextField
-                  label="Titel"
-                  value={form.title}
-                  onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
-                  fullWidth
-                  required
-                />
-
-                <TextField
-                  label="Kategorie (optional)"
-                  value={form.category}
-                  onChange={(event) =>
-                    setForm((prev) => ({ ...prev, category: event.target.value }))
-                  }
-                  fullWidth
-                />
-
-                <TextField
-                  label="Inhalt (Markdown)"
-                  value={form.content}
-                  onChange={(event) =>
-                    setForm((prev) => ({ ...prev, content: event.target.value }))
-                  }
-                  multiline
-                  rows={8}
-                  InputProps={{ inputComponent: 'textarea' }}
-                  fullWidth
-                  required
-                />
-
-                <Button variant="contained" onClick={handleCreateMessage} disabled={loading}>
-                  Nachricht versenden
-                </Button>
-              </Stack>
+              <Typography variant="subtitle1" fontWeight={700}>
+                {form.title || 'Titel der Nachricht'}
+              </Typography>
+              {form.category && (
+                <Chip label={form.category} size="small" variant="outlined" sx={{ mt: 1 }} />
+              )}
+              <Divider sx={{ my: 1.5 }} />
+              <MarkdownContent content={form.content || markdownHelpPlaceholder} />
             </CardContent>
           </Card>
-
-          <Stack spacing={2}>
-            <Card variant="outlined">
-              <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ mb: 2 }}>
-                  Live-Preview
-                </Typography>
-                <Typography variant="subtitle1" fontWeight={700}>
-                  {form.title || 'Titel der Nachricht'}
-                </Typography>
-                {form.category && (
-                  <Chip label={form.category} size="small" variant="outlined" sx={{ mt: 1 }} />
-                )}
-                <Divider sx={{ my: 1.5 }} />
-                <MarkdownContent content={form.content || markdownHelpPlaceholder} />
-              </CardContent>
-            </Card>
-            <ShiftMessagesHistory
-              groups={groups}
-              loading={loading}
-              onDeleteMessage={handleDeleteMessage}
-            />
-          </Stack>
+          <ShiftMessagesHistory
+            groups={groups}
+            loading={loading}
+            onDeleteMessage={handleDeleteMessage}
+          />
+        </Stack>
       </Box>
       {error && (
         <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>

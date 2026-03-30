@@ -15,11 +15,7 @@ interface TabSwitcherProps {
   onChange: (value: string) => void;
 }
 
-const TabSwitcher: React.FC<TabSwitcherProps> = ({
-  tabs,
-  currentTab,
-  onChange
-}) => {
+const TabSwitcher: React.FC<TabSwitcherProps> = ({ tabs, currentTab, onChange }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -28,16 +24,18 @@ const TabSwitcher: React.FC<TabSwitcherProps> = ({
   };
 
   return (
-    <Box sx={{
-      borderBottom: 1,
-      borderColor: alpha(spacePalette.primary.main, 0.2),
-      mb: 3
-    }}>
+    <Box
+      sx={{
+        borderBottom: 1,
+        borderColor: alpha(spacePalette.primary.main, 0.2),
+        mb: 3,
+      }}
+    >
       <Tabs
         value={currentTab}
         onChange={handleChange}
         centered
-        variant={isMobile ? "fullWidth" : "standard"}
+        variant={isMobile ? 'fullWidth' : 'standard'}
         sx={{
           '& .MuiTab-root': {
             textTransform: 'none',
@@ -50,7 +48,7 @@ const TabSwitcher: React.FC<TabSwitcherProps> = ({
           },
           '& .MuiTabs-indicator': {
             backgroundColor: spacePalette.primary.main,
-          }
+          },
         }}
       >
         {tabs.map((tab) => (

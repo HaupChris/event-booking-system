@@ -1,15 +1,21 @@
 // src/form/adminArea/components/FilterSortBar.tsx
 
 import React from 'react';
-import type { SelectChangeEvent} from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
 import {
-  Box, FormControl, InputLabel, Select, MenuItem,
-  Button, useMediaQuery, useTheme,
-  alpha
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  useMediaQuery,
+  useTheme,
+  alpha,
 } from '@mui/material';
 import {
   ArrowUpward as ArrowUpwardIcon,
-  ArrowDownward as ArrowDownwardIcon
+  ArrowDownward as ArrowDownwardIcon,
 } from '@mui/icons-material';
 import { spacePalette } from '../../../components/styles/theme';
 
@@ -33,7 +39,7 @@ const FilterSortBar: React.FC<FilterSortBarProps> = ({
   sortOrder,
   onSortByChange,
   onSortOrderToggle,
-  children
+  children,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -54,37 +60,33 @@ const FilterSortBar: React.FC<FilterSortBarProps> = ({
         p: 2,
         backgroundColor: alpha(spacePalette.primary.main, 0.05),
         borderRadius: 1,
-        border: `1px solid ${alpha(spacePalette.primary.main, 0.1)}`
+        border: `1px solid ${alpha(spacePalette.primary.main, 0.1)}`,
       }}
     >
-      <Box sx={{ display: 'flex', gap: 1, width: isMobile ? '100%' : 'auto' }}>
-        {children}
-      </Box>
+      <Box sx={{ display: 'flex', gap: 1, width: isMobile ? '100%' : 'auto' }}>{children}</Box>
 
-      <Box sx={{
-        display: 'flex',
-        gap: 1,
-        mt: isMobile ? 1 : 0,
-        width: isMobile ? '100%' : 'auto',
-        justifyContent: isMobile ? 'flex-end' : 'flex-end'
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 1,
+          mt: isMobile ? 1 : 0,
+          width: isMobile ? '100%' : 'auto',
+          justifyContent: isMobile ? 'flex-end' : 'flex-end',
+        }}
+      >
         <FormControl
           variant="outlined"
           size="small"
           sx={{
             minWidth: 120,
             '& .MuiOutlinedInput-root': {
-              bgcolor: 'background.paper'
-            }
+              bgcolor: 'background.paper',
+            },
           }}
         >
           <InputLabel>Sort By</InputLabel>
-          <Select
-            value={sortBy}
-            onChange={handleSortByChange}
-            label="Sort By"
-          >
-            {sortOptions.map(option => (
+          <Select value={sortBy} onChange={handleSortByChange} label="Sort By">
+            {sortOptions.map((option) => (
               <MenuItem key={option.value} value={option.value}>
                 {option.label}
               </MenuItem>

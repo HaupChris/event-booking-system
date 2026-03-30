@@ -1,18 +1,29 @@
 import React from 'react';
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead,
-  TableRow, Paper, IconButton, Chip, alpha, Tooltip, Typography, Box
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Chip,
+  alpha,
+  Tooltip,
+  Typography,
+  Box,
 } from '@mui/material';
 import {
   MoreHoriz as MoreHorizIcon,
   ContentCopy as CopyIcon,
-  Visibility as VisibilityIcon
+  Visibility as VisibilityIcon,
 } from '@mui/icons-material';
-import type { CombinedBooking } from "../interface";
-import type { FormContent } from "../../userArea/interface";
+import type { CombinedBooking } from '../interface';
+import type { FormContent } from '../../userArea/interface';
 import { spacePalette } from '../../../components/styles/theme';
 import { getTicketTitle } from '../utils/bookingUtils';
-import type {ArtistFormContent} from "../../artistArea/interface";
+import type { ArtistFormContent } from '../../artistArea/interface';
 
 interface ColumnVisibility {
   type: boolean;
@@ -37,7 +48,7 @@ const BookingTable: React.FC<BookingTableProps> = ({
   columnVisibility,
   formContent,
   artistFormContent,
-  onOpenDetails
+  onOpenDetails,
 }) => {
   const handleCopyLink = (profileUuid: string) => {
     const url = `${window.location.origin}/profile/${profileUuid}`;
@@ -67,12 +78,13 @@ const BookingTable: React.FC<BookingTableProps> = ({
             <TableRow
               key={`${booking.bookingType}-${booking.id}`}
               sx={{
-                bgcolor: booking.bookingType === 'artist'
-                  ? alpha(spacePalette.primary.main, 0.08)
-                  : 'transparent',
+                bgcolor:
+                  booking.bookingType === 'artist'
+                    ? alpha(spacePalette.primary.main, 0.08)
+                    : 'transparent',
                 '&:hover': {
-                  bgcolor: alpha(spacePalette.primary.main, 0.05)
-                }
+                  bgcolor: alpha(spacePalette.primary.main, 0.05),
+                },
               }}
             >
               {columnVisibility.type && (
@@ -85,11 +97,11 @@ const BookingTable: React.FC<BookingTableProps> = ({
                 </TableCell>
               )}
               {columnVisibility.name && (
-                <TableCell>{booking.first_name} {booking.last_name}</TableCell>
+                <TableCell>
+                  {booking.first_name} {booking.last_name}
+                </TableCell>
               )}
-              {columnVisibility.email && (
-                <TableCell>{booking.email}</TableCell>
-              )}
+              {columnVisibility.email && <TableCell>{booking.email}</TableCell>}
               {columnVisibility.ticket && (
                 <TableCell>
                   {getTicketTitle(
@@ -100,9 +112,7 @@ const BookingTable: React.FC<BookingTableProps> = ({
                   )}
                 </TableCell>
               )}
-              {columnVisibility.price && (
-                <TableCell>€{booking.total_price.toFixed(2)}</TableCell>
-              )}
+              {columnVisibility.price && <TableCell>€{booking.total_price.toFixed(2)}</TableCell>}
               {columnVisibility.profileLink && (
                 <TableCell>
                   {booking.profile_uuid ? (
@@ -141,8 +151,8 @@ const BookingTable: React.FC<BookingTableProps> = ({
                   sx={{
                     color: spacePalette.primary.main,
                     '&:hover': {
-                      backgroundColor: alpha(spacePalette.primary.main, 0.1)
-                    }
+                      backgroundColor: alpha(spacePalette.primary.main, 0.1),
+                    },
                   }}
                 >
                   <MoreHorizIcon />

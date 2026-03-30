@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import {
-  Box, Typography, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Modal, IconButton, LinearProgress
+  Box,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Modal,
+  IconButton,
+  LinearProgress,
 } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import CloseIcon from '@mui/icons-material/Close';
@@ -24,11 +34,11 @@ const ArtistMaterialsPage: React.FC = () => {
 
   const getArtistsForMaterial = (materialId: number) => {
     return artistBookings
-      .filter(booking => booking.artist_material_ids?.includes(materialId))
-      .map(booking => ({
-first_name: booking.first_name,
+      .filter((booking) => booking.artist_material_ids?.includes(materialId))
+      .map((booking) => ({
+        first_name: booking.first_name,
         last_name: booking.last_name,
-        email: booking.email
+        email: booking.email,
       }));
   };
 
@@ -40,7 +50,9 @@ first_name: booking.first_name,
 
   return (
     <Box sx={{ p: 2 }}>
-      <Typography variant="h4" gutterBottom>Artist Materials</Typography>
+      <Typography variant="h4" gutterBottom>
+        Artist Materials
+      </Typography>
 
       <TableContainer component={Paper}>
         <Table>
@@ -72,7 +84,9 @@ first_name: booking.first_name,
                       </Box>
                     </Box>
                   </TableCell>
-                  <TableCell>{count}/{material.num_needed}</TableCell>
+                  <TableCell>
+                    {count}/{material.num_needed}
+                  </TableCell>
                   <TableCell>
                     <IconButton onClick={() => handleOpenModal(material.id)}>
                       <MoreHorizIcon />
@@ -87,25 +101,28 @@ first_name: booking.first_name,
 
       {/* Artists Modal */}
       <Modal open={openModal} onClose={handleCloseModal}>
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '90vw',
-          maxWidth: 400,
-          bgcolor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 2
-        }}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '90vw',
+            maxWidth: 400,
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 2,
+          }}
+        >
           <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 8, right: 8 }}>
             <CloseIcon />
           </IconButton>
           {selectedMaterial !== null && (
             <Box>
               <Typography variant="h6" gutterBottom>
-                Artists bringing {artistFormContent.artist_materials.find(m => m.id === selectedMaterial)?.title}
+                Artists bringing{' '}
+                {artistFormContent.artist_materials.find((m) => m.id === selectedMaterial)?.title}
               </Typography>
               <Table size="small">
                 <TableHead>
@@ -117,7 +134,9 @@ first_name: booking.first_name,
                 <TableBody>
                   {getArtistsForMaterial(selectedMaterial).map((artist) => (
                     <TableRow key={`${artist.email}-${artist.first_name}-${artist.last_name}`}>
-                      <TableCell>{artist.first_name} {artist.last_name}</TableCell>
+                      <TableCell>
+                        {artist.first_name} {artist.last_name}
+                      </TableCell>
                       <TableCell>{artist.email}</TableCell>
                     </TableRow>
                   ))}

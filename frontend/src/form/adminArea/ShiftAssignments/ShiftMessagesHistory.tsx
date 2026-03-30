@@ -144,20 +144,29 @@ function ShiftMessagesHistory({ groups, loading, onDeleteMessage }: ShiftMessage
 
             {groupedByWorkshift.map((bucket) => (
               <Card key={bucket.workshiftTitle} variant="outlined" sx={{ borderRadius: 2 }}>
-                <CardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
+                <CardContent
+                  sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}
+                >
                   <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1 }}>
                     {bucket.workshiftTitle}
                   </Typography>
 
                   <Stack spacing={1.5}>
                     {bucket.timeslots.map((timeslotGroup) => (
-                      <Card key={timeslotGroup.timeslot_id} variant="outlined" sx={{ borderRadius: 1.5 }}>
-                        <CardContent sx={{ p: { xs: 1.5, sm: 2 }, '&:last-child': { pb: { xs: 1.5, sm: 2 } } }}>
+                      <Card
+                        key={timeslotGroup.timeslot_id}
+                        variant="outlined"
+                        sx={{ borderRadius: 1.5 }}
+                      >
+                        <CardContent
+                          sx={{ p: { xs: 1.5, sm: 2 }, '&:last-child': { pb: { xs: 1.5, sm: 2 } } }}
+                        >
                           <Typography variant="body2" fontWeight={600}>
                             {timeslotGroup.timeslot_title}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {formatTime(timeslotGroup.timeslot_start)} - {formatTime(timeslotGroup.timeslot_end)}
+                            {formatTime(timeslotGroup.timeslot_start)} -{' '}
+                            {formatTime(timeslotGroup.timeslot_end)}
                           </Typography>
                           <Divider sx={{ my: 1.5 }} />
 
@@ -166,7 +175,14 @@ function ShiftMessagesHistory({ groups, loading, onDeleteMessage }: ShiftMessage
                               <Accordion key={message.id} disableGutters>
                                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                   <Box sx={{ width: '100%', pr: 1 }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
+                                    <Box
+                                      sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'flex-start',
+                                        gap: 1,
+                                      }}
+                                    >
                                       <Typography variant="body2" fontWeight={600}>
                                         {message.title}
                                       </Typography>
@@ -181,9 +197,20 @@ function ShiftMessagesHistory({ groups, loading, onDeleteMessage }: ShiftMessage
                                         <DeleteIcon fontSize="small" />
                                       </IconButton>
                                     </Box>
-                                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+                                    <Box
+                                      sx={{
+                                        display: 'flex',
+                                        gap: 1,
+                                        alignItems: 'center',
+                                        flexWrap: 'wrap',
+                                      }}
+                                    >
                                       {message.category && (
-                                        <Chip label={message.category} size="small" variant="outlined" />
+                                        <Chip
+                                          label={message.category}
+                                          size="small"
+                                          variant="outlined"
+                                        />
                                       )}
                                       <Typography variant="caption" color="text.secondary">
                                         {formatDateTime(message.created_date)}

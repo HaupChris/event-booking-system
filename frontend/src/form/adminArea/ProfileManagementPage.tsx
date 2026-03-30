@@ -97,7 +97,8 @@ const ProfileManagementPage: React.FC = () => {
         return true;
       }
 
-      const combinedSearch = `${profile.first_name} ${profile.last_name} ${profile.email}`.toLowerCase();
+      const combinedSearch =
+        `${profile.first_name} ${profile.last_name} ${profile.email}`.toLowerCase();
       return combinedSearch.includes(normalizedSearch);
     });
   }, [filter, profiles, searchTerm]);

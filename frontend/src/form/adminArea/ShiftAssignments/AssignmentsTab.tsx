@@ -91,48 +91,54 @@ function AssignmentsTab({
             },
           }}
         >
-            <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-                <Typography variant="h6">Participants</Typography>
-              </Box>
-              <UserList
-                regularBookings={regularBookings}
-                selectedTimeslot={selectedTimeslot}
-                onUserSelect={onUserSelect}
-                selectedUsers={selectedUsers}
-                formContent={formContent}
-                assignments={assignments}
-              />
-            </Paper>
+          <Paper
+            sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+          >
+            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+              <Typography variant="h6">Participants</Typography>
+            </Box>
+            <UserList
+              regularBookings={regularBookings}
+              selectedTimeslot={selectedTimeslot}
+              onUserSelect={onUserSelect}
+              selectedUsers={selectedUsers}
+              formContent={formContent}
+              assignments={assignments}
+            />
+          </Paper>
 
-            <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-                <Typography variant="h6">Actions</Typography>
-              </Box>
-              <ActionButtons
-                selectedUsers={selectedUsers}
-                selectedTimeslot={selectedTimeslot}
-                onAssignUsers={onAssignUsers}
-                onUnassignFromTimeslot={onUnassignFromTimeslot}
-                onUnassignAllShifts={onUnassignAllShifts}
-                loading={loading}
-                onClearUserSelection={onClearUserSelection}
-                onExportShiftAssignments={onExportShiftAssignments}
-              />
-            </Paper>
+          <Paper
+            sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+          >
+            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+              <Typography variant="h6">Actions</Typography>
+            </Box>
+            <ActionButtons
+              selectedUsers={selectedUsers}
+              selectedTimeslot={selectedTimeslot}
+              onAssignUsers={onAssignUsers}
+              onUnassignFromTimeslot={onUnassignFromTimeslot}
+              onUnassignAllShifts={onUnassignAllShifts}
+              loading={loading}
+              onClearUserSelection={onClearUserSelection}
+              onExportShiftAssignments={onExportShiftAssignments}
+            />
+          </Paper>
 
-            <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-                <Typography variant="h6">Workshifts</Typography>
-              </Box>
-              <WorkshiftList
-                formContent={formContent}
-                selectedTimeslot={selectedTimeslot}
-                onTimeslotSelect={onTimeslotSelect}
-                assignments={assignments}
-                bookings={regularBookings}
-              />
-            </Paper>
+          <Paper
+            sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+          >
+            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+              <Typography variant="h6">Workshifts</Typography>
+            </Box>
+            <WorkshiftList
+              formContent={formContent}
+              selectedTimeslot={selectedTimeslot}
+              onTimeslotSelect={onTimeslotSelect}
+              assignments={assignments}
+              bookings={regularBookings}
+            />
+          </Paper>
         </Box>
       </Box>
     </Box>

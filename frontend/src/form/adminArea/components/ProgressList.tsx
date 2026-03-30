@@ -2,14 +2,21 @@
 
 import React, { useState } from 'react';
 import {
-  List, ListItemButton, ListItemText, Collapse,
-  Typography, Box, LinearProgress, Badge,
-  IconButton, alpha
+  List,
+  ListItemButton,
+  ListItemText,
+  Collapse,
+  Typography,
+  Box,
+  LinearProgress,
+  Badge,
+  IconButton,
+  alpha,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
-  MoreHoriz as MoreHorizIcon
+  MoreHoriz as MoreHorizIcon,
 } from '@mui/icons-material';
 import { spacePalette } from '../../../components/styles/theme';
 
@@ -31,11 +38,7 @@ interface ProgressListProps {
   subtitle?: (item: ProgressItem) => React.ReactNode;
 }
 
-const ProgressList: React.FC<ProgressListProps> = ({
-  items,
-  onItemDetails,
-  subtitle
-}) => {
+const ProgressList: React.FC<ProgressListProps> = ({ items, onItemDetails, subtitle }) => {
   const [expanded, setExpanded] = useState<number | string | null>(null);
 
   const toggleExpanded = (id: number | string) => {
@@ -70,9 +73,9 @@ const ProgressList: React.FC<ProgressListProps> = ({
                 bgcolor: 'background.paper',
                 borderRadius: 1,
                 '&:hover': {
-                  bgcolor: alpha(progressColor, 0.05)
+                  bgcolor: alpha(progressColor, 0.05),
                 },
-                boxShadow: 1
+                boxShadow: 1,
               }}
             >
               <ListItemText
@@ -82,13 +85,13 @@ const ProgressList: React.FC<ProgressListProps> = ({
                   </Typography>
                 }
                 secondary={
-                  subtitle ? subtitle(item) : (
-                    item.description && (
-                      <Typography variant="body2" color="text.secondary" noWrap>
-                        {item.description}
-                      </Typography>
-                    )
-                  )
+                  subtitle
+                    ? subtitle(item)
+                    : item.description && (
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {item.description}
+                        </Typography>
+                      )
                 }
               />
 
@@ -97,7 +100,7 @@ const ProgressList: React.FC<ProgressListProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   width: { xs: '60%', sm: '50%' },
-                  mr: 1
+                  mr: 1,
                 }}
               >
                 <Box sx={{ width: '100%', mr: 1 }}>
@@ -105,9 +108,13 @@ const ProgressList: React.FC<ProgressListProps> = ({
                     variant="determinate"
                     value={Math.min(progress, 100)}
                     color={
-                      progress >= 100 ? "success" :
-                      progress >= 75 ? "primary" :
-                      progress >= 50 ? "warning" : "error"
+                      progress >= 100
+                        ? 'success'
+                        : progress >= 75
+                          ? 'primary'
+                          : progress >= 50
+                            ? 'warning'
+                            : 'error'
                     }
                   />
                 </Box>
@@ -119,11 +126,7 @@ const ProgressList: React.FC<ProgressListProps> = ({
               </Box>
 
               {item.badgeContent !== undefined && item.badgeIcon && (
-                <Badge
-                  badgeContent={item.badgeContent}
-                  color="primary"
-                  sx={{ mr: 1 }}
-                >
+                <Badge badgeContent={item.badgeContent} color="primary" sx={{ mr: 1 }}>
                   {item.badgeIcon}
                 </Badge>
               )}
@@ -144,9 +147,7 @@ const ProgressList: React.FC<ProgressListProps> = ({
             </ListItemButton>
 
             <Collapse in={expanded === item.id} timeout="auto" unmountOnExit>
-              <Box sx={{ pl: 2, pr: 2, pt: 1, pb: 2 }}>
-                {item.children}
-              </Box>
+              <Box sx={{ pl: 2, pr: 2, pt: 1, pb: 2 }}>{item.children}</Box>
             </Collapse>
           </Box>
         );

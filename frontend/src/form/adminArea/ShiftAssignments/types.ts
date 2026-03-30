@@ -1,72 +1,72 @@
 export interface ShiftAssignment {
-    id: number;
-    booking_id: number;
-    timeslot_id: number;
-    is_confirmed: boolean;
-    admin_notes: string;
-    assignment_date: string;
-    status: 'pending' | 'accepted' | 'declined';
-    rejection_reason?: string;
-    alternative_preferences?: string;
-    response_date?: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone: string;
-    workshift_title: string;
-    timeslot_title: string;
-    timeslot_start: string;
-    timeslot_end: string;
-    priority: number;
+  id: number;
+  booking_id: number;
+  timeslot_id: number;
+  is_confirmed: boolean;
+  admin_notes: string;
+  assignment_date: string;
+  status: 'pending' | 'accepted' | 'declined';
+  rejection_reason?: string;
+  alternative_preferences?: string;
+  response_date?: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  workshift_title: string;
+  timeslot_title: string;
+  timeslot_start: string;
+  timeslot_end: string;
+  priority: number;
 }
 
 export interface UserWithAssignments {
-    booking_id: number;
-    first_name: string;
-    last_name: string;
-    ticket_days: string;
-    days_count: number;
-    email: string;
-    supporter_buddy: string;
-    amount_shifts: number;
-    timeslot_priority_1: number;
-    timeslot_priority_2: number;
-    timeslot_priority_3: number;
-    assigned_shifts: ShiftAssignment[];
-    assigned_count: number;
-    is_fully_assigned: boolean;
+  booking_id: number;
+  first_name: string;
+  last_name: string;
+  ticket_days: string;
+  days_count: number;
+  email: string;
+  supporter_buddy: string;
+  amount_shifts: number;
+  timeslot_priority_1: number;
+  timeslot_priority_2: number;
+  timeslot_priority_3: number;
+  assigned_shifts: ShiftAssignment[];
+  assigned_count: number;
+  is_fully_assigned: boolean;
 }
 
 export interface UserListFilters {
-    searchTerm: string;
-    assignmentFilter: 'all' | 'completed' | 'incomplete' | 'unassigned';
-    acceptanceFilter: 'all' | 'all_accepted' | 'has_pending' | 'has_declined';
-    ticketDayFilter: string; // e.g., 'all', 'Freitag', 'Samstag', etc.
-    shiftCountFilter: 'all' | '1' | '2' | '3'; // or however many shift options you have
-    daysCountFilter: 'all' | '1' | '2' | '3';
+  searchTerm: string;
+  assignmentFilter: 'all' | 'completed' | 'incomplete' | 'unassigned';
+  acceptanceFilter: 'all' | 'all_accepted' | 'has_pending' | 'has_declined';
+  ticketDayFilter: string; // e.g., 'all', 'Freitag', 'Samstag', etc.
+  shiftCountFilter: 'all' | '1' | '2' | '3'; // or however many shift options you have
+  daysCountFilter: 'all' | '1' | '2' | '3';
 }
 
 export interface ShiftMessage {
-    id: number;
-    title: string;
-    category: string | null;
-    content: string;
-    created_by: string | null;
-    created_date: string;
+  id: number;
+  title: string;
+  category: string | null;
+  content: string;
+  created_by: string | null;
+  created_date: string;
 }
 
 export interface ShiftMessageGroup {
-    timeslot_id: number;
-    workshift_title: string;
-    timeslot_title: string;
-    timeslot_start: string;
-    timeslot_end: string;
-    messages: ShiftMessage[];
+  timeslot_id: number;
+  workshift_title: string;
+  timeslot_title: string;
+  timeslot_start: string;
+  timeslot_end: string;
+  messages: ShiftMessage[];
 }
 
 export interface CreateShiftMessageRequest {
-    timeslot_ids: number[];
-    title: string;
-    category?: string;
-    content: string;
+  timeslot_ids: number[];
+  title: string;
+  category?: string;
+  content: string;
 }

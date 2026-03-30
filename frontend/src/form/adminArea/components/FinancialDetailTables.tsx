@@ -62,11 +62,15 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                   {Object.entries(ticketTotals).map(([key, { count, total, isArtist }]) => (
                     <TableRow
                       key={key}
-                      sx={{ bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent' }}
+                      sx={{
+                        bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent',
+                      }}
                     >
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          {isArtist && <Chip label="A" color="primary" size="small" sx={{ mr: 1 }} />}
+                          {isArtist && (
+                            <Chip label="A" color="primary" size="small" sx={{ mr: 1 }} />
+                          )}
                           {key.split('-')[1]}
                         </Box>
                       </TableCell>
@@ -80,7 +84,9 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                       {Object.values(ticketTotals).reduce((sum, { count }) => sum + count, 0)}
                     </TableCell>
                     <TableCell align="right">
-                      {Object.values(ticketTotals).reduce((sum, { total }) => sum + total, 0).toFixed(2)}
+                      {Object.values(ticketTotals)
+                        .reduce((sum, { total }) => sum + total, 0)
+                        .toFixed(2)}
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -103,11 +109,15 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                   {Object.entries(beverageTotals).map(([key, { count, total, isArtist }]) => (
                     <TableRow
                       key={key}
-                      sx={{ bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent' }}
+                      sx={{
+                        bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent',
+                      }}
                     >
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          {isArtist && <Chip label="A" color="primary" size="small" sx={{ mr: 1 }} />}
+                          {isArtist && (
+                            <Chip label="A" color="primary" size="small" sx={{ mr: 1 }} />
+                          )}
                           {key.split('-')[1]}
                         </Box>
                       </TableCell>
@@ -121,7 +131,9 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                       {Object.values(beverageTotals).reduce((sum, { count }) => sum + count, 0)}
                     </TableCell>
                     <TableCell align="right">
-                      {Object.values(beverageTotals).reduce((sum, { total }) => sum + total, 0).toFixed(2)}
+                      {Object.values(beverageTotals)
+                        .reduce((sum, { total }) => sum + total, 0)
+                        .toFixed(2)}
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -144,11 +156,15 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                   {Object.entries(foodTotals).map(([key, { count, total, isArtist }]) => (
                     <TableRow
                       key={key}
-                      sx={{ bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent' }}
+                      sx={{
+                        bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent',
+                      }}
                     >
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          {isArtist && <Chip label="A" color="primary" size="small" sx={{ mr: 1 }} />}
+                          {isArtist && (
+                            <Chip label="A" color="primary" size="small" sx={{ mr: 1 }} />
+                          )}
                           {key.split('-')[1]}
                           <br />
                           {key.split('-')[2]}
@@ -164,7 +180,9 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                       {Object.values(foodTotals).reduce((sum, { count }) => sum + count, 0)}
                     </TableCell>
                     <TableCell align="right">
-                      {Object.values(foodTotals).reduce((sum, { total }) => sum + total, 0).toFixed(2)}
+                      {Object.values(foodTotals)
+                        .reduce((sum, { total }) => sum + total, 0)
+                        .toFixed(2)}
                     </TableCell>
                   </TableRow>
                 </TableBody>

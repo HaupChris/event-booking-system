@@ -54,23 +54,23 @@ const FinancialSummaryCards: React.FC<FinancialSummaryCardsProps> = ({
         },
       }}
     >
-        <StatsCard
-          title="Revenue"
-          value={`EUR${grandTotal.toFixed(2)}`}
-          subtitle={`Expected: EUR${expectedAmount.toFixed(2)}`}
-          color="primary"
-          icon={<Paid fontSize="large" />}
-          progress={paymentProgress}
-          footer={
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-              <Typography variant="body2">Received:</Typography>
-              <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                EUR{paidAmount.toFixed(2)}
-              </Typography>
-            </Box>
-          }
-          fullHeight
-        />
+      <StatsCard
+        title="Revenue"
+        value={`EUR${grandTotal.toFixed(2)}`}
+        subtitle={`Expected: EUR${expectedAmount.toFixed(2)}`}
+        color="primary"
+        icon={<Paid fontSize="large" />}
+        progress={paymentProgress}
+        footer={
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+            <Typography variant="body2">Received:</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+              EUR{paidAmount.toFixed(2)}
+            </Typography>
+          </Box>
+        }
+        fullHeight
+      />
       <StatsCard
         title="Participants"
         value={allCount}
@@ -160,10 +160,13 @@ const FinancialSummaryCards: React.FC<FinancialSummaryCardsProps> = ({
         }
         footer={
           <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Box
+              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}
+            >
               <Typography variant="body2">Beverages:</Typography>
               <Typography variant="body2">
-                EUR{Object.values(beverageTotals)
+                EUR
+                {Object.values(beverageTotals)
                   .reduce((sum, { total }) => sum + total, 0)
                   .toFixed(2)}
               </Typography>
@@ -171,7 +174,8 @@ const FinancialSummaryCards: React.FC<FinancialSummaryCardsProps> = ({
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="body2">Food:</Typography>
               <Typography variant="body2">
-                EUR{Object.values(foodTotals)
+                EUR
+                {Object.values(foodTotals)
                   .reduce((sum, { total }) => sum + total, 0)
                   .toFixed(2)}
               </Typography>

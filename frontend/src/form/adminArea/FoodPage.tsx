@@ -13,7 +13,7 @@ const FoodPage: React.FC = () => {
         icon: <RestaurantIcon />,
         getRegularOptions: (formContent) => formContent.food_options,
         getArtistOptions: (artistFormContent) => artistFormContent.food_options,
-        bookingFieldName: 'food_id'
+        bookingFieldName: 'food_id',
       }}
     />
   );

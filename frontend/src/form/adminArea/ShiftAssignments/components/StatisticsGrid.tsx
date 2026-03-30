@@ -30,12 +30,11 @@ const StatisticsGrid: React.FC<StatisticsGridProps> = ({
   assignments,
 }) => {
   // Calculate acceptance statistics
-  const acceptedCount = assignments.filter(a => a.status === 'accepted').length;
-  const pendingCount = assignments.filter(a => a.status === 'pending' || !a.status).length;
-  const declinedCount = assignments.filter(a => a.status === 'declined').length;
-  const acceptanceRate = assignments.length > 0
-    ? Math.round((acceptedCount / assignments.length) * 100)
-    : 0;
+  const acceptedCount = assignments.filter((a) => a.status === 'accepted').length;
+  const pendingCount = assignments.filter((a) => a.status === 'pending' || !a.status).length;
+  const declinedCount = assignments.filter((a) => a.status === 'declined').length;
+  const acceptanceRate =
+    assignments.length > 0 ? Math.round((acceptedCount / assignments.length) * 100) : 0;
 
   return (
     <Box
@@ -50,15 +49,15 @@ const StatisticsGrid: React.FC<StatisticsGridProps> = ({
         },
       }}
     >
-        <StatsCard
-          title="Total Users"
-          value={totalUsers}
-          icon={<PeopleIcon fontSize="large" />}
-          color="primary"
-          subtitle={`${fullyAssignedUsers} fully assigned`}
-          progress={(fullyAssignedUsers / totalUsers) * 100}
-          fullHeight
-        />
+      <StatsCard
+        title="Total Users"
+        value={totalUsers}
+        icon={<PeopleIcon fontSize="large" />}
+        color="primary"
+        subtitle={`${fullyAssignedUsers} fully assigned`}
+        progress={(fullyAssignedUsers / totalUsers) * 100}
+        fullHeight
+      />
       <StatsCard
         title="Shifts Progress"
         value={`${totalShiftsAssigned}/${totalShiftsWanted}`}

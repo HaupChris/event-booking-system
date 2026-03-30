@@ -20,11 +20,14 @@ interface ProfileStatsResponse {
 }
 
 export const getProfileStats = async (token: string): Promise<ProfileStatsItem[]> => {
-  const response = await axios.get<ProfileStatsResponse>(`${API_BASE_URL}/api/admin/profiles/stats`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await axios.get<ProfileStatsResponse>(
+    `${API_BASE_URL}/api/admin/profiles/stats`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   return response.data.profiles;
 };

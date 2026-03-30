@@ -175,8 +175,9 @@ const PaymentConfirmationsPage: React.FC = () => {
           size={{
             xs: 12,
             sm: 6,
-            md: 3
-          }}>
+            md: 3,
+          }}
+        >
           <Paper sx={{ p: 2, bgcolor: 'primary', color: 'white' }}>
             <Typography variant="h6">Erwarteter Gesamtbetrag</Typography>
             <Typography variant="h4">€{totalExpected.toFixed(2)}</Typography>
@@ -186,8 +187,9 @@ const PaymentConfirmationsPage: React.FC = () => {
           size={{
             xs: 12,
             sm: 6,
-            md: 3
-          }}>
+            md: 3,
+          }}
+        >
           <Paper sx={{ p: 2, bgcolor: 'success.light', color: 'white' }}>
             <Typography variant="h6">Empfangener Gesamtbetrag</Typography>
             <Typography variant="h4">€{totalReceived.toFixed(2)}</Typography>
@@ -197,8 +199,9 @@ const PaymentConfirmationsPage: React.FC = () => {
           size={{
             xs: 12,
             sm: 6,
-            md: 3
-          }}>
+            md: 3,
+          }}
+        >
           <Paper sx={{ p: 2, bgcolor: 'info.light', color: 'white' }}>
             <Typography variant="h6">Bezahlte Buchungen</Typography>
             <Typography variant="h4">
@@ -210,8 +213,9 @@ const PaymentConfirmationsPage: React.FC = () => {
           size={{
             xs: 12,
             sm: 6,
-            md: 3
-          }}>
+            md: 3,
+          }}
+        >
           <Paper
             sx={{
               p: 2,
@@ -373,8 +377,9 @@ const PaymentConfirmationsPage: React.FC = () => {
                 <Grid
                   size={{
                     xs: 12,
-                    sm: 6
-                  }}>
+                    sm: 6,
+                  }}
+                >
                   <TextField
                     fullWidth
                     label="Paid Amount"
@@ -393,8 +398,9 @@ const PaymentConfirmationsPage: React.FC = () => {
                 <Grid
                   size={{
                     xs: 12,
-                    sm: 6
-                  }}>
+                    sm: 6,
+                  }}
+                >
                   <TextField
                     fullWidth
                     label="Payment Date"

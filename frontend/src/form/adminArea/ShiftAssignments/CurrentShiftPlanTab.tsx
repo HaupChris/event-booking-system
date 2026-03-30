@@ -63,7 +63,9 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
     return formContent.work_shifts.map((workshift) => {
       const timeslots = workshift.time_slots.map((timeslot) => {
         const timeslotAssignments = assignmentsByTimeslot.get(timeslot.id) || [];
-        const confirmedAssignments = timeslotAssignments.filter((item) => item.status === 'accepted');
+        const confirmedAssignments = timeslotAssignments.filter(
+          (item) => item.status === 'accepted'
+        );
         const pendingAssignments = timeslotAssignments.filter((item) => item.status === 'pending');
         const confirmed = confirmedAssignments.length;
         const required = timeslot.num_needed || 0;
@@ -80,10 +82,12 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
           remaining,
           fillPercentage,
           isFilled: required > 0 && confirmed >= required,
-          confirmedPeople: confirmedAssignments.map(
-            (item) => `${item.first_name} ${item.last_name}`.trim()
+          confirmedPeople: confirmedAssignments.map((item) =>
+            `${item.first_name} ${item.last_name}`.trim()
           ),
-          offeredPeople: pendingAssignments.map((item) => `${item.first_name} ${item.last_name}`.trim()),
+          offeredPeople: pendingAssignments.map((item) =>
+            `${item.first_name} ${item.last_name}`.trim()
+          ),
         };
       });
 
@@ -117,7 +121,8 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
       totalConfirmed,
       totalTimeslots,
       filledTimeslots,
-      coveragePercentage: totalRequired > 0 ? Math.min(100, (totalConfirmed / totalRequired) * 100) : 0,
+      coveragePercentage:
+        totalRequired > 0 ? Math.min(100, (totalConfirmed / totalRequired) * 100) : 0,
     };
   }, [workshiftPlan]);
 
@@ -135,63 +140,73 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
           },
         }}
       >
-          <Card variant="outlined">
-            <CardContent sx={{ p: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                Confirmed Assignments
-              </Typography>
-              <Typography variant="h5" sx={{ mt: 0.5 }}>
-                {summary.totalConfirmed}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Card variant="outlined">
+          <CardContent sx={{ p: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              Confirmed Assignments
+            </Typography>
+            <Typography variant="h5" sx={{ mt: 0.5 }}>
+              {summary.totalConfirmed}
+            </Typography>
+          </CardContent>
+        </Card>
 
-          <Card variant="outlined">
-            <CardContent sx={{ p: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                Needed in Total
-              </Typography>
-              <Typography variant="h5" sx={{ mt: 0.5 }}>
-                {summary.totalRequired}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Card variant="outlined">
+          <CardContent sx={{ p: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              Needed in Total
+            </Typography>
+            <Typography variant="h5" sx={{ mt: 0.5 }}>
+              {summary.totalRequired}
+            </Typography>
+          </CardContent>
+        </Card>
 
-          <Card variant="outlined">
-            <CardContent sx={{ p: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                Filled Timeslots
-              </Typography>
-              <Typography variant="h5" sx={{ mt: 0.5 }}>
-                {summary.filledTimeslots} / {summary.totalTimeslots}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Card variant="outlined">
+          <CardContent sx={{ p: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              Filled Timeslots
+            </Typography>
+            <Typography variant="h5" sx={{ mt: 0.5 }}>
+              {summary.filledTimeslots} / {summary.totalTimeslots}
+            </Typography>
+          </CardContent>
+        </Card>
 
-          <Card variant="outlined">
-            <CardContent sx={{ p: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                Coverage
-              </Typography>
-              <Typography variant="h5" sx={{ mt: 0.5 }}>
-                {Math.round(summary.coveragePercentage)}%
-              </Typography>
-            </CardContent>
-          </Card>
+        <Card variant="outlined">
+          <CardContent sx={{ p: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              Coverage
+            </Typography>
+            <Typography variant="h5" sx={{ mt: 0.5 }}>
+              {Math.round(summary.coveragePercentage)}%
+            </Typography>
+          </CardContent>
+        </Card>
       </Box>
       <Stack spacing={2}>
         {workshiftPlan.map((workshift) => (
           <Card key={workshift.id} variant="outlined">
             <CardContent sx={{ p: 2 }}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{ mb: 1.5 }}
+              >
                 <Typography variant="h6">{workshift.title}</Typography>
                 <Stack direction="row" spacing={1}>
                   <Chip
                     size="small"
                     label={`Timeslots ${workshift.filledTimeslots}/${workshift.totalTimeslots}`}
-                    color={workshift.filledTimeslots === workshift.totalTimeslots ? 'success' : 'default'}
+                    color={
+                      workshift.filledTimeslots === workshift.totalTimeslots ? 'success' : 'default'
+                    }
                   />
-                  <Chip size="small" label={`${workshift.confirmedTotal}/${workshift.requiredTotal}`} />
+                  <Chip
+                    size="small"
+                    label={`${workshift.confirmedTotal}/${workshift.requiredTotal}`}
+                  />
                 </Stack>
               </Stack>
 
@@ -199,7 +214,12 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
                 {workshift.timeslots.map((timeslot) => (
                   <Card key={timeslot.id} variant="outlined">
                     <CardContent sx={{ p: 2 }}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                      <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        sx={{ mb: 1 }}
+                      >
                         <Box>
                           <Typography variant="subtitle1">{timeslot.title}</Typography>
                           <Typography variant="body2" color="text.secondary">
@@ -209,7 +229,13 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
                         <Chip
                           size="small"
                           label={`${timeslot.confirmed}/${timeslot.required}`}
-                          color={timeslot.isFilled ? 'success' : timeslot.confirmed > 0 ? 'warning' : 'default'}
+                          color={
+                            timeslot.isFilled
+                              ? 'success'
+                              : timeslot.confirmed > 0
+                                ? 'warning'
+                                : 'default'
+                          }
                         />
                       </Stack>
 
@@ -220,7 +246,8 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
                       />
 
                       <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                        Belegt: {timeslot.confirmed} | Benoetigt: {timeslot.required} | Offen: {timeslot.remaining}
+                        Belegt: {timeslot.confirmed} | Benoetigt: {timeslot.required} | Offen:{' '}
+                        {timeslot.remaining}
                       </Typography>
 
                       <Divider sx={{ my: 1.5 }} />
@@ -246,9 +273,16 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
                           ) : (
                             <List dense disablePadding>
                               {timeslot.confirmedPeople.map((personName) => (
-                                <ListItem key={`accepted-${timeslot.id}-${personName}`} disableGutters sx={{ py: 0.25 }}>
+                                <ListItem
+                                  key={`accepted-${timeslot.id}-${personName}`}
+                                  disableGutters
+                                  sx={{ py: 0.25 }}
+                                >
                                   <ListItemText
-                                    primaryTypographyProps={{ variant: 'body2', color: 'success.dark' }}
+                                    primaryTypographyProps={{
+                                      variant: 'body2',
+                                      color: 'success.dark',
+                                    }}
                                     primary={personName}
                                   />
                                 </ListItem>
@@ -268,9 +302,16 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
                           ) : (
                             <List dense disablePadding>
                               {timeslot.offeredPeople.map((personName) => (
-                                <ListItem key={`pending-${timeslot.id}-${personName}`} disableGutters sx={{ py: 0.25 }}>
+                                <ListItem
+                                  key={`pending-${timeslot.id}-${personName}`}
+                                  disableGutters
+                                  sx={{ py: 0.25 }}
+                                >
                                   <ListItemText
-                                    primaryTypographyProps={{ variant: 'body2', color: 'warning.dark' }}
+                                    primaryTypographyProps={{
+                                      variant: 'body2',
+                                      color: 'warning.dark',
+                                    }}
                                     primary={personName}
                                   />
                                 </ListItem>
