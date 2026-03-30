@@ -83,8 +83,8 @@ const SpaceBackground: React.FC<SpaceBackgroundProps> = ({
       spawned: boolean;
 
       constructor() {
-        this.x = (Math.random() * 0.3) - 0.15;
-        this.y = (Math.random() * 0.3) - 0.15;
+        this.x = Math.random() * 0.3 - 0.15;
+        this.y = Math.random() * 0.3 - 0.15;
         this.z = 8.0;
         this.speed = Math.random() * 0.01 + 0.01;
         this.scale = 0.15;
@@ -92,8 +92,8 @@ const SpaceBackground: React.FC<SpaceBackgroundProps> = ({
       }
 
       reset() {
-        this.x = (Math.random() * 0.3) - 0.15;
-        this.y = (Math.random() * 0.3) - 0.15;
+        this.x = Math.random() * 0.3 - 0.15;
+        this.y = Math.random() * 0.3 - 0.15;
         this.z = 8.0;
         this.speed = Math.random() * 0.01 + 0.01;
         this.scale = 0.15;
@@ -115,16 +115,24 @@ const SpaceBackground: React.FC<SpaceBackgroundProps> = ({
 
         // Draw simple circle for flyby object with theme-aware colors
         ctx.beginPath();
-        ctx.arc(projX, projY, baseSize/2, 0, 2 * Math.PI);
-        ctx.fillStyle = mode === 'dark'
-          ? 'rgba(100, 181, 246, 0.3)'  // Blue for dark mode
-          : 'rgba(25, 118, 210, 0.3)';  // Darker blue for light mode
+        ctx.arc(projX, projY, baseSize / 2, 0, 2 * Math.PI);
+        ctx.fillStyle =
+          mode === 'dark'
+            ? 'rgba(100, 181, 246, 0.3)' // Blue for dark mode
+            : 'rgba(25, 118, 210, 0.3)'; // Darker blue for light mode
         ctx.fill();
 
         // Draw glow
         ctx.beginPath();
-        ctx.arc(projX, projY, baseSize/1.5, 0, 2 * Math.PI);
-        const gradient = ctx.createRadialGradient(projX, projY, baseSize/4, projX, projY, baseSize/1.5);
+        ctx.arc(projX, projY, baseSize / 1.5, 0, 2 * Math.PI);
+        const gradient = ctx.createRadialGradient(
+          projX,
+          projY,
+          baseSize / 4,
+          projX,
+          projY,
+          baseSize / 1.5
+        );
         if (mode === 'dark') {
           gradient.addColorStop(0, 'rgba(100, 181, 246, 0.3)');
           gradient.addColorStop(1, 'rgba(100, 181, 246, 0)');
@@ -166,7 +174,7 @@ const SpaceBackground: React.FC<SpaceBackgroundProps> = ({
       const centerY = h / 2 + Math.cos(time * 0.3) * 30;
 
       // Update & draw stars
-      stars.forEach(star => {
+      stars.forEach((star) => {
         star.update();
         star.draw(ctx, centerX, centerY, FOV);
       });

@@ -31,7 +31,13 @@ const renderInline = (text: string): React.ReactNode[] => {
         <Box
           key={key}
           component="code"
-          sx={{ bgcolor: 'action.hover', px: 0.5, py: 0.1, borderRadius: 0.5, fontFamily: 'monospace' }}
+          sx={{
+            bgcolor: 'action.hover',
+            px: 0.5,
+            py: 0.1,
+            borderRadius: 0.5,
+            fontFamily: 'monospace',
+          }}
         >
           {part.slice(1, -1)}
         </Box>
@@ -109,7 +115,12 @@ const MarkdownContent: React.FC<MarkdownContentProps> = ({ content }) => {
       flushParagraph();
       flushList();
       blocks.push(
-        <Typography key={`h3-${blocks.length}`} variant="subtitle1" fontWeight={700} sx={{ mt: 1, mb: 0.8 }}>
+        <Typography
+          key={`h3-${blocks.length}`}
+          variant="subtitle1"
+          fontWeight={700}
+          sx={{ mt: 1, mb: 0.8 }}
+        >
           {renderInline(trimmed.slice(4))}
         </Typography>
       );
@@ -120,7 +131,12 @@ const MarkdownContent: React.FC<MarkdownContentProps> = ({ content }) => {
       flushParagraph();
       flushList();
       blocks.push(
-        <Typography key={`h2-${blocks.length}`} variant="subtitle1" fontWeight={800} sx={{ mt: 1, mb: 0.8 }}>
+        <Typography
+          key={`h2-${blocks.length}`}
+          variant="subtitle1"
+          fontWeight={800}
+          sx={{ mt: 1, mb: 0.8 }}
+        >
           {renderInline(trimmed.slice(3))}
         </Typography>
       );

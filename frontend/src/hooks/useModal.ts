@@ -17,29 +17,29 @@ import { useState } from 'react';
  * close();
  */
 export function useModal<T = unknown>() {
-    const [selectedItem, setSelectedItem] = useState<T | null>(null);
-    const [isOpen, setIsOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<T | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
-    /**
-     * Opens the modal and sets the selected item
-     */
-    const open = (item: T) => {
-        setSelectedItem(item);
-        setIsOpen(true);
-    };
+  /**
+   * Opens the modal and sets the selected item
+   */
+  const open = (item: T) => {
+    setSelectedItem(item);
+    setIsOpen(true);
+  };
 
-    /**
-     * Closes the modal and clears the selected item
-     */
-    const close = () => {
-        setIsOpen(false);
-        setSelectedItem(null);
-    };
+  /**
+   * Closes the modal and clears the selected item
+   */
+  const close = () => {
+    setIsOpen(false);
+    setSelectedItem(null);
+  };
 
-    return {
-        selectedItem,
-        isOpen,
-        open,
-        close
-    };
+  return {
+    selectedItem,
+    isOpen,
+    open,
+    close,
+  };
 }

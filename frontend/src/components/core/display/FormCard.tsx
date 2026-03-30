@@ -112,9 +112,10 @@ const FormCard: React.FC<FormCardProps> = ({
               position: 'absolute',
               width: '100%',
               height: mode === 'circus' ? '100%' : '2px',
-              background: mode === 'circus'
-                ? `radial-gradient(circle at center, ${alpha(theme.palette.primary.main, 0.2)}, transparent)`
-                : `linear-gradient(to right, transparent, ${theme.palette.primary.main}, transparent)`,
+              background:
+                mode === 'circus'
+                  ? `radial-gradient(circle at center, ${alpha(theme.palette.primary.main, 0.2)}, transparent)`
+                  : `linear-gradient(to right, transparent, ${theme.palette.primary.main}, transparent)`,
               top: 0,
               animation: mode === 'circus' ? 'glowPulse 2s infinite' : 'scanDown 2s infinite',
             },

@@ -133,7 +133,6 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
           </CardContent>
         </Card>
       )}
-
     </Stack>
   );
 };

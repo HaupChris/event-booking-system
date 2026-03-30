@@ -1,9 +1,8 @@
 import type { ReactNode } from 'react';
 import React from 'react';
 import { Box, Typography, Paper, alpha } from '@mui/material';
-import {spacePalette} from "../../styles/theme";
-import mixins from "../../styles/mixins";
-
+import { spacePalette } from '../../styles/theme';
+import mixins from '../../styles/mixins';
 
 interface SpacePanelLayoutProps {
   children: ReactNode;
@@ -36,13 +35,15 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
         }}
       >
         {/* Decorative top gradient */}
-        <Box sx={{
-          ...mixins.headerGradient,
-          '@keyframes gradientMove': {
-            '0%': { backgroundPosition: '0% 0%' },
-            '100%': { backgroundPosition: '300% 0%' },
-          }
-        }} />
+        <Box
+          sx={{
+            ...mixins.headerGradient,
+            '@keyframes gradientMove': {
+              '0%': { backgroundPosition: '0% 0%' },
+              '100%': { backgroundPosition: '300% 0%' },
+            },
+          }}
+        />
 
         {/* Mission Briefing (optional) */}
         {missionBriefing && (
@@ -59,7 +60,6 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
             </Typography>
           </Box>
         )}
-
 
         {/* Title (optional) */}
         {title && (
@@ -78,11 +78,7 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
         )}
 
         {/* Main content */}
-        <Box
-            sx={{ p: { xs: 1, sm: 3 } }}
-        >
-          {children}
-        </Box>
+        <Box sx={{ p: { xs: 1, sm: 3 } }}>{children}</Box>
 
         {/* Footer ID */}
         <Box sx={mixins.footerBar}>
@@ -92,7 +88,7 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
               fontFamily: 'monospace',
               color: alpha('#fff', 0.7),
               letterSpacing: '1px',
-              fontSize: '0.7rem'
+              fontSize: '0.7rem',
             }}
           >
             {footerId}

@@ -71,12 +71,7 @@ const PWAInstallPrompt: React.FC = () => {
             >
               Install
             </Button>
-            <IconButton
-              size="small"
-              aria-label="close"
-              color="inherit"
-              onClick={handleDismiss}
-            >
+            <IconButton size="small" aria-label="close" color="inherit" onClick={handleDismiss}>
               <CloseIcon fontSize="small" />
             </IconButton>
           </Box>

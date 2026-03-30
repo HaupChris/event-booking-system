@@ -22,7 +22,9 @@ function findItemById<T extends { id: number }>(array: T[], id: number): T | und
 }
 
 function getShiftAndTimeslot(workShifts: WorkShift[], timeslotId: number) {
-  const shift = workShifts.find((s) => s.time_slots.find((slot: TimeSlot) => slot.id === timeslotId));
+  const shift = workShifts.find((s) =>
+    s.time_slots.find((slot: TimeSlot) => slot.id === timeslotId)
+  );
   const timeslot = shift?.time_slots.find((slot) => slot.id === timeslotId);
   return { shift, timeslot };
 }
@@ -38,10 +40,21 @@ function SummaryForm({ currentBooking, formContent }: SummaryFormProps) {
   const ticket = findItemById(formContent.ticket_options, currentBooking.ticket_id);
   const beverage = findItemById(formContent.beverage_options, currentBooking.beverage_id);
   const food = findItemById(formContent.food_options, currentBooking.food_id);
-  const shiftSlot1 = getShiftAndTimeslot(formContent.work_shifts, currentBooking.timeslot_priority_1);
-  const shiftSlot2 = getShiftAndTimeslot(formContent.work_shifts, currentBooking.timeslot_priority_2);
-  const shiftSlot3 = getShiftAndTimeslot(formContent.work_shifts, currentBooking.timeslot_priority_3);
-  const materials = currentBooking.material_ids.map((id) => findItemById(formContent.materials, id));
+  const shiftSlot1 = getShiftAndTimeslot(
+    formContent.work_shifts,
+    currentBooking.timeslot_priority_1
+  );
+  const shiftSlot2 = getShiftAndTimeslot(
+    formContent.work_shifts,
+    currentBooking.timeslot_priority_2
+  );
+  const shiftSlot3 = getShiftAndTimeslot(
+    formContent.work_shifts,
+    currentBooking.timeslot_priority_3
+  );
+  const materials = currentBooking.material_ids.map((id) =>
+    findItemById(formContent.materials, id)
+  );
   const discount = getDiscountUser(currentBooking, formContent);
 
   return (

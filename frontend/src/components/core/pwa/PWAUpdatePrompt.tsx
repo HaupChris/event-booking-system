@@ -57,12 +57,7 @@ const PWAUpdatePrompt: React.FC = () => {
         severity="success"
         icon={<RefreshIcon />}
         action={
-          <Button
-            color="inherit"
-            size="small"
-            onClick={reloadPage}
-            sx={{ fontWeight: 'bold' }}
-          >
+          <Button color="inherit" size="small" onClick={reloadPage} sx={{ fontWeight: 'bold' }}>
             Reload
           </Button>
         }

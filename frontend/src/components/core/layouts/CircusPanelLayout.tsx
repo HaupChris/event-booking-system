@@ -26,7 +26,8 @@ const CircusPanelLayout: React.FC<CircusPanelLayoutProps> = ({
         sx={{
           width: '100%',
           borderRadius: { xs: '8px', sm: '12px' },
-          background: 'radial-gradient(circle at top center, #4a2410 0%, #2d1810 50%, #1a0a0a 100%)',
+          background:
+            'radial-gradient(circle at top center, #4a2410 0%, #2d1810 50%, #1a0a0a 100%)',
           boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
           overflow: 'visible',
           position: 'relative',
@@ -54,7 +55,7 @@ const CircusPanelLayout: React.FC<CircusPanelLayoutProps> = ({
             zIndex: 1,
             textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
             transform: 'rotate(180deg)',
-          }
+          },
         }}
       >
         {/* Vintage decorative top border - elegant gold line */}
@@ -83,7 +84,8 @@ const CircusPanelLayout: React.FC<CircusPanelLayoutProps> = ({
               mx: { xs: 1, sm: 2 },
               my: 2,
               boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
-              clipPath: 'polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%)',
+              clipPath:
+                'polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%)',
             }}
           >
             <Typography
@@ -96,20 +98,23 @@ const CircusPanelLayout: React.FC<CircusPanelLayoutProps> = ({
                 fontStyle: 'italic',
               }}
             >
-              <span style={{
-                color: theme.palette.primary.main,
-                fontWeight: 'bold',
-                letterSpacing: '0.1em'
-              }}>
+              <span
+                style={{
+                  color: theme.palette.primary.main,
+                  fontWeight: 'bold',
+                  letterSpacing: '0.1em',
+                }}
+              >
                 ★
               </span>{' '}
-              {missionBriefing}
-              {' '}
-              <span style={{
-                color: theme.palette.primary.main,
-                fontWeight: 'bold',
-                letterSpacing: '0.1em'
-              }}>
+              {missionBriefing}{' '}
+              <span
+                style={{
+                  color: theme.palette.primary.main,
+                  fontWeight: 'bold',
+                  letterSpacing: '0.1em',
+                }}
+              >
                 ★
               </span>
             </Typography>
@@ -137,11 +142,7 @@ const CircusPanelLayout: React.FC<CircusPanelLayoutProps> = ({
         )}
 
         {/* Main content */}
-        <Box
-          sx={{ p: { xs: 2, sm: 3 } }}
-        >
-          {children}
-        </Box>
+        <Box sx={{ p: { xs: 2, sm: 3 } }}>{children}</Box>
 
         {/* Decorative bottom border - elegant divider */}
         <Box

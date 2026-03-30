@@ -8,28 +8,28 @@
 }
 
 .icon-container {
-    animation: scale-up 1.0s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 2em;
+  animation: scale-up 1s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2em;
 }
 
 .checkout {
-    border: #eac764 solid 2px;
-    border-radius: 5px;
-    padding: 2em;
-    margin-bottom: 2em;
+  border: #eac764 solid 2px;
+  border-radius: 5px;
+  padding: 2em;
+  margin-bottom: 2em;
 }
 
 a {
-  color: #EB7942 !important;
+  color: #eb7942 !important;
 }
 
-a:active, a:hover {
-    color: #31f605 !important;
+a:active,
+a:hover {
+  color: #31f605 !important;
 }
-
 
 .rocket-body {
   position: absolute;
@@ -108,7 +108,6 @@ a:active, a:hover {
   position: relative;
   animation: slideContentUp 1s ease-in-out 4s forwards;
 }
-
 
 /* Rocket Animation Styles */
 .rocket-animation-container {
@@ -189,7 +188,9 @@ a:active, a:hover {
   width: 100px;
   height: 40px;
   opacity: 0;
-  animation: smokeAppear 0.5s ease-in 1s forwards, smokeExpand 2s ease-in 1.5s forwards;
+  animation:
+    smokeAppear 0.5s ease-in 1s forwards,
+    smokeExpand 2s ease-in 1.5s forwards;
 }
 
 .smoke {
@@ -289,4 +290,3 @@ a:active, a:hover {
     opacity: 0;
   }
 }
-

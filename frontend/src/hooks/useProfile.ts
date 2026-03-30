@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { NewsItem, ProfileData, ShiftAssignment, ShiftMessage } from '../services/profileService';
+import type {
+  NewsItem,
+  ProfileData,
+  ShiftAssignment,
+  ShiftMessage,
+} from '../services/profileService';
 import {
   acceptShift as acceptShiftAPI,
   declineShift as declineShiftAPI,
@@ -12,7 +17,11 @@ import {
 } from '../services/profileService';
 import { syncService } from '../services/syncService';
 import { NewsFeedDB, ProfileDB } from '../utils/indexedDB';
-import { extractProfileDataFromCache, mapCachedNews, persistProfileCache } from './useProfile.helpers';
+import {
+  extractProfileDataFromCache,
+  mapCachedNews,
+  persistProfileCache,
+} from './useProfile.helpers';
 
 export interface UseProfileOptions {
   profileUuid: string;
@@ -153,7 +162,10 @@ export const useProfile = (options: UseProfileOptions): UseProfileReturn => {
         return;
       }
 
-      const [newsData, count] = await Promise.all([getNewsFeed(profileUuid), getUnreadNewsCount(profileUuid)]);
+      const [newsData, count] = await Promise.all([
+        getNewsFeed(profileUuid),
+        getUnreadNewsCount(profileUuid),
+      ]);
       setNews(newsData);
       setUnreadCount(count);
       if (enableOffline) {
@@ -244,7 +256,9 @@ export const useProfile = (options: UseProfileOptions): UseProfileReturn => {
       }
       setNews((prev) =>
         prev.map((item) =>
-          item.id === newsId ? { ...item, is_read: true, read_date: new Date().toISOString() } : item
+          item.id === newsId
+            ? { ...item, is_read: true, read_date: new Date().toISOString() }
+            : item
         )
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));

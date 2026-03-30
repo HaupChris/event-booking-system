@@ -1,16 +1,18 @@
-import React from "react";
-import type {FormProps} from "./UserRegistrationFormContainer";
-import {userAreaTexts} from "../constants/texts";
-import TicketSelectionFormBase from "../../components/core/forms/TicketSelectionFormBase";
+import React from 'react';
+import type { FormProps } from './UserRegistrationFormContainer';
+import { userAreaTexts } from '../constants/texts';
+import TicketSelectionFormBase from '../../components/core/forms/TicketSelectionFormBase';
 
 function TicketSelectionForm(props: FormProps) {
-    return <TicketSelectionFormBase
-        currentBooking={props.currentBooking}
-        updateBooking={props.updateBooking}
-        formContent={props.formContent}
-        formValidation={props.formValidation}
-        texts={userAreaTexts.ticketSelectionForm}
-    />;
+  return (
+    <TicketSelectionFormBase
+      currentBooking={props.currentBooking}
+      updateBooking={props.updateBooking}
+      formContent={props.formContent}
+      formValidation={props.formValidation}
+      texts={userAreaTexts.ticketSelectionForm}
+    />
+  );
 }
 
 export default TicketSelectionForm;

@@ -2,7 +2,13 @@ import type { NewsItem, ProfileData } from '../services/profileService';
 import { BookingDB, ProfileDB } from '../utils/indexedDB';
 
 export const mapCachedNews = (
-  cachedNews: Array<{ id: string; title: string; content: string; timestamp: string; read?: boolean }>,
+  cachedNews: Array<{
+    id: string;
+    title: string;
+    content: string;
+    timestamp: string;
+    read?: boolean;
+  }>,
   profileUuid: string
 ): NewsItem[] =>
   cachedNews
@@ -18,7 +24,10 @@ export const mapCachedNews = (
       author: null,
     }));
 
-export const persistProfileCache = async (profileUuid: string, data: ProfileData): Promise<void> => {
+export const persistProfileCache = async (
+  profileUuid: string,
+  data: ProfileData
+): Promise<void> => {
   await ProfileDB.save({
     userId: profileUuid,
     email: data.user.email,

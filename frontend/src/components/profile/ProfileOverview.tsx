@@ -5,16 +5,7 @@
  */
 
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Grid,
-  Chip,
-  Divider,
-  Card,
-  CardContent,
-  Alert,
-} from '@mui/material';
+import { Box, Typography, Grid, Chip, Divider, Card, CardContent, Alert } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PendingIcon from '@mui/icons-material/Pending';
 import EmailIcon from '@mui/icons-material/Email';
@@ -34,7 +25,7 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
 
   return (
     <Box>
-      <Typography variant="h5" color={"text.primary"} sx={{ mb: 2 }}>
+      <Typography variant="h5" color={'text.primary'} sx={{ mb: 2 }}>
         Profil Übersicht
       </Typography>
       <Grid container spacing={3}>
@@ -42,8 +33,9 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
         <Grid
           size={{
             xs: 12,
-            md: 6
-          }}>
+            md: 6,
+          }}
+        >
           <Card variant="outlined" sx={cardSx}>
             <CardContent sx={cardContentSx}>
               <Typography variant="h6" gutterBottom color="primary">
@@ -78,8 +70,9 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
         <Grid
           size={{
             xs: 12,
-            md: 6
-          }}>
+            md: 6,
+          }}
+        >
           <Card variant="outlined" sx={cardSx}>
             <CardContent sx={cardContentSx}>
               <Typography variant="h6" gutterBottom color="primary">
@@ -175,8 +168,9 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
                     size={{
                       xs: 12,
                       sm: 6,
-                      md: 3
-                    }}>
+                      md: 3,
+                    }}
+                  >
                     <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Ticket
@@ -196,8 +190,9 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
                     size={{
                       xs: 12,
                       sm: 6,
-                      md: 3
-                    }}>
+                      md: 3,
+                    }}
+                  >
                     <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Essen
@@ -217,8 +212,9 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
                     size={{
                       xs: 12,
                       sm: 6,
-                      md: 3
-                    }}>
+                      md: 3,
+                    }}
+                  >
                     <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Getränke
@@ -238,8 +234,9 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
                     size={{
                       xs: 12,
                       sm: 6,
-                      md: 3
-                    }}>
+                      md: 3,
+                    }}
+                  >
                     <Box sx={{ px: 1, py: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                       <Typography variant="caption" color="text.secondary">
                         Schichten
@@ -258,7 +255,8 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
               </Grid>
 
               <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-                Buchung vom: {new Date(booking.timestamp).toLocaleDateString('de-DE', {
+                Buchung vom:{' '}
+                {new Date(booking.timestamp).toLocaleDateString('de-DE', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',

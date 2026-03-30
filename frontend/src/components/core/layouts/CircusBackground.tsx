@@ -56,7 +56,10 @@ const CircusBackground: React.FC<CircusBackgroundProps> = ({
         this.y = Math.random() * -(canvas?.height || window.innerHeight);
         this.size = Math.random() * 5 + 3;
         this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.shape = ['diamond', 'circle', 'star'][Math.floor(Math.random() * 3)] as 'diamond' | 'circle' | 'star';
+        this.shape = ['diamond', 'circle', 'star'][Math.floor(Math.random() * 3)] as
+          | 'diamond'
+          | 'circle'
+          | 'star';
         this.rotation = Math.random() * 360;
         this.rotationSpeed = Math.random() * 2 + 1;
         this.fallSpeed = Math.random() * 0.5 + 0.3;
@@ -156,7 +159,15 @@ const CircusBackground: React.FC<CircusBackgroundProps> = ({
         // Draw highlight
         ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
         ctx.beginPath();
-        ctx.ellipse(swayX - this.size * 0.3, this.y - this.size * 0.3, this.size * 0.3, this.size * 0.4, 0, 0, Math.PI * 2);
+        ctx.ellipse(
+          swayX - this.size * 0.3,
+          this.y - this.size * 0.3,
+          this.size * 0.3,
+          this.size * 0.4,
+          0,
+          0,
+          Math.PI * 2
+        );
         ctx.fill();
 
         // Draw string
@@ -233,17 +244,17 @@ const CircusBackground: React.FC<CircusBackgroundProps> = ({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Update and draw all particles
-      sparkles.forEach(sparkle => {
+      sparkles.forEach((sparkle) => {
         sparkle.update();
         sparkle.draw(ctx);
       });
 
-      balloons.forEach(balloon => {
+      balloons.forEach((balloon) => {
         balloon.update();
         balloon.draw(ctx);
       });
 
-      confettiPieces.forEach(confetti => {
+      confettiPieces.forEach((confetti) => {
         confetti.update();
         confetti.draw(ctx);
       });

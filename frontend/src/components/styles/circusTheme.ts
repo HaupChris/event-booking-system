@@ -4,44 +4,44 @@ import type { Components, Theme } from '@mui/material/styles';
 // Circus theme palette (Theatrical/Vintage)
 export const circusPalette = {
   primary: {
-    main: '#D4AF37',      // Antique gold
-    light: '#F4D03F',     // Bright gold
-    dark: '#B8860B',      // Deep golden bronze
-    contrastText: '#1a0a0a'
+    main: '#D4AF37', // Antique gold
+    light: '#F4D03F', // Bright gold
+    dark: '#B8860B', // Deep golden bronze
+    contrastText: '#1a0a0a',
   },
   secondary: {
-    main: '#6B46C1',      // Deep royal purple
-    light: '#9F7AEA',     // Light lavender purple
-    dark: '#4C2A85',      // Dark plum purple
+    main: '#6B46C1', // Deep royal purple
+    light: '#9F7AEA', // Light lavender purple
+    dark: '#4C2A85', // Dark plum purple
   },
   accent: {
-    main: '#4A90E2',      // Vibrant circus blue
-    light: '#7BB3FF',     // Sky blue
-    dark: '#2E5C8A',      // Deep navy blue
+    main: '#4A90E2', // Vibrant circus blue
+    light: '#7BB3FF', // Sky blue
+    dark: '#2E5C8A', // Deep navy blue
   },
   background: {
-    default: '#1a0a0a',   // Very dark brown (vintage paper aged)
-    paper: '#2d1810',     // Warm dark brown
-    card: 'radial-gradient(circle at top center, #4a2410 0%, #2d1810 50%, #1a0a0a 100%)'  // Tent interior gradient
+    default: '#1a0a0a', // Very dark brown (vintage paper aged)
+    paper: '#2d1810', // Warm dark brown
+    card: 'radial-gradient(circle at top center, #4a2410 0%, #2d1810 50%, #1a0a0a 100%)', // Tent interior gradient
   },
   text: {
-    primary: '#F5E6D3',   // Vintage cream/parchment
+    primary: '#F5E6D3', // Vintage cream/parchment
     secondary: alpha('#F5E6D3', 0.85),
     muted: alpha('#F5E6D3', 0.65),
-    gold: '#D4AF37',      // For special emphasis
+    gold: '#D4AF37', // For special emphasis
   },
   decorative: {
-    sepia: '#704214',     // Sepia brown for borders
+    sepia: '#704214', // Sepia brown for borders
     vintageRed: '#8B4513', // Safe brown-red (no pure red for colorblindness)
     stripeLight: '#D4AF37', // Gold stripes
-    stripeDark: '#6B46C1',  // Purple stripes
+    stripeDark: '#6B46C1', // Purple stripes
   },
   status: {
     success: '#4caf50',
     warning: '#ff9800',
     error: '#f44336',
-    info: '#4A90E2'       // Use circus blue for info
-  }
+    info: '#4A90E2', // Use circus blue for info
+  },
 };
 
 // Circus typography configuration (Theatrical/Vintage)
@@ -78,7 +78,7 @@ export const circusTypography = {
     fontWeight: 600,
     letterSpacing: '0.1em',
     textTransform: 'uppercase' as const,
-  }
+  },
 };
 
 // Circus component overrides (Vintage theatrical styling)
@@ -115,8 +115,8 @@ export const getCircusComponentOverrides = (): Components<Omit<Theme, 'component
             background: 'linear-gradient(135deg, #F4D03F 0%, #D4AF37 100%)',
             boxShadow: '0 6px 12px rgba(212, 175, 55, 0.4), 0 0 20px rgba(212, 175, 55, 0.3)',
             transform: 'translateY(-2px)',
-          }
-        }
+          },
+        },
       },
     },
     MuiOutlinedInput: {
@@ -134,7 +134,8 @@ export const getCircusComponentOverrides = (): Components<Omit<Theme, 'component
             top: 0,
             bottom: 0,
             width: '8px',
-            background: 'repeating-linear-gradient(0deg, transparent, transparent 4px, currentColor 4px, currentColor 5px)',
+            background:
+              'repeating-linear-gradient(0deg, transparent, transparent 4px, currentColor 4px, currentColor 5px)',
             opacity: 0.15,
             pointerEvents: 'none',
           },
@@ -193,9 +194,9 @@ export const getCircusComponentOverrides = (): Components<Omit<Theme, 'component
           paddingLeft: 0,
           paddingRight: 0,
           paddingTop: 16,
-          paddingBottom: 16
-        }
-      }
+          paddingBottom: 16,
+        },
+      },
     },
     MuiPaper: {
       styleOverrides: {
@@ -218,7 +219,7 @@ export const getCircusComponentOverrides = (): Components<Omit<Theme, 'component
           borderRadius: '12px',
           overflow: 'hidden',
           position: 'relative',
-        }
+        },
       },
     },
   };
@@ -228,7 +229,7 @@ export const getCircusComponentOverrides = (): Components<Omit<Theme, 'component
 export const circusTheme = createTheme({
   spacing: 8,
   palette: {
-    mode: 'dark',  // Use dark mode as base for better contrast
+    mode: 'dark', // Use dark mode as base for better contrast
     primary: circusPalette.primary,
     secondary: {
       main: circusPalette.secondary.main,

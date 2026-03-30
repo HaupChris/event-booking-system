@@ -3,7 +3,7 @@ import { Box, Typography, TextField, Button, IconButton, alpha, useTheme } from 
 import { EuroSymbol, ContentCopy, OpenInNew } from '@mui/icons-material';
 import FormCard from '../../../components/core/display/FormCard';
 import { useThemeMode } from '../../../components/styles/theme';
-import {userAreaTexts} from "../../constants/texts";
+import { userAreaTexts } from '../../constants/texts';
 
 interface PaymentInfoProps {
   totalPrice: number;
@@ -16,7 +16,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
   totalPrice,
   betreff,
   onCopy,
-  onPaypalClick
+  onPaypalClick,
 }) => {
   const theme = useTheme();
   const { mode } = useThemeMode();
@@ -30,17 +30,13 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
 
   return (
     <FormCard
-        title={userAreaTexts.confirmationForm.paymentInfo.title}
+      title={userAreaTexts.confirmationForm.paymentInfo.title}
       icon={<EuroSymbol />}
       sx={{ my: 3 }}
     >
       <Box sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-          <Typography
-            variant="h4"
-            fontWeight="bold"
-            sx={{ color: theme.palette.primary.main }}
-          >
+          <Typography variant="h4" fontWeight="bold" sx={{ color: theme.palette.primary.main }}>
             {totalPrice}€
           </Typography>
         </Box>
@@ -81,17 +77,14 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
                   <ContentCopy sx={{ color: alpha(theme.palette.text.primary, 0.7) }} />
                 </IconButton>
               ),
-              readOnly: true
+              readOnly: true,
             }}
             value={betreff}
             fullWidth
           />
 
-          <Typography
-            variant="body2"
-            sx={{ mb: 3, color: alpha(theme.palette.text.primary, 0.6) }}
-          >
-                    {userAreaTexts.confirmationForm.paymentInfo.subjectHelp}
+          <Typography variant="body2" sx={{ mb: 3, color: alpha(theme.palette.text.primary, 0.6) }}>
+            {userAreaTexts.confirmationForm.paymentInfo.subjectHelp}
           </Typography>
 
           <Button
@@ -108,7 +101,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
               textTransform: 'none',
             }}
           >
-                    {userAreaTexts.confirmationForm.paymentInfo.paypalButton}
+            {userAreaTexts.confirmationForm.paymentInfo.paypalButton}
           </Button>
         </Box>
 
@@ -117,7 +110,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
             variant="body2"
             sx={{ textAlign: 'center', color: alpha(theme.palette.text.primary, 0.6) }}
           >
-                    {userAreaTexts.confirmationForm.paymentInfo.alternativePayment}
+            {userAreaTexts.confirmationForm.paymentInfo.alternativePayment}
           </Typography>
         </Box>
       </Box>

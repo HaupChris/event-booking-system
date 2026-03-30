@@ -23,8 +23,9 @@ function SummaryPersonalCard({ firstName, lastName, email, phone }: SummaryPerso
         <Grid
           size={{
             xs: 12,
-            sm: 6
-          }}>
+            sm: 6,
+          }}
+        >
           <Box sx={{ display: 'flex', mb: 1.5 }}>
             <Typography
               variant="subtitle1"
@@ -79,8 +80,9 @@ function SummaryPersonalCard({ firstName, lastName, email, phone }: SummaryPerso
         <Grid
           size={{
             xs: 12,
-            sm: 6
-          }}>
+            sm: 6,
+          }}
+        >
           <InfoPair label="Email" value={email} icon={<EmailIcon />} />
           <InfoPair label="Telefon" value={phone} icon={<PhoneIcon />} />
         </Grid>

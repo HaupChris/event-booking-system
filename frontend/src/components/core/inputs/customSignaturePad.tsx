@@ -8,12 +8,7 @@ interface SignaturePadProps {
 }
 
 function CustomSignaturePad(props: SignaturePadProps) {
-  const {
-    onEnd,
-    penColor = 'black',
-    clearOnResize = false,
-    existingSignature,
-  } = props;
+  const { onEnd, penColor = 'black', clearOnResize = false, existingSignature } = props;
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);

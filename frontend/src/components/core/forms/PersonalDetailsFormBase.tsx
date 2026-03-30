@@ -52,11 +52,7 @@ interface PersonalDetailsFormBaseProps {
 }
 
 function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
-  const {
-    texts,
-    icon = <PersonIcon />,
-    formContent,
-  } = props;
+  const { texts, icon = <PersonIcon />, formContent } = props;
   const professionIdsField = props.professionIdsField ?? 'profession_ids';
 
   const theme = useTheme();

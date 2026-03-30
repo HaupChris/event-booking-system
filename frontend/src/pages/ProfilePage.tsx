@@ -95,13 +95,7 @@ const ProfilePage: React.FC = () => {
 
     switch (activeView) {
       case 'news':
-        return (
-          <NewsFeed
-            news={news}
-            isOnline={isOnline}
-            onMarkAsRead={markNewsAsRead}
-          />
-        );
+        return <NewsFeed news={news} isOnline={isOnline} onMarkAsRead={markNewsAsRead} />;
       case 'profile':
         return profile ? <ProfileOverview profile={profile} /> : null;
       case 'shifts':
@@ -120,19 +114,15 @@ const ProfilePage: React.FC = () => {
       case 'faqs':
         return <FAQs />;
       default:
-        return (
-          <NewsFeed
-            news={news}
-            isOnline={isOnline}
-            onMarkAsRead={markNewsAsRead}
-          />
-        );
+        return <NewsFeed news={news} isOnline={isOnline} onMarkAsRead={markNewsAsRead} />;
     }
   };
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -189,7 +179,11 @@ const ProfilePage: React.FC = () => {
             Wiesenwahn Festival
           </Typography>
           {profile?.user && (
-            <Typography variant="caption" color="text.secondary" sx={{ px: 2, display: 'block', mb: 2 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ px: 2, display: 'block', mb: 2 }}
+            >
               {profile.user.first_name} {profile.user.last_name}
             </Typography>
           )}

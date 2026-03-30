@@ -92,42 +92,42 @@ const FAQs: React.FC = () => {
           )}
 
           {!loading && !error && categories.length === 0 && (
-            <Alert severity="info">
-              Derzeit sind keine FAQs verfügbar.
-            </Alert>
+            <Alert severity="info">Derzeit sind keine FAQs verfügbar.</Alert>
           )}
 
-          {!loading && !error && categories.map((category) => (
-            <Box key={category.id} sx={{ mb: 4 }}>
-              <Typography variant="h6" gutterBottom sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
-                {category.name}
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-              {category.faqs.map((faq) => (
-                <Accordion
-                  key={`faq-${faq.id}`}
-                  expanded={expanded === `panel${faq.id}`}
-                  onChange={handleChange(`panel${faq.id}`)}
-                  sx={{ mb: 1 }}
-                >
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls={`panel${faq.id}-content`}
-                    id={`panel${faq.id}-header`}
+          {!loading &&
+            !error &&
+            categories.map((category) => (
+              <Box key={category.id} sx={{ mb: 4 }}>
+                <Typography variant="h6" gutterBottom sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
+                  {category.name}
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                {category.faqs.map((faq) => (
+                  <Accordion
+                    key={`faq-${faq.id}`}
+                    expanded={expanded === `panel${faq.id}`}
+                    onChange={handleChange(`panel${faq.id}`)}
+                    sx={{ mb: 1 }}
                   >
-                    <Typography variant="subtitle1" fontWeight="medium">
-                      {faq.question}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Typography variant="body2" color="text.secondary">
-                      {faq.answer}
-                    </Typography>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </Box>
-          ))}
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls={`panel${faq.id}-content`}
+                      id={`panel${faq.id}-header`}
+                    >
+                      <Typography variant="subtitle1" fontWeight="medium">
+                        {faq.question}
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography variant="body2" color="text.secondary">
+                        {faq.answer}
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                ))}
+              </Box>
+            ))}
         </Box>
 
         <Box sx={{ mt: 4, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
@@ -135,7 +135,8 @@ const FAQs: React.FC = () => {
             <strong>Weitere Fragen?</strong>
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Wenn deine Frage hier nicht beantwortet wurde, wende dich gerne an das Orga-Team per E-Mail.
+            Wenn deine Frage hier nicht beantwortet wurde, wende dich gerne an das Orga-Team per
+            E-Mail.
           </Typography>
         </Box>
       </CardContent>

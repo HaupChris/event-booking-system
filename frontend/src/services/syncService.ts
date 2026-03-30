@@ -3,18 +3,8 @@
  * Handles syncing data between server and IndexedDB
  */
 
-import type {
-  ProfileData,
-  BookingData,
-  NewsFeedItem,
-  SyncOperation} from '../utils/indexedDB';
-import {
-  ProfileDB,
-  BookingDB,
-  NewsFeedDB,
-  SyncQueueDB,
-  MetadataDB
-} from '../utils/indexedDB';
+import type { ProfileData, BookingData, NewsFeedItem, SyncOperation } from '../utils/indexedDB';
+import { ProfileDB, BookingDB, NewsFeedDB, SyncQueueDB, MetadataDB } from '../utils/indexedDB';
 import { API_URL } from '../config/env';
 
 const API_BASE_URL = API_URL;
@@ -77,7 +67,6 @@ export class SyncService {
           detail: { timestamp: new Date().toISOString() },
         })
       );
-
     } catch {
     } finally {
       this.syncInProgress = false;
@@ -104,7 +93,6 @@ export class SyncService {
 
       return profileData;
     } catch {
-
       // Return cached data if available
       return await ProfileDB.get(userId);
     }
@@ -130,7 +118,6 @@ export class SyncService {
 
       return bookingData;
     } catch {
-
       // Return cached data if available
       return await BookingDB.get(userId);
     }
@@ -156,7 +143,6 @@ export class SyncService {
 
       return newsItems;
     } catch {
-
       // Return cached data if available
       return await NewsFeedDB.getAll();
     }
@@ -228,7 +214,6 @@ export class SyncService {
         await this.executeOperation(operation, token);
         await SyncQueueDB.remove(operation.id);
       } catch (error) {
-
         // Update retry count
         const newRetries = operation.retries + 1;
 

@@ -9,10 +9,10 @@ import vegan_diet from '../img/both_meals_vegan.png';
 import vegetarian_diet from '../img/both_meals_vegetarian.png';
 
 export const foodImages: { [key: number]: string } = {
-    0: gyros,
-    1: gyros,
-    2: wraps,
-    3: wraps,
-    4: vegan_diet,
-    5: vegetarian_diet
+  0: gyros,
+  1: gyros,
+  2: wraps,
+  3: wraps,
+  4: vegan_diet,
+  5: vegetarian_diet,
 };

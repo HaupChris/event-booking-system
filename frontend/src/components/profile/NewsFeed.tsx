@@ -87,9 +87,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ news, isOnline, onMarkAsRead }) => 
   if (news.length === 0) {
     return (
       <Box>
-        <Alert severity="info">
-          Noch keine Neuigkeiten verfügbar. Schau später wieder vorbei!
-        </Alert>
+        <Alert severity="info">Noch keine Neuigkeiten verfügbar. Schau später wieder vorbei!</Alert>
       </Box>
     );
   }

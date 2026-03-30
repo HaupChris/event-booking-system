@@ -17,7 +17,7 @@ export interface ThemeContextType {
 
 export const ThemeContext = createContext<ThemeContextType>({
   mode: 'dark',
-  toggleTheme: () => {}
+  toggleTheme: () => {},
 });
 
 // Hook to get current theme
@@ -29,28 +29,28 @@ const darkPalette = {
     main: '#64b5f6',
     light: '#bbdefb',
     dark: '#1e88e5',
-    contrastText: '#ffffff'
+    contrastText: '#ffffff',
   },
   secondary: {
     main: '#ffffff',
-    dark: '#e0e0e0'
+    dark: '#e0e0e0',
   },
   background: {
     default: '#0d0d0d',
     paper: '#1a1a1a',
-    card: 'radial-gradient(circle at bottom left, #061429 0%, #071f3b 100%)'
+    card: 'radial-gradient(circle at bottom left, #061429 0%, #071f3b 100%)',
   },
   text: {
     primary: '#ffffff',
     secondary: alpha('#ffffff', 0.8),
-    muted: alpha('#ffffff', 0.6)
+    muted: alpha('#ffffff', 0.6),
   },
   status: {
     success: '#4caf50',
     warning: '#ff9800',
     error: '#f44336',
-    info: '#2196f3'
-  }
+    info: '#2196f3',
+  },
 };
 
 // Light theme palette
@@ -59,28 +59,28 @@ const lightPalette = {
     main: '#1976d2',
     light: '#42a5f5',
     dark: '#0d47a1',
-    contrastText: '#ffffff'
+    contrastText: '#ffffff',
   },
   secondary: {
     main: '#212121',
-    dark: '#424242'
+    dark: '#424242',
   },
   background: {
     default: '#f5f5f5',
     paper: '#ffffff',
-    card: 'radial-gradient(circle at bottom left, #e3f2fd 0%, #bbdefb 100%)'
+    card: 'radial-gradient(circle at bottom left, #e3f2fd 0%, #bbdefb 100%)',
   },
   text: {
     primary: '#212121',
     secondary: alpha('#212121', 0.8),
-    muted: alpha('#212121', 0.6)
+    muted: alpha('#212121', 0.6),
   },
   status: {
     success: '#4caf50',
     warning: '#ff9800',
     error: '#f44336',
-    info: '#2196f3'
-  }
+    info: '#2196f3',
+  },
 };
 
 // Shared typography configuration
@@ -155,7 +155,7 @@ export let spacePalette = darkPalette;
 
 // Export mixins with accessor function to ensure they use current palette
 export const getMixins = (mode: ThemeMode) => {
-  const palette = mode === 'circus' ? circusPalette : (mode === 'dark' ? darkPalette : lightPalette);
+  const palette = mode === 'circus' ? circusPalette : mode === 'dark' ? darkPalette : lightPalette;
 
   return {
     spacePanel: {
@@ -191,12 +191,12 @@ export const getMixins = (mode: ThemeMode) => {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-    }
+    },
   };
 };
 
 // Adjust spacePalette globally based on mode
 export const updateThemeMode = (mode: ThemeMode) => {
-  spacePalette = mode === 'circus' ? circusPalette : (mode === 'dark' ? darkPalette : lightPalette);
+  spacePalette = mode === 'circus' ? circusPalette : mode === 'dark' ? darkPalette : lightPalette;
   return { spacePalette };
 };

@@ -5,13 +5,7 @@
  */
 
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Alert,
-  Card,
-  CardContent,
-} from '@mui/material';
+import { Box, Typography, Alert, Card, CardContent } from '@mui/material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 const RideSharing: React.FC = () => {

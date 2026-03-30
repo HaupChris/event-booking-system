@@ -38,15 +38,12 @@ export interface UpdateNewsRequest {
  */
 export const getAllNews = async (token: string, includeInactive = false): Promise<NewsItem[]> => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/admin/news`,
-      {
-        params: { include_inactive: includeInactive },
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/admin/news`, {
+      params: { include_inactive: includeInactive },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data.news;
   } catch (error) {
     console.error('Error fetching news:', error);
@@ -59,14 +56,11 @@ export const getAllNews = async (token: string, includeInactive = false): Promis
  */
 export const getNewsById = async (token: string, newsId: number): Promise<NewsItem> => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/admin/news/${newsId}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/admin/news/${newsId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching news item:', error);
@@ -79,16 +73,12 @@ export const getNewsById = async (token: string, newsId: number): Promise<NewsIt
  */
 export const createNews = async (token: string, data: CreateNewsRequest): Promise<number> => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/api/admin/news`,
-      data,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/api/admin/news`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data.id;
   } catch (error) {
     console.error('Error creating news:', error);
@@ -105,16 +95,12 @@ export const updateNews = async (
   data: UpdateNewsRequest
 ): Promise<void> => {
   try {
-    await axios.put(
-      `${API_BASE_URL}/api/admin/news/${newsId}`,
-      data,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    await axios.put(`${API_BASE_URL}/api/admin/news/${newsId}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
   } catch (error) {
     console.error('Error updating news:', error);
     throw error;
@@ -130,15 +116,12 @@ export const deleteNews = async (
   permanent = false
 ): Promise<void> => {
   try {
-    await axios.delete(
-      `${API_BASE_URL}/api/admin/news/${newsId}`,
-      {
-        params: { permanent },
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
+    await axios.delete(`${API_BASE_URL}/api/admin/news/${newsId}`, {
+      params: { permanent },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   } catch (error) {
     console.error('Error deleting news:', error);
     throw error;

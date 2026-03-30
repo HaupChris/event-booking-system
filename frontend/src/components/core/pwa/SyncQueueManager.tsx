@@ -204,12 +204,7 @@ const SyncQueueManager: React.FC = () => {
                       <>
                         {new Date(op.timestamp).toLocaleString()}
                         {op.retries > 0 && (
-                          <Typography
-                            component="span"
-                            variant="body2"
-                            color="error"
-                            sx={{ ml: 1 }}
-                          >
+                          <Typography component="span" variant="body2" color="error" sx={{ ml: 1 }}>
                             • {op.retries} {op.retries === 1 ? 'retry' : 'retries'}
                           </Typography>
                         )}

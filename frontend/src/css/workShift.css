@@ -1,14 +1,14 @@
 .timeslot-list {
-    column-count: 1;
-    column-gap: 2em;
+  column-count: 1;
+  column-gap: 2em;
 }
 
 @media screen and (min-width: 901px) {
-    .timeslot-list {
-        column-count: 2;
-        justify-content: center;
-        break-inside: avoid;
-        page-break-inside: avoid;
-        -webkit-column-break-inside: avoid;
-    }
+  .timeslot-list {
+    column-count: 2;
+    justify-content: center;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
 }

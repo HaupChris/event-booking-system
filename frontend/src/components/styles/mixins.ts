@@ -35,7 +35,7 @@ export const mixins = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
 };
 
 export default mixins;

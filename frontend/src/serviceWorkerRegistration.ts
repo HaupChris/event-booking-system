@@ -4,8 +4,8 @@ import { VAPID_PUBLIC_KEY } from './config/env';
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
-    window.location.hostname === '[::1]' ||
-    window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
+  window.location.hostname === '[::1]' ||
+  window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
 );
 
 type Config = {
@@ -167,9 +167,11 @@ function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
 // Check if app is installed as PWA
 export function isPWA(): boolean {
   const maybeStandaloneNavigator = window.navigator as Navigator & { standalone?: boolean };
-  return window.matchMedia('(display-mode: standalone)').matches ||
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
     maybeStandaloneNavigator.standalone === true ||
-    document.referrer.includes('android-app://');
+    document.referrer.includes('android-app://')
+  );
 }
 
 // Prompt user to install PWA

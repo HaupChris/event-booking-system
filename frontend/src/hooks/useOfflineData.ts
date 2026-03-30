@@ -37,7 +37,10 @@ export interface UseOfflineDataReturn {
   refreshProfile: () => Promise<void>;
   refreshBooking: () => Promise<void>;
   refreshNews: () => Promise<void>;
-  queueOperation: (type: SyncOperation['type'], payload: SyncOperation['payload']) => Promise<string>;
+  queueOperation: (
+    type: SyncOperation['type'],
+    payload: SyncOperation['payload']
+  ) => Promise<string>;
   syncNow: () => Promise<void>;
 
   // Sync queue
@@ -131,14 +134,14 @@ export function useOfflineData(options: UseOfflineDataOptions = {}): UseOfflineD
   }, [token]);
 
   // Queue an operation
-  const queueOperation = useCallback(async (
-    type: SyncOperation['type'],
-    payload: SyncOperation['payload']
-  ): Promise<string> => {
-    const operationId = await syncService.queueOperation(type, payload);
-    await updatePendingCount();
-    return operationId;
-  }, [updatePendingCount]);
+  const queueOperation = useCallback(
+    async (type: SyncOperation['type'], payload: SyncOperation['payload']): Promise<string> => {
+      const operationId = await syncService.queueOperation(type, payload);
+      await updatePendingCount();
+      return operationId;
+    },
+    [updatePendingCount]
+  );
 
   // Sync all data now
   const syncNow = useCallback(async () => {
@@ -148,11 +151,7 @@ export function useOfflineData(options: UseOfflineDataOptions = {}): UseOfflineD
 
     try {
       await syncService.syncAll(token);
-      await Promise.all([
-        refreshProfile(),
-        refreshBooking(),
-        refreshNews(),
-      ]);
+      await Promise.all([refreshProfile(), refreshBooking(), refreshNews()]);
       await updatePendingCount();
     } catch (error) {
       console.error('[useOfflineData] Sync failed:', error);

@@ -21,13 +21,13 @@ import type { ViewFilterType } from '../form/adminArea/utils/optionsUtils';
  * />
  */
 export function useAdminPageFilters(initialViewType: ViewFilterType = 'all') {
-    const [viewType, setViewType] = useState<ViewFilterType>(initialViewType);
-    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [viewType, setViewType] = useState<ViewFilterType>(initialViewType);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-    return {
-        viewType,
-        setViewType,
-        anchorEl,
-        setAnchorEl
-    };
+  return {
+    viewType,
+    setViewType,
+    anchorEl,
+    setAnchorEl,
+  };
 }

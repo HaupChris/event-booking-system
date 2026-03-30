@@ -19,24 +19,24 @@ import { useState } from 'react';
  * setSortBy('date');
  */
 export function useSort<T extends string = string>(
-    initialSortBy: T,
-    initialOrder: 'asc' | 'desc' = 'asc'
+  initialSortBy: T,
+  initialOrder: 'asc' | 'desc' = 'asc'
 ) {
-    const [sortBy, setSortBy] = useState<T>(initialSortBy);
-    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(initialOrder);
+  const [sortBy, setSortBy] = useState<T>(initialSortBy);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(initialOrder);
 
-    /**
-     * Toggles sort order between 'asc' and 'desc'
-     */
-    const toggleOrder = () => {
-        setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
-    };
+  /**
+   * Toggles sort order between 'asc' and 'desc'
+   */
+  const toggleOrder = () => {
+    setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+  };
 
-    return {
-        sortBy,
-        setSortBy,
-        sortOrder,
-        setSortOrder,
-        toggleOrder
-    };
+  return {
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    toggleOrder,
+  };
 }

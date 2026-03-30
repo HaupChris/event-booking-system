@@ -5,7 +5,7 @@ export const spacing = {
   md: '16px',
   lg: '24px',
   xl: '32px',
-  xxl: '48px'
+  xxl: '48px',
 };
 
 export default spacing;

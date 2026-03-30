@@ -68,15 +68,12 @@ export const getAllFAQs = async (
     if (categoryId !== undefined) {
       params.category_id = categoryId;
     }
-    const response = await axios.get(
-      `${API_BASE_URL}/api/admin/faqs`,
-      {
-        params,
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/admin/faqs`, {
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data.faqs;
   } catch (error) {
     console.error('Error fetching FAQs:', error);
@@ -89,14 +86,11 @@ export const getAllFAQs = async (
  */
 export const getFAQById = async (token: string, faqId: number): Promise<FAQ> => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/admin/faqs/${faqId}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/admin/faqs/${faqId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching FAQ:', error);
@@ -109,16 +103,12 @@ export const getFAQById = async (token: string, faqId: number): Promise<FAQ> => 
  */
 export const createFAQ = async (token: string, data: CreateFAQRequest): Promise<number> => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/api/admin/faqs`,
-      data,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/api/admin/faqs`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data.id;
   } catch (error) {
     console.error('Error creating FAQ:', error);
@@ -135,16 +125,12 @@ export const updateFAQ = async (
   data: UpdateFAQRequest
 ): Promise<void> => {
   try {
-    await axios.put(
-      `${API_BASE_URL}/api/admin/faqs/${faqId}`,
-      data,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    await axios.put(`${API_BASE_URL}/api/admin/faqs/${faqId}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
   } catch (error) {
     console.error('Error updating FAQ:', error);
     throw error;
@@ -154,21 +140,14 @@ export const updateFAQ = async (
 /**
  * Delete a FAQ
  */
-export const deleteFAQ = async (
-  token: string,
-  faqId: number,
-  permanent = false
-): Promise<void> => {
+export const deleteFAQ = async (token: string, faqId: number, permanent = false): Promise<void> => {
   try {
-    await axios.delete(
-      `${API_BASE_URL}/api/admin/faqs/${faqId}`,
-      {
-        params: { permanent },
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
+    await axios.delete(`${API_BASE_URL}/api/admin/faqs/${faqId}`, {
+      params: { permanent },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   } catch (error) {
     console.error('Error deleting FAQ:', error);
     throw error;
@@ -183,15 +162,12 @@ export const getAllFAQCategories = async (
   includeInactive = false
 ): Promise<FAQCategory[]> => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/admin/faq-categories`,
-      {
-        params: { include_inactive: includeInactive },
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/admin/faq-categories`, {
+      params: { include_inactive: includeInactive },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data.categories;
   } catch (error) {
     console.error('Error fetching FAQ categories:', error);
@@ -207,14 +183,11 @@ export const getFAQCategoryById = async (
   categoryId: number
 ): Promise<FAQCategory> => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/admin/faq-categories/${categoryId}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/admin/faq-categories/${categoryId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching FAQ category:', error);
@@ -230,16 +203,12 @@ export const createFAQCategory = async (
   data: CreateFAQCategoryRequest
 ): Promise<number> => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/api/admin/faq-categories`,
-      data,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/api/admin/faq-categories`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data.id;
   } catch (error) {
     console.error('Error creating FAQ category:', error);
@@ -256,16 +225,12 @@ export const updateFAQCategory = async (
   data: UpdateFAQCategoryRequest
 ): Promise<void> => {
   try {
-    await axios.put(
-      `${API_BASE_URL}/api/admin/faq-categories/${categoryId}`,
-      data,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    await axios.put(`${API_BASE_URL}/api/admin/faq-categories/${categoryId}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
   } catch (error) {
     console.error('Error updating FAQ category:', error);
     throw error;
@@ -281,15 +246,12 @@ export const deleteFAQCategory = async (
   permanent = false
 ): Promise<void> => {
   try {
-    await axios.delete(
-      `${API_BASE_URL}/api/admin/faq-categories/${categoryId}`,
-      {
-        params: { permanent },
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
+    await axios.delete(`${API_BASE_URL}/api/admin/faq-categories/${categoryId}`, {
+      params: { permanent },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   } catch (error) {
     console.error('Error deleting FAQ category:', error);
     throw error;

@@ -91,7 +91,6 @@ export function initDB(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains(STORES.METADATA)) {
         db.createObjectStore(STORES.METADATA, { keyPath: 'key' });
       }
-
     };
   });
 }
@@ -272,7 +271,9 @@ export const NewsFeedDB = {
 
 // Sync queue operations
 export const SyncQueueDB = {
-  async add(operation: Omit<SyncOperation, 'id' | 'timestamp' | 'retries' | 'status'>): Promise<string> {
+  async add(
+    operation: Omit<SyncOperation, 'id' | 'timestamp' | 'retries' | 'status'>
+  ): Promise<string> {
     const id = `sync-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const syncOp: SyncOperation = {
       id,

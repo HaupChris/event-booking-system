@@ -18,15 +18,26 @@ function ShiftMessageFeed({ shiftMessages }: ShiftMessageFeedProps) {
 
   return (
     <Box sx={{ mb: 3 }}>
-      <Typography variant="h6" color={"text.primary"} sx={{ mb: 2 }}>
+      <Typography variant="h6" color={'text.primary'} sx={{ mb: 2 }}>
         Nachrichten zu deinen Schichten
       </Typography>
       <Grid container spacing={2}>
         {shiftMessages.map((message) => (
           <Grid key={message.id} size={12}>
-            <Card variant="outlined" sx={{ borderRadius: 2, borderLeft: '4px solid', borderLeftColor: 'primary.main' }}>
+            <Card
+              variant="outlined"
+              sx={{ borderRadius: 2, borderLeft: '4px solid', borderLeftColor: 'primary.main' }}
+            >
               <CardContent sx={cardContentSx}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 1 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    gap: 2,
+                    mb: 1,
+                  }}
+                >
                   <Typography variant="h6">{message.title}</Typography>
                   <Typography variant="caption" color="text.secondary">
                     {new Date(message.created_date).toLocaleDateString('de-DE', {
@@ -39,10 +50,21 @@ function ShiftMessageFeed({ shiftMessages }: ShiftMessageFeedProps) {
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                  {message.category && <Chip label={message.category} size="small" color="secondary" variant="outlined" />}
+                  {message.category && (
+                    <Chip
+                      label={message.category}
+                      size="small"
+                      color="secondary"
+                      variant="outlined"
+                    />
+                  )}
                   <Chip label={message.workshift_title} size="small" variant="outlined" />
                   <Chip label={message.timeslot_title} size="small" variant="outlined" />
-                  <Chip label={`${formatTime(message.timeslot_start)} - ${formatTime(message.timeslot_end)} Uhr`} size="small" variant="outlined" />
+                  <Chip
+                    label={`${formatTime(message.timeslot_start)} - ${formatTime(message.timeslot_end)} Uhr`}
+                    size="small"
+                    variant="outlined"
+                  />
                 </Box>
                 <MarkdownContent content={message.content} />
               </CardContent>

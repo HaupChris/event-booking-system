@@ -44,14 +44,12 @@ function MaterialsFormBase<TMaterialsField extends string = 'material_ids'>(
   const { texts } = props;
   const materialsPropName = (props.materialsPropName ?? 'material_ids') as TMaterialsField;
   const theme = useTheme();
-  const selectedMaterialIds = (props.currentBooking[materialsPropName] as number[] | undefined) ?? [];
+  const selectedMaterialIds =
+    (props.currentBooking[materialsPropName] as number[] | undefined) ?? [];
 
   function handleToggle(material_id: number) {
     if (!selectedMaterialIds.includes(material_id)) {
-      props.updateBooking(materialsPropName, [
-        ...selectedMaterialIds,
-        material_id,
-      ]);
+      props.updateBooking(materialsPropName, [...selectedMaterialIds, material_id]);
     } else {
       props.updateBooking(
         materialsPropName,
@@ -69,13 +67,17 @@ function MaterialsFormBase<TMaterialsField extends string = 'material_ids'>(
         elevation={2}
         sx={{ border: 'None' }}
         title={texts.materialsTitle}
-        icon={<BackpackIcon sx={{ color: theme.palette.primary.main, mr: 1, fontSize: '1.5rem' }} />}
+        icon={
+          <BackpackIcon sx={{ color: theme.palette.primary.main, mr: 1, fontSize: '1.5rem' }} />
+        }
       >
         {selectedMaterialIds.length > 0 && (
           <FormCard
             selected={true}
             icon={
-              <InventoryIcon sx={{ color: theme.palette.primary.main, fontSize: '1.2rem', mr: 1 }} />
+              <InventoryIcon
+                sx={{ color: theme.palette.primary.main, fontSize: '1.2rem', mr: 1 }}
+              />
             }
             title={texts.bringingItems(selectedMaterialIds.length)}
           >

@@ -1,12 +1,12 @@
 // src/hooks/useFormManagement.tsx
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 /**
  * Interface for form validation errors.
  * Maps each field key to an optional error message string.
  */
 export type FormValidation<T> = {
-    [K in keyof T]?: string;
+  [K in keyof T]?: string;
 };
 
 // Add step management to the options interface
@@ -51,7 +51,7 @@ export function useFormManagement<T extends object>({
   storageKey,
   versionKey,
   currentVersion = '1.0',
-  initialStep = 0
+  initialStep = 0,
 }: FormManagementOptions<T>): FormManagementReturn<T> {
   // Add a flag to prevent overriding loaded data
   const [isInitialized, setIsInitialized] = useState(false);
@@ -94,8 +94,7 @@ export function useFormManagement<T extends object>({
           }
 
           setIsInitialized(true); // Mark as initialized with stored data
-        } catch (e) {
-        }
+        } catch (e) {}
       } else {
         setIsInitialized(true); // Mark as initialized with initial state
       }
@@ -106,7 +105,8 @@ export function useFormManagement<T extends object>({
 
   // Save to localStorage when form state changes
   useEffect(() => {
-    if (storageKey && isInitialized) { // Only save after initialization
+    if (storageKey && isInitialized) {
+      // Only save after initialization
       localStorage.setItem(storageKey, JSON.stringify(formState));
     }
   }, [formState, storageKey, isInitialized]);
@@ -121,13 +121,13 @@ export function useFormManagement<T extends object>({
   // Handle next step with validation
   const handleNext = (requiredFields: Array<keyof T>) => {
     if (validateStep(requiredFields)) {
-      setActiveStep(prevStep => prevStep + 1);
+      setActiveStep((prevStep) => prevStep + 1);
     }
   };
 
   // Handle previous step
   const handlePrevious = () => {
-    setActiveStep(prevStep => Math.max(0, prevStep - 1));
+    setActiveStep((prevStep) => Math.max(0, prevStep - 1));
   };
 
   /**
@@ -138,12 +138,12 @@ export function useFormManagement<T extends object>({
    * @param value The new value for the field
    */
   const updateField = <K extends keyof T>(key: K, value: T[K]) => {
-    setFormState(prev => ({ ...prev, [key]: value }));
+    setFormState((prev) => ({ ...prev, [key]: value }));
 
     // Validate field if validation rule exists
     if (validationRules[key]) {
       const errorMessage = validationRules[key]!(value);
-      setValidation(prev => ({ ...prev, [key]: errorMessage }));
+      setValidation((prev) => ({ ...prev, [key]: errorMessage }));
     }
   };
 
@@ -158,7 +158,7 @@ export function useFormManagement<T extends object>({
     if (!validationRules[key]) return '';
 
     const errorMessage = validationRules[key]!(value);
-    setValidation(prev => ({ ...prev, [key]: errorMessage }));
+    setValidation((prev) => ({ ...prev, [key]: errorMessage }));
     return errorMessage;
   };
 
@@ -187,7 +187,6 @@ export function useFormManagement<T extends object>({
     return isValid;
   };
 
-
   return {
     formState,
     validation,
@@ -197,6 +196,6 @@ export function useFormManagement<T extends object>({
     setCurrentError,
     activeStep,
     handleNext,
-    handlePrevious
+    handlePrevious,
   };
 }

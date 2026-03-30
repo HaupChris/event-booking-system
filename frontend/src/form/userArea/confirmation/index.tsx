@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { Snackbar, Alert } from '@mui/material';
-import { SignalCellularNodata } from "@mui/icons-material";
-import type { Booking, FormContent } from "../interface";
-import type { BookingState } from "../UserRegistrationFormContainer";
+import { SignalCellularNodata } from '@mui/icons-material';
+import type { Booking, FormContent } from '../interface';
+import type { BookingState } from '../UserRegistrationFormContainer';
 
 import InitialView from './InitialView';
 import SuccessView from './SuccessView';
 import ErrorView from './ErrorView';
-import {generalConstants} from "../../constants/texts";
+import { generalConstants } from '../../constants/texts';
 
 interface ConfirmationFormProps {
   currentBooking: Booking;
@@ -17,7 +17,7 @@ interface ConfirmationFormProps {
 }
 
 function findItemById<T extends { id: number }>(array: T[], id: number): T | undefined {
-  return array.find(item => item.id === id);
+  return array.find((item) => item.id === id);
 }
 
 function ConfirmationForm(props: ConfirmationFormProps) {
@@ -25,10 +25,13 @@ function ConfirmationForm(props: ConfirmationFormProps) {
 
   // Get booking details
   const ticket = findItemById(formContent.ticket_options, currentBooking.ticket_id);
-  const beverage_or_undefined = findItemById(formContent.beverage_options, currentBooking.beverage_id);
-  const beverage = beverage_or_undefined ? beverage_or_undefined : { title: "Keine Bierflat" };
+  const beverage_or_undefined = findItemById(
+    formContent.beverage_options,
+    currentBooking.beverage_id
+  );
+  const beverage = beverage_or_undefined ? beverage_or_undefined : { title: 'Keine Bierflat' };
   const food_or_undefined = findItemById(formContent.food_options, currentBooking.food_id);
-  const food = food_or_undefined ? food_or_undefined : { title: "Kein Essen" };
+  const food = food_or_undefined ? food_or_undefined : { title: 'Kein Essen' };
 
   const betreff = `WWWW: ${currentBooking.last_name}, ${currentBooking.first_name} - ${ticket?.title} - ${beverage?.title} - ${food?.title} - ${currentBooking.total_price}€`;
 
@@ -51,7 +54,7 @@ function ConfirmationForm(props: ConfirmationFormProps) {
     return () => {
       window.removeEventListener('online', updateOnlineStatus);
       window.removeEventListener('offline', updateOnlineStatus);
-    }
+    };
   }, []);
 
   // Handle PayPal redirection countdown
@@ -61,7 +64,7 @@ function ConfirmationForm(props: ConfirmationFormProps) {
         setCountdown((prevCountdown) => {
           if (prevCountdown === 1) {
             clearInterval(timer);
-            window.open(generalConstants.paymentLink, "_blank");
+            window.open(generalConstants.paymentLink, '_blank');
           }
           return prevCountdown - 1;
         });
@@ -128,9 +131,7 @@ function ConfirmationForm(props: ConfirmationFormProps) {
       />
     );
   } else if (bookingState.isSubmitted && !bookingState.isSuccessful) {
-    return (
-      <ErrorView onRetry={handleRetry} />
-    );
+    return <ErrorView onRetry={handleRetry} />;
   } else {
     return (
       <>

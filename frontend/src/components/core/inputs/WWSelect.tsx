@@ -1,17 +1,7 @@
 import type { ReactNode } from 'react';
 import React from 'react';
-import type {
-  SelectProps,
-  SelectChangeEvent
-} from '@mui/material';
-import {
-  Select,
-  MenuItem,
-  Typography,
-  IconButton,
-  alpha,
-  useTheme
-} from '@mui/material';
+import type { SelectProps, SelectChangeEvent } from '@mui/material';
+import { Select, MenuItem, Typography, IconButton, alpha, useTheme } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { useThemeMode } from '../../styles/theme';
 import type { SxProps, Theme } from '@mui/material/styles';
@@ -32,7 +22,7 @@ interface WWSelectProps extends Omit<SelectProps, 'onChange'> {
   label?: string;
   renderCustomValue?: (value: string | number) => ReactNode;
   sx?: SxProps<Theme>;
-  minWidth?: string | number | { xs?: string | number, sm?: string | number, md?: string | number };
+  minWidth?: string | number | { xs?: string | number; sm?: string | number; md?: string | number };
 }
 
 const WWSelect: React.FC<WWSelectProps> = ({
@@ -99,7 +89,7 @@ const WWSelect: React.FC<WWSelectProps> = ({
         }
 
         // Find the matching option to display its label
-        const selectedOption = options.find(opt => opt.value === selected);
+        const selectedOption = options.find((opt) => opt.value === selected);
         return (
           <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
             {selectedOption ? selectedOption.label : String(selected)}
@@ -120,7 +110,7 @@ const WWSelect: React.FC<WWSelectProps> = ({
       }
       sx={{
         minWidth: minWidth,
-        borderRadius: "8px",
+        borderRadius: '8px',
         bgcolor: getBackgroundColor(),
         '& .MuiOutlinedInput-notchedOutline': {
           borderColor: alpha(theme.palette.primary.main, 0.3),
@@ -142,7 +132,7 @@ const WWSelect: React.FC<WWSelectProps> = ({
         '& .MuiSvgIcon-root': {
           color: alpha(theme.palette.text.primary, 0.7),
         },
-        ...sx
+        ...sx,
       }}
       MenuProps={{
         PaperProps: {

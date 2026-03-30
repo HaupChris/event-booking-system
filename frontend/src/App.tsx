@@ -67,7 +67,12 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ auth, isAdmin, setIsAdmin }) => {
             auth ? (
               <Navigate replace to="/form" />
             ) : (
-              <LoginPage title="User Login" endpoint="/api/auth" redirectPath="/form" showRecoveryLink={true} />
+              <LoginPage
+                title="User Login"
+                endpoint="/api/auth"
+                redirectPath="/form"
+                showRecoveryLink={true}
+              />
             )
           }
         />
@@ -94,9 +99,7 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ auth, isAdmin, setIsAdmin }) => {
         />
         <Route
           path="/artist-form"
-          element={
-            auth ? <ArtistRegistrationFormContainer /> : <Navigate replace to="/artist" />
-          }
+          element={auth ? <ArtistRegistrationFormContainer /> : <Navigate replace to="/artist" />}
         />
 
         {/* Admin routes */}

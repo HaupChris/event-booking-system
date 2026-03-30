@@ -141,7 +141,10 @@ export function RegistrationFormContainer<
       return;
     }
 
-    updateField('total_price' as keyof TBooking, total_price as unknown as TBooking[keyof TBooking]);
+    updateField(
+      'total_price' as keyof TBooking,
+      total_price as unknown as TBooking[keyof TBooking]
+    );
   }, [booking, config, formContent, updateField]);
 
   const handleStepNext = () => {
@@ -188,7 +191,9 @@ export function RegistrationFormContainer<
             isSubmitted: true,
             isSubmitting: false,
           });
-          setCurrentError('Absenden fehlgeschlagen. Bitte pruefe die Serververbindung und versuche es erneut.');
+          setCurrentError(
+            'Absenden fehlgeschlagen. Bitte pruefe die Serververbindung und versuche es erneut.'
+          );
         }
       });
   };
@@ -202,11 +207,12 @@ export function RegistrationFormContainer<
     }
 
     // Check if component needs form props
-    const componentName = typeof StepComponent === 'string'
-      ? StepComponent
-      : ((StepComponent as { displayName?: string; name?: string }).displayName ||
-        (StepComponent as { displayName?: string; name?: string }).name ||
-        '');
+    const componentName =
+      typeof StepComponent === 'string'
+        ? StepComponent
+        : (StepComponent as { displayName?: string; name?: string }).displayName ||
+          (StepComponent as { displayName?: string; name?: string }).name ||
+          '';
     const needsFormProps =
       !componentName?.includes('Confirmation') &&
       !componentName?.includes('Summary') &&

@@ -94,8 +94,9 @@ function SummaryWorkShiftsCard({
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <InfoPair
               label="Supporter Buddy"
               value={supporterBuddy || userAreaTexts.summaryForm.noSupportBuddy}
@@ -104,8 +105,9 @@ function SummaryWorkShiftsCard({
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <InfoPair
               label={userAreaTexts.summaryForm.shiftsCount}
               value={

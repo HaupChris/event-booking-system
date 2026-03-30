@@ -55,18 +55,19 @@ function FormField(props: FormFieldProps) {
         ...(props.multiline && !props.InputProps?.inputComponent
           ? { inputComponent: 'textarea' as React.ElementType<InputBaseComponentProps> }
           : {}),
-        startAdornment: icon && React.isValidElement<{ sx?: object }>(icon) ? (
-          <InputAdornment position="start">
-            {React.cloneElement(icon, {
-              sx: {
-                ...(icon.props.sx ?? {}),
-                color: theme.palette.primary.main,
-              },
-            })}
-          </InputAdornment>
-        ) : (
-          props.InputProps?.startAdornment
-        ),
+        startAdornment:
+          icon && React.isValidElement<{ sx?: object }>(icon) ? (
+            <InputAdornment position="start">
+              {React.cloneElement(icon, {
+                sx: {
+                  ...(icon.props.sx ?? {}),
+                  color: theme.palette.primary.main,
+                },
+              })}
+            </InputAdornment>
+          ) : (
+            props.InputProps?.startAdornment
+          ),
       }}
       sx={{
         mt: 0,
