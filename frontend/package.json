@@ -63,5 +63,8 @@
     "i": "^0.3.7",
     "prettier": "^3.1.1"
   },
+  "overrides": {
+    "serialize-javascript": "7.0.5"
+  },
   "proxy": "http://localhost:5001"
 }
