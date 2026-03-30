@@ -1,0 +1,31 @@
+name: Export Dependabot Alerts
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  export-alerts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Export Dependabot alerts to CSV
+        uses: ShamKarthikS-Hexaware/dependabot-alert-export@v1.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          org_name: ${{ github.repository_owner }}
+          repo_name: ${{ github.event.repository.name }}
+          csv_path: data/vulnerability.csv
+
+      - name: Upload vulnerability report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability_report
+          path: data/vulnerability.csv
