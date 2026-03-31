@@ -276,6 +276,13 @@ export const ProfileBookingSummaryCard: React.FC<BookingSummaryCardProps> = ({ b
             />
           </Grid>
         )}
+
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <SummaryTile
+            label="Eingeladen von"
+            title={booking.invited_by_name?.trim() || 'Nicht angegeben'}
+          />
+        </Grid>
       </Grid>
 
       <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>

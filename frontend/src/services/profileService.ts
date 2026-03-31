@@ -57,6 +57,8 @@ export interface Booking {
   timestamp: string;
   total_price: number;
   profile_uuid: string;
+  invited_by_id?: number | null;
+  invited_by_name?: string | null;
   ticket: Ticket | null;
   food: FoodBeverage | null;
   beverage: FoodBeverage | null;

@@ -64,6 +64,8 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                     b.id as booking_id,
                     b.timestamp,
                     b.total_price,
+                    b.invited_by_id,
+                    oti.name as invited_by_name,
                     b.is_paid,
                     b.paid_amount,
                     b.payment_notes,
@@ -107,6 +109,7 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                 LEFT JOIN TicketOptions t ON b.ticket_option_id = t.id
                 LEFT JOIN FoodOptions f ON b.food_option_id = f.id
                 LEFT JOIN BeverageOptions bv ON b.beverage_option_id = bv.id
+                LEFT JOIN OrgaTeamInviters oti ON b.invited_by_id = oti.id
                 LEFT JOIN TimeSlots ts1 ON b.first_priority_timeslot_id = ts1.id
                 LEFT JOIN TimeSlots ts2 ON b.second_priority_timeslot_id = ts2.id
                 LEFT JOIN TimeSlots ts3 ON b.third_priority_timeslot_id = ts3.id
@@ -128,6 +131,8 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                         ab.id as booking_id,
                         ab.timestamp,
                         ab.total_price,
+                        ab.invited_by_id,
+                        oti.name as invited_by_name,
                         ab.is_paid,
                         ab.paid_amount,
                         ab.payment_notes,
@@ -157,6 +162,7 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                     LEFT JOIN TicketOptions t ON ab.ticket_option_id = t.id
                     LEFT JOIN FoodOptions f ON ab.food_option_id = f.id
                     LEFT JOIN BeverageOptions bv ON ab.beverage_option_id = bv.id
+                    LEFT JOIN OrgaTeamInviters oti ON ab.invited_by_id = oti.id
                     WHERE ab.profile_uuid = ?
                 """,
                     (profile_uuid,),
@@ -189,6 +195,8 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                 "timestamp": row["timestamp"],
                 "total_price": row["total_price"],
                 "profile_uuid": row["profile_uuid"],
+                "invited_by_id": row["invited_by_id"],
+                "invited_by_name": row["invited_by_name"],
                 "ticket": (
                     {
                         "id": row["ticket_id"],
