@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Typography, Snackbar, Alert, alpha, useTheme } from '@mui/material';
-import { Celebration, CheckCircleOutline } from '@mui/icons-material';
+import { Box, Typography, Snackbar, Alert, alpha, useTheme, Button } from '@mui/material';
+import { Celebration, CheckCircleOutline, OpenInNew } from '@mui/icons-material';
 import ThemedFormLayout from '../../../components/core/layouts/ThemedFormLayout';
 import FormCard from '../../../components/core/display/FormCard';
 import AnimatedRocket from '../../../components/core/display/animatedRocket';
@@ -16,6 +16,7 @@ interface SuccessViewProps {
   redirecting: boolean;
   setRedirecting: (value: boolean) => void;
   countdown: number;
+  profileUuid: string;
   copied: boolean;
   onCloseCopied: (event: React.SyntheticEvent | Event, reason?: string) => void;
 }
@@ -28,6 +29,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({
   redirecting,
   setRedirecting,
   countdown,
+  profileUuid,
   copied,
   onCloseCopied,
 }) => {
@@ -83,6 +85,47 @@ const SuccessView: React.FC<SuccessViewProps> = ({
         onCopy={onCopy}
         onPaypalClick={onPaypalClick}
       />
+
+      <Box
+        sx={{
+          mt: 2,
+          p: 2,
+          borderRadius: 2,
+          border: '1px solid',
+          borderColor: alpha(theme.palette.primary.main, 0.35),
+          backgroundColor: alpha(theme.palette.primary.dark, 0.08),
+        }}
+      >
+        <Typography variant="body2" sx={{ color: alpha(theme.palette.text.primary, 0.85), mb: 1 }}>
+          Bitte schließe zuerst die Zahlung ab. Danach kannst du dein Profil fuer News und
+          Schicht-Updates jederzeit direkt aufrufen.
+        </Typography>
+        {profileUuid ? (
+          <Button
+            fullWidth
+            variant="outlined"
+            color="primary"
+            href={`/profile/${profileUuid}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            startIcon={<OpenInNew />}
+            sx={{ textTransform: 'none' }}
+          >
+            Profil in neuem Tab oeffnen
+          </Button>
+        ) : (
+          <Button
+            fullWidth
+            variant="outlined"
+            color="primary"
+            disabled
+            startIcon={<OpenInNew />}
+            sx={{ textTransform: 'none' }}
+          >
+            Profil-Link wird vorbereitet
+          </Button>
+        )}
+      </Box>
 
       <Box
         sx={{

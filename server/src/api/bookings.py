@@ -72,7 +72,7 @@ def submit_form():
             logger.info(
                 f"Booking process completed in {duration:.3f}s for {booking.first_name} {booking.last_name}"
             )
-            return jsonify({"msg": "Booking successful"}), 200
+            return jsonify({"msg": "Booking successful", "profile_uuid": profile_uuid}), 200
         else:
             logger.warning(
                 f"Duplicate booking attempt for {booking.first_name} {booking.last_name} ({booking.email})"

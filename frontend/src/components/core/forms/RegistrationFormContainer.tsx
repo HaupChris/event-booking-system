@@ -166,7 +166,16 @@ export function RegistrationFormContainer<
       .post(config.apiEndpoints.submitForm, booking, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then(() => {
+      .then((response) => {
+        const profileUuid =
+          typeof response.data?.profile_uuid === 'string' ? response.data.profile_uuid : '';
+        if (profileUuid) {
+          updateField(
+            'profile_uuid' as keyof TBooking,
+            profileUuid as unknown as TBooking[keyof TBooking]
+          );
+        }
+
         setBookingState({
           isSuccessful: true,
           isSubmitting: false,

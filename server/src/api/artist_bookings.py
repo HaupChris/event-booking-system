@@ -64,7 +64,7 @@ def submit_artist_form():
 
             duration = time.time() - start_time
             logger.info(f"Artist booking process completed in {duration:.3f}s for {artist_name}")
-            return jsonify({"msg": "Artist booking successful"}), 200
+            return jsonify({"msg": "Artist booking successful", "profile_uuid": profile_uuid}), 200
         else:
             logger.warning(f"Duplicate artist booking attempt for {artist_name}")
             return jsonify({"error": "Duplicate booking"}), 400

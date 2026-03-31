@@ -8,6 +8,7 @@ import InitialView from './InitialView';
 import SuccessView from './SuccessView';
 import ErrorView from './ErrorView';
 import { generalConstants } from '../../constants/texts';
+import { createPaymentSubject } from '../../../utils/paymentSubject';
 
 interface ConfirmationFormProps {
   currentBooking: Booking;
@@ -33,7 +34,14 @@ function ConfirmationForm(props: ConfirmationFormProps) {
   const food_or_undefined = findItemById(formContent.food_options, currentBooking.food_id);
   const food = food_or_undefined ? food_or_undefined : { title: 'Kein Essen' };
 
-  const betreff = `WWWW: ${currentBooking.last_name}, ${currentBooking.first_name} - ${ticket?.title} - ${beverage?.title} - ${food?.title} - ${currentBooking.total_price}€`;
+  const betreff = createPaymentSubject({
+    firstName: currentBooking.first_name,
+    lastName: currentBooking.last_name,
+    ticketTitle: ticket?.title || 'Ticket nicht gefunden',
+    beverageTitle: beverage?.title || 'Keine Bierflat',
+    foodTitle: food?.title || 'Kein Essen',
+    totalPrice: currentBooking.total_price,
+  });
 
   // State management
   const [copied, setCopied] = useState(false);
@@ -126,6 +134,7 @@ function ConfirmationForm(props: ConfirmationFormProps) {
         redirecting={redirecting}
         setRedirecting={setRedirecting}
         countdown={countdown}
+        profileUuid={currentBooking.profile_uuid}
         copied={copied}
         onCloseCopied={handleClose}
       />

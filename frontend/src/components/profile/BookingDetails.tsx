@@ -22,16 +22,80 @@ interface BookingDetailsProps {
   profile: ProfileData;
 }
 
+interface ArtistPerformanceDetails {
+  preferredDay?: string;
+  preferredTime?: string;
+  duration?: string | number;
+  genre?: string;
+  description?: string;
+  bandMembers?: string;
+}
+
+const parseArtistPerformanceDetails = (
+  value?: string
+): {
+  details: ArtistPerformanceDetails;
+  rawValue: string;
+} => {
+  if (!value) {
+    return { details: {}, rawValue: '' };
+  }
+
+  try {
+    const parsed = JSON.parse(value) as ArtistPerformanceDetails;
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return { details: parsed, rawValue: '' };
+    }
+  } catch {
+    return { details: {}, rawValue: value };
+  }
+
+  return { details: {}, rawValue: value };
+};
+
+const getArtistPerformanceFields = (details: ArtistPerformanceDetails) => {
+  const fields: Array<{ label: string; value: string }> = [];
+
+  if (details.preferredDay) {
+    fields.push({ label: 'Bevorzugter Spieltag', value: details.preferredDay });
+  }
+  if (details.preferredTime) {
+    fields.push({ label: 'Bevorzugtes Zeitfenster', value: details.preferredTime });
+  }
+  if (details.duration) {
+    fields.push({ label: 'Set-Dauer', value: `${details.duration} Minuten` });
+  }
+  if (details.genre) {
+    fields.push({ label: 'Genre / Musikstil', value: details.genre });
+  }
+  if (details.description) {
+    fields.push({ label: 'Act-Beschreibung', value: details.description });
+  }
+  if (details.bandMembers) {
+    fields.push({ label: 'Bandmitglieder', value: String(details.bandMembers) });
+  }
+
+  return fields;
+};
+
 const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
-  const { booking, materials, professions } = profile;
+  const { booking, materials, professions, user } = profile;
+  const isArtist = user.is_artist;
   const cardSx = { borderRadius: 2 };
   const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
   const formatTime = (time?: string) => (time ? time.slice(0, 5) : '');
+  const { details: performanceDetails, rawValue: rawPerformanceDetails } =
+    parseArtistPerformanceDetails(booking.performance_details);
+  const artistPerformanceFields = getArtistPerformanceFields(performanceDetails);
+  const hasStructuredPerformanceDetails = artistPerformanceFields.length > 0;
+
+  const hasArtistPerformanceDetails =
+    isArtist && (hasStructuredPerformanceDetails || Boolean(rawPerformanceDetails));
 
   return (
     <Stack spacing={3}>
       {/* Work Shift Priorities (for regular users) */}
-      {booking.work_shift_priorities && booking.work_shift_priorities.length > 0 && (
+      {!isArtist && booking.work_shift_priorities && booking.work_shift_priorities.length > 0 && (
         <Card variant="outlined" sx={cardSx}>
           <CardContent sx={cardContentSx}>
             <Typography variant="h6" gutterBottom color="primary">
@@ -55,12 +119,36 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
                 </ListItem>
               ))}
             </List>
-            {booking.supporter_buddy?.length !== 0 && (
+            {booking.supporter_buddy && (
               <Box sx={{ mt: 2, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
                 <Typography variant="body2" color="text.secondary">
                   Support-Buddy: {booking.supporter_buddy}
                 </Typography>
               </Box>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {hasArtistPerformanceDetails && (
+        <Card variant="outlined" sx={cardSx}>
+          <CardContent sx={cardContentSx}>
+            <Typography variant="h6" gutterBottom color="primary">
+              Auftrittsdetails
+            </Typography>
+
+            {hasStructuredPerformanceDetails ? (
+              <List disablePadding>
+                {artistPerformanceFields.map((field) => (
+                  <ListItem key={field.label} sx={{ px: 0 }}>
+                    <ListItemText primary={field.label} secondary={field.value} />
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                {rawPerformanceDetails}
+              </Typography>
             )}
           </CardContent>
         </Card>
@@ -97,7 +185,9 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
               Materialien
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              Du hast angeboten, folgende Materialien mitzubringen:
+              {isArtist
+                ? 'Du hast angegeben, folgende Ausruestung mitzubringen:'
+                : 'Du hast angeboten, folgende Materialien mitzubringen:'}
             </Typography>
             <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {materials.map((material) => (
