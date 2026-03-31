@@ -17,10 +17,10 @@ import {
   OpenInNew,
   SignalCellularNodata,
 } from '@mui/icons-material';
-import rocketBaak from '../../img/rocket_baak.png';
 import type { ArtistBooking, ArtistFormContent } from './interface';
 import type { ArtistBookingState } from './ArtistRegistrationFormContainer';
 import { resolvePaymentLink } from '../../utils/paymentLink';
+import SuccessClownVideo from '../../components/core/display/SuccessClownVideo';
 
 interface ArtistConfirmationProps {
   booking: ArtistBooking;
@@ -117,9 +117,7 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
         {props.bookingState.isSubmitted ? (
           props.bookingState.isSuccessful ? (
             <Box>
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-                <img src={rocketBaak} alt="jellyfish" style={{ width: '115px', height: '115px' }} />
-              </Box>
+              <SuccessClownVideo width={180} />
 
               <Typography variant="body1" paragraph>
                 Deine Künstler-Anmeldung war erfolgreich! Du erhältst in Kürze eine Bestätigungsmail

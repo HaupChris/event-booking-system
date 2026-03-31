@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Typography, Snackbar, Alert, alpha, useTheme, Button } from '@mui/material';
 import { Celebration, CheckCircleOutline, OpenInNew } from '@mui/icons-material';
 import ThemedFormLayout from '../../../components/core/layouts/ThemedFormLayout';
 import FormCard from '../../../components/core/display/FormCard';
-import AnimatedRocket from '../../../components/core/display/animatedRocket';
+import SuccessClownVideo from '../../../components/core/display/SuccessClownVideo';
 import PaymentInfo from './PaymentInfo';
 import RedirectModal from './RedirectModal';
 import { userAreaTexts } from '../../constants/texts';
@@ -36,7 +36,6 @@ const SuccessView: React.FC<SuccessViewProps> = ({
   onCloseCopied,
 }) => {
   const theme = useTheme();
-  const [showRocket, setShowRocket] = useState(true);
 
   return (
     <ThemedFormLayout
@@ -67,18 +66,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({
         </Box>
       </FormCard>
 
-      {showRocket && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            mb: 3,
-            position: 'relative',
-          }}
-        >
-          <AnimatedRocket onAnimationComplete={() => setShowRocket(false)} />
-        </Box>
-      )}
+      <SuccessClownVideo />
 
       {/* Payment Box */}
       <PaymentInfo

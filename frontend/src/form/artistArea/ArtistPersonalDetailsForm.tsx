@@ -13,6 +13,7 @@ function ArtistPersonalDetailsForm(props: ArtistFormProps) {
       texts={artistAreaTexts.personalDetailsForm}
       icon={<MusicNoteIcon />}
       formContent={props.formContent}
+      onDevSeedForm={props.onDevSeedForm}
     />
   );
 }

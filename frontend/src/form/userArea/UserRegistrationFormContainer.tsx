@@ -22,6 +22,33 @@ import WorkShiftForm from './WorkshiftsForm';
 import MaterialsForm from './MaterialsForm';
 import SignatureForm from './SignatureForm';
 
+const DEV_SIGNATURE_IMAGE =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2w0WQAAAAASUVORK5CYII=';
+
+const getFirstId = <T extends { id: number }>(options: T[]): number => {
+  return options.length > 0 ? options[0].id : -1;
+};
+
+const getTimeslotPriorities = (formContent: FormContent): [number, number, number] => {
+  const timeSlotIds = formContent.work_shifts.flatMap((shift) =>
+    shift.time_slots.map((slot) => slot.id)
+  );
+
+  if (timeSlotIds.length === 0) {
+    return [-1, -1, -1];
+  }
+
+  if (timeSlotIds.length === 1) {
+    return [timeSlotIds[0], timeSlotIds[0], timeSlotIds[0]];
+  }
+
+  if (timeSlotIds.length === 2) {
+    return [timeSlotIds[0], timeSlotIds[1], timeSlotIds[0]];
+  }
+
+  return [timeSlotIds[0], timeSlotIds[1], timeSlotIds[2]];
+};
+
 // Form steps enum
 enum FormSteps {
   NameAndAddress = 0,
@@ -118,6 +145,7 @@ export interface FormProps {
   currentBooking: Booking;
   formValidation: { [key in keyof Booking]?: string };
   formContent: FormContent;
+  onDevSeedForm?: () => void;
 }
 
 // Booking state interface
@@ -217,6 +245,38 @@ export function UserRegistrationFormContainer() {
         // Pricing configuration
         calculateTotalPrice: calculateTotalPriceUser,
         priceDependencies: ['beverage_id', 'food_id', 'ticket_id', 'amount_shifts'],
+        getDevSeedData: (formContent) => {
+          const [timeslotPriority1, timeslotPriority2, timeslotPriority3] =
+            getTimeslotPriorities(formContent);
+          const timestamp = Date.now();
+
+          return {
+            first_name: 'Dev',
+            last_name: 'Tester',
+            email: `dev.user.${timestamp}@example.com`,
+            phone: '01701234567',
+            invited_by_id: getFirstId(formContent.orga_inviters),
+            ticket_id: getFirstId(formContent.ticket_options),
+            beverage_id: getFirstId(formContent.beverage_options),
+            food_id: getFirstId(formContent.food_options),
+            timeslot_priority_1: timeslotPriority1,
+            timeslot_priority_2: timeslotPriority2,
+            timeslot_priority_3: timeslotPriority3,
+            material_ids:
+              formContent.materials.length > 0 ? [formContent.materials[0].id] : ([] as number[]),
+            amount_shifts: 1,
+            supporter_buddy: 'Dev Buddy',
+            signature: DEV_SIGNATURE_IMAGE,
+            profession_ids:
+              formContent.professions.length > 0
+                ? [formContent.professions[0].id]
+                : ([] as number[]),
+            is_paid: false,
+            paid_amount: 0,
+            payment_notes: '',
+            payment_date: '',
+          };
+        },
 
         // Metadata
         maxSteps: Object.keys(FormSteps).length / 2,

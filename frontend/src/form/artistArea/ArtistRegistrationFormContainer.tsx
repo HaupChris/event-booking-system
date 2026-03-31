@@ -22,6 +22,13 @@ import ArtistPerformanceForm from './ArtistPerformanceForm';
 import ArtistFoodSelectionForm from './ArtistFoodSelectionForm';
 import ArtistEquipmentForm from './ArtistEquipmentForm';
 
+const DEV_SIGNATURE_IMAGE =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2w0WQAAAAASUVORK5CYII=';
+
+const getFirstId = <T extends { id: number }>(options: T[]): number => {
+  return options.length > 0 ? options[0].id : -1;
+};
+
 enum FormSteps {
   PersonalDetails = 0,
   PerformanceDetails = 1,
@@ -106,6 +113,7 @@ export interface ArtistFormProps {
   currentBooking: ArtistBooking;
   formValidation: { [key in keyof ArtistBooking]?: string };
   formContent: ArtistFormContent;
+  onDevSeedForm?: () => void;
 }
 
 export interface ArtistBookingState {
@@ -197,6 +205,36 @@ export function ArtistRegistrationFormContainer() {
         // Pricing configuration
         calculateTotalPrice: calculateTotalPriceArtist,
         priceDependencies: ['beverage_id', 'food_id', 'ticket_id'],
+        getDevSeedData: (formContent) => {
+          const timestamp = Date.now();
+
+          return {
+            first_name: 'Artist',
+            last_name: 'Dev',
+            email: `dev.artist.${timestamp}@example.com`,
+            phone: '01701234567',
+            invited_by_id: getFirstId(formContent.orga_inviters),
+            ticket_id: getFirstId(formContent.ticket_options),
+            beverage_id: getFirstId(formContent.beverage_options),
+            food_id: getFirstId(formContent.food_options),
+            artist_material_ids:
+              formContent.artist_materials.length > 0
+                ? [formContent.artist_materials[0].id]
+                : ([] as number[]),
+            signature: DEV_SIGNATURE_IMAGE,
+            performance_details: 'Dev seed: kurzer Test-Auftritt mit 2 Songs.',
+            equipment: 'Mikrofon, XLR-Kabel, 2 Monitorwege',
+            special_requests: 'Bitte Soundcheck am Nachmittag einplanen.',
+            profession_ids:
+              formContent.professions.length > 0
+                ? [formContent.professions[0].id]
+                : ([] as number[]),
+            is_paid: false,
+            paid_amount: 0,
+            payment_notes: '',
+            payment_date: '',
+          };
+        },
 
         // Metadata
         maxSteps: Object.keys(FormSteps).length / 2,

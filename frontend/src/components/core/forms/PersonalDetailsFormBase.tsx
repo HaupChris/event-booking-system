@@ -6,6 +6,7 @@ import {
   FormGroup,
   FormControlLabel,
   Paper,
+  Button,
   alpha,
   Chip,
   useTheme,
@@ -57,6 +58,7 @@ interface PersonalDetailsFormBaseProps {
     professions: Profession[];
     orga_inviters: OrgaInviter[];
   };
+  onDevSeedForm?: () => void;
   icon?: React.ReactNode;
   professionIdsField?: 'profession_ids';
 }
@@ -64,6 +66,7 @@ interface PersonalDetailsFormBaseProps {
 function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
   const { texts, icon = <PersonIcon />, formContent } = props;
   const professionIdsField = props.professionIdsField ?? 'profession_ids';
+  const showDevSeedButton = import.meta.env.DEV && Boolean(props.onDevSeedForm);
 
   const theme = useTheme();
   const selectedProfessionIds =
@@ -100,6 +103,17 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
         icon={icon}
         withDivider={false}
       />
+
+      {showDevSeedButton && (
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={props.onDevSeedForm}
+          sx={{ mb: 2, textTransform: 'none' }}
+        >
+          Dev: Formular automatisch fuellen
+        </Button>
+      )}
 
       <Box component="form" sx={{ mt: 2 }}>
         <FormField

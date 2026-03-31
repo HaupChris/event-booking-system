@@ -11,6 +11,7 @@ function PersonalDetailsForm(props: FormProps) {
       formValidation={props.formValidation}
       texts={userAreaTexts.personalDetailsForm}
       formContent={props.formContent}
+      onDevSeedForm={props.onDevSeedForm}
     />
   );
 }

@@ -50,6 +50,9 @@ export interface RegistrationFormConfig<
   calculateTotalPrice: (booking: TBooking, formContent: TFormContent) => number;
   priceDependencies: (keyof TBooking)[];
 
+  // Optional development seeding helper
+  getDevSeedData?: (formContent: TFormContent, booking: TBooking) => Partial<TBooking>;
+
   // Metadata
   maxSteps: number;
 }
@@ -158,6 +161,20 @@ export function RegistrationFormContainer<
     [updateField]
   );
 
+  const handleDevSeedForm = useCallback(() => {
+    if (!config.getDevSeedData) {
+      return;
+    }
+
+    const seededData = config.getDevSeedData(formContent, booking);
+    Object.entries(seededData).forEach(([key, value]) => {
+      if (value !== undefined) {
+        updateField(key as keyof TBooking, value as TBooking[keyof TBooking]);
+      }
+    });
+    setCurrentError('');
+  }, [booking, config, formContent, setCurrentError, updateField]);
+
   // Submit booking
   const submitBooking = () => {
     setBookingState((prevState) => ({ ...prevState, isSubmitting: true }));
@@ -237,6 +254,7 @@ export function RegistrationFormContainer<
           currentBooking={booking}
           formValidation={formValidation}
           formContent={formContent}
+          onDevSeedForm={activeStep === 0 ? handleDevSeedForm : undefined}
         />
       );
     } else {
