@@ -7,6 +7,7 @@ from py_ts_interfaces import Interface
 class TimeSlot(Interface):
     id: int
     title: str
+    working_title: str
     start_time: str
     end_time: str
     num_needed: int
@@ -17,8 +18,10 @@ class TimeSlot(Interface):
 class WorkShift(Interface):
     id: int
     title: str
+    working_title: str
     description: str
     time_slots: list[TimeSlot]
+    multiple_selection_possible: int
 
 
 @dataclass

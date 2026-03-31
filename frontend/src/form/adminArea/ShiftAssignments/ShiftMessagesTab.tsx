@@ -22,6 +22,7 @@ import type { FormContent } from '../../userArea/interface';
 import type { CreateShiftMessageRequest, ShiftMessageGroup } from './types';
 import { ShiftAssignmentAPI } from './api';
 import ShiftMessagesHistory from './ShiftMessagesHistory';
+import { getAdminTitle } from '../utils/titleUtils';
 
 interface ShiftMessagesTabProps {
   formContent: FormContent;
@@ -73,7 +74,7 @@ function ShiftMessagesTab({ formContent }: ShiftMessagesTabProps) {
       selectedWorkshift
         ? selectedWorkshift.time_slots.map((slot) => ({
             id: slot.id,
-            title: slot.title,
+            title: getAdminTitle(slot),
             start_time: slot.start_time,
             end_time: slot.end_time,
           }))
@@ -207,7 +208,7 @@ function ShiftMessagesTab({ formContent }: ShiftMessagesTabProps) {
                 </MenuItem>
                 {formContent.work_shifts.map((workshift) => (
                   <MenuItem key={workshift.id} value={workshift.id}>
-                    {workshift.title}
+                    {getAdminTitle(workshift)}
                   </MenuItem>
                 ))}
               </TextField>

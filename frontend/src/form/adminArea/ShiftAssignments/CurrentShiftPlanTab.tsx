@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import type { FormContent } from '../../userArea/interface';
 import type { ShiftAssignment } from './types';
+import { getAdminTitle } from '../utils/titleUtils';
 
 interface CurrentShiftPlanTabProps {
   assignments: ShiftAssignment[];
@@ -74,7 +75,7 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
 
         return {
           id: timeslot.id,
-          title: timeslot.title,
+          title: getAdminTitle(timeslot),
           startTime: timeslot.start_time || '',
           endTime: timeslot.end_time || '',
           required,
@@ -98,7 +99,7 @@ function CurrentShiftPlanTab({ assignments, formContent }: CurrentShiftPlanTabPr
 
       return {
         id: workshift.id,
-        title: workshift.title,
+        title: getAdminTitle(workshift),
         timeslots,
         requiredTotal,
         confirmedTotal,

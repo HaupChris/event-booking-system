@@ -142,7 +142,7 @@ def get_shift_messages_grouped() -> list[dict[str, Any]]:
             JOIN TimeSlots ts ON sm.timeslot_id = ts.id
             JOIN WorkShifts ws ON ts.workshift_id = ws.id
             WHERE sm.is_active = 1
-            ORDER BY ws.title ASC, ts.start_time ASC, sm.created_date DESC
+            ORDER BY workshift_title ASC, ts.start_time ASC, sm.created_date DESC
             """
         )
 
@@ -186,8 +186,8 @@ def get_shift_messages_for_booking(booking_id: int) -> list[dict[str, Any]]:
                 sm.content,
                 sm.created_by,
                 sm.created_date,
-                ws.title as workshift_title,
-                ts.title as timeslot_title,
+                COALESCE(NULLIF(TRIM(ws.working_title), ''), ws.title) as workshift_title,
+                COALESCE(NULLIF(TRIM(ts.working_title), ''), ts.title) as timeslot_title,
                 ts.start_time as timeslot_start,
                 ts.end_time as timeslot_end
             FROM ShiftMessages sm

@@ -27,8 +27,8 @@ def get_all_shift_assignments() -> list[ShiftAssignmentWithDetails]:
                               u.last_name,
                               u.email,
                               u.phone_number,
-                              ws.title as workshift_title,
-                              ts.title as timeslot_title,
+                              COALESCE(NULLIF(TRIM(ws.working_title), ''), ws.title) as workshift_title,
+                              COALESCE(NULLIF(TRIM(ts.working_title), ''), ts.title) as timeslot_title,
                               ts.start_time,
                               ts.end_time,
                               CASE
@@ -95,8 +95,8 @@ def get_assignments_by_timeslot(timeslot_id: int) -> list[ShiftAssignmentWithDet
                               u.last_name,
                               u.email,
                               u.phone_number,
-                              ws.title as workshift_title,
-                              ts.title as timeslot_title,
+                              COALESCE(NULLIF(TRIM(ws.working_title), ''), ws.title) as workshift_title,
+                              COALESCE(NULLIF(TRIM(ts.working_title), ''), ts.title) as timeslot_title,
                               ts.start_time,
                               ts.end_time,
                               CASE
@@ -165,8 +165,8 @@ def get_assignments_by_booking(booking_id: int) -> list[ShiftAssignmentWithDetai
                               u.last_name,
                               u.email,
                               u.phone_number,
-                              ws.title as workshift_title,
-                              ts.title as timeslot_title,
+                              COALESCE(NULLIF(TRIM(ws.working_title), ''), ws.title) as workshift_title,
+                              COALESCE(NULLIF(TRIM(ts.working_title), ''), ts.title) as timeslot_title,
                               ts.start_time,
                               ts.end_time,
                               CASE
@@ -386,8 +386,8 @@ def get_timeslot_summary() -> list[dict]:
         cursor.execute(
             """
                        SELECT ts.id        as timeslot_id,
-                              ws.title     as workshift_title,
-                              ts.title     as timeslot_title,
+                              COALESCE(NULLIF(TRIM(ws.working_title), ''), ws.title) as workshift_title,
+                              COALESCE(NULLIF(TRIM(ts.working_title), ''), ts.title) as timeslot_title,
                               ts.start_time,
                               ts.end_time,
                               ts.num_needed,

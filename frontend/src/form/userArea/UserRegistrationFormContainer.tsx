@@ -30,23 +30,33 @@ const getFirstId = <T extends { id: number }>(options: T[]): number => {
 };
 
 const getTimeslotPriorities = (formContent: FormContent): [number, number, number] => {
-  const timeSlotIds = formContent.work_shifts.flatMap((shift) =>
-    shift.time_slots.map((slot) => slot.id)
-  );
+  const selectedIds: number[] = [];
 
-  if (timeSlotIds.length === 0) {
+  formContent.work_shifts.forEach((shift) => {
+    if (selectedIds.length >= 3) {
+      return;
+    }
+
+    const maxPerWorkshift = Math.max(1, shift.multiple_selection_possible ?? 1);
+    const availableIds = shift.time_slots
+      .map((slot) => slot.id)
+      .filter((slotId) => !selectedIds.includes(slotId));
+
+    selectedIds.push(...availableIds.slice(0, maxPerWorkshift));
+  });
+
+  if (selectedIds.length < 3) {
+    const fallbackIds = formContent.work_shifts
+      .flatMap((shift) => shift.time_slots.map((slot) => slot.id))
+      .filter((slotId) => !selectedIds.includes(slotId));
+    selectedIds.push(...fallbackIds);
+  }
+
+  if (selectedIds.length === 0) {
     return [-1, -1, -1];
   }
 
-  if (timeSlotIds.length === 1) {
-    return [timeSlotIds[0], timeSlotIds[0], timeSlotIds[0]];
-  }
-
-  if (timeSlotIds.length === 2) {
-    return [timeSlotIds[0], timeSlotIds[1], timeSlotIds[0]];
-  }
-
-  return [timeSlotIds[0], timeSlotIds[1], timeSlotIds[2]];
+  return [selectedIds[0] ?? -1, selectedIds[1] ?? -1, selectedIds[2] ?? -1];
 };
 
 // Form steps enum

@@ -5,6 +5,7 @@ import {
   calculateTotalPriceArtist,
   calculateTotalPriceUser,
 } from '../../../components/core/utils/Pricing';
+import { getAdminTitle } from './titleUtils';
 
 interface InviterFilterData {
   inviterFilterOptions: { value: string; label: string }[];
@@ -35,8 +36,8 @@ export const getTimeslotWithWorkshift = (id: number, formContent: FormContent) =
     const timeslot = shift.time_slots.find((slot) => slot.id === id);
     if (timeslot) {
       return {
-        workshiftTitle: shift.title,
-        timeslotTitle: timeslot.title,
+        workshiftTitle: getAdminTitle(shift),
+        timeslotTitle: getAdminTitle(timeslot),
         timeslotStart: timeslot.start_time,
         timeslotEnd: timeslot.end_time,
       };

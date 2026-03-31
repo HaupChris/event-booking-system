@@ -12,11 +12,13 @@ import { CheckCircle, Cancel, PendingActions } from '@mui/icons-material';
 import type { ShiftAssignment } from '../types';
 import { spacePalette } from '../../../../components/styles/theme';
 import type { BookingWithTimestamp } from '../../../userArea/interface';
+import { getAdminTitle } from '../../utils/titleUtils';
 
 interface TimeslotItemProps {
   timeslot: {
     id: number;
     title: string;
+    working_title?: string;
     start_time: string;
     end_time: string;
     num_needed: number;
@@ -107,7 +109,7 @@ const TimeslotItem: React.FC<TimeslotItemProps> = ({
             sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}
           >
             <Typography variant="subtitle2" fontWeight="medium">
-              {timeslot.title} {timeslot.id}
+              {getAdminTitle(timeslot)} {timeslot.id}
             </Typography>
             <Chip
               label={getStatusText()}

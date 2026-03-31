@@ -13,6 +13,7 @@ from src.services.formcontent_service import (
     update_form_content_with_db_counts,
 )
 from src.services.orga_team_service import get_active_orga_team_members
+from src.services.workshift_service import ensure_workshift_schema
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -36,6 +37,7 @@ else:
 
 # Ensure database is initialized on import
 init_db(DB_FILE_PATH, [REGULAR_SCHEMA_PATH], get_form_content_obj())
+ensure_workshift_schema()
 
 
 def _connect_db() -> sqlite3.Connection:

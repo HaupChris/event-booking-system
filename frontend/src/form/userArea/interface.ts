@@ -1,6 +1,7 @@
 export interface TimeSlot {
   id: number;
   title: string;
+  working_title?: string;
   start_time: string;
   end_time: string;
   num_needed: number;
@@ -10,7 +11,9 @@ export interface TimeSlot {
 export interface WorkShift {
   id: number;
   title: string;
+  working_title?: string;
   description: string;
+  multiple_selection_possible?: number;
   time_slots: Array<TimeSlot>;
 }
 

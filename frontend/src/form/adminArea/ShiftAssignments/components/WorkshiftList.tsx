@@ -22,6 +22,7 @@ import type {
 import type { ShiftAssignment } from '../types';
 import TimeslotItem from './TimeslotItem';
 import { spacePalette } from '../../../../components/styles/theme';
+import { getAdminTitle } from '../../utils/titleUtils';
 
 interface TimeslotWithAssignments extends TimeSlot {
   assigned_count: number;
@@ -189,7 +190,7 @@ const WorkshiftList: React.FC<WorkshiftListProps> = ({
                     }}
                   >
                     <Typography variant="subtitle1" fontWeight="bold">
-                      {workshift.title}
+                      {getAdminTitle(workshift)}
                     </Typography>
                     {status.icon}
                   </Box>

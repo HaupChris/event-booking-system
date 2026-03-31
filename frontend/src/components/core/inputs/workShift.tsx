@@ -20,6 +20,29 @@ function WorkShift({
   availablePriorities,
 }: WorkShiftProps) {
   const theme = useTheme();
+  const maxSelectionsPerWorkshift = Math.max(1, workShift.multiple_selection_possible ?? 1);
+
+  const selectedTimeslotIds = useMemo(
+    () =>
+      [
+        currentBooking.timeslot_priority_1,
+        currentBooking.timeslot_priority_2,
+        currentBooking.timeslot_priority_3,
+      ].filter((id) => id >= 0),
+    [
+      currentBooking.timeslot_priority_1,
+      currentBooking.timeslot_priority_2,
+      currentBooking.timeslot_priority_3,
+    ]
+  );
+
+  const selectedCountInWorkshift = useMemo(
+    () => workShift.time_slots.filter((slot) => selectedTimeslotIds.includes(slot.id)).length,
+    [selectedTimeslotIds, workShift.time_slots]
+  );
+
+  const isWorkshiftSelectionAtLimit = selectedCountInWorkshift >= maxSelectionsPerWorkshift;
+
   const sortedTimeSlots = useMemo(() => {
     // Sort time slots so that filled ones appear at the bottom
     return [...workShift.time_slots].sort((a, b) => {
@@ -76,6 +99,14 @@ function WorkShift({
         >
           {workShift.description}
         </Typography>
+
+        <Typography
+          sx={{ color: alpha(theme.palette.text.primary, 0.65), pl: 4, mt: 0.5 }}
+          variant="caption"
+        >
+          Du kannst hier bis zu {maxSelectionsPerWorkshift} Zeitfenster aus diesem Arbeitsdienst
+          auswaehlen.
+        </Typography>
       </Box>
 
       {/* TimeSlots List */}
@@ -104,6 +135,8 @@ function WorkShift({
                     ? PRIORITIES.THIRD
                     : '';
 
+            const isSelectionDisabled = isWorkshiftSelectionAtLimit && selectedPriority === '';
+
             return (
               <TimeSlot
                 key={timeSlot.id}
@@ -112,6 +145,7 @@ function WorkShift({
                 availablePriorities={availablePriorities}
                 selectedPriority={selectedPriority}
                 updateBooking={updateBooking}
+                selectionDisabled={isSelectionDisabled}
               />
             );
           })}

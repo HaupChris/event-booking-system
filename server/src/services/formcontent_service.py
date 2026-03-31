@@ -5,6 +5,7 @@ import sqlite3
 import time
 from collections.abc import Callable
 from dataclasses import asdict
+from typing import Any
 
 from src.models.datatypes import (
     ArtistFormContent,
@@ -74,18 +75,28 @@ def get_form_content_obj() -> FormContent:
                 ts = TimeSlot(
                     id=timeslot_global_id,
                     title=ts_data["title"],
+                    working_title=ts_data.get("working_title", ts_data["title"]),
                     start_time=ts_data["start_time"],
                     end_time=ts_data["end_time"],
                     num_needed=ts_data["num_needed"],
                 )
                 timeslot_global_id += 1
                 timeslots_list.append(ts)
+
+            multiple_selection_possible = ws_data.get("multiple_selection_possible", 1)
+            try:
+                multiple_selection_possible = max(1, int(multiple_selection_possible))
+            except (TypeError, ValueError):
+                multiple_selection_possible = 1
+
             work_shifts.append(
                 WorkShift(
                     id=ws_id,
                     title=ws_data["title"],
+                    working_title=ws_data.get("working_title", ws_data["title"]),
                     description=ws_data["description"],
                     time_slots=timeslots_list,
+                    multiple_selection_possible=multiple_selection_possible,
                 )
             )
         logger.debug(
@@ -222,6 +233,79 @@ def get_artist_form_content_obj() -> ArtistFormContent:
         raise
 
 
+def _normalize_positive_int(value: Any, default: int = 1) -> int:
+    if not isinstance(value, (int, float, str, bytes, bytearray)):
+        return default
+
+    try:
+        parsed_value = int(value)
+    except (TypeError, ValueError):
+        return default
+
+    return parsed_value if parsed_value >= 1 else default
+
+
+def _load_work_shifts_from_db(cursor: sqlite3.Cursor) -> list[WorkShift]:
+    cursor.execute(
+        """
+        SELECT
+            id,
+            title,
+            COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title,
+            description,
+            multiple_selection_possible
+        FROM WorkShifts
+        ORDER BY id ASC
+        """
+    )
+    workshift_rows = cursor.fetchall()
+
+    work_shifts: list[WorkShift] = []
+    for ws_row in workshift_rows:
+        workshift_id = ws_row[0]
+        cursor.execute(
+            """
+            SELECT
+                id,
+                title,
+                COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title,
+                start_time,
+                end_time,
+                num_needed
+            FROM TimeSlots
+            WHERE workshift_id = ?
+            ORDER BY id ASC
+            """,
+            (workshift_id,),
+        )
+        timeslot_rows = cursor.fetchall()
+
+        time_slots = [
+            TimeSlot(
+                id=row[0],
+                title=row[1],
+                working_title=row[2],
+                start_time=row[3] or "",
+                end_time=row[4] or "",
+                num_needed=_normalize_positive_int(row[5]),
+            )
+            for row in timeslot_rows
+        ]
+
+        work_shifts.append(
+            WorkShift(
+                id=workshift_id,
+                title=ws_row[1],
+                working_title=ws_row[2],
+                description=ws_row[3] or "",
+                time_slots=time_slots,
+                multiple_selection_possible=_normalize_positive_int(ws_row[4]),
+            )
+        )
+
+    return work_shifts
+
+
 def update_form_content_with_db_counts(
     form_content_obj: FormContent, db_connect_func: Callable[[], sqlite3.Connection]
 ) -> dict:
@@ -231,12 +315,19 @@ def update_form_content_with_db_counts(
     and returns a dictionary.
     """
     start_time = time.time()
+    conn: sqlite3.Connection | None = None
 
     try:
         logger.debug("Starting form content database count update")
 
         conn = db_connect_func()
         cursor = conn.cursor()
+
+        try:
+            db_work_shifts = _load_work_shifts_from_db(cursor)
+            form_content_obj.work_shifts = db_work_shifts
+        except sqlite3.OperationalError:
+            logger.warning("Workshift columns missing in DB, using JSON fallback for this request")
 
         # timeslot ids in database may differ from ids in the formcontent json file. we need to use the db ones.
         # _update_timeslot_ids_from_db(form_content_obj, cursor)
@@ -393,10 +484,8 @@ def update_form_content_with_db_counts(
             exc_info=True,
         )
         # Return the form content without updated counts as fallback
-        try:
+        if conn is not None:
             conn.close()
-        except:
-            pass
         return asdict(form_content_obj)
     except Exception as e:
         duration = time.time() - start_time
@@ -405,10 +494,8 @@ def update_form_content_with_db_counts(
             exc_info=True,
         )
         # Return the form content without updated counts as fallback
-        try:
+        if conn is not None:
             conn.close()
-        except:
-            pass
         return asdict(form_content_obj)
 
 
@@ -458,6 +545,7 @@ def update_artist_form_content_with_db_counts(
     and returns a dictionary.
     """
     start_time = time.time()
+    conn: sqlite3.Connection | None = None
 
     try:
         logger.debug("Starting artist form content database count update")
@@ -568,10 +656,8 @@ def update_artist_form_content_with_db_counts(
             exc_info=True,
         )
         # Return the form content without updated counts as fallback
-        try:
+        if conn is not None:
             conn.close()
-        except:
-            pass
         return asdict(form_content_obj)
     except Exception as e:
         duration = time.time() - start_time
@@ -580,8 +666,6 @@ def update_artist_form_content_with_db_counts(
             exc_info=True,
         )
         # Return the form content without updated counts as fallback
-        try:
+        if conn is not None:
             conn.close()
-        except:
-            pass
         return asdict(form_content_obj)

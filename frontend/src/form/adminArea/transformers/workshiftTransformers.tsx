@@ -15,6 +15,7 @@ import {
   getWorkshiftForTimeslot,
   timeslotPriorityToString,
 } from '../utils/workshiftUtils';
+import { getAdminTitle } from '../utils/titleUtils';
 import type { TimeSlot, WorkShift as WorkShiftType } from '../../userArea/interface';
 
 interface BookingForWorkshift {
@@ -60,7 +61,7 @@ export const transformWorkshiftsToProgressItems = ({
 
     return {
       id: workshift.id,
-      title: workshift.title,
+      title: getAdminTitle(workshift),
       currentCount: totalBooked,
       totalNeeded,
       badgeContent: workshift.time_slots.length,
@@ -98,7 +99,7 @@ export const transformWorkshiftsToProgressItems = ({
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                       <AccessTimeIcon sx={{ mr: 1, fontSize: 'small', color: 'primary.main' }} />
                       <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                        {timeslot.title}
+                        {getAdminTitle(timeslot)}
                         {timeslot.start_time && timeslot.end_time && (
                           <Typography
                             component="span"
@@ -216,7 +217,7 @@ export const transformBookingsToPeopleItems = ({
                   sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                 >
                   <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                    {workshift?.title} - {timeslot.title}
+                    {workshift ? getAdminTitle(workshift) : 'Unknown'} - {getAdminTitle(timeslot)}
                   </Typography>
                   <Chip
                     label={timeslotPriorityToString(timeslot.priority)}

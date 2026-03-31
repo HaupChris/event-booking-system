@@ -39,12 +39,15 @@ CREATE TABLE IF NOT EXISTS FoodOptions  (
 CREATE TABLE IF NOT EXISTS WorkShifts  (
     id INTEGER PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
-    description TEXT
+    working_title TEXT,
+    description TEXT,
+    multiple_selection_possible INTEGER NOT NULL DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS TimeSlots  (
     id INTEGER PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
+    working_title TEXT,
     start_time TEXT,
     end_time TEXT,
     num_needed INTEGER,

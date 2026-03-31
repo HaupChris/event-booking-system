@@ -16,6 +16,7 @@ from src.services.booking_service import (
 )
 from src.services.mail_service import send_confirmation_mail
 from src.services.orga_team_service import is_valid_active_orga_team_member
+from src.services.workshift_service import validate_booking_timeslot_selection
 from src.utils.logger import get_logger, log_security_event
 
 # Initialize logger
@@ -56,6 +57,19 @@ def submit_form():
                 f"Booking submission failed: invalid invited_by_id={booking.invited_by_id} from {client_ip}"
             )
             return jsonify({"error": "Invalid inviter selection"}), 400
+
+        selection_valid, selection_error = validate_booking_timeslot_selection(
+            [
+                booking.timeslot_priority_1,
+                booking.timeslot_priority_2,
+                booking.timeslot_priority_3,
+            ]
+        )
+        if not selection_valid:
+            logger.warning(
+                f"Booking submission failed: invalid timeslot selection for {booking.email}: {selection_error}"
+            )
+            return jsonify({"error": selection_error}), 400
 
         # Attempt to insert booking
         success, profile_uuid = insert_booking(booking)

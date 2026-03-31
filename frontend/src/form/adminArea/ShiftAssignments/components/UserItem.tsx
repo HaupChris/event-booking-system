@@ -13,6 +13,7 @@ import type { ShiftAssignment, UserWithAssignments } from '../types';
 import type { FormContent } from '../../../userArea/interface';
 import { spacePalette } from '../../../../components/styles/theme';
 import ListItemButton from '@mui/material/ListItemButton';
+import { getAdminTitle } from '../../utils/titleUtils';
 
 interface UserItemProps {
   user: UserWithAssignments;
@@ -42,8 +43,8 @@ const UserItem: React.FC<UserItemProps> = ({
       const timeslot = workshift.time_slots.find((ts) => ts.id === timeslotId);
       if (timeslot) {
         return {
-          workshiftTitle: workshift.title,
-          timeslotTitle: timeslot.title,
+          workshiftTitle: getAdminTitle(workshift),
+          timeslotTitle: getAdminTitle(timeslot),
           timeRange:
             timeslot.start_time && timeslot.end_time
               ? `${timeslot.start_time} - ${timeslot.end_time}`

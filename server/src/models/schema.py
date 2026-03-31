@@ -79,8 +79,17 @@ def _init_db_data(connection: Connection, form_content: FormContent):
         for ws_idx, workshift in enumerate(form_content.work_shifts):
             # Insert WorkShift
             cursor.execute(
-                "INSERT INTO WorkShifts (id, title, description) VALUES (?, ?, ?)",
-                (ws_idx, workshift.title, workshift.description),
+                """
+                INSERT INTO WorkShifts (id, title, working_title, description, multiple_selection_possible)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    ws_idx,
+                    workshift.title,
+                    workshift.working_title,
+                    workshift.description,
+                    workshift.multiple_selection_possible,
+                ),
             )
 
             # Insert TimeSlots for this WorkShift
@@ -88,12 +97,13 @@ def _init_db_data(connection: Connection, form_content: FormContent):
                 cursor.execute(
                     """
                     INSERT INTO TimeSlots
-                        (id, title, start_time, end_time, num_needed, workshift_id)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                        (id, title, working_title, start_time, end_time, num_needed, workshift_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         timeslot.id,
                         timeslot.title,
+                        timeslot.working_title,
                         timeslot.start_time,
                         timeslot.end_time,
                         timeslot.num_needed,

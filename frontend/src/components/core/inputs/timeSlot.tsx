@@ -20,6 +20,7 @@ interface TimeSlotProps {
   updateBooking: (key: keyof Booking, value: number) => void;
   availablePriorities: string[];
   currentBooking: Booking;
+  selectionDisabled?: boolean;
 }
 
 function TimeSlot({
@@ -28,6 +29,7 @@ function TimeSlot({
   updateBooking,
   availablePriorities,
   currentBooking,
+  selectionDisabled = false,
 }: TimeSlotProps) {
   const theme = useTheme();
   const timeslotAvailablePriorities = availablePriorities
@@ -299,8 +301,17 @@ function TimeSlot({
                 onChange={handlePriorityChange}
                 placeholder="Priorität wählen"
                 allowClear={true}
+                disabled={selectionDisabled}
               />
             </FormControl>
+            {selectionDisabled && (
+              <Typography
+                variant="caption"
+                sx={{ mt: 1, color: alpha(theme.palette.text.primary, 0.65) }}
+              >
+                Du hast fuer diesen Arbeitsdienst bereits die maximale Anzahl ausgewaehlt.
+              </Typography>
+            )}
           </Box>
         </Box>
       </ListItem>

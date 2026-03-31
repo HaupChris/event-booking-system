@@ -16,12 +16,14 @@ import {
   Work as WorkIcon,
   Person as PersonIcon,
   AccessTime as AccessTimeIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useFetchData } from './useFetchData';
 import TabSwitcher from './components/TabSwitcher';
 import ProgressList from './components/ProgressList';
 import PeopleList from './components/PeopleList';
 import FilterSortBar from './components/FilterSortBar';
+import WorkshiftCrudTab from './components/WorkshiftCrudTab';
 import type { TimeSlot } from '../userArea/interface';
 import { useModal } from '../../hooks/useModal';
 import { useSort } from '../../hooks/useSort';
@@ -34,9 +36,10 @@ import {
   getWorkshiftForTimeslot,
   timeslotPriorityToString,
 } from './utils/workshiftUtils';
+import { getAdminTitle } from './utils/titleUtils';
 
 const WorkshiftsPage: React.FC = () => {
-  const { regularBookings, formContent } = useFetchData();
+  const { regularBookings, formContent, refetch } = useFetchData();
 
   // Tab state
   const [activeTab, setActiveTab] = useState('workshifts');
@@ -91,7 +94,7 @@ const WorkshiftsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ px: { xs: 0, md: 1 }, py: { xs: 1, md: 2 } }}>
       {/* Header with title */}
       <Typography variant="h5" gutterBottom>
         Workshift Management
@@ -102,6 +105,7 @@ const WorkshiftsPage: React.FC = () => {
         tabs={[
           { value: 'workshifts', label: 'Workshift Overview', icon: <WorkIcon /> },
           { value: 'people', label: 'People Overview', icon: <PersonIcon /> },
+          { value: 'configuration', label: 'Shift Setup', icon: <SettingsIcon /> },
         ]}
         currentTab={activeTab}
         onChange={setActiveTab}
@@ -151,6 +155,8 @@ const WorkshiftsPage: React.FC = () => {
         </>
       )}
 
+      {activeTab === 'configuration' && <WorkshiftCrudTab onDataChanged={refetch} />}
+
       {/* Timeslot Details Modal */}
       <Modal open={openTimeslotModal} onClose={handleCloseTimeslotModal}>
         <Box
@@ -183,7 +189,7 @@ const WorkshiftsPage: React.FC = () => {
                     return (
                       <Box sx={{ mt: 1 }}>
                         <Typography variant="subtitle2" color="primary.main">
-                          {workshift.title}
+                          {getAdminTitle(workshift)}
                         </Typography>
                         <Typography
                           variant="body2"

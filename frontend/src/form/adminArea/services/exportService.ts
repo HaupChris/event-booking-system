@@ -5,6 +5,7 @@
 
 import type { BookingWithTimestamp, FormContent } from '../../userArea/interface';
 import type { ArtistBookingWithTimestamp, ArtistFormContent } from '../../artistArea/interface';
+import { getAdminTitle } from '../utils/titleUtils';
 
 type ExportData = Record<string, unknown>;
 
@@ -210,8 +211,8 @@ export const exportWorkShiftsData = (
               FirstName: b.first_name,
               LastName: b.last_name,
               Priority: priorities[index],
-              Workshift: shift.title,
-              Timeslot: timeslot.title,
+              Workshift: getAdminTitle(shift),
+              Timeslot: getAdminTitle(timeslot),
               StartTime: timeslot.start_time,
               EndTime: timeslot.end_time,
               MaxShifts: b.amount_shifts || 0,
