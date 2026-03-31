@@ -59,7 +59,7 @@ def get_booking_details(booking: Booking, form_content: dict) -> str:
     for i, ts_id in enumerate(
         [booking.timeslot_priority_1, booking.timeslot_priority_2, booking.timeslot_priority_3]
     ):
-        timeslot_info += f"Priorität {i+1}: {format_timeslot_info(ts_id)}\n"
+        timeslot_info += f"Priorität {i + 1}: {format_timeslot_info(ts_id)}\n"
 
     timeslot_info += (
         f"Du hast dich bereit erklärt, maximal {booking.amount_shifts} Schicht(en) zu übernehmen.\n"
@@ -509,14 +509,18 @@ def send_artist_confirmation_mail(
             {booking_details_html}
           </div>
 
-          {booking.total_price > 0 and f'''
+          {
+        booking.total_price > 0
+        and f'''
           <p>Für deine Buchung ist noch ein Beitrag erforderlich:</p>
 
           <a href="{PAYPAL_LINK}" class="btn">BEITRAG JETZT ÜBERWEISEN</a>
 
           <p>Betreff für die Überweisung:<br>
           <strong>WWWW ARTIST - {booking.first_name}, {booking.last_name} - {ticket_title} - {beverage_title} - {food_title}</strong></p>
-          ''' or '<p>Für dich als Künstler*in fallen keine Kosten an.</p>'}
+          '''
+        or "<p>Für dich als Künstler*in fallen keine Kosten an.</p>"
+    }
 
           <p>Weitere Informationen zu deinem Auftritt besprechen wir rechtzeit vorm Festival. Dazu werden wir dich zu einer Whatsapp Gruppe hinzufügen.</p>
 
@@ -656,8 +660,8 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
         booking_type_label = "Künstler" if profile["booking_type"] == "artist" else "Regular"
         profile_links_html += f"""
           <div class="profile-item">
-            <h4>{profile['name']} ({booking_type_label})</h4>
-            <p style="font-size: 0.9em; color: #999;">Buchung vom: {profile['timestamp'][:10]}</p>
+            <h4>{profile["name"]} ({booking_type_label})</h4>
+            <p style="font-size: 0.9em; color: #999;">Buchung vom: {profile["timestamp"][:10]}</p>
             <a href="{profile_url}" class="btn">PROFIL ÖFFNEN</a>
           </div>
         """

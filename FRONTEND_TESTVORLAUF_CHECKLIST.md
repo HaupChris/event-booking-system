@@ -14,10 +14,10 @@
 
 ## 2) User Flow
 
-- [ ] Login auf `/form` funktioniert
-- [ ] Multi-Step User-Form komplett durchklicken
-- [ ] Submit auf letzter Seite funktioniert (kein 4xx/5xx)
-- [ ] Confirmation-Ansicht wird korrekt angezeigt
+- [x] Login auf `/form` funktioniert
+- [x] Multi-Step User-Form komplett durchklicken
+- [x] Submit auf letzter Seite funktioniert (kein 4xx/5xx)
+- [x] Confirmation-Ansicht wird korrekt angezeigt
 - [ ] Profil-Link oeffnet und laedt Daten korrekt
 
 ## 3) Artist Flow
