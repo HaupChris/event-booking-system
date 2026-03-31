@@ -45,7 +45,7 @@ interface MenuItem {
   icon: React.ReactNode;
 }
 
-const menuItems: MenuItem[] = [
+const baseMenuItems: MenuItem[] = [
   { id: 'news', label: 'Neuigkeiten', icon: <NewspaperIcon /> },
   { id: 'profile', label: 'Mein Profil', icon: <AccountBoxIcon /> },
   { id: 'shifts', label: 'Schichten', icon: <WorkIcon /> },
@@ -73,6 +73,11 @@ const ProfilePage: React.FC = () => {
     markNewsAsRead,
   } = useProfile({ profileUuid: profileUuid || '', enableOffline: true });
 
+  const isArtistProfile = Boolean(profile?.user?.is_artist);
+  const menuItems = isArtistProfile
+    ? baseMenuItems.filter((item) => item.id !== 'shifts')
+    : baseMenuItems;
+
   const handleMenuClick = (viewId: string) => {
     setActiveView(viewId);
     setDrawerOpen(false);
@@ -99,6 +104,9 @@ const ProfilePage: React.FC = () => {
       case 'profile':
         return profile ? <ProfileOverview profile={profile} /> : null;
       case 'shifts':
+        if (isArtistProfile) {
+          return <NewsFeed news={news} isOnline={isOnline} onMarkAsRead={markNewsAsRead} />;
+        }
         return (
           <WorkShifts
             shifts={shifts}
