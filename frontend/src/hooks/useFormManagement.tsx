@@ -1,5 +1,5 @@
 // src/hooks/useFormManagement.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
  * Interface for form validation errors.
@@ -53,6 +53,10 @@ export function useFormManagement<T extends object>({
   currentVersion = '1.0',
   initialStep = 0,
 }: FormManagementOptions<T>): FormManagementReturn<T> {
+  // Use ref for validationRules to keep updateField stable
+  const validationRulesRef = useRef(validationRules);
+  validationRulesRef.current = validationRules;
+
   // Add a flag to prevent overriding loaded data
   const [isInitialized, setIsInitialized] = useState(false);
   const [formState, setFormState] = useState<T>(initialState);
@@ -137,15 +141,16 @@ export function useFormManagement<T extends object>({
    * @param key The field key to update
    * @param value The new value for the field
    */
-  const updateField = <K extends keyof T>(key: K, value: T[K]) => {
+  const updateField = useCallback(<K extends keyof T>(key: K, value: T[K]) => {
     setFormState((prev) => ({ ...prev, [key]: value }));
 
     // Validate field if validation rule exists
-    if (validationRules[key]) {
-      const errorMessage = validationRules[key]!(value);
+    const rules = validationRulesRef.current;
+    if (rules[key]) {
+      const errorMessage = rules[key]!(value);
       setValidation((prev) => ({ ...prev, [key]: errorMessage }));
     }
-  };
+  }, []);
 
   /**
    * Validates a specific field and updates validation state

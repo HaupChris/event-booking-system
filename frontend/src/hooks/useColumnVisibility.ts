@@ -4,7 +4,7 @@
  */
 
 import type React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export interface ColumnVisibilityState {
   [key: string]: boolean;
@@ -24,18 +24,26 @@ export function useColumnVisibility<T extends ColumnVisibilityState>({
   const [columnVisibility, setColumnVisibility] = useState<T>(initialVisibility);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
+  // Stabilize mobileHiddenColumns to avoid re-renders from inline array literals
+  const mobileHiddenColumnsRef = useRef(mobileHiddenColumns);
+  const serialized = mobileHiddenColumns.join(',');
+  useEffect(() => {
+    mobileHiddenColumnsRef.current = mobileHiddenColumns;
+  }, [serialized]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Update visibility when screen size changes
   useEffect(() => {
-    if (mobileHiddenColumns.length === 0) return;
+    const cols = mobileHiddenColumnsRef.current;
+    if (cols.length === 0) return;
 
     setColumnVisibility((prev) => {
       const updated = { ...prev };
-      mobileHiddenColumns.forEach((col) => {
+      cols.forEach((col) => {
         updated[col] = !isMobile as T[keyof T];
       });
       return updated;
     });
-  }, [isMobile, mobileHiddenColumns]);
+  }, [isMobile, serialized]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

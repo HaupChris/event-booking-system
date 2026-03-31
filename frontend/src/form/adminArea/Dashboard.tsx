@@ -25,7 +25,7 @@ import {
   PointOfSale,
   School,
   AssignmentInd,
-  AccountBox,
+  Settings,
   Newspaper,
   Help,
 } from '@mui/icons-material';
@@ -49,7 +49,7 @@ import ProfessionsPage from './ProfessionsPage';
 import ShiftAssignmentsPage from './ShiftAssignments';
 import NewsManagementPage from './NewsManagementPage';
 import FAQManagementPage from './FAQManagementPage';
-import ProfileManagementPage from './ProfileManagementPage';
+import SettingsPage from './SettingsPage';
 
 // Define all possible dashboard tabs
 interface DashboardTab {
@@ -76,7 +76,7 @@ const dashboardTabs: DashboardTab[] = [
     icon: <AssignmentInd />,
     permissions: ['read'],
   },
-  { id: 'profiles', label: 'Profile Management', icon: <AccountBox />, permissions: ['read'] },
+  { id: 'settings', label: 'Settings', icon: <Settings />, permissions: ['read'] },
   { id: 'news', label: 'News Management', icon: <Newspaper />, permissions: ['read'] },
   { id: 'faqs', label: 'FAQ Management', icon: <Help />, permissions: ['read'] },
 ];
@@ -135,8 +135,8 @@ function Dashboard() {
         return <NewsManagementPage />;
       case 'faqs':
         return <FAQManagementPage />;
-      case 'profiles':
-        return <ProfileManagementPage />;
+      case 'settings':
+        return <SettingsPage />;
       default:
         return <HomePage />;
     }

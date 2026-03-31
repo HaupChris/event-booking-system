@@ -1,6 +1,6 @@
 import type { Booking, WorkShift as WorkShiftType } from '../../../form/userArea/interface';
 import { Box, List, ListItem, Typography, alpha, useTheme } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import TimeSlot from './timeSlot';
 import '../../../css/workShift.css';
 import { PRIORITIES } from '../../../form/userArea/constants';
@@ -20,11 +20,9 @@ function WorkShift({
   availablePriorities,
 }: WorkShiftProps) {
   const theme = useTheme();
-  const [sortedTimeSlots, setSortedTimeSlots] = useState(workShift.time_slots);
-
-  useEffect(() => {
+  const sortedTimeSlots = useMemo(() => {
     // Sort time slots so that filled ones appear at the bottom
-    const sorted = [...workShift.time_slots].sort((a, b) => {
+    return [...workShift.time_slots].sort((a, b) => {
       if (a.num_booked >= a.num_needed && b.num_booked < b.num_needed) {
         return 1;
       } else if (b.num_booked >= b.num_needed && a.num_booked < a.num_needed) {
@@ -32,9 +30,7 @@ function WorkShift({
       }
       return 0;
     });
-
-    setSortedTimeSlots(sorted);
-  }, [workShift]);
+  }, [workShift.time_slots]);
 
   return (
     <Box

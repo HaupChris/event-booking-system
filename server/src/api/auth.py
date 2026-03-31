@@ -1,11 +1,9 @@
-import os
-
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from werkzeug.security import check_password_hash, generate_password_hash
 
+from src.services.password_service import verify_password
 from src.utils.logger import (
     get_logger,
     log_authentication_event,
@@ -13,43 +11,12 @@ from src.utils.logger import (
     track_failed_authentication,
 )
 
-# Initialize logger for this module
 logger = get_logger(__name__)
 
 auth_bp = Blueprint("auth", __name__)
 limiter_auth = Limiter(get_remote_address)
 
-# Load environment variables with logging
-PASSWORD = os.environ.get("PASSWORD", "b")
-if PASSWORD == "":
-    logger.error("User password loading from environment variable failed!")
-
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "a")
-if ADMIN_PASSWORD == "":
-    logger.error("Admin password loading from environment variable failed!")
-
-ARTIST_PASSWORD = os.environ.get("ARTIST_PASSWORD", "artist")
-if ARTIST_PASSWORD == "":
-    logger.error("Artist password loading from environment variable failed!")
-
-# Check for default passwords in production
-if PASSWORD == "b":
-    logger.warning("Using default user password - not recommended for production")
-if ADMIN_PASSWORD == "a":
-    logger.warning("Using default admin password - not recommended for production")
-if ARTIST_PASSWORD == "artist":
-    logger.warning("Using default artist password - not recommended for production")
-
-# Hash passwords on startup
-hashed_user_password = generate_password_hash(PASSWORD, method="pbkdf2:sha256", salt_length=8)
-hashed_admin_password = generate_password_hash(
-    ADMIN_PASSWORD, method="pbkdf2:sha256", salt_length=8
-)
-hashed_artist_password = generate_password_hash(
-    ARTIST_PASSWORD, method="pbkdf2:sha256", salt_length=8
-)
-
-logger.info("Authentication module initialized with hashed passwords")
+logger.info("Authentication module initialized (DB-backed passwords)")
 
 
 @auth_bp.route("/admin", methods=["POST"])
@@ -75,7 +42,7 @@ def authenticate_admin():
             return jsonify({"msg": "Missing password"}), 400
 
         # Check password
-        if not check_password_hash(hashed_admin_password, password):
+        if not verify_password("admin", password):
             logger.warning(f"Admin auth failed: invalid password from {client_ip}")
             track_failed_authentication(client_ip, "admin")
             log_authentication_event("ADMIN_AUTH", "admin", False)
@@ -120,7 +87,7 @@ def authenticate():
             return jsonify({"msg": "Missing password"}), 400
 
         # Check password
-        if not check_password_hash(hashed_user_password, password):
+        if not verify_password("user", password):
             logger.warning(f"User auth failed: invalid password from {client_ip}")
             track_failed_authentication(client_ip, "user")
             log_authentication_event("USER_AUTH", "user", False)
@@ -165,7 +132,7 @@ def authenticate_artist():
             return jsonify({"msg": "Missing password"}), 400
 
         # Check password
-        if not check_password_hash(hashed_artist_password, password):
+        if not verify_password("artist", password):
             logger.warning(f"Artist auth failed: invalid password from {client_ip}")
             track_failed_authentication(client_ip, "artist")
             log_authentication_event("ARTIST_AUTH", "artist", False)

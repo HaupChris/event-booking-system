@@ -1,25 +1,24 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import type { ArtistFormProps } from './ArtistRegistrationFormContainer';
-import SpacePanelLayout from '../../components/core/layouts/SpacePanelLayout';
 import { artistAreaTexts } from '../constants/texts';
 import SettingsIcon from '@mui/icons-material/Settings';
-import MissionHeading from '../../components/core/display/MissionHeading';
 import FormField from '../../components/core/inputs/FormField';
 import FormCard from '../../components/core/display/FormCard';
+import ThemedFormLayout from '../../components/core/layouts/ThemedFormLayout';
 
 function ArtistEquipmentForm(props: ArtistFormProps) {
+  const theme = useTheme();
+
   return (
-    <SpacePanelLayout
+    <ThemedFormLayout
       missionBriefing={artistAreaTexts.technicalRequirementsForm.missionBriefing}
       footerId={artistAreaTexts.technicalRequirementsForm.footerId}
     >
-      <MissionHeading
+      <FormCard
         title={artistAreaTexts.technicalRequirementsForm.title}
-        icon={<SettingsIcon />}
-      />
-
-      <FormCard>
+        icon={<SettingsIcon sx={{ color: theme.palette.primary.main, mr: 1 }} />}
+      >
         <Box sx={{ px: 2, pb: 2 }}>
           <FormField
             multiline
@@ -66,7 +65,7 @@ function ArtistEquipmentForm(props: ArtistFormProps) {
               <a
                 href="https://www.thomann.de/de/yamaha_stagepas_1k_stereo_bundle.htm"
                 target="_blank"
-                style={{ color: '#00ffff' }}
+                style={{ color: theme.palette.primary.main }}
                 rel="noreferrer"
               >
                 Yamaha Stagepas 1K Stereo Bundle
@@ -76,7 +75,7 @@ function ArtistEquipmentForm(props: ArtistFormProps) {
               <a
                 href="https://www.behringer.com/product.html?modelCode=0605-AAD"
                 target="_blank"
-                style={{ color: '#00ffff' }}
+                style={{ color: theme.palette.primary.main }}
                 rel="noreferrer"
               >
                 Behringer XR18 Wireless Mixer
@@ -90,7 +89,7 @@ function ArtistEquipmentForm(props: ArtistFormProps) {
           </Typography>
         </Box>
       </FormCard>
-    </SpacePanelLayout>
+    </ThemedFormLayout>
   );
 }
 

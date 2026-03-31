@@ -1,7 +1,6 @@
 import React from 'react';
-import { Typography, Box, alpha, Divider } from '@mui/material';
+import { Typography, Box, alpha, Divider, useTheme } from '@mui/material';
 import type { ArtistBooking, ArtistFormContent, ArtistMaterial } from './interface';
-import SpacePanelLayout from '../../components/core/layouts/SpacePanelLayout';
 import { artistAreaTexts } from '../constants/texts';
 import PersonIcon from '@mui/icons-material/Person';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
@@ -12,9 +11,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import EuroIcon from '@mui/icons-material/Euro';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import InfoPair from '../../components/core/display/InfoPair';
-import { spacePalette } from '../../components/styles/theme';
 import FormCard from '../../components/core/display/FormCard';
 import WorkIcon from '@mui/icons-material/Work';
+import ThemedFormLayout from '../../components/core/layouts/ThemedFormLayout';
 
 function findItemById<T extends { id: number }>(array: T[], id: number): T | undefined {
   return array.find((item) => item.id === id);
@@ -35,6 +34,7 @@ interface PerformanceDetails {
 }
 
 function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) {
+  const theme = useTheme();
   const {
     first_name,
     last_name,
@@ -60,7 +60,7 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
       parsedPerformanceDetails = JSON.parse(performance_details);
     }
   } catch (e) {
-    // console.error("Failed to parse performance details:", e);
+    // ignore parse errors
   }
 
   const artistMaterials = artist_material_ids
@@ -68,7 +68,7 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
     .filter(Boolean) as ArtistMaterial[];
 
   return (
-    <SpacePanelLayout
+    <ThemedFormLayout
       missionBriefing={artistAreaTexts.summaryForm.missionBriefing}
       footerId={artistAreaTexts.summaryForm.footerId}
     >
@@ -77,14 +77,8 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
         icon={<EuroIcon />}
         selected={true}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Typography variant="h4" fontWeight="bold" sx={{ color: spacePalette.primary.main }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Typography variant="h4" fontWeight="bold" sx={{ color: theme.palette.primary.main }}>
             {total_price}€
           </Typography>
         </Box>
@@ -98,6 +92,7 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
           <InfoPair label="Telefon" value={phone} />
         </Box>
       </FormCard>
+
       {currentBooking.profession_ids?.length > 0 ? (
         <FormCard title={artistAreaTexts.summaryForm.professionsTitle} icon={<WorkIcon />}>
           <Box sx={{ px: 2 }}>
@@ -107,10 +102,10 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
                 flexWrap: 'wrap',
                 gap: 1,
                 p: 1.5,
-                bgcolor: alpha('#000', 0.2),
+                bgcolor: alpha(theme.palette.background.default, 0.2),
                 borderRadius: '8px',
                 border: '1px solid',
-                borderColor: alpha(spacePalette.primary.main, 0.2),
+                borderColor: alpha(theme.palette.primary.main, 0.2),
               }}
             >
               {currentBooking.profession_ids.map((id) => {
@@ -119,15 +114,15 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
                   <Box
                     key={id}
                     sx={{
-                      bgcolor: alpha(spacePalette.primary.main, 0.1),
+                      bgcolor: alpha(theme.palette.primary.main, 0.1),
                       border: '1px solid',
-                      borderColor: alpha(spacePalette.primary.main, 0.3),
+                      borderColor: alpha(theme.palette.primary.main, 0.3),
                       borderRadius: '4px',
                       px: 1.5,
                       py: 0.5,
                     }}
                   >
-                    <Typography variant="body2" sx={{ color: alpha('#fff', 0.9) }}>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
                       {profession.title}
                     </Typography>
                   </Box>
@@ -177,7 +172,6 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
         </Box>
       </FormCard>
 
-      {/* Beverage and Food */}
       <FormCard title={artistAreaTexts.summaryForm.catering} icon={<RestaurantIcon />}>
         <Box sx={{ px: 2 }}>
           <InfoPair
@@ -190,7 +184,7 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
             icon={<LocalDrinkIcon />}
           />
 
-          <Divider sx={{ my: 1.5, borderColor: alpha(spacePalette.primary.main, 0.2) }} />
+          <Divider sx={{ my: 1.5, borderColor: alpha(theme.palette.primary.main, 0.2) }} />
 
           <InfoPair
             label={artistAreaTexts.summaryForm.foodTitle}
@@ -204,14 +198,15 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
         </Box>
       </FormCard>
 
-      {/* Technical Requirements */}
       <FormCard title={artistAreaTexts.summaryForm.technicalRequirements} icon={<SettingsIcon />}>
         <Box sx={{ px: 2 }}>
           <InfoPair label="Benötigte Ausrüstung" value={equipment || 'Keine angegeben'} />
 
           {special_requests && (
             <>
-              <Divider sx={{ my: 1.5, borderColor: alpha(spacePalette.primary.main, 0.2) }} />
+              <Divider
+                sx={{ my: 1.5, borderColor: alpha(theme.palette.primary.main, 0.2) }}
+              />
               <InfoPair
                 label={artistAreaTexts.summaryForm.specialRequests}
                 value={special_requests}
@@ -221,11 +216,10 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
         </Box>
       </FormCard>
 
-      {/* Materials */}
       {artistMaterials && artistMaterials.length > 0 && (
         <FormCard title={artistAreaTexts.summaryForm.equipment} icon={<BackpackIcon />}>
           <Box sx={{ px: 2 }}>
-            <Typography variant="subtitle1" sx={{ mb: 1, color: alpha('#fff', 0.8) }}>
+            <Typography variant="subtitle1" sx={{ mb: 1, color: alpha(theme.palette.text.primary, 0.8) }}>
               {artistAreaTexts.summaryForm.bringingItems}
             </Typography>
             <Box
@@ -234,25 +228,25 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
                 flexWrap: 'wrap',
                 gap: 1,
                 p: 1.5,
-                bgcolor: alpha('#000', 0.2),
+                bgcolor: alpha(theme.palette.background.default, 0.2),
                 borderRadius: '8px',
                 border: '1px solid',
-                borderColor: alpha(spacePalette.primary.main, 0.2),
+                borderColor: alpha(theme.palette.primary.main, 0.2),
               }}
             >
               {artistMaterials.map((material) => (
                 <Box
                   key={material.id}
                   sx={{
-                    bgcolor: alpha(spacePalette.primary.main, 0.1),
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
                     border: '1px solid',
-                    borderColor: alpha(spacePalette.primary.main, 0.3),
+                    borderColor: alpha(theme.palette.primary.main, 0.3),
                     borderRadius: '4px',
                     px: 1.5,
                     py: 0.5,
                   }}
                 >
-                  <Typography variant="body2" sx={{ color: alpha('#fff', 0.9) }}>
+                  <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
                     {material.title}
                   </Typography>
                 </Box>
@@ -261,7 +255,7 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
           </Box>
         </FormCard>
       )}
-    </SpacePanelLayout>
+    </ThemedFormLayout>
   );
 }
 

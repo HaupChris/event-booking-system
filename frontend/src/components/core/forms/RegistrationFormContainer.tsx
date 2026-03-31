@@ -3,7 +3,7 @@
  * Consolidates logic from UserRegistrationFormContainer and ArtistRegistrationFormContainer.
  */
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Alert, Box, CardContent, Typography } from '@mui/material';
 import { AuthContext, TokenContext } from '../../../contexts/AuthContext';
 import axios from 'axios';
@@ -151,9 +151,12 @@ export function RegistrationFormContainer<
     handleNext(config.requiredFields[activeStep]);
   };
 
-  const updateBooking = (key: keyof TBooking, value: TBooking[keyof TBooking]) => {
-    updateField(key, value);
-  };
+  const updateBooking = useCallback(
+    (key: keyof TBooking, value: TBooking[keyof TBooking]) => {
+      updateField(key, value);
+    },
+    [updateField]
+  );
 
   // Submit booking
   const submitBooking = () => {

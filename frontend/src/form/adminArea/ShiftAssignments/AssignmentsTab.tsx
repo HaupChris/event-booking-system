@@ -79,7 +79,7 @@ function AssignmentsTab({
           {success}
         </Alert>
       )}
-      <Box sx={{ minHeight: { xs: 'auto', lg: '72vh' } }}>
+      <Box sx={{ height: { xs: 'auto', lg: 'calc(100vh - 280px)' }, minHeight: { lg: '800px' } }}>
         <Box
           sx={{
             height: '100%',

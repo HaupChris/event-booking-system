@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormProps } from './UserRegistrationFormContainer';
 import WorkShift from '../../components/core/inputs/workShift';
 import type { WorkShift as WorkShiftType } from '../userArea/interface';
@@ -23,12 +23,7 @@ function HelpIcon() {
 function WorkShiftForm(props: FormProps) {
   const theme = useTheme();
   const { currentBooking, updateBooking, formValidation, formContent } = props;
-  const [availablePriorities, setAvailablePriorities] = useState<string[]>([
-    PRIORITIES.FIRST,
-    PRIORITIES.SECOND,
-    PRIORITIES.THIRD,
-    '',
-  ]);
+  // availablePriorities is computed via useMemo below
 
   const [supporterBuddyFirstName, setSupporterBuddyFirstName] = useState(
     currentBooking.supporter_buddy.split(' ')[0]
@@ -43,11 +38,17 @@ function WorkShiftForm(props: FormProps) {
     { value: 3, label: '3 Schichten (2 Essen gratis)' },
   ];
 
-  useEffect(() => {
-    updateBooking('supporter_buddy', supporterBuddyFirstName + ' ' + supporterBuddyLastName);
-  }, [supporterBuddyFirstName, supporterBuddyLastName, updateBooking]);
+  const updateBookingRef = useRef(updateBooking);
+  updateBookingRef.current = updateBooking;
 
-  const updateAvailablePriorities = useCallback(() => {
+  useEffect(() => {
+    updateBookingRef.current(
+      'supporter_buddy',
+      supporterBuddyFirstName + ' ' + supporterBuddyLastName
+    );
+  }, [supporterBuddyFirstName, supporterBuddyLastName]);
+
+  const availablePriorities = useMemo(() => {
     const available = [PRIORITIES.FIRST, PRIORITIES.SECOND, PRIORITIES.THIRD];
     if (currentBooking.timeslot_priority_1 !== -1) {
       available.splice(available.indexOf(PRIORITIES.FIRST), 1);
@@ -58,17 +59,12 @@ function WorkShiftForm(props: FormProps) {
     if (currentBooking.timeslot_priority_3 !== -1) {
       available.splice(available.indexOf(PRIORITIES.THIRD), 1);
     }
-
-    setAvailablePriorities(available);
+    return available;
   }, [
     currentBooking.timeslot_priority_1,
     currentBooking.timeslot_priority_2,
     currentBooking.timeslot_priority_3,
   ]);
-
-  useEffect(() => {
-    updateAvailablePriorities();
-  }, [updateAvailablePriorities]);
 
   const faqItems = [
     {

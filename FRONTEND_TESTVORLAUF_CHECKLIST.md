@@ -2,9 +2,9 @@
 
 ## 0) Setup
 
-- [ ] Backend starten: `cd server && source .venv/bin/activate && python main.py`
-- [ ] Frontend starten: `cd frontend && npm start`
-- [ ] Optional: frischer Browser-Tab im Inkognito-Modus, um Alt-Caches zu vermeiden
+- [x] Backend starten: `cd server && source .venv/bin/activate && python main.py`
+- [x] Frontend starten: `cd frontend && npm start`
+- [x] Optional: frischer Browser-Tab im Inkognito-Modus, um Alt-Caches zu vermeiden
 
 ## 1) Schnellchecks (Build/Quality)
 
