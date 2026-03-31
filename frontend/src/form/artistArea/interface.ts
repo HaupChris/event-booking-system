@@ -39,4 +39,5 @@ export interface ArtistFormContent {
   food_options: Array<FoodOption>;
   artist_materials: Array<ArtistMaterial>;
   professions: Array<Profession>;
+  payment_link?: string;
 }

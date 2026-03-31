@@ -8,7 +8,7 @@ import React, { useCallback, useState } from 'react';
 import { Alert, Box, Grid, Snackbar, Typography } from '@mui/material';
 import type { ProfileData } from '../../services/profileService';
 import BookingDetails from './BookingDetails';
-import { generalConstants } from '../../form/constants/texts';
+import { resolvePaymentLink } from '../../utils/paymentLink';
 import { createPaymentSubject } from '../../utils/paymentSubject';
 import {
   ProfileBookingSummaryCard,
@@ -23,6 +23,7 @@ interface ProfileOverviewProps {
 const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
   const { user, booking, payment } = profile;
   const [copied, setCopied] = useState(false);
+  const paymentLink = resolvePaymentLink(profile.payment_link);
 
   const paymentSubject = createPaymentSubject({
     firstName: user.first_name,
@@ -42,8 +43,8 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
 
   const handlePayPalClick = useCallback(() => {
     handleCopySubject();
-    window.open(generalConstants.paymentLink, '_blank', 'noopener,noreferrer');
-  }, [handleCopySubject]);
+    window.open(paymentLink, '_blank', 'noopener,noreferrer');
+  }, [handleCopySubject, paymentLink]);
 
   const handleCopiedClose = (_: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {

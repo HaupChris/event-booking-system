@@ -7,10 +7,9 @@ from email.mime.text import MIMEText
 from dotenv import load_dotenv
 
 from src.models.datatypes import ArtistBooking, Booking
+from src.services.app_settings_service import get_payment_link
 
 load_dotenv()
-
-PAYPAL_LINK = "https://www.paypal.me/Wiesenwahn"
 
 
 def get_booking_details(booking: Booking, form_content: dict) -> str:
@@ -99,6 +98,7 @@ def send_confirmation_mail(booking: Booking, form_content: dict, profile_uuid: s
 
     # Get base URL from environment or use default
     base_url = os.environ.get("APP_BASE_URL", "http://localhost:3000")
+    payment_link = get_payment_link()
 
     booking_details_html = get_booking_details(booking, form_content).replace("\n", "<br>")
 
@@ -271,7 +271,7 @@ def send_confirmation_mail(booking: Booking, form_content: dict, profile_uuid: s
 
           <p>Für den Start deiner Mission ist noch ein Treibstofftransfer erforderlich:</p>
 
-          <a href="{PAYPAL_LINK}" class="btn">TREIBSTOFFTRANSFER STARTEN</a>
+          <a href="{payment_link}" class="btn">TREIBSTOFFTRANSFER STARTEN</a>
 
           <p>Betreff für den Transfer:<br>
           <strong>WW26 - {booking.first_name}, {booking.last_name} - {ticket_title} - {beverage_title} - {food_title}</strong></p>
@@ -327,6 +327,7 @@ def send_artist_confirmation_mail(
 
     # Get base URL from environment or use default
     base_url = os.environ.get("APP_BASE_URL", "http://localhost:3000")
+    payment_link = get_payment_link()
 
     # Get booking details in HTML format
     booking_details_html = get_artist_booking_details(booking, form_content).replace("\n", "<br>")
@@ -514,7 +515,7 @@ def send_artist_confirmation_mail(
         and f'''
           <p>Für deine Buchung ist noch ein Beitrag erforderlich:</p>
 
-          <a href="{PAYPAL_LINK}" class="btn">BEITRAG JETZT ÜBERWEISEN</a>
+          <a href="{payment_link}" class="btn">BEITRAG JETZT ÜBERWEISEN</a>
 
           <p>Betreff für die Überweisung:<br>
           <strong>WWWW ARTIST - {booking.first_name}, {booking.last_name} - {ticket_title} - {beverage_title} - {food_title}</strong></p>

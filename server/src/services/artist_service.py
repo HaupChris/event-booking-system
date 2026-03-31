@@ -5,6 +5,7 @@ import uuid
 from contextlib import closing
 
 from src.models.datatypes import ArtistBooking, ArtistBookingWithTimestamp
+from src.services.app_settings_service import get_payment_link
 from src.services.booking_service import DB_DIR, DB_FILE_PATH
 from src.services.formcontent_service import (
     get_artist_form_content_obj,
@@ -326,7 +327,9 @@ def get_up_to_date_artist_form_content() -> dict:
     Returns the current form content (dict) with booking counts updated based on the DB state.
     """
     form_content_obj = get_artist_form_content_obj()
-    return update_artist_form_content_with_db_counts(form_content_obj, _connect_db)
+    result = update_artist_form_content_with_db_counts(form_content_obj, _connect_db)
+    result["payment_link"] = get_payment_link()
+    return result
 
 
 def delete_artist_booking(booking_id: int) -> bool:

@@ -7,7 +7,7 @@ import type { BookingState } from '../UserRegistrationFormContainer';
 import InitialView from './InitialView';
 import SuccessView from './SuccessView';
 import ErrorView from './ErrorView';
-import { generalConstants } from '../../constants/texts';
+import { resolvePaymentLink } from '../../../utils/paymentLink';
 import { createPaymentSubject } from '../../../utils/paymentSubject';
 
 interface ConfirmationFormProps {
@@ -23,6 +23,7 @@ function findItemById<T extends { id: number }>(array: T[], id: number): T | und
 
 function ConfirmationForm(props: ConfirmationFormProps) {
   const { currentBooking, formContent, bookingState } = props;
+  const paymentLink = resolvePaymentLink(formContent.payment_link);
 
   // Get booking details
   const ticket = findItemById(formContent.ticket_options, currentBooking.ticket_id);
@@ -72,7 +73,7 @@ function ConfirmationForm(props: ConfirmationFormProps) {
         setCountdown((prevCountdown) => {
           if (prevCountdown === 1) {
             clearInterval(timer);
-            window.open(generalConstants.paymentLink, '_blank');
+            window.open(paymentLink, '_blank');
           }
           return prevCountdown - 1;
         });
@@ -80,7 +81,7 @@ function ConfirmationForm(props: ConfirmationFormProps) {
 
       return () => clearInterval(timer);
     }
-  }, [redirecting]);
+  }, [paymentLink, redirecting]);
 
   // Event handlers
   const handleCopy = () => {
@@ -134,6 +135,7 @@ function ConfirmationForm(props: ConfirmationFormProps) {
         redirecting={redirecting}
         setRedirecting={setRedirecting}
         countdown={countdown}
+        paymentLink={paymentLink}
         profileUuid={currentBooking.profile_uuid}
         copied={copied}
         onCloseCopied={handleClose}

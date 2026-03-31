@@ -133,6 +133,7 @@ export interface ProfileData {
   professions: Profession[];
   shifts: ShiftAssignment[];
   payment: Payment;
+  payment_link?: string;
 }
 
 export interface ProfileRecoveryRequest {

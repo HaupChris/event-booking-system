@@ -13,6 +13,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 from src.services.faq_service import get_faqs_grouped_by_category
+from src.services.app_settings_service import get_payment_link
 from src.services.mail_service import send_profile_recovery_mail
 from src.services.news_service import get_news_for_profile, get_unread_count, mark_news_as_read
 from src.services.profile_service import (
@@ -60,6 +61,8 @@ def get_profile(profile_uuid: str):
             logger.warning(f"Profile not found for UUID {profile_uuid[:8]}... from {client_ip}")
             log_security_event("profile_not_found", {"uuid": profile_uuid[:8], "ip": client_ip})
             return jsonify({"error": "Profile not found"}), 404
+
+        profile["payment_link"] = get_payment_link()
 
         elapsed_time = time.time() - start_time
         logger.info(f"Profile {profile_uuid[:8]}... retrieved successfully in {elapsed_time:.2f}s")

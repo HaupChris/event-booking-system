@@ -20,7 +20,7 @@ import {
 import rocketBaak from '../../img/rocket_baak.png';
 import type { ArtistBooking, ArtistFormContent } from './interface';
 import type { ArtistBookingState } from './ArtistRegistrationFormContainer';
-import { generalConstants } from '../constants/texts';
+import { resolvePaymentLink } from '../../utils/paymentLink';
 
 interface ArtistConfirmationProps {
   booking: ArtistBooking;
@@ -34,6 +34,7 @@ function findItemById<T extends { id: number }>(array: T[], id: number): T | und
 }
 
 function ArtistConfirmationForm(props: ArtistConfirmationProps) {
+  const paymentLink = resolvePaymentLink(props.formContent.payment_link);
   const ticket = findItemById(props.formContent.ticket_options, props.booking.ticket_id);
   const beverage_or_undefined = findItemById(
     props.formContent.beverage_options,
@@ -71,13 +72,13 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
         setCountdown((prevCountdown) => {
           if (prevCountdown === 1) {
             clearInterval(timer);
-            window.open(generalConstants.paymentLink, '_blank');
+            window.open(paymentLink, '_blank');
           }
           return prevCountdown - 1;
         });
       }, 1000);
     }
-  }, [redirecting]);
+  }, [paymentLink, redirecting]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(betreff).then();
@@ -288,7 +289,7 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
               <Typography sx={{ mt: 2 }}>
                 <strong>Du wurdest nicht weiter geleitet?</strong>
               </Typography>
-              <a href={generalConstants.paymentLink} target="_blank" rel="noreferrer">
+              <a href={paymentLink} target="_blank" rel="noreferrer">
                 <Button
                   sx={countdown > 0 ? { display: 'none' } : { mt: 2 }}
                   fullWidth

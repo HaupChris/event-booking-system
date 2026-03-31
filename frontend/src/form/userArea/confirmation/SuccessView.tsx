@@ -16,6 +16,7 @@ interface SuccessViewProps {
   redirecting: boolean;
   setRedirecting: (value: boolean) => void;
   countdown: number;
+  paymentLink: string;
   profileUuid: string;
   copied: boolean;
   onCloseCopied: (event: React.SyntheticEvent | Event, reason?: string) => void;
@@ -29,6 +30,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({
   redirecting,
   setRedirecting,
   countdown,
+  paymentLink,
   profileUuid,
   copied,
   onCloseCopied,
@@ -150,6 +152,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({
         open={redirecting}
         onClose={() => setRedirecting(false)}
         countdown={countdown}
+        paymentLink={paymentLink}
       />
 
       {/* Snackbar for copy confirmation */}

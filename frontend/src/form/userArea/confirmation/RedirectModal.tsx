@@ -2,15 +2,16 @@ import React from 'react';
 import { Box, Typography, Button, Modal, CircularProgress, alpha, useTheme } from '@mui/material';
 import { CheckCircleOutline, OpenInNew } from '@mui/icons-material';
 import { useThemeMode } from '../../../components/styles/theme';
-import { generalConstants, userAreaTexts } from '../../constants/texts';
+import { userAreaTexts } from '../../constants/texts';
 
 interface RedirectModalProps {
   open: boolean;
   onClose: () => void;
   countdown: number;
+  paymentLink: string;
 }
 
-const RedirectModal: React.FC<RedirectModalProps> = ({ open, onClose, countdown }) => {
+const RedirectModal: React.FC<RedirectModalProps> = ({ open, onClose, countdown, paymentLink }) => {
   const theme = useTheme();
   const { mode } = useThemeMode();
 
@@ -127,7 +128,7 @@ const RedirectModal: React.FC<RedirectModalProps> = ({ open, onClose, countdown 
               {userAreaTexts.confirmationForm.redirectModal.manualRedirectText}
             </Typography>
             <a
-              href={generalConstants.paymentLink}
+              href={paymentLink}
               target="_blank"
               rel="noreferrer"
               style={{ textDecoration: 'none', width: '100%', display: 'block' }}

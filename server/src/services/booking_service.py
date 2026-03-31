@@ -7,6 +7,7 @@ from contextlib import closing
 
 from src.models.datatypes import Booking, BookingWithTimestamp
 from src.models.schema import init_db
+from src.services.app_settings_service import get_payment_link
 from src.services.formcontent_service import (
     get_form_content_obj,
     update_form_content_with_db_counts,
@@ -375,7 +376,7 @@ def get_all_bookings() -> list[BookingWithTimestamp]:
                     payment_date=row[19],
                     profession_ids=profession_ids,
                     material_ids=material_ids,
-                    profile_uuid=row[20]
+                    profile_uuid=row[20],
                 )
                 bookings.append(booking)
             duration = time.time() - start_time
@@ -418,6 +419,7 @@ def get_up_to_date_form_content() -> dict:
         logger.debug("Generating up-to-date form content")
         form_content_obj = get_form_content_obj()
         result = update_form_content_with_db_counts(form_content_obj, _connect_db)
+        result["payment_link"] = get_payment_link()
 
         duration = time.time() - start_time
         logger.debug(f"Form content generated in {duration:.3f}s")

@@ -57,6 +57,7 @@ export interface FormContent {
   work_shifts: Array<WorkShift>;
   materials: Array<Material>;
   professions: Array<Profession>;
+  payment_link?: string;
 }
 
 export interface Booking {
