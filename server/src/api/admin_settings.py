@@ -6,10 +6,17 @@ Admin-only endpoint for managing application passwords.
 Requires admin JWT authentication.
 """
 
+import re
+
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
-from src.services.app_settings_service import get_payment_link, set_payment_link
+from src.services.app_settings_service import (
+    get_frontend_branding_pack,
+    get_payment_link,
+    set_frontend_branding_pack,
+    set_payment_link,
+)
 from src.services.password_service import VALID_ROLES, update_password
 from src.utils.logger import get_logger
 
@@ -18,10 +25,15 @@ logger = get_logger(__name__)
 admin_settings_bp = Blueprint("admin_settings", __name__)
 
 MIN_PASSWORD_LENGTH = 1
+BRANDING_PACK_PATTERN = re.compile(r"^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$")
 
 
 def _is_valid_http_url(value: str) -> bool:
     return value.startswith("https://") or value.startswith("http://")
+
+
+def _is_valid_branding_pack(value: str) -> bool:
+    return bool(BRANDING_PACK_PATTERN.match(value))
 
 
 def _ensure_admin_identity():
@@ -68,6 +80,55 @@ def update_payment_link_setting():
 
     logger.info("Payment link updated via admin settings")
     return jsonify({"msg": "Payment link updated successfully", "payment_link": payment_link}), 200
+
+
+@admin_settings_bp.route("/settings/branding-pack", methods=["GET"])
+@jwt_required()
+def get_branding_pack_setting():
+    """Return currently configured frontend branding pack."""
+    unauthorized_response = _ensure_admin_identity()
+    if unauthorized_response:
+        return unauthorized_response
+
+    branding_pack = get_frontend_branding_pack()
+    return jsonify({"branding_pack": branding_pack}), 200
+
+
+@admin_settings_bp.route("/settings/branding-pack", methods=["PUT"])
+@jwt_required()
+def update_branding_pack_setting():
+    """Update frontend branding pack setting."""
+    unauthorized_response = _ensure_admin_identity()
+    if unauthorized_response:
+        return unauthorized_response
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"msg": "Missing JSON body"}), 400
+
+    branding_pack = data.get("branding_pack", "").strip()
+    if not branding_pack:
+        return jsonify({"msg": "Branding pack must not be empty"}), 400
+
+    if not _is_valid_branding_pack(branding_pack):
+        return (
+            jsonify(
+                {"msg": "Branding pack must use kebab-case and be 3-64 chars (a-z, 0-9, hyphen)."}
+            ),
+            400,
+        )
+
+    success = set_frontend_branding_pack(branding_pack)
+    if not success:
+        return jsonify({"msg": "Failed to update branding pack"}), 500
+
+    logger.info("Frontend branding pack updated via admin settings")
+    return (
+        jsonify(
+            {"msg": "Frontend branding pack updated successfully", "branding_pack": branding_pack}
+        ),
+        200,
+    )
 
 
 @admin_settings_bp.route("/settings/password", methods=["PUT"])

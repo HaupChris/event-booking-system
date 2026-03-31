@@ -14,6 +14,7 @@ import {
 import InfoIcon from '@mui/icons-material/Info';
 import { useThemeMode } from '../../styles/theme';
 import type { SxProps, Theme } from '@mui/material/styles';
+import { useBrandingPack } from '../../../branding/useBrandingPack';
 
 interface FormCardProps {
   title?: string;
@@ -56,6 +57,7 @@ const FormCard: React.FC<FormCardProps> = ({
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const theme = useTheme();
   const { mode } = useThemeMode();
+  const brandingPack = useBrandingPack();
 
   const handleTooltipClose = () => {
     setTooltipOpen(false);
@@ -85,7 +87,7 @@ const FormCard: React.FC<FormCardProps> = ({
       elevation={elevation}
       sx={{
         backgroundColor: getCardBackground(),
-        borderRadius: mode === 'circus' ? '8px' : '10px',
+        borderRadius: brandingPack.decoration.cardRadius,
         border: selected ? '2px solid' : '1px solid',
         borderColor: selected ? theme.palette.primary.main : alpha(theme.palette.primary.main, 0.3),
         position: 'relative',
@@ -169,6 +171,7 @@ const FormCard: React.FC<FormCardProps> = ({
                 sx={{
                   color: theme.palette.text.primary,
                   fontWeight: 'medium',
+                  fontFamily: brandingPack.typography.heading,
                 }}
               >
                 {title}

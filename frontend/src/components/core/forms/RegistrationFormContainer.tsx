@@ -10,6 +10,7 @@ import axios from 'axios';
 import StepNavigation from '../navigation/StepNavigation';
 import { useFormManagement } from '../../../hooks/useFormManagement';
 import rocketImage from '../../../img/rocket.png';
+import { useBrandingPack } from '../../../branding/useBrandingPack';
 
 /**
  * Configuration for the registration form container
@@ -85,6 +86,8 @@ export function RegistrationFormContainer<
   TFormContent extends object,
   TFormSteps extends number,
 >({ config }: RegistrationFormContainerProps<TBooking, TFormContent, TFormSteps>) {
+  const brandingPack = useBrandingPack();
+
   // Use form management hook
   const {
     formState: booking,
@@ -298,14 +301,16 @@ export function RegistrationFormContainer<
             justifyContent: 'center',
           }}
         >
-          <Typography
-            color="text.primary"
-            align="center"
-            variant="h4"
-            sx={{ paddingBottom: '1em' }}
-          >
-            {config.stepTitles[activeStep]}
-          </Typography>
+          {config.stepTitles[activeStep] && (
+            <Typography
+              color="text.primary"
+              align="center"
+              variant="h4"
+              sx={{ paddingBottom: '1em', fontFamily: brandingPack.typography.display }}
+            >
+              {config.stepTitles[activeStep]}
+            </Typography>
+          )}
 
           {currentError && (
             <Alert variant="outlined" severity="error" sx={{ my: 2 }}>

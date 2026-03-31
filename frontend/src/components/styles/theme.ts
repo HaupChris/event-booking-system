@@ -13,11 +13,15 @@ export type ThemeMode = 'dark' | 'light' | 'circus';
 export interface ThemeContextType {
   mode: ThemeMode;
   toggleTheme: () => void;
+  brandingPackId: string;
+  setBrandingPackId: (packId: string) => void;
 }
 
 export const ThemeContext = createContext<ThemeContextType>({
   mode: 'dark',
   toggleTheme: () => {},
+  brandingPackId: 'ww-2025-circus',
+  setBrandingPackId: () => {},
 });
 
 // Hook to get current theme

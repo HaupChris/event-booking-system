@@ -1,28 +1,18 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Checkbox,
-  FormGroup,
-  FormControlLabel,
-  Paper,
-  Button,
-  alpha,
-  Chip,
-  useTheme,
-} from '@mui/material';
+import { Box, Typography, alpha, Chip, useTheme } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
-import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
-import SmartphoneIcon from '@mui/icons-material/Smartphone';
-import BadgeIcon from '@mui/icons-material/Badge';
 import WorkIcon from '@mui/icons-material/Work';
 import GroupsIcon from '@mui/icons-material/Groups';
-import FormField from '../inputs/FormField';
 import ThemedFormLayout from '../layouts/ThemedFormLayout';
 import MissionHeading from '../display/MissionHeading';
 import FormCard from '../display/FormCard';
 import type { OrgaInviter, Profession } from '../../../form/userArea/interface';
 import WWSelect from '../inputs/WWSelect';
+import { useBrandingPack } from '../../../branding/useBrandingPack';
+import { useThemeMode } from '../../styles/theme';
+import PersonalDetailsHero from './PersonalDetailsHero';
+import PersonalDetailsContactCard from './PersonalDetailsContactCard';
+import OrnateCheckboxOptionList from '../inputs/OrnateCheckboxOptionList';
 
 interface PersonalDetailsTextProps {
   missionBriefing: string;
@@ -69,6 +59,8 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
   const showDevSeedButton = import.meta.env.DEV && Boolean(props.onDevSeedForm);
 
   const theme = useTheme();
+  const { mode } = useThemeMode();
+  const brandingPack = useBrandingPack();
   const selectedProfessionIds =
     (props.currentBooking[professionIdsField] as number[] | undefined) ?? [];
 
@@ -93,85 +85,41 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
     value: inviter.id,
     label: inviter.name,
   }));
+  const isCircusMode = mode === 'circus';
 
   return (
-    <ThemedFormLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
-      {/* Event date information */}
-      <MissionHeading
-        title={texts.title}
+    <ThemedFormLayout footerId={texts.footerId}>
+      <PersonalDetailsHero
         subtitle={texts.subtitle}
         icon={icon}
-        withDivider={false}
+        showDevSeedButton={showDevSeedButton}
+        onDevSeedForm={props.onDevSeedForm}
       />
 
-      {showDevSeedButton && (
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={props.onDevSeedForm}
-          sx={{ mb: 2, textTransform: 'none' }}
-        >
-          Dev: Formular automatisch fuellen
-        </Button>
-      )}
+      <PersonalDetailsContactCard
+        updateBooking={(key, value) => props.updateBooking(key, value)}
+        currentBooking={props.currentBooking}
+        formValidation={props.formValidation}
+      />
 
-      <Box component="form" sx={{ mt: 2 }}>
-        <FormField
-          error={!!props.formValidation.first_name}
-          id="first_name"
-          label="Vorname"
-          name="first_name"
-          value={props.currentBooking.first_name}
-          onChange={(e) => props.updateBooking('first_name', e.target.value)}
-          autoFocus
-          required
-          icon={<PersonIcon />}
-        />
-
-        <FormField
-          error={!!props.formValidation.last_name}
-          name="last_name"
-          label="Nachname"
-          id="last_name"
-          value={props.currentBooking.last_name}
-          onChange={(e) => props.updateBooking('last_name', e.target.value)}
-          required
-          icon={<BadgeIcon />}
-        />
-
-        <FormField
-          error={!!props.formValidation.email}
-          type="email"
-          name="email"
-          label="E-Mail (für deine Bestätigung)"
-          id="email"
-          value={props.currentBooking.email}
-          onChange={(e) => props.updateBooking('email', e.target.value)}
-          required
-          icon={<AlternateEmailIcon />}
-        />
-
-        <FormField
-          error={!!props.formValidation.phone}
-          type="tel"
-          name="phone"
-          label="Telefon"
-          id="phone"
-          value={props.currentBooking.phone}
-          onChange={(e) => props.updateBooking('phone', e.target.value)}
-          required
-          icon={<SmartphoneIcon />}
-        />
-      </Box>
-
-      <Box sx={{ mt: 4 }}>
+      <Box
+        sx={{
+          mt: 4,
+        }}
+      >
         <MissionHeading
           title={texts.inviterTitle}
           subtitle={texts.inviterSubtitle}
           icon={<GroupsIcon />}
           withDivider={true}
         />
-        <FormCard>
+        <FormCard
+          sx={{
+            border: '2px solid',
+            borderColor: alpha(brandingPack.colors.panelBorder, isCircusMode ? 0.85 : 0.32),
+            background: alpha(theme.palette.background.paper, isCircusMode ? 0.3 : 0.58),
+          }}
+        >
           <Box sx={{ p: 2 }}>
             <WWSelect
               options={inviterOptions}
@@ -189,12 +137,20 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
               minWidth="100%"
             />
             {inviterOptions.length === 0 && (
-              <Typography variant="caption" color="warning.main" sx={{ mt: 1, display: 'block' }}>
+              <Typography
+                variant="caption"
+                color="warning.main"
+                sx={{ mt: 1, display: 'block', fontFamily: brandingPack.typography.body }}
+              >
                 Aktuell sind keine Orga-Personen hinterlegt. Bitte melde dich beim Team.
               </Typography>
             )}
             {props.formValidation.invited_by_id && (
-              <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
+              <Typography
+                variant="caption"
+                color="error"
+                sx={{ mt: 1, display: 'block', fontFamily: brandingPack.typography.body }}
+              >
                 {props.formValidation.invited_by_id}
               </Typography>
             )}
@@ -202,7 +158,6 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
         </FormCard>
       </Box>
 
-      {/* Professions Section */}
       <Box sx={{ mt: 4 }}>
         <MissionHeading
           title={texts.professionsTitle}
@@ -213,7 +168,14 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
 
         {selectedProfessions.length > 0 && (
           <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.text.secondary }}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                mb: 1,
+                color: theme.palette.text.secondary,
+                fontFamily: brandingPack.typography.accent,
+              }}
+            >
               {texts.selectedProfessions(selectedProfessions.length)}
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -227,6 +189,7 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
                   sx={{
                     fontWeight: 'medium',
                     bgcolor: alpha(theme.palette.primary.main, 0.2),
+                    fontFamily: brandingPack.typography.body,
                     '& .MuiChip-label': { px: 1 },
                   }}
                   onDelete={() => handleProfessionToggle(profession.id)}
@@ -236,52 +199,22 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
           </Box>
         )}
 
-        <FormCard>
+        <FormCard
+          sx={{
+            border: '2px solid',
+            borderColor: alpha(brandingPack.colors.panelBorder, isCircusMode ? 0.85 : 0.32),
+            background: alpha(theme.palette.background.paper, isCircusMode ? 0.3 : 0.58),
+          }}
+        >
           <Box sx={{ p: 2 }}>
-            <FormGroup>
-              {(formContent.professions || []).map((profession) => (
-                <Paper
-                  key={profession.id}
-                  elevation={1}
-                  sx={{
-                    mb: 1,
-                    p: 1,
-                    borderRadius: '8px',
-                    backgroundColor: selectedProfessionIds.includes(profession.id)
-                      ? alpha(theme.palette.primary.main, 0.15)
-                      : alpha(theme.palette.background.paper, 0.7),
-                    border: '1px solid',
-                    borderColor: selectedProfessionIds.includes(profession.id)
-                      ? alpha(theme.palette.primary.main, 0.5)
-                      : alpha(theme.palette.primary.main, 0.2),
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={selectedProfessionIds.includes(profession.id)}
-                        onChange={() => handleProfessionToggle(profession.id)}
-                        color="primary"
-                      />
-                    }
-                    label={
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          color: theme.palette.text.primary,
-                          fontWeight: selectedProfessionIds.includes(profession.id)
-                            ? 'medium'
-                            : 'normal',
-                        }}
-                      >
-                        {profession.title}
-                      </Typography>
-                    }
-                  />
-                </Paper>
-              ))}
-            </FormGroup>
+            <OrnateCheckboxOptionList
+              options={(formContent.professions || []).map((profession) => ({
+                id: profession.id,
+                label: profession.title,
+              }))}
+              selectedIds={selectedProfessionIds}
+              onToggle={handleProfessionToggle}
+            />
           </Box>
         </FormCard>
       </Box>

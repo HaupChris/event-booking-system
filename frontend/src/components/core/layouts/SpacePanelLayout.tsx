@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import React from 'react';
-import { Box, Typography, Paper, alpha } from '@mui/material';
-import { spacePalette } from '../../styles/theme';
-import mixins from '../../styles/mixins';
+import { Box, Typography, Paper, alpha, useTheme } from '@mui/material';
+import { getMixins, useThemeMode } from '../../styles/theme';
+import { useBrandingPack } from '../../../branding/useBrandingPack';
 
 interface SpacePanelLayoutProps {
   children: ReactNode;
@@ -19,25 +19,30 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
   footerId = 'WWWW-COMPONENT',
   maxWidth = 1200,
 }) => {
+  const theme = useTheme();
+  const { mode } = useThemeMode();
+  const themedMixins = getMixins(mode);
+  const brandingPack = useBrandingPack();
+
   return (
     <Box sx={{ width: '100%', maxWidth }}>
       <Paper
         elevation={3}
         sx={{
           width: '100%',
-          borderRadius: '14px',
-          background: spacePalette.background.card,
+          borderRadius: brandingPack.decoration.panelRadius,
+          background: themedMixins.spacePanel.background,
           boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
           overflow: 'hidden',
           position: 'relative',
           border: '1px solid',
-          borderColor: alpha(spacePalette.primary.main, 0.2),
+          borderColor: alpha(theme.palette.primary.main, 0.2),
         }}
       >
         {/* Decorative top gradient */}
         <Box
           sx={{
-            ...mixins.headerGradient,
+            ...themedMixins.headerGradient,
             '@keyframes gradientMove': {
               '0%': { backgroundPosition: '0% 0%' },
               '100%': { backgroundPosition: '300% 0%' },
@@ -47,16 +52,16 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
 
         {/* Mission Briefing (optional) */}
         {missionBriefing && (
-          <Box sx={mixins.missionBriefing}>
+          <Box sx={themedMixins.missionBriefing}>
             <Typography
               variant="body2"
               sx={{
-                color: alpha('#fff', 0.9),
-                fontFamily: 'monospace',
+                color: alpha(theme.palette.text.primary, 0.9),
+                fontFamily: brandingPack.typography.body,
                 fontSize: '0.85rem',
               }}
             >
-              <span style={{ color: spacePalette.primary.main }}>MISSION:</span> {missionBriefing}
+              <span style={{ color: theme.palette.primary.main }}>MISSION:</span> {missionBriefing}
             </Typography>
           </Box>
         )}
@@ -67,10 +72,11 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
             variant="h5"
             align="center"
             sx={{
-              color: alpha('#fff', 0.9),
+              color: alpha(theme.palette.text.primary, 0.95),
               fontWeight: 'medium',
               mt: 2,
               mb: 3,
+              fontFamily: brandingPack.typography.heading,
             }}
           >
             {title}
@@ -81,12 +87,12 @@ const SpacePanelLayout: React.FC<SpacePanelLayoutProps> = ({
         <Box sx={{ p: { xs: 1, sm: 3 } }}>{children}</Box>
 
         {/* Footer ID */}
-        <Box sx={mixins.footerBar}>
+        <Box sx={themedMixins.footerBar}>
           <Typography
             variant="caption"
             sx={{
-              fontFamily: 'monospace',
-              color: alpha('#fff', 0.7),
+              fontFamily: brandingPack.typography.accent,
+              color: alpha(theme.palette.text.primary, 0.72),
               letterSpacing: '1px',
               fontSize: '0.7rem',
             }}

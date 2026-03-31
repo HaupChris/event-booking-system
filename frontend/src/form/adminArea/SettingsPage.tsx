@@ -19,11 +19,16 @@ import {
 import { Save, Visibility, VisibilityOff } from '@mui/icons-material';
 import { TokenContext } from '../../contexts/AuthContext';
 import {
+  getBrandingPack,
   getPaymentLink,
   updatePassword,
+  updateBrandingPack,
   updatePaymentLink,
 } from '../../services/adminSettingsService';
 import { resolvePaymentLink } from '../../utils/paymentLink';
+import { getBrandingPackOptions } from '../../branding/packs';
+import { useThemeMode } from '../../components/styles/theme';
+import SettingsPaymentsBrandingSection from './components/SettingsPaymentsBrandingSection';
 
 interface RolePasswords {
   newPassword: string;
@@ -48,6 +53,8 @@ const INITIAL_VISIBILITY: RolePasswordVisibility = { newPassword: false, confirm
 
 const SettingsPage: React.FC = () => {
   const { token } = useContext(TokenContext);
+  const { setBrandingPackId } = useThemeMode();
+  const brandingPackOptions = getBrandingPackOptions();
 
   const [passwords, setPasswords] = useState<Record<RoleKey, RolePasswords>>({
     admin: { ...INITIAL_STATE },
@@ -59,6 +66,9 @@ const SettingsPage: React.FC = () => {
   const [activeRole, setActiveRole] = useState<RoleKey>('admin');
   const [saving, setSaving] = useState<RoleKey | null>(null);
   const [savingPaymentLink, setSavingPaymentLink] = useState(false);
+  const [brandingPack, setBrandingPack] = useState('');
+  const [brandingPackDraft, setBrandingPackDraft] = useState('');
+  const [savingBrandingPack, setSavingBrandingPack] = useState(false);
   const [passwordVisibility, setPasswordVisibility] = useState<
     Record<RoleKey, RolePasswordVisibility>
   >({
@@ -105,6 +115,16 @@ const SettingsPage: React.FC = () => {
         setPaymentLink(fallback);
         setPaymentLinkDraft(fallback);
         showSnackbar('Failed to load payment link.', 'error');
+      });
+
+    getBrandingPack(token)
+      .then((response) => {
+        const pack = response.branding_pack;
+        setBrandingPack(pack);
+        setBrandingPackDraft(pack);
+      })
+      .catch(() => {
+        showSnackbar('Failed to load branding pack.', 'error');
       });
   }, [showSnackbar, token]);
 
@@ -158,6 +178,27 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleBrandingPackSave = async () => {
+    const trimmedPack = brandingPackDraft.trim();
+    if (!trimmedPack) {
+      showSnackbar('Branding pack must not be empty.', 'error');
+      return;
+    }
+
+    try {
+      setSavingBrandingPack(true);
+      await updateBrandingPack(token, trimmedPack);
+      setBrandingPack(trimmedPack);
+      setBrandingPackDraft(trimmedPack);
+      setBrandingPackId(trimmedPack);
+      showSnackbar('Branding pack updated.', 'success');
+    } catch {
+      showSnackbar('Failed to update branding pack.', 'error');
+    } finally {
+      setSavingBrandingPack(false);
+    }
+  };
+
   const selectedRoleLabel = ROLES.find((role) => role.key === activeRole)?.label || 'Admin';
   const selectedPasswords = passwords[activeRole];
   const selectedVisibility = passwordVisibility[activeRole];
@@ -184,34 +225,20 @@ const SettingsPage: React.FC = () => {
         <CardContent sx={{ pt: 0, px: 2.5, pb: 2.5 }}>
           <Stack spacing={2.5}>
             <Box>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
-                Payments
-              </Typography>
-              <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems="flex-start">
-                <TextField
-                  label="PayPal Link"
-                  size="small"
-                  fullWidth
-                  value={paymentLinkDraft}
-                  onChange={(event) => setPaymentLinkDraft(event.target.value)}
-                  helperText="Used in user/artist confirmation, profile page and email templates."
-                />
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<Save />}
-                  disabled={savingPaymentLink || paymentLinkDraft.trim() === paymentLink}
-                  onClick={handlePaymentLinkSave}
-                  sx={{
-                    ...primaryButtonSx,
-                    minWidth: { xs: '100%', md: 150 },
-                    height: 40,
-                    mt: { xs: 0, md: 0.5 },
-                  }}
-                >
-                  {savingPaymentLink ? 'Saving...' : 'Save'}
-                </Button>
-              </Stack>
+              <SettingsPaymentsBrandingSection
+                paymentLink={paymentLink}
+                paymentLinkDraft={paymentLinkDraft}
+                savingPaymentLink={savingPaymentLink}
+                onPaymentLinkDraftChange={setPaymentLinkDraft}
+                onPaymentLinkSave={handlePaymentLinkSave}
+                brandingPack={brandingPack}
+                brandingPackDraft={brandingPackDraft}
+                brandingPackOptions={brandingPackOptions}
+                savingBrandingPack={savingBrandingPack}
+                onBrandingPackDraftChange={setBrandingPackDraft}
+                onBrandingPackSave={handleBrandingPackSave}
+                primaryButtonSx={primaryButtonSx}
+              />
             </Box>
 
             <Divider />

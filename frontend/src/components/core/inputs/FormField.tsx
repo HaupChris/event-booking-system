@@ -4,6 +4,7 @@ import type { TextFieldProps } from '@mui/material';
 import { TextField, InputAdornment, alpha, useTheme } from '@mui/material';
 import type { InputBaseComponentProps } from '@mui/material/InputBase';
 import { useThemeMode } from '../../styles/theme';
+import { useBrandingPack } from '../../../branding/useBrandingPack';
 
 interface FormFieldProps extends Omit<TextFieldProps, 'variant'> {
   icon?: React.ReactNode;
@@ -13,13 +14,14 @@ function FormField(props: FormFieldProps) {
   const icon = props.icon;
   const theme = useTheme();
   const { mode } = useThemeMode();
+  const brandingPack = useBrandingPack();
 
   // Get theme-specific styles
   const getFieldStyles = () => {
     if (mode === 'circus') {
       return {
-        backgroundColor: alpha('#4a2410', 0.4),
-        borderColor: alpha('#704214', 0.6),
+        backgroundColor: alpha(theme.palette.background.paper, 0.35),
+        borderColor: alpha(brandingPack.colors.panelBorder, 0.8),
         borderColorHover: alpha(theme.palette.primary.main, 0.8),
         borderColorFocused: theme.palette.primary.main,
         labelColor: alpha(theme.palette.text.primary, 0.8),
@@ -31,13 +33,13 @@ function FormField(props: FormFieldProps) {
 
     // Space theme (default)
     return {
-      backgroundColor: alpha('#020c1b', 0.7),
+      backgroundColor: alpha(theme.palette.background.paper, 0.45),
       borderColor: alpha(theme.palette.primary.main, 0.3),
       borderColorHover: alpha(theme.palette.primary.main, 0.5),
       borderColorFocused: theme.palette.primary.main,
-      labelColor: alpha('#fff', 0.7),
+      labelColor: alpha(theme.palette.text.primary, 0.72),
       labelColorFocused: theme.palette.primary.main,
-      inputColor: alpha('#fff', 0.9),
+      inputColor: alpha(theme.palette.text.primary, 0.92),
       caretColor: theme.palette.primary.main,
     };
   };
@@ -74,7 +76,7 @@ function FormField(props: FormFieldProps) {
         mb: 2.5,
         '& .MuiOutlinedInput-root': {
           backgroundColor: styles.backgroundColor,
-          borderRadius: '8px',
+          borderRadius: brandingPack.decoration.cardRadius,
           '& fieldset': {
             borderColor: styles.borderColor,
             borderWidth: mode === 'circus' ? 2 : 1,
@@ -97,6 +99,7 @@ function FormField(props: FormFieldProps) {
         '& .MuiInputLabel-root': {
           color: styles.labelColor,
           fontWeight: 500,
+          fontFamily: brandingPack.typography.accent,
           '&.Mui-focused': {
             color: styles.labelColorFocused,
             fontWeight: 600,
@@ -106,7 +109,10 @@ function FormField(props: FormFieldProps) {
           },
           // Improve floating label visibility
           '&.MuiInputLabel-shrink': {
-            backgroundColor: mode === 'circus' ? '#2d1810' : '#020c1b',
+            backgroundColor:
+              mode === 'circus'
+                ? alpha(theme.palette.background.paper, 0.95)
+                : alpha(theme.palette.background.default, 0.96),
             paddingLeft: '6px',
             paddingRight: '6px',
             marginLeft: '-3px',
@@ -117,6 +123,7 @@ function FormField(props: FormFieldProps) {
         '& .MuiInputBase-input': {
           color: styles.inputColor,
           caretColor: styles.caretColor,
+          fontFamily: brandingPack.typography.body,
         },
         ...props.sx,
       }}

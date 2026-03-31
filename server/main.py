@@ -20,6 +20,7 @@ from src.api.bookings import bookings_bp
 from src.api.formcontent import formcontent_bp
 from src.api.health import health_bp
 from src.api.profile import profile_bp
+from src.api.settings import settings_bp
 from src.api.shift_assignments import shift_assignments_bp
 from src.utils.config import load_config
 from src.utils.logger import (
@@ -69,6 +70,7 @@ app.register_blueprint(formcontent_bp, url_prefix="/api")
 app.register_blueprint(health_bp, url_prefix="/api")
 app.register_blueprint(artist_bp, url_prefix="/api")
 app.register_blueprint(shift_assignments_bp, url_prefix="/api")
+app.register_blueprint(settings_bp, url_prefix="/api")
 app.register_blueprint(profile_bp, url_prefix="/api/profile")
 app.register_blueprint(admin_faq_bp, url_prefix="/api/admin")
 app.register_blueprint(admin_news_bp, url_prefix="/api/admin")
