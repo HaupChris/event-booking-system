@@ -204,9 +204,7 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
 
           {special_requests && (
             <>
-              <Divider
-                sx={{ my: 1.5, borderColor: alpha(theme.palette.primary.main, 0.2) }}
-              />
+              <Divider sx={{ my: 1.5, borderColor: alpha(theme.palette.primary.main, 0.2) }} />
               <InfoPair
                 label={artistAreaTexts.summaryForm.specialRequests}
                 value={special_requests}
@@ -219,7 +217,10 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
       {artistMaterials && artistMaterials.length > 0 && (
         <FormCard title={artistAreaTexts.summaryForm.equipment} icon={<BackpackIcon />}>
           <Box sx={{ px: 2 }}>
-            <Typography variant="subtitle1" sx={{ mb: 1, color: alpha(theme.palette.text.primary, 0.8) }}>
+            <Typography
+              variant="subtitle1"
+              sx={{ mb: 1, color: alpha(theme.palette.text.primary, 0.8) }}
+            >
               {artistAreaTexts.summaryForm.bringingItems}
             </Typography>
             <Box

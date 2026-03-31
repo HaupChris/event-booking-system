@@ -1,40 +1,22 @@
-import React, { useState, useContext } from 'react';
-import {
-  Box,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  IconButton,
-  Chip,
-  Snackbar,
-  Alert,
-  CircularProgress,
-  Tabs,
-  Tab,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from '@mui/material';
-import {
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  ArrowUpward,
-  ArrowDownward,
-} from '@mui/icons-material';
+import React, { useContext, useMemo, useState } from 'react';
+import { Alert, Box, CircularProgress, Snackbar, Tab, Tabs, Typography } from '@mui/material';
 import { TokenContext } from '../../contexts/AuthContext';
 import type { FAQ, FAQCategory } from '../../services/adminFaqService';
-import FAQDialog from './components/FAQDialog';
 import CategoryDialog from './components/CategoryDialog';
 import DeleteConfirmDialog from './components/DeleteConfirmDialog';
+import FAQCategoryTab from './components/FAQCategoryTab';
+import FAQDialog from './components/FAQDialog';
+import FAQListTab from './components/FAQListTab';
 import { useFAQManagement } from './hooks/useFAQManagement';
+
+const getCategoryName = (id: number, categories: FAQCategory[]) =>
+  categories.find((category) => category.id === id)?.name || 'Unknown';
+
+const getFAQCount = (categoryId: number, faqs: FAQ[]) =>
+  faqs.filter((faq) => faq.category_id === categoryId).length;
+
+const truncate = (text: string, max: number) =>
+  text.length > max ? `${text.substring(0, max)}...` : text;
 
 const FAQManagementPage: React.FC = () => {
   const { token } = useContext(TokenContext);
@@ -66,15 +48,18 @@ const FAQManagementPage: React.FC = () => {
     handleMoveCategory,
   } = useFAQManagement(token);
 
-  const filteredFAQs =
-    selectedCategoryFilter === 'all'
-      ? faqs
-      : faqs.filter((f) => f.category_id === selectedCategoryFilter);
-  const getCategoryName = (id: number) => categories.find((c) => c.id === id)?.name || 'Unknown';
-  const getFAQCount = (categoryId: number) =>
-    faqs.filter((f) => f.category_id === categoryId).length;
-  const truncate = (text: string, max: number) =>
-    text.length > max ? text.substring(0, max) + '...' : text;
+  const sortedCategories = useMemo(
+    () => [...categories].sort((a, b) => a.display_order - b.display_order),
+    [categories]
+  );
+
+  const filteredFAQs = useMemo(
+    () =>
+      selectedCategoryFilter === 'all'
+        ? faqs
+        : faqs.filter((faq) => faq.category_id === selectedCategoryFilter),
+    [faqs, selectedCategoryFilter]
+  );
 
   const handleOpenCreateFAQDialog = () => {
     setSelectedFAQ(null);
@@ -110,26 +95,48 @@ const FAQManagementPage: React.FC = () => {
     setCategoryDialogOpen(true);
   };
 
+  const handleOpenDeleteFAQDialog = (faq: FAQ) => {
+    setSelectedFAQ(faq);
+    setFaqDeleteDialogOpen(true);
+  };
+
+  const handleOpenDeleteCategoryDialog = (category: FAQCategory) => {
+    setSelectedCategory(category);
+    setCategoryDeleteDialogOpen(true);
+  };
+
   const onSaveFAQ = async () => {
     const success = await handleSaveFAQ();
-    if (success) setFaqDialogOpen(false);
+    if (success) {
+      setFaqDialogOpen(false);
+    }
   };
 
   const onDeleteFAQ = async () => {
-    if (!selectedFAQ) return;
+    if (!selectedFAQ) {
+      return;
+    }
     const success = await handleDeleteFAQ(selectedFAQ.id);
-    if (success) setFaqDeleteDialogOpen(false);
+    if (success) {
+      setFaqDeleteDialogOpen(false);
+    }
   };
 
   const onSaveCategory = async () => {
     const success = await handleSaveCategory();
-    if (success) setCategoryDialogOpen(false);
+    if (success) {
+      setCategoryDialogOpen(false);
+    }
   };
 
   const onDeleteCategory = async () => {
-    if (!selectedCategory) return;
+    if (!selectedCategory) {
+      return;
+    }
     const success = await handleDeleteCategory(selectedCategory.id);
-    if (success) setCategoryDeleteDialogOpen(false);
+    if (success) {
+      setCategoryDeleteDialogOpen(false);
+    }
   };
 
   if (loading) {
@@ -140,7 +147,7 @@ const FAQManagementPage: React.FC = () => {
     );
   }
 
-  const sortedCategories = [...categories].sort((a, b) => a.display_order - b.display_order);
+  const selectedCategoryFaqCount = selectedCategory ? getFAQCount(selectedCategory.id, faqs) : 0;
 
   return (
     <Box>
@@ -158,173 +165,28 @@ const FAQManagementPage: React.FC = () => {
       </Tabs>
 
       {activeTab === 0 && (
-        <>
-          <Box
-            sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-          >
-            <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel>Category Filter</InputLabel>
-              <Select
-                value={selectedCategoryFilter}
-                onChange={(e) =>
-                  setSelectedCategoryFilter(
-                    e.target.value === 'all' ? 'all' : Number(e.target.value)
-                  )
-                }
-                label="Category Filter"
-              >
-                <MenuItem value="all">All Categories</MenuItem>
-                {categories
-                  .filter((c) => c.is_active)
-                  .map((c) => (
-                    <MenuItem key={c.id} value={c.id}>
-                      {c.name}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreateFAQDialog}>
-              Create FAQ
-            </Button>
-          </Box>
-
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Question</TableCell>
-                  <TableCell>Answer</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Order</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="right">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredFAQs.map((faq) => (
-                  <TableRow key={faq.id} hover>
-                    <TableCell>
-                      <Typography variant="body2">{truncate(faq.question, 60)}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">{truncate(faq.answer, 60)}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip label={getCategoryName(faq.category_id)} size="small" color="primary" />
-                    </TableCell>
-                    <TableCell>{faq.display_order}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={faq.is_active ? 'Active' : 'Inactive'}
-                        size="small"
-                        color={faq.is_active ? 'success' : 'default'}
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      <IconButton size="small" onClick={() => handleOpenEditFAQDialog(faq)}>
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => {
-                          setSelectedFAQ(faq);
-                          setFaqDeleteDialogOpen(true);
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </>
+        <FAQListTab
+          selectedCategoryFilter={selectedCategoryFilter}
+          categories={categories}
+          filteredFAQs={filteredFAQs}
+          onFilterChange={setSelectedCategoryFilter}
+          getCategoryName={(id) => getCategoryName(id, categories)}
+          truncate={truncate}
+          onCreateFAQ={handleOpenCreateFAQDialog}
+          onEditFAQ={handleOpenEditFAQDialog}
+          onDeleteFAQ={handleOpenDeleteFAQDialog}
+        />
       )}
 
       {activeTab === 1 && (
-        <>
-          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleOpenCreateCategoryDialog}
-            >
-              Create Category
-            </Button>
-          </Box>
-
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Order</TableCell>
-                  <TableCell>FAQ Count</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="right">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sortedCategories.map((category, index) => (
-                  <TableRow key={category.id} hover>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight="medium">
-                        {category.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleMoveCategory(category, 'up')}
-                          disabled={index === 0}
-                        >
-                          <ArrowUpward fontSize="small" />
-                        </IconButton>
-                        <Typography variant="body2">{category.display_order}</Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleMoveCategory(category, 'down')}
-                          disabled={index === sortedCategories.length - 1}
-                        >
-                          <ArrowDownward fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{getFAQCount(category.id)}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={category.is_active ? 'Active' : 'Inactive'}
-                        size="small"
-                        color={category.is_active ? 'success' : 'default'}
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      <IconButton
-                        size="small"
-                        onClick={() => handleOpenEditCategoryDialog(category)}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => {
-                          setSelectedCategory(category);
-                          setCategoryDeleteDialogOpen(true);
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </>
+        <FAQCategoryTab
+          categories={sortedCategories}
+          getFAQCount={(id) => getFAQCount(id, faqs)}
+          onCreateCategory={handleOpenCreateCategoryDialog}
+          onEditCategory={handleOpenEditCategoryDialog}
+          onDeleteCategory={handleOpenDeleteCategoryDialog}
+          onMoveCategory={handleMoveCategory}
+        />
       )}
 
       <FAQDialog
@@ -359,13 +221,13 @@ const FAQManagementPage: React.FC = () => {
         open={categoryDeleteDialogOpen}
         title="Delete Category?"
         message={
-          selectedCategory && getFAQCount(selectedCategory.id) > 0
-            ? `This category contains ${getFAQCount(selectedCategory.id)} FAQ(s). Please reassign or delete them first.`
+          selectedCategoryFaqCount > 0
+            ? `This category contains ${selectedCategoryFaqCount} FAQ(s). Please reassign or delete them first.`
             : `Are you sure you want to deactivate "${selectedCategory?.name}"? It will no longer be visible to users.`
         }
         onClose={() => setCategoryDeleteDialogOpen(false)}
         onConfirm={onDeleteCategory}
-        disabled={selectedCategory ? getFAQCount(selectedCategory.id) > 0 : false}
+        disabled={selectedCategoryFaqCount > 0}
       />
 
       <Snackbar

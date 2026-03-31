@@ -42,6 +42,135 @@ import { TokenContext } from '../../contexts/AuthContext';
 import type { Booking } from '../userArea/interface';
 import type { CombinedBooking } from './interface';
 
+interface PaymentManagementModalProps {
+  open: boolean;
+  editedBooking: CombinedBooking | null;
+  onClose: () => void;
+  onTogglePaid: () => void;
+  onInputChange: (field: keyof Booking, value: Booking[keyof Booking]) => void;
+  onSave: () => void;
+  getTicketTitle: (ticketId: number) => string;
+}
+
+const PaymentManagementModal: React.FC<PaymentManagementModalProps> = ({
+  open,
+  editedBooking,
+  onClose,
+  onTogglePaid,
+  onInputChange,
+  onSave,
+  getTicketTitle,
+}) => {
+  if (!editedBooking) {
+    return null;
+  }
+
+  return (
+    <Modal open={open} onClose={onClose}>
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90vw',
+          maxWidth: 500,
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: 24,
+          p: 3,
+        }}
+      >
+        <Typography variant="h5" color={'text.primary'} gutterBottom>
+          Payment Management
+        </Typography>
+        <Typography color={'text.primary'} variant="subtitle1">
+          {editedBooking.first_name} {editedBooking.last_name}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" gutterBottom>
+          {getTicketTitle(editedBooking.ticket_id)} - Expected: €
+          {editedBooking.total_price.toFixed(2)}
+        </Typography>
+
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+          <Grid size={12}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={editedBooking.is_paid}
+                  onChange={onTogglePaid}
+                  color={editedBooking.is_paid ? 'success' : 'error'}
+                />
+              }
+              label={
+                <Typography color={editedBooking.is_paid ? 'success.light' : 'error'}>
+                  {editedBooking.is_paid ? 'Ist bezahlt' : 'Noch nicht bezahlt'}
+                </Typography>
+              }
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              fullWidth
+              label="Paid Amount"
+              type="number"
+              value={editedBooking.paid_amount === 0 ? '' : editedBooking.paid_amount || ''}
+              placeholder="0"
+              onChange={(event) =>
+                onInputChange('paid_amount', parseFloat(event.target.value) || 0)
+              }
+              InputProps={{
+                startAdornment: <InputAdornment position="start">€</InputAdornment>,
+              }}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              fullWidth
+              label="Payment Date"
+              type="date"
+              value={editedBooking.payment_date || ''}
+              onChange={(event) => onInputChange('payment_date', event.target.value)}
+              InputLabelProps={{ shrink: true }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <CalendarToday fontSize="small" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+
+          <Grid size={12}>
+            <TextField
+              fullWidth
+              label="Payment Notes"
+              multiline
+              rows={3}
+              InputProps={{ inputComponent: 'textarea' }}
+              value={editedBooking.payment_notes || ''}
+              onChange={(event) => onInputChange('payment_notes', event.target.value)}
+              placeholder="Enter any notes about the payment..."
+            />
+          </Grid>
+        </Grid>
+
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+          <Button variant="outlined" onClick={onClose} sx={{ mr: 1 }} startIcon={<Clear />}>
+            Cancel
+          </Button>
+          <Button variant="contained" color="primary" onClick={onSave} startIcon={<Save />}>
+            Save Changes
+          </Button>
+        </Box>
+      </Box>
+    </Modal>
+  );
+};
+
 const PaymentConfirmationsPage: React.FC = () => {
   const { bookings, formContent, refetch } = useFetchData();
   const [, setSelectedBooking] = useState<CombinedBooking | null>(null);
@@ -327,133 +456,15 @@ const PaymentConfirmationsPage: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* Payment Management Modal */}
-      <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '90vw',
-            maxWidth: 500,
-            bgcolor: 'background.paper',
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 3,
-          }}
-        >
-          {editedBooking && (
-            <>
-              <Typography variant="h5" color={'text.primary'} gutterBottom>
-                Payment Management
-              </Typography>
-              <Typography color={'text.primary'} variant="subtitle1">
-                {editedBooking.first_name} {editedBooking.last_name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {getTicketTitle(editedBooking.ticket_id)} - Expected: €
-                {editedBooking.total_price.toFixed(2)}
-              </Typography>
-
-              <Grid container spacing={2} sx={{ mt: 2 }}>
-                <Grid size={12}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={editedBooking.is_paid}
-                        onChange={handleTogglePaid}
-                        color={editedBooking.is_paid ? 'success' : 'error'}
-                      />
-                    }
-                    label={
-                      <Typography color={editedBooking.is_paid ? 'success.light' : 'error'}>
-                        {editedBooking.is_paid ? 'Ist bezahlt' : 'Noch nicht bezahlt'}
-                      </Typography>
-                    }
-                  />
-                </Grid>
-
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <TextField
-                    fullWidth
-                    label="Paid Amount"
-                    type="number"
-                    value={editedBooking.paid_amount === 0 ? '' : editedBooking.paid_amount || ''}
-                    placeholder="0"
-                    onChange={(e) =>
-                      handleInputChange('paid_amount', parseFloat(e.target.value) || 0)
-                    }
-                    InputProps={{
-                      startAdornment: <InputAdornment position="start">€</InputAdornment>,
-                    }}
-                  />
-                </Grid>
-
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <TextField
-                    fullWidth
-                    label="Payment Date"
-                    type="date"
-                    value={editedBooking.payment_date || ''}
-                    onChange={(e) => handleInputChange('payment_date', e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <CalendarToday fontSize="small" />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-
-                <Grid size={12}>
-                  <TextField
-                    fullWidth
-                    label="Payment Notes"
-                    multiline
-                    rows={3}
-                    InputProps={{ inputComponent: 'textarea' }}
-                    value={editedBooking.payment_notes || ''}
-                    onChange={(e) => handleInputChange('payment_notes', e.target.value)}
-                    placeholder="Enter any notes about the payment..."
-                  />
-                </Grid>
-              </Grid>
-
-              <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                  variant="outlined"
-                  onClick={handleCloseModal}
-                  sx={{ mr: 1 }}
-                  startIcon={<Clear />}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSaveChanges}
-                  startIcon={<Save />}
-                >
-                  Save Changes
-                </Button>
-              </Box>
-            </>
-          )}
-        </Box>
-      </Modal>
+      <PaymentManagementModal
+        open={openModal}
+        editedBooking={editedBooking}
+        onClose={handleCloseModal}
+        onTogglePaid={handleTogglePaid}
+        onInputChange={handleInputChange}
+        onSave={handleSaveChanges}
+        getTicketTitle={getTicketTitle}
+      />
       <Snackbar
         open={showSnackbar}
         autoHideDuration={6000}
