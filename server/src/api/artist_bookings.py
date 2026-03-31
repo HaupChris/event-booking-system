@@ -16,6 +16,7 @@ from src.services.artist_service import (
     update_artist_payment,
 )
 from src.services.mail_service import send_artist_confirmation_mail
+from src.services.orga_team_service import is_valid_active_orga_team_member
 from src.utils.logger import get_logger, log_security_event
 
 # Initialize logger
@@ -47,6 +48,12 @@ def submit_artist_form():
         booking = ArtistBooking(**booking_data)
         artist_name = getattr(booking, "artist_name", "Unknown Artist")
         logger.info(f"Artist booking submission from {artist_name}")
+
+        if not is_valid_active_orga_team_member(booking.invited_by_id):
+            logger.warning(
+                f"Artist booking submission failed: invalid invited_by_id={booking.invited_by_id} from {client_ip}"
+            )
+            return jsonify({"error": "Invalid inviter selection"}), 400
 
         success, profile_uuid = insert_artist_booking(booking)
 

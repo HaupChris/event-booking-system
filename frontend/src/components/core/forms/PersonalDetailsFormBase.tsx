@@ -15,11 +15,13 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import SmartphoneIcon from '@mui/icons-material/Smartphone';
 import BadgeIcon from '@mui/icons-material/Badge';
 import WorkIcon from '@mui/icons-material/Work';
+import GroupsIcon from '@mui/icons-material/Groups';
 import FormField from '../inputs/FormField';
 import ThemedFormLayout from '../layouts/ThemedFormLayout';
 import MissionHeading from '../display/MissionHeading';
 import FormCard from '../display/FormCard';
-import type { Profession } from '../../../form/userArea/interface';
+import type { OrgaInviter, Profession } from '../../../form/userArea/interface';
+import WWSelect from '../inputs/WWSelect';
 
 interface PersonalDetailsTextProps {
   missionBriefing: string;
@@ -29,23 +31,31 @@ interface PersonalDetailsTextProps {
   professionsTitle: string;
   professionsSubtitle: string;
   selectedProfessions: (count: number) => string;
+  inviterTitle: string;
+  inviterSubtitle: string;
+  inviterPlaceholder: string;
 }
 
 type PersonalFieldKey = 'first_name' | 'last_name' | 'email' | 'phone';
 
 interface PersonalDetailsFormBaseProps {
-  updateBooking: (key: PersonalFieldKey | 'profession_ids', value: string | number[]) => void;
+  updateBooking: (
+    key: PersonalFieldKey | 'profession_ids' | 'invited_by_id',
+    value: string | number | number[]
+  ) => void;
   currentBooking: {
     first_name: string;
     last_name: string;
     email: string;
     phone: string;
+    invited_by_id: number;
     profession_ids: number[];
   };
   formValidation: { [key: string]: string | undefined };
   texts: PersonalDetailsTextProps;
   formContent: {
     professions: Profession[];
+    orga_inviters: OrgaInviter[];
   };
   icon?: React.ReactNode;
   professionIdsField?: 'profession_ids';
@@ -76,6 +86,10 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
   const selectedProfessions = (formContent.professions || []).filter((profession) =>
     selectedProfessionIds.includes(profession.id)
   );
+  const inviterOptions = (formContent.orga_inviters || []).map((inviter) => ({
+    value: inviter.id,
+    label: inviter.name,
+  }));
 
   return (
     <ThemedFormLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
@@ -134,6 +148,44 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
           required
           icon={<SmartphoneIcon />}
         />
+      </Box>
+
+      <Box sx={{ mt: 4 }}>
+        <MissionHeading
+          title={texts.inviterTitle}
+          subtitle={texts.inviterSubtitle}
+          icon={<GroupsIcon />}
+          withDivider={true}
+        />
+        <FormCard>
+          <Box sx={{ p: 2 }}>
+            <WWSelect
+              options={inviterOptions}
+              value={
+                props.currentBooking.invited_by_id >= 0 ? props.currentBooking.invited_by_id : null
+              }
+              onChange={(value) =>
+                props.updateBooking(
+                  'invited_by_id',
+                  value === null ? -1 : typeof value === 'number' ? value : Number(value)
+                )
+              }
+              placeholder={texts.inviterPlaceholder}
+              isFullWidth={true}
+              minWidth="100%"
+            />
+            {inviterOptions.length === 0 && (
+              <Typography variant="caption" color="warning.main" sx={{ mt: 1, display: 'block' }}>
+                Aktuell sind keine Orga-Personen hinterlegt. Bitte melde dich beim Team.
+              </Typography>
+            )}
+            {props.formValidation.invited_by_id && (
+              <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
+                {props.formValidation.invited_by_id}
+              </Typography>
+            )}
+          </Box>
+        </FormCard>
       </Box>
 
       {/* Professions Section */}

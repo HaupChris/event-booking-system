@@ -43,6 +43,7 @@ function getEmptyBooking(): Booking {
     first_name: '',
     email: '',
     phone: '',
+    invited_by_id: -1,
     ticket_id: -1,
     beverage_id: -1,
     food_id: -1,
@@ -107,6 +108,7 @@ export function getDummyFormContent(): FormContent {
       // ...
     ],
     professions: [],
+    orga_inviters: [],
   };
 }
 
@@ -131,6 +133,7 @@ const validationRules = {
   last_name: (value: string) => validateName(value, 'last_name'),
   email: validateEmail,
   phone: validatePhone,
+  invited_by_id: (value: number) => validateRequiredSelect(value, 'eine Person aus dem Orga-Team'),
   ticket_id: (value: number) => validateRequiredSelect(value, 'ein Ticket'),
   timeslot_priority_1: validateTimeslotPriority,
   timeslot_priority_2: validateTimeslotPriority,
@@ -156,7 +159,7 @@ export function UserRegistrationFormContainer() {
         storageConfig: {
           storageKey: 'booking',
           versionKey: 'formVersion',
-          currentVersion: '1.3',
+          currentVersion: '1.4',
         },
 
         // Validation and form configuration
@@ -174,7 +177,13 @@ export function UserRegistrationFormContainer() {
           [FormSteps.Confirmation]: userAreaTexts.confirmationForm.initialView.title,
         },
         requiredFields: {
-          [FormSteps.NameAndAddress]: ['last_name', 'first_name', 'email', 'phone'],
+          [FormSteps.NameAndAddress]: [
+            'last_name',
+            'first_name',
+            'email',
+            'phone',
+            'invited_by_id',
+          ],
           [FormSteps.Ticket]: ['ticket_id'],
           [FormSteps.Beverage]: [],
           [FormSteps.Food]: [],

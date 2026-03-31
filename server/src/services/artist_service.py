@@ -11,6 +11,7 @@ from src.services.formcontent_service import (
     get_artist_form_content_obj,
     update_artist_form_content_with_db_counts,
 )
+from src.services.orga_team_service import get_active_orga_team_members
 
 
 def get_all_artist_bookings() -> list[ArtistBookingWithTimestamp]:
@@ -36,12 +37,15 @@ def get_all_artist_bookings() -> list[ArtistBookingWithTimestamp]:
                    b.paid_amount,
                    b.payment_notes,
                    b.payment_date,
+                   b.invited_by_id,
+                   ot.name as invited_by_name,
                    b.equipment,
                    b.special_requests,
                    b.performance_details,
                    b.profile_uuid
             FROM Artists a
             JOIN ArtistBookings b ON a.id = b.artist_id
+            LEFT JOIN OrgaTeamInviters ot ON b.invited_by_id = ot.id
             """
         )
         rows = cursor.fetchall()
@@ -85,10 +89,12 @@ def get_all_artist_bookings() -> list[ArtistBookingWithTimestamp]:
                 paid_amount=row[12],
                 payment_notes=row[13],
                 payment_date=row[14],
-                equipment=row[15],
-                special_requests=row[16],
-                performance_details=row[17],
-                profile_uuid=row[18],
+                invited_by_id=row[15] if row[15] is not None else -1,
+                invited_by_name=row[16] or "",
+                equipment=row[17],
+                special_requests=row[18],
+                performance_details=row[19],
+                profile_uuid=row[20],
                 artist_material_ids=material_ids,
                 profession_ids=profession_ids,
             )
@@ -115,14 +121,17 @@ def get_artist_booking_by_id(booking_id: int) -> ArtistBookingWithTimestamp | No
                               b.signature,
                               b.is_paid,
                               b.paid_amount,
-                              b.payment_notes,
-                              b.payment_date,
-                              b.equipment,
-                              b.special_requests,
-                              b.performance_details,
-                              b.profile_uuid
+                               b.payment_notes,
+                               b.payment_date,
+                               b.invited_by_id,
+                               ot.name as invited_by_name,
+                               b.equipment,
+                               b.special_requests,
+                               b.performance_details,
+                               b.profile_uuid
                        FROM Artists a
-                                JOIN ArtistBookings b ON a.id = b.artist_id
+                                 JOIN ArtistBookings b ON a.id = b.artist_id
+                                 LEFT JOIN OrgaTeamInviters ot ON b.invited_by_id = ot.id
                        WHERE b.id = ?
                        """,
             (booking_id,),
@@ -158,10 +167,12 @@ def get_artist_booking_by_id(booking_id: int) -> ArtistBookingWithTimestamp | No
             paid_amount=row[12],
             payment_notes=row[13],
             payment_date=row[14],
-            equipment=row[15],
-            special_requests=row[16],
-            performance_details=row[17],
-            profile_uuid=row[18],
+            invited_by_id=row[15] if row[15] is not None else -1,
+            invited_by_name=row[16] or "",
+            equipment=row[17],
+            special_requests=row[18],
+            performance_details=row[19],
+            profile_uuid=row[20],
             artist_material_ids=material_ids,
         )
 
@@ -214,10 +225,11 @@ def update_artist_booking(booking_id: int, booking_data: dict) -> bool:
                                total_price         = ?,
                                equipment           = ?,
                                special_requests    = ?,
-                               performance_details = ?,
-                               is_paid             = ?,
-                               paid_amount         = ?,
-                               payment_notes       = ?,
+                                performance_details = ?,
+                                invited_by_id       = ?,
+                                is_paid             = ?,
+                                paid_amount         = ?,
+                                payment_notes       = ?,
                                payment_date        = ?
                            WHERE id = ?
                            """,
@@ -229,6 +241,7 @@ def update_artist_booking(booking_id: int, booking_data: dict) -> bool:
                     booking_data.get("equipment", ""),
                     booking_data.get("special_requests", ""),
                     booking_data.get("performance_details", ""),
+                    booking_data.get("invited_by_id"),
                     1 if booking_data.get("is_paid", False) else 0,
                     booking_data.get("paid_amount", 0),
                     booking_data.get("payment_notes", ""),
@@ -329,6 +342,7 @@ def get_up_to_date_artist_form_content() -> dict:
     form_content_obj = get_artist_form_content_obj()
     result = update_artist_form_content_with_db_counts(form_content_obj, _connect_db)
     result["payment_link"] = get_payment_link()
+    result["orga_inviters"] = get_active_orga_team_members()
     return result
 
 
@@ -441,9 +455,9 @@ def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> tuple[int,
             INSERT INTO ArtistBookings (
                 artist_id, ticket_option_id, beverage_option_id, food_option_id,
                 signature, total_price, is_paid, paid_amount, payment_notes, payment_date,
-                equipment, special_requests, performance_details, profile_uuid
+                invited_by_id, equipment, special_requests, performance_details, profile_uuid
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 artist_id,
@@ -456,6 +470,7 @@ def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> tuple[int,
                 booking.paid_amount,
                 booking.payment_notes,
                 booking.payment_date,
+                booking.invited_by_id,
                 booking.equipment,
                 booking.special_requests,
                 booking.performance_details,

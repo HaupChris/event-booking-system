@@ -71,12 +71,19 @@ class Profession(Interface):
 
 
 @dataclass
+class OrgaTeamInviter(Interface):
+    id: int
+    name: str
+
+
+@dataclass
 class FormContent(Interface):
     ticket_options: list[TicketOption]
     beverage_options: list[BeverageOption]
     food_options: list[FoodOption]
     work_shifts: list[WorkShift]
     materials: list[Material]
+    orga_inviters: list[OrgaTeamInviter] = field(default_factory=list)
     artist_materials: list[ArtistMaterial] = field(default_factory=list)
     professions: list[Profession] = field(default_factory=list)
 
@@ -87,6 +94,7 @@ class Booking(Interface):
     first_name: str
     email: str
     phone: str
+    invited_by_id: int
     ticket_id: int
     beverage_id: int
     food_id: int
@@ -103,6 +111,7 @@ class Booking(Interface):
     payment_notes: str
     payment_date: str
     profile_uuid: str = ""
+    invited_by_name: str = ""
     artist_material_ids: list[int] = field(default_factory=list)
     profession_ids: list[int] = field(default_factory=list)
 
@@ -119,6 +128,7 @@ class ArtistBooking(Interface):
     first_name: str
     email: str
     phone: str
+    invited_by_id: int
     ticket_id: int
     beverage_id: int
     food_id: int
@@ -133,6 +143,7 @@ class ArtistBooking(Interface):
     special_requests: str = ""
     performance_details: str = ""
     profile_uuid: str = ""
+    invited_by_name: str = ""
     profession_ids: list[int] = field(default_factory=list)
 
 
@@ -148,6 +159,7 @@ class ArtistFormContent(Interface):
     beverage_options: list[BeverageOption]
     food_options: list[FoodOption]
     artist_materials: list[ArtistMaterial]
+    orga_inviters: list[OrgaTeamInviter] = field(default_factory=list)
     professions: list[Profession] = field(default_factory=list)
 
 

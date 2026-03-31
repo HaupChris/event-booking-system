@@ -29,6 +29,7 @@ interface ColumnVisibility {
   type: boolean;
   name: boolean;
   email: boolean;
+  invitedBy: boolean;
   ticket: boolean;
   price: boolean;
   profileLink: boolean;
@@ -67,6 +68,7 @@ const BookingTable: React.FC<BookingTableProps> = ({
             {columnVisibility.type && <TableCell>Type</TableCell>}
             {columnVisibility.name && <TableCell>Name</TableCell>}
             {columnVisibility.email && <TableCell>Email</TableCell>}
+            {columnVisibility.invitedBy && <TableCell>Invited By</TableCell>}
             {columnVisibility.ticket && <TableCell>Ticket</TableCell>}
             {columnVisibility.price && <TableCell>Price</TableCell>}
             {columnVisibility.profileLink && <TableCell>Profile Link</TableCell>}
@@ -102,6 +104,9 @@ const BookingTable: React.FC<BookingTableProps> = ({
                 </TableCell>
               )}
               {columnVisibility.email && <TableCell>{booking.email}</TableCell>}
+              {columnVisibility.invitedBy && (
+                <TableCell>{booking.invited_by_name || 'Nicht gesetzt'}</TableCell>
+              )}
               {columnVisibility.ticket && (
                 <TableCell>
                   {getTicketTitle(

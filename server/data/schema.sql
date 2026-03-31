@@ -6,6 +6,15 @@ CREATE TABLE IF NOT EXISTS Users  (
     phone_number TEXT
 );
 
+CREATE TABLE IF NOT EXISTS OrgaTeamInviters (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL UNIQUE,
+    is_active INTEGER DEFAULT 1,
+    display_order INTEGER NOT NULL DEFAULT 0,
+    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS TicketOptions  (
     id INTEGER PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
@@ -61,6 +70,7 @@ CREATE TABLE IF NOT EXISTS Bookings  (
     third_priority_timeslot_id INTEGER,
     amount_shifts INTEGER,
     supporter_buddy TEXT,
+    invited_by_id INTEGER,
     signature BLOB,
     total_price REAL,
     is_paid INTEGER DEFAULT 0,
@@ -71,6 +81,7 @@ CREATE TABLE IF NOT EXISTS Bookings  (
     FOREIGN KEY(ticket_option_id) REFERENCES TicketOptions(id) ON DELETE SET NULL,
     FOREIGN KEY(beverage_option_id) REFERENCES BeverageOptions(id) ON DELETE SET NULL,
     FOREIGN KEY(food_option_id) REFERENCES FoodOptions(id) ON DELETE SET NULL,
+    FOREIGN KEY(invited_by_id) REFERENCES OrgaTeamInviters(id) ON DELETE SET NULL,
     FOREIGN KEY(first_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL,
     FOREIGN KEY(second_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL,
     FOREIGN KEY(third_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL
@@ -119,13 +130,15 @@ CREATE TABLE IF NOT EXISTS ArtistBookings (
     paid_amount REAL DEFAULT 0.0,
     payment_notes TEXT DEFAULT '',
     payment_date TEXT DEFAULT NULL,
+    invited_by_id INTEGER,
     equipment TEXT DEFAULT '',
     special_requests TEXT DEFAULT '',
     performance_details TEXT DEFAULT '',
     FOREIGN KEY(artist_id) REFERENCES Artists(id) ON DELETE CASCADE,
     FOREIGN KEY(ticket_option_id) REFERENCES TicketOptions(id) ON DELETE SET NULL,
     FOREIGN KEY(beverage_option_id) REFERENCES BeverageOptions(id) ON DELETE SET NULL,
-    FOREIGN KEY(food_option_id) REFERENCES FoodOptions(id) ON DELETE SET NULL
+    FOREIGN KEY(food_option_id) REFERENCES FoodOptions(id) ON DELETE SET NULL,
+    FOREIGN KEY(invited_by_id) REFERENCES OrgaTeamInviters(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS ArtistBookingMaterials (

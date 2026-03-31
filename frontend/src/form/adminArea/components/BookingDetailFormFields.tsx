@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import React from 'react';
 import {
   Box,
@@ -49,6 +50,10 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
     editedBooking.bookingType === 'artist'
       ? artistFormContent.food_options
       : formContent.food_options;
+  const inviterOptions =
+    editedBooking.bookingType === 'artist'
+      ? artistFormContent.orga_inviters
+      : formContent.orga_inviters;
 
   const pricingAwareInputChange = (
     field: keyof CombinedBooking,
@@ -112,6 +117,27 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
           disabled={!editMode}
           margin="normal"
         />
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Invited By</InputLabel>
+          <Select
+            value={editedBooking.invited_by_id ?? -1}
+            onChange={(event) => onInputChange('invited_by_id', Number(event.target.value))}
+            disabled={!editMode}
+            label="Invited By"
+          >
+            <MenuItem value={-1} disabled>
+              Not selected
+            </MenuItem>
+            {inviterOptions.map((inviter) => (
+              <MenuItem key={inviter.id} value={inviter.id}>
+                {inviter.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>

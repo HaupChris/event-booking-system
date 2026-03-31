@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Box,
   Typography,
@@ -34,20 +34,20 @@ import type { CombinedBooking } from './interface';
 import FormCard from '../../components/core/display/FormCard';
 import BookingTable from './components/BookingTable';
 import BookingDetailModal from './components/BookingDetailModal';
-import { filterBookings, sortBookings } from './utils/bookingUtils';
+import { filterBookings, getInviterFilterData, sortBookings } from './utils/bookingUtils';
 import { useColumnVisibility } from '../../hooks/useColumnVisibility';
 import { useSnackbar } from '../../hooks/useSnackbar';
 import { useBookingActions } from '../../hooks/useBookingActions';
 import { useModal } from '../../hooks/useModal';
 import { useSort } from '../../hooks/useSort';
 import { useAdminPageFilters } from '../../hooks/useAdminPageFilters';
-import { useContext } from 'react';
 
 interface ColumnVisibility {
   [key: string]: boolean;
   type: boolean;
   name: boolean;
   email: boolean;
+  invitedBy: boolean;
   ticket: boolean;
   price: boolean;
   profileLink: boolean;
@@ -62,6 +62,7 @@ const BookingsPage: React.FC = () => {
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
+  const [invitedByFilter, setInvitedByFilter] = useState('all');
 
   // Custom hooks for state management
   const {
@@ -75,12 +76,13 @@ const BookingsPage: React.FC = () => {
       type: true,
       name: true,
       email: !isMobile,
+      invitedBy: !isMobile,
       ticket: !isMobile,
       price: !isMobile,
       profileLink: !isMobile,
       actions: true,
     },
-    mobileHiddenColumns: ['email', 'ticket', 'price', 'profileLink'],
+    mobileHiddenColumns: ['email', 'invitedBy', 'ticket', 'price', 'profileLink'],
     isMobile,
   });
 
@@ -108,10 +110,11 @@ const BookingsPage: React.FC = () => {
   const { snackbarState, showSuccess, showError, hideSnackbar } = useSnackbar();
 
   const { deleteBooking } = useBookingActions();
+  const { inviterFilterOptions, hasUnassignedBookings } = getInviterFilterData(bookings);
 
   // Process bookings
   const processedBookings = sortBookings(
-    filterBookings(bookings, viewType, searchQuery),
+    filterBookings(bookings, viewType, searchQuery, invitedByFilter),
     sortCriterion,
     sortOrder
   );
@@ -270,6 +273,23 @@ const BookingsPage: React.FC = () => {
           }}
           sx={{ flexGrow: 1, maxWidth: isMobile ? '100%' : '60%' }}
         />
+
+        <FormControl variant="outlined" size="small" sx={{ minWidth: isMobile ? '100%' : 210 }}>
+          <InputLabel>Invited By</InputLabel>
+          <Select
+            value={invitedByFilter}
+            onChange={(event) => setInvitedByFilter(String(event.target.value))}
+            label="Invited By"
+          >
+            <MenuItem value="all">All inviters</MenuItem>
+            {hasUnassignedBookings && <MenuItem value="unassigned">Not selected</MenuItem>}
+            {inviterFilterOptions.map((inviter) => (
+              <MenuItem key={inviter.value} value={inviter.value}>
+                {inviter.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
         {/* Sort Controls */}
         <Box

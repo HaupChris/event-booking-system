@@ -1,3 +1,7 @@
+/* eslint-disable max-lines */
+const selectedProfessionsText = (count: number) =>
+  `Du hast ${count} ${count === 1 ? 'Qualifikation' : 'Qualifikationen'} ausgewählt`;
+
 export const userAreaTexts = {
   // Organized by form component first, then by element type
   personalDetailsForm: {
@@ -8,8 +12,11 @@ export const userAreaTexts = {
     professionsTitle: 'Berufliche Qualifikationen',
     professionsSubtitle:
       'Wähle alle Qualifikationen aus, die auf dich zutreffen. Diese Angaben sind freiwillig und helfen uns, im Notfall schnell die richtigen Personen zu finden.',
-    selectedProfessions: (count: number) =>
-      `Du hast ${count} ${count === 1 ? 'Qualifikation' : 'Qualifikationen'} ausgewählt`,
+    selectedProfessions: selectedProfessionsText,
+    inviterTitle: 'Einladung',
+    inviterSubtitle:
+      'Bitte wähle aus, welche Person aus dem Orga-Team dich zum Festival eingeladen hat.',
+    inviterPlaceholder: 'Orga-Person auswählen',
   },
 
   ticketSelectionForm: {
@@ -190,7 +197,6 @@ export const userAreaTexts = {
     },
   },
 };
-
 export const artistAreaTexts = {
   personalDetailsForm: {
     missionBriefing:
@@ -201,8 +207,11 @@ export const artistAreaTexts = {
     professionsTitle: 'Berufliche Qualifikationen',
     professionsSubtitle:
       'Wähle alle Qualifikationen aus, die auf dich zutreffen. Diese Angaben sind freiwillig und helfen uns, im Notfall schnell die richtigen Personen zu finden.',
-    selectedProfessions: (count: number) =>
-      `Du hast ${count} ${count === 1 ? 'Qualifikation' : 'Qualifikationen'} ausgewählt`,
+    selectedProfessions: selectedProfessionsText,
+    inviterTitle: 'Einladung',
+    inviterSubtitle:
+      'Bitte wähle aus, welche Person aus dem Orga-Team dich als Artist eingeladen hat.',
+    inviterPlaceholder: 'Orga-Person auswählen',
   },
 
   performanceDetailsForm: {

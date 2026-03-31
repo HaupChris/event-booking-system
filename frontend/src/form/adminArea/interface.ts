@@ -5,6 +5,8 @@ export interface CombinedBooking {
   first_name: string;
   email: string;
   phone: string;
+  invited_by_id?: number;
+  invited_by_name?: string;
   ticket_id: number;
   beverage_id: number;
   food_id: number;

@@ -10,6 +10,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from src.api.admin_faq import admin_faq_bp
 from src.api.admin_news import admin_news_bp
+from src.api.admin_orga_team import admin_orga_team_bp
 from src.api.admin_profiles import admin_profiles_bp
 from src.api.admin_settings import admin_settings_bp
 from src.api.artist_bookings import artist_bp
@@ -72,6 +73,7 @@ app.register_blueprint(admin_faq_bp, url_prefix="/api/admin")
 app.register_blueprint(admin_news_bp, url_prefix="/api/admin")
 app.register_blueprint(admin_profiles_bp, url_prefix="/api/admin")
 app.register_blueprint(admin_settings_bp, url_prefix="/api/admin")
+app.register_blueprint(admin_orga_team_bp, url_prefix="/api/admin")
 
 
 @app.errorhandler(Exception)

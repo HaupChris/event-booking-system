@@ -12,6 +12,7 @@ from src.services.formcontent_service import (
     get_form_content_obj,
     update_form_content_with_db_counts,
 )
+from src.services.orga_team_service import get_active_orga_team_members
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -121,12 +122,13 @@ def create_booking(user_id: int, booking: Booking) -> tuple[int, str | None]:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                           INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, food_option_id,
-                                                 first_priority_timeslot_id, second_priority_timeslot_id,
-                                                 third_priority_timeslot_id,
-                                                 amount_shifts, supporter_buddy, signature, total_price, is_paid,
-                                                 paid_amount, payment_notes, payment_date, profile_uuid)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, food_option_id,
+                                                  first_priority_timeslot_id, second_priority_timeslot_id,
+                                                  third_priority_timeslot_id,
+                                                  amount_shifts, supporter_buddy, invited_by_id,
+                                                  signature, total_price, is_paid,
+                                                  paid_amount, payment_notes, payment_date, profile_uuid)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                            """,
                 (
                     user_id,
@@ -138,6 +140,7 @@ def create_booking(user_id: int, booking: Booking) -> tuple[int, str | None]:
                     booking.timeslot_priority_3,
                     booking.amount_shifts,
                     booking.supporter_buddy,
+                    booking.invited_by_id,
                     booking.signature,
                     booking.total_price,
                     booking.is_paid,
@@ -315,18 +318,21 @@ def get_all_bookings() -> list[BookingWithTimestamp]:
                                   b.second_priority_timeslot_id,
                                   b.third_priority_timeslot_id,
                                   b.amount_shifts,
-                                  b.supporter_buddy,
-                                  b.total_price,
-                                  b.Timestamp,
+                                   b.supporter_buddy,
+                                   b.invited_by_id,
+                                   ot.name as invited_by_name,
+                                   b.total_price,
+                                   b.Timestamp,
                                   b.signature,
                                   b.is_paid,
                                   b.paid_amount,
                                   b.payment_notes,
-                                  b.payment_date,
-                                  b.profile_uuid
-                           FROM Users u
-                                    JOIN Bookings b ON u.id = b.user_id
-                           """
+                                   b.payment_date,
+                                   b.profile_uuid
+                            FROM Users u
+                                     JOIN Bookings b ON u.id = b.user_id
+                                     LEFT JOIN OrgaTeamInviters ot ON b.invited_by_id = ot.id
+                            """
             )
             rows = cursor.fetchall()
 
@@ -367,16 +373,18 @@ def get_all_bookings() -> list[BookingWithTimestamp]:
                     timeslot_priority_3=row[10],
                     amount_shifts=row[11],
                     supporter_buddy=row[12],
-                    total_price=row[13],
-                    timestamp=row[14],
-                    signature=row[15] or "",
-                    is_paid=True if row[16] == 1 else False,
-                    paid_amount=row[17],
-                    payment_notes=row[18],
-                    payment_date=row[19],
+                    invited_by_id=row[13] if row[13] is not None else -1,
+                    invited_by_name=row[14] or "",
+                    total_price=row[15],
+                    timestamp=row[16],
+                    signature=row[17] or "",
+                    is_paid=True if row[18] == 1 else False,
+                    paid_amount=row[19],
+                    payment_notes=row[20],
+                    payment_date=row[21],
                     profession_ids=profession_ids,
                     material_ids=material_ids,
-                    profile_uuid=row[20],
+                    profile_uuid=row[22],
                 )
                 bookings.append(booking)
             duration = time.time() - start_time
@@ -420,6 +428,7 @@ def get_up_to_date_form_content() -> dict:
         form_content_obj = get_form_content_obj()
         result = update_form_content_with_db_counts(form_content_obj, _connect_db)
         result["payment_link"] = get_payment_link()
+        result["orga_inviters"] = get_active_orga_team_members()
 
         duration = time.time() - start_time
         logger.debug(f"Form content generated in {duration:.3f}s")
@@ -485,12 +494,13 @@ def update_booking_db(booking_id: int, booking_data: dict) -> bool:
                                    food_option_id              = ?,
                                    first_priority_timeslot_id  = ?,
                                    second_priority_timeslot_id = ?,
-                                   third_priority_timeslot_id  = ?,
-                                   amount_shifts               = ?,
-                                   supporter_buddy             = ?,
-                                   total_price                 = ?
-                               WHERE id = ?
-                               """,
+                                    third_priority_timeslot_id  = ?,
+                                    amount_shifts               = ?,
+                                    supporter_buddy             = ?,
+                                    invited_by_id               = ?,
+                                    total_price                 = ?
+                                WHERE id = ?
+                                """,
                     (
                         booking_data["ticket_id"],
                         booking_data["beverage_id"],
@@ -500,6 +510,7 @@ def update_booking_db(booking_id: int, booking_data: dict) -> bool:
                         booking_data["timeslot_priority_3"],
                         booking_data["amount_shifts"],
                         booking_data["supporter_buddy"],
+                        booking_data.get("invited_by_id"),
                         booking_data["total_price"],
                         booking_id,
                     ),

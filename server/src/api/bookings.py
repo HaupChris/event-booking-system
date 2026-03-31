@@ -15,6 +15,7 @@ from src.services.booking_service import (
     update_booking_payment,
 )
 from src.services.mail_service import send_confirmation_mail
+from src.services.orga_team_service import is_valid_active_orga_team_member
 from src.utils.logger import get_logger, log_security_event
 
 # Initialize logger
@@ -49,6 +50,12 @@ def submit_form():
         logger.info(
             f"Booking submission from {booking.first_name} {booking.last_name} ({booking.email})"
         )
+
+        if not is_valid_active_orga_team_member(booking.invited_by_id):
+            logger.warning(
+                f"Booking submission failed: invalid invited_by_id={booking.invited_by_id} from {client_ip}"
+            )
+            return jsonify({"error": "Invalid inviter selection"}), 400
 
         # Attempt to insert booking
         success, profile_uuid = insert_booking(booking)

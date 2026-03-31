@@ -50,6 +50,11 @@ export interface Profession {
   title: string;
 }
 
+export interface OrgaInviter {
+  id: number;
+  name: string;
+}
+
 export interface FormContent {
   ticket_options: Array<TicketOption>;
   beverage_options: Array<BeverageOption>;
@@ -58,6 +63,7 @@ export interface FormContent {
   materials: Array<Material>;
   professions: Array<Profession>;
   payment_link?: string;
+  orga_inviters: Array<OrgaInviter>;
 }
 
 export interface Booking {
@@ -65,6 +71,8 @@ export interface Booking {
   first_name: string;
   email: string;
   phone: string;
+  invited_by_id: number;
+  invited_by_name?: string;
   ticket_id: number;
   beverage_id: number;
   food_id: number;

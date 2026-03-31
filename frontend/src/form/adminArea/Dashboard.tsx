@@ -28,6 +28,7 @@ import {
   Settings,
   Newspaper,
   Help,
+  Groups,
 } from '@mui/icons-material';
 import ListItemButton from '@mui/material/ListItemButton';
 import { CSVLink } from 'react-csv';
@@ -50,6 +51,7 @@ import ShiftAssignmentsPage from './ShiftAssignments';
 import NewsManagementPage from './NewsManagementPage';
 import FAQManagementPage from './FAQManagementPage';
 import SettingsPage from './SettingsPage';
+import OrgaTeamPage from './OrgaTeamPage';
 
 // Define all possible dashboard tabs
 interface DashboardTab {
@@ -77,9 +79,22 @@ const dashboardTabs: DashboardTab[] = [
     permissions: ['read'],
   },
   { id: 'settings', label: 'Settings', icon: <Settings />, permissions: ['read'] },
+  { id: 'orgaTeam', label: 'Orga Team', icon: <Groups />, permissions: ['read'] },
   { id: 'news', label: 'News Management', icon: <Newspaper />, permissions: ['read'] },
   { id: 'faqs', label: 'FAQ Management', icon: <Help />, permissions: ['read'] },
 ];
+
+const exportableTabs = new Set([
+  'bookings',
+  'tickets',
+  'beverages',
+  'food',
+  'materials',
+  'artistMaterials',
+  'workShifts',
+  'financials',
+  'payments',
+]);
 
 function Dashboard() {
   // Use fetch hook for data
@@ -137,6 +152,8 @@ function Dashboard() {
         return <FAQManagementPage />;
       case 'settings':
         return <SettingsPage />;
+      case 'orgaTeam':
+        return <OrgaTeamPage />;
       default:
         return <HomePage />;
     }
@@ -170,7 +187,7 @@ function Dashboard() {
           </Box>
 
           {/* Export button - only show for tabs with data */}
-          {activeTab !== 'home' && (
+          {exportableTabs.has(activeTab) && (
             <CSVLink
               data={getExportData()}
               filename={`${activeTab}_data.csv`}

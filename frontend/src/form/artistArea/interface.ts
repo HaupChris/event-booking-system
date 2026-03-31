@@ -1,4 +1,10 @@
-import type { TicketOption, BeverageOption, FoodOption, Profession } from '../userArea/interface';
+import type {
+  TicketOption,
+  BeverageOption,
+  FoodOption,
+  Profession,
+  OrgaInviter,
+} from '../userArea/interface';
 
 export interface ArtistMaterial {
   id: number;
@@ -12,6 +18,8 @@ export interface ArtistBooking {
   first_name: string;
   email: string;
   phone: string;
+  invited_by_id: number;
+  invited_by_name?: string;
   ticket_id: number;
   beverage_id: number;
   food_id: number;
@@ -40,4 +48,5 @@ export interface ArtistFormContent {
   artist_materials: Array<ArtistMaterial>;
   professions: Array<Profession>;
   payment_link?: string;
+  orga_inviters: Array<OrgaInviter>;
 }

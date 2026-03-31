@@ -122,6 +122,24 @@ function WorkShiftForm(props: FormProps) {
             options={numberOfShiftsOptions}
             value={currentBooking.amount_shifts}
             onChange={updateAmountShifts}
+            sx={{
+              bgcolor: alpha(theme.palette.background.paper, 0.7),
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: alpha(theme.palette.primary.main, 0.3),
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: alpha(theme.palette.primary.main, 0.5),
+              },
+            }}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  bgcolor: alpha(theme.palette.background.paper, 0.95),
+                  border: '1px solid',
+                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                },
+              },
+            }}
           />
         </Box>
       </FormCard>

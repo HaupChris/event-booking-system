@@ -41,6 +41,7 @@ function getEmptyArtistBooking(): ArtistBooking {
     first_name: '',
     email: '',
     phone: '',
+    invited_by_id: -1,
     ticket_id: -1,
     beverage_id: -1,
     food_id: -1,
@@ -96,6 +97,7 @@ export function getDummyArtistFormContent(): ArtistFormContent {
     ],
     artist_materials: [],
     professions: [],
+    orga_inviters: [],
   };
 }
 
@@ -118,6 +120,7 @@ const validationRules = {
   last_name: (value: string) => validateName(value, 'last_name'),
   email: validateEmail,
   phone: validatePhone,
+  invited_by_id: (value: number) => validateRequiredSelect(value, 'eine Person aus dem Orga-Team'),
   ticket_id: (value: number) => validateRequiredSelect(value, 'ein Ticket'),
   performance_details: (value: string) => validateRequiredText(value, 'Details zu deinem Auftritt'),
   signature: validateSignature,
@@ -141,7 +144,7 @@ export function ArtistRegistrationFormContainer() {
         storageConfig: {
           storageKey: 'artistBooking',
           versionKey: 'artistFormVersion',
-          currentVersion: '1.0',
+          currentVersion: '1.1',
         },
 
         // Validation and form configuration
@@ -159,7 +162,13 @@ export function ArtistRegistrationFormContainer() {
           [FormSteps.Confirmation]: artistAreaTexts.confirmationForm.initialView.title,
         },
         requiredFields: {
-          [FormSteps.PersonalDetails]: ['last_name', 'first_name', 'email', 'phone'],
+          [FormSteps.PersonalDetails]: [
+            'last_name',
+            'first_name',
+            'email',
+            'phone',
+            'invited_by_id',
+          ],
           [FormSteps.PerformanceDetails]: ['performance_details'],
           [FormSteps.Ticket]: ['ticket_id'],
           [FormSteps.Beverage]: [],

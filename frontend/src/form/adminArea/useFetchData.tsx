@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { TokenContext } from '../../contexts/AuthContext';
 import type { ArtistBookingWithTimestamp, ArtistFormContent } from '../artistArea/interface';
-import type { BookingWithTimestamp, FormContent } from '../userArea/interface';
+import type { BookingWithTimestamp, FormContent, OrgaInviter } from '../userArea/interface';
 import type { CombinedBooking } from './interface';
 import { setAuthToken } from '../../services/apiClient';
 import api from '../../services/api';
@@ -16,6 +16,7 @@ export const useFetchData = () => {
     work_shifts: [],
     materials: [],
     professions: [],
+    orga_inviters: [] as OrgaInviter[],
   });
   const [artistFormContent, setArtistFormContent] = useState<ArtistFormContent>({
     ticket_options: [],
@@ -23,6 +24,7 @@ export const useFetchData = () => {
     food_options: [],
     artist_materials: [],
     professions: [],
+    orga_inviters: [] as OrgaInviter[],
   });
   const { token } = useContext(TokenContext);
 

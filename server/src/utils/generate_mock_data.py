@@ -170,6 +170,7 @@ def generate_mock_artists_data(num_artists, form_content):
     food_options = form_content["food_options"]
     artist_materials = form_content["artist_materials"]
     professions = form_content.get("professions", [])
+    orga_inviters = form_content.get("orga_inviters", [])
 
     for _ in range(num_artists):
         first_name, last_name = generate_mock_name()
@@ -205,6 +206,7 @@ def generate_mock_artists_data(num_artists, form_content):
         ticket_id = random.choice(ticket_options).id
         beverage_id = random.choice(beverage_options).id
         food_id = random.choice(food_options).id
+        invited_by_id = random.choice(orga_inviters).id if orga_inviters else -1
 
         # Random selection of materials
         num_materials = random.randint(0, min(5, len(artist_materials)))
@@ -234,6 +236,7 @@ def generate_mock_artists_data(num_artists, form_content):
             last_name=last_name,
             email=generate_mock_email(first_name, last_name),
             phone=generate_mock_phone(),
+            invited_by_id=invited_by_id,
             ticket_id=ticket_id,
             beverage_id=beverage_id,
             food_id=food_id,
@@ -272,6 +275,7 @@ def generate_mock_bookings_data(num_bookings, form_content):
     materials = form_content["materials"]
     work_shifts = form_content["work_shifts"]
     professions = form_content.get("professions", [])
+    orga_inviters = form_content.get("orga_inviters", [])
 
     # Flatten timeslots for easier selection
     all_timeslots = []
@@ -286,6 +290,7 @@ def generate_mock_bookings_data(num_bookings, form_content):
         ticket_id = random.choice(ticket_options).id
         beverage_id = random.choice(beverage_options).id
         food_id = random.choice(food_options).id
+        invited_by_id = random.choice(orga_inviters).id if orga_inviters else -1
 
         # Random selection of materials
         num_materials = random.randint(0, min(3, len(materials)))
@@ -334,6 +339,7 @@ def generate_mock_bookings_data(num_bookings, form_content):
             last_name=last_name,
             email=generate_mock_email(first_name, last_name),
             phone=generate_mock_phone(),
+            invited_by_id=invited_by_id,
             ticket_id=ticket_id,
             beverage_id=beverage_id,
             food_id=food_id,
