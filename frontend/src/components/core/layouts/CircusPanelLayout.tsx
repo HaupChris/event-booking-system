@@ -63,31 +63,32 @@ const CircusPanelLayout: React.FC<CircusPanelLayoutProps> = ({
         {missionBriefing && (
           <Box
             sx={{
-              background: brandingPack.colors.ribbonBackground,
-              padding: { xs: '10px 16px', sm: '12px 24px' },
-              position: 'relative',
-              mx: { xs: 1, sm: 2 },
+              mx: { xs: 1.5, sm: 2.5 },
               my: 2,
-              boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+              px: { xs: 1.5, sm: 2.5 },
+              py: 0.85,
+              background:
+                'linear-gradient(180deg, rgba(100,62,33,0.96) 0%, rgba(66,38,20,0.97) 50%, rgba(43,24,15,0.97) 100%)',
+              boxShadow: '0 6px 14px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(244,205,142,0.28)',
               border: '1px solid',
-              borderColor: brandingPack.colors.panelBorder,
-              clipPath:
-                'polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%)',
+              borderColor: '#d8b87a',
+              clipPath: 'polygon(3% 0, 97% 0, 100% 50%, 97% 100%, 3% 100%, 0 50%)',
             }}
           >
             <Typography
               variant="body2"
               sx={{
-                color: brandingPack.colors.ribbonText,
+                color: '#f4ead6',
                 fontFamily: brandingPack.typography.body,
                 fontSize: '0.95rem',
                 textAlign: 'center',
                 fontStyle: 'italic',
+                letterSpacing: '0.01em',
               }}
             >
               <span
                 style={{
-                  color: brandingPack.colors.heroText,
+                  color: '#e8d2ab',
                   fontWeight: 'bold',
                   letterSpacing: '0.1em',
                 }}
@@ -97,7 +98,7 @@ const CircusPanelLayout: React.FC<CircusPanelLayoutProps> = ({
               {missionBriefing}{' '}
               <span
                 style={{
-                  color: brandingPack.colors.heroText,
+                  color: '#e8d2ab',
                   fontWeight: 'bold',
                   letterSpacing: '0.1em',
                 }}

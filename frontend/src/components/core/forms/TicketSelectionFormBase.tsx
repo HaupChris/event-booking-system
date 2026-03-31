@@ -1,11 +1,9 @@
 import React from 'react';
-import { FormControl, RadioGroup, Box, Typography, alpha } from '@mui/material';
+import { FormControl, RadioGroup, Box } from '@mui/material';
 import ThemedFormLayout from '../layouts/ThemedFormLayout';
 import TicketOptionComponent from '../display/TicketOption';
 import type { TicketOption } from '../../../form/userArea/interface';
 import { calculateDayVisitors, getMaxCapacityPerDay } from '../utils/CalculateNumberOfVisitors';
-import { useThemeMode } from '../../styles/theme';
-import { useBrandingPack } from '../../../branding/useBrandingPack';
 
 interface TicketSelectionTextProps {
   missionBriefing: string;
@@ -27,9 +25,6 @@ interface TicketSelectionFormBaseProps {
 
 function TicketSelectionFormBase(props: TicketSelectionFormBaseProps) {
   const { texts } = props;
-  const { mode } = useThemeMode();
-  const brandingPack = useBrandingPack();
-  const isCircusMode = mode === 'circus';
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     props.updateBooking('ticket_id', Number((event.target as HTMLInputElement).value));
@@ -73,38 +68,7 @@ function TicketSelectionFormBase(props: TicketSelectionFormBaseProps) {
   };
 
   return (
-    <ThemedFormLayout footerId={texts.footerId}>
-      <Box sx={{ mb: 2.4, px: { xs: 0.6, sm: 1.2 } }}>
-        <Box
-          sx={{
-            px: { xs: 1.5, sm: 2.5 },
-            py: 0.85,
-            border: '1px solid',
-            borderColor: alpha('#d8b87a', 0.95),
-            clipPath: 'polygon(3% 0, 97% 0, 100% 50%, 97% 100%, 3% 100%, 0 50%)',
-            background: isCircusMode
-              ? 'linear-gradient(180deg, rgba(100,62,33,0.96) 0%, rgba(66,38,20,0.97) 50%, rgba(43,24,15,0.97) 100%)'
-              : brandingPack.colors.ribbonBackground,
-            boxShadow: isCircusMode
-              ? '0 6px 14px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(244,205,142,0.28)'
-              : 'none',
-          }}
-        >
-          <Typography
-            sx={{
-              textAlign: 'center',
-              color: isCircusMode ? '#f4ead6' : brandingPack.colors.ribbonText,
-              fontFamily: brandingPack.typography.body,
-              fontStyle: 'italic',
-              fontSize: { xs: '0.95rem', sm: '1.05rem' },
-              letterSpacing: isCircusMode ? '0.01em' : undefined,
-            }}
-          >
-            ★ {texts.missionBriefing} ★
-          </Typography>
-        </Box>
-      </Box>
-
+    <ThemedFormLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
       <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
         <FormControl
           component="fieldset"
