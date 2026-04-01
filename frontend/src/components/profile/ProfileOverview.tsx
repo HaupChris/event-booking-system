@@ -10,11 +10,15 @@ import type { ProfileData } from '../../services/profileService';
 import BookingDetails from './BookingDetails';
 import { resolvePaymentLink } from '../../utils/paymentLink';
 import { createPaymentSubject } from '../../utils/paymentSubject';
+import MissionHeading from '../core/display/MissionHeading';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import {
   ProfileBookingSummaryCard,
   ProfileContactCard,
   ProfilePaymentCard,
 } from './ProfileOverviewSections';
+import { useThemeMode } from '../styles/theme';
+import { useBrandingPack } from '../../branding/useBrandingPack';
 
 interface ProfileOverviewProps {
   profile: ProfileData;
@@ -22,6 +26,9 @@ interface ProfileOverviewProps {
 
 const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
   const { user, booking, payment } = profile;
+  const { mode } = useThemeMode();
+  const brandingPack = useBrandingPack();
+  const isCircusMode = mode === 'circus';
   const [copied, setCopied] = useState(false);
   const paymentLink = resolvePaymentLink(profile.payment_link);
 
@@ -55,9 +62,11 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
 
   return (
     <Box>
-      <Typography variant="h5" color="text.primary" sx={{ mb: 2 }}>
-        Profil Uebersicht
-      </Typography>
+      <MissionHeading
+        title="Profil Uebersicht"
+        subtitle="Deine wichtigsten Daten, Zahlungen und Buchungsdetails"
+        icon={<AccountBoxIcon />}
+      />
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 6 }}>
@@ -79,7 +88,15 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
         </Grid>
 
         <Grid size={12}>
-          <Typography color="text.primary" variant="h6" sx={{ mb: 2 }}>
+          <Typography
+            color="text.primary"
+            variant="h6"
+            sx={{
+              mb: 2,
+              mt: 1,
+              fontFamily: isCircusMode ? brandingPack.typography.heading : undefined,
+            }}
+          >
             Weitere Buchungsdetails
           </Typography>
           <BookingDetails profile={profile} />

@@ -1,19 +1,27 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { AuthContext, TokenContext } from '../../../contexts/AuthContext';
 import {
+  alpha,
+  Alert,
   Box,
   Button,
   Container,
-  Alert,
-  InputAdornment,
   IconButton,
-  FormControl,
-  OutlinedInput,
+  Link as MuiLink,
+  Paper,
+  TextField,
   Typography,
 } from '@mui/material';
+import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useThemeMode } from '../../styles/theme';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import ThemedFormLayout from '../layouts/ThemedFormLayout';
+import FormCard from '../display/FormCard';
+import MissionHeading from '../display/MissionHeading';
+import { useBrandingPack } from '../../../branding/useBrandingPack';
+import { OrnateInput } from '../../../form/userArea/TestDesignFormPrimitives';
 
 interface LoginPageProps {
   title: string;
@@ -21,13 +29,22 @@ interface LoginPageProps {
   redirectPath: string;
   setIsAdmin?: (value: boolean) => void;
   showRecoveryLink?: boolean;
+  variant?: 'festival' | 'admin';
+  missionBriefing?: string;
+  footerId?: string;
+  loginLabel?: string;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({
+  title,
   endpoint,
   redirectPath,
   setIsAdmin,
   showRecoveryLink = false,
+  variant = 'festival',
+  missionBriefing,
+  footerId,
+  loginLabel = 'Startklar!',
 }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -35,8 +52,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
   const { setAuth } = useContext(AuthContext);
   const { setToken } = useContext(TokenContext);
   const navigate = useNavigate();
-  const { mode } = useThemeMode();
-  const isCircusTheme = mode === 'circus';
+  const brandingPack = useBrandingPack();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -76,156 +92,173 @@ const LoginPage: React.FC<LoginPageProps> = ({
     event.preventDefault();
   };
 
-  return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        {isCircusTheme && (
-          <Box
+  if (variant === 'admin') {
+    return (
+      <Container component="main" maxWidth="xs">
+        <Box
+          sx={{
+            marginTop: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Paper
+            variant="outlined"
             sx={{
               width: '100%',
-              textAlign: 'center',
-              mb: 3,
-              position: 'relative',
+              p: 4,
+              borderRadius: 2,
+              borderColor: alpha('#1f2937', 0.2),
             }}
           >
-            <Typography
-              sx={{
-                fontFamily: '"Abril Fatface", "Playfair Display", serif',
-                fontSize: { xs: '2rem', sm: '2.5rem' },
-                color: '#D4AF37',
-                textShadow: '2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(212, 175, 55, 0.3)',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                '&::before': {
-                  content: '"★★★"',
-                  color: '#6B46C1',
-                },
-                '&::after': {
-                  content: '"★★★"',
-                  color: '#6B46C1',
-                },
-              }}
-            >
-              &nbsp;Zirkus&nbsp;
+            <Typography variant="h5" sx={{ mb: 2, textAlign: 'center', fontWeight: 600 }}>
+              {title}
             </Typography>
-            <Typography
-              sx={{
-                fontFamily: '"Abril Fatface", "Playfair Display", serif',
-                fontSize: { xs: '2rem', sm: '2.5rem' },
-                color: '#D4AF37',
-                textShadow: '2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(212, 175, 55, 0.3)',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Wiesenwahn
-            </Typography>
-            <Typography
-              sx={{
-                fontFamily: '"Playfair Display", serif',
-                fontSize: '1rem',
-                color: '#F5E6D3',
-                fontStyle: 'italic',
-                mt: 1,
-              }}
-            >
-              Hereinspaziert!
-            </Typography>
-          </Box>
-        )}
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          noValidate
-          sx={
-            isCircusTheme
-              ? {
-                  mt: 1,
-                  width: '100%',
-                  padding: '32px',
-                  background:
-                    'radial-gradient(circle at top center, #4a2410 0%, #2d1810 50%, #1a0a0a 100%)',
-                  border: '6px double #704214',
-                  borderRadius: '12px',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.6), inset 0 0 20px rgba(212, 175, 55, 0.1)',
-                  position: 'relative',
-                  '&::before': {
-                    content: '"❖"',
-                    position: 'absolute',
-                    top: 10,
-                    left: 10,
-                    fontSize: '1.5rem',
-                    color: '#D4AF37',
-                    opacity: 0.6,
-                  },
-                  '&::after': {
-                    content: '"❖"',
-                    position: 'absolute',
-                    bottom: 10,
-                    right: 10,
-                    fontSize: '1.5rem',
-                    color: '#D4AF37',
-                    opacity: 0.6,
-                    transform: 'rotate(180deg)',
-                  },
-                }
-              : { mt: 1 }
-          }
-        >
-          <FormControl sx={{ width: '100%' }} variant="standard">
-            <OutlinedInput
-              id="standard-adornment-password"
-              placeholder={'Passwort'}
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              autoFocus
-              required
-              onChange={(e) => setPassword(e.target.value)}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-          </FormControl>
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-            Startklar!
-          </Button>
-          {showRecoveryLink && (
-            <Box sx={{ textAlign: 'center', mt: 1 }}>
-              <Link
-                to="/profile/recover"
-                style={{
-                  fontSize: '0.875rem',
-                  textDecoration: 'none',
-                  color: 'inherit',
+            <Box component="form" onSubmit={handleSubmit} noValidate>
+              <TextField
+                id="password-input"
+                label="Passwort"
+                placeholder="Passwort"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                autoFocus
+                fullWidth
+                required
+                onChange={(e) => setPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
-              >
-                Profil-Link vergessen?
-              </Link>
+              />
+              <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                {loginLabel}
+              </Button>
+              {error && <Alert severity="error">{error}</Alert>}
             </Box>
-          )}
-          {error && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              {error}
-            </Alert>
-          )}
+          </Paper>
         </Box>
+      </Container>
+    );
+  }
+
+  return (
+    <Container component="main" maxWidth="md" sx={{ mt: { xs: 2, sm: 4 }, mb: 4 }}>
+      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+        <ThemedFormLayout
+          title={title}
+          missionBriefing={
+            missionBriefing ??
+            'Bitte gib das Zugangspasswort ein, um den Registrierungsbereich zu betreten.'
+          }
+          footerId={footerId ?? 'EINLASS-KONTROLLE'}
+          maxWidth={560}
+        >
+          <Box sx={{ maxWidth: 420, mx: 'auto', width: '100%' }}>
+            <Box sx={{ textAlign: 'center', mb: 2.2 }}>
+              <Typography
+                sx={{
+                  fontFamily: brandingPack.typography.display,
+                  fontSize: { xs: '1.85rem', sm: '2.25rem' },
+                  color: 'primary.main',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                  lineHeight: 1.1,
+                }}
+              >
+                Zirkus Wiesenwahn
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  mt: 0.6,
+                  color: 'text.secondary',
+                  fontFamily: brandingPack.typography.body,
+                  fontStyle: 'italic',
+                }}
+              >
+                Hereinspaziert zur Festival-Anmeldung.
+              </Typography>
+            </Box>
+
+            <MissionHeading title="Zugang zum Festivalbereich" icon={<LockOpenIcon />} />
+
+            <FormCard selected={true} sx={{ mt: 0 }}>
+              <Box component="form" onSubmit={handleSubmit} noValidate sx={{ px: 1, pb: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                  <VpnKeyIcon sx={{ color: 'primary.main' }} />
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                      fontFamily: brandingPack.typography.body,
+                    }}
+                  >
+                    Passwort eingeben und los geht's.
+                  </Typography>
+                </Box>
+
+                <OrnateInput
+                  label="Passwort *"
+                  type="password"
+                  value={password}
+                  placeholder="Passwort"
+                  icon={<VpnKeyIcon fontSize="large" />}
+                  size="compact"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{
+                    mt: 0,
+                    mb: 1,
+                    fontFamily: brandingPack.typography.accent,
+                    textTransform: 'none',
+                  }}
+                >
+                  {loginLabel}
+                </Button>
+
+                {showRecoveryLink && (
+                  <Box sx={{ textAlign: 'center', mt: 1 }}>
+                    <MuiLink
+                      component={RouterLink}
+                      to="/profile/recover"
+                      underline="hover"
+                      sx={{
+                        fontSize: '0.875rem',
+                        color: 'text.secondary',
+                        fontFamily: brandingPack.typography.body,
+                      }}
+                    >
+                      Profil-Link vergessen?
+                    </MuiLink>
+                  </Box>
+                )}
+
+                {error && (
+                  <Alert variant="outlined" severity="error" sx={{ mt: 2 }}>
+                    {error}
+                  </Alert>
+                )}
+              </Box>
+            </FormCard>
+          </Box>
+        </ThemedFormLayout>
       </Box>
     </Container>
   );

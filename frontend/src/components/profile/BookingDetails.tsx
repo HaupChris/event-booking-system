@@ -6,6 +6,7 @@
 
 import React from 'react';
 import {
+  alpha,
   Typography,
   Card,
   CardContent,
@@ -17,6 +18,8 @@ import {
   Box,
 } from '@mui/material';
 import type { ProfileData } from '../../services/profileService';
+import { useThemeMode } from '../styles/theme';
+import { useBrandingPack } from '../../branding/useBrandingPack';
 
 interface BookingDetailsProps {
   profile: ProfileData;
@@ -80,8 +83,20 @@ const getArtistPerformanceFields = (details: ArtistPerformanceDetails) => {
 
 const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
   const { booking, materials, professions, user } = profile;
+  const { mode } = useThemeMode();
+  const brandingPack = useBrandingPack();
+  const isCircusMode = mode === 'circus';
   const isArtist = user.is_artist;
-  const cardSx = { borderRadius: 2 };
+  const headingSx = { fontFamily: isCircusMode ? brandingPack.typography.heading : undefined };
+  const bodySx = { fontFamily: isCircusMode ? brandingPack.typography.body : undefined };
+  const cardSx = isCircusMode
+    ? {
+        borderRadius: '12px',
+        backgroundColor: 'rgba(28, 12, 12, 0.72)',
+        borderColor: alpha('#cda163', 0.5),
+        boxShadow: '0 8px 22px rgba(0,0,0,0.36)',
+      }
+    : { borderRadius: 2 };
   const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
   const formatTime = (time?: string) => (time ? time.slice(0, 5) : '');
   const { details: performanceDetails, rawValue: rawPerformanceDetails } =
@@ -98,7 +113,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
       {!isArtist && booking.work_shift_priorities && booking.work_shift_priorities.length > 0 && (
         <Card variant="outlined" sx={cardSx}>
           <CardContent sx={cardContentSx}>
-            <Typography variant="h6" gutterBottom color="primary">
+            <Typography variant="h6" gutterBottom color="primary" sx={headingSx}>
               Schicht-Prioritäten
             </Typography>
             <List disablePadding>
@@ -115,12 +130,25 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
                         ? `${formatTime(priority.timeslot_start_time)} - ${formatTime(priority.timeslot_end_time)} Uhr`
                         : 'Zeitfenster wird geladen'
                     }
+                    slotProps={{
+                      primary: { sx: bodySx },
+                      secondary: { sx: bodySx },
+                    }}
                   />
                 </ListItem>
               ))}
             </List>
             {booking.supporter_buddy && (
-              <Box sx={{ mt: 2, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
+              <Box
+                sx={{
+                  mt: 2,
+                  p: 2,
+                  backgroundColor: 'action.hover',
+                  borderRadius: 1,
+                  border: isCircusMode ? '1px solid' : 'none',
+                  borderColor: isCircusMode ? alpha('#d8b87a', 0.35) : 'transparent',
+                }}
+              >
                 <Typography variant="body2" color="text.secondary">
                   Support-Buddy: {booking.supporter_buddy}
                 </Typography>
@@ -133,7 +161,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
       {hasArtistPerformanceDetails && (
         <Card variant="outlined" sx={cardSx}>
           <CardContent sx={cardContentSx}>
-            <Typography variant="h6" gutterBottom color="primary">
+            <Typography variant="h6" gutterBottom color="primary" sx={headingSx}>
               Auftrittsdetails
             </Typography>
 
@@ -141,12 +169,19 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
               <List disablePadding>
                 {artistPerformanceFields.map((field) => (
                   <ListItem key={field.label} sx={{ px: 0 }}>
-                    <ListItemText primary={field.label} secondary={field.value} />
+                    <ListItemText
+                      primary={field.label}
+                      secondary={field.value}
+                      slotProps={{
+                        primary: { sx: bodySx },
+                        secondary: { sx: bodySx },
+                      }}
+                    />
                   </ListItem>
                 ))}
               </List>
             ) : (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={bodySx}>
                 {rawPerformanceDetails}
               </Typography>
             )}
@@ -158,10 +193,12 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
       {booking.equipment && (
         <Card variant="outlined" sx={cardSx}>
           <CardContent sx={cardContentSx}>
-            <Typography variant="h6" gutterBottom color="primary">
+            <Typography variant="h6" gutterBottom color="primary" sx={headingSx}>
               Technische Anforderungen
             </Typography>
-            <Typography variant="body1">{booking.equipment}</Typography>
+            <Typography variant="body1" sx={bodySx}>
+              {booking.equipment}
+            </Typography>
           </CardContent>
         </Card>
       )}
@@ -169,10 +206,12 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
       {booking.special_requests && (
         <Card variant="outlined" sx={cardSx}>
           <CardContent sx={cardContentSx}>
-            <Typography variant="h6" gutterBottom color="primary">
+            <Typography variant="h6" gutterBottom color="primary" sx={headingSx}>
               Besondere Anfragen
             </Typography>
-            <Typography variant="body1">{booking.special_requests}</Typography>
+            <Typography variant="body1" sx={bodySx}>
+              {booking.special_requests}
+            </Typography>
           </CardContent>
         </Card>
       )}
@@ -181,10 +220,10 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
       {materials.length > 0 && (
         <Card variant="outlined" sx={cardSx}>
           <CardContent sx={cardContentSx}>
-            <Typography variant="h6" gutterBottom color="primary">
+            <Typography variant="h6" gutterBottom color="primary" sx={headingSx}>
               Materialien
             </Typography>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
+            <Typography variant="body2" color="text.secondary" gutterBottom sx={bodySx}>
               {isArtist
                 ? 'Du hast angegeben, folgende Ausruestung mitzubringen:'
                 : 'Du hast angeboten, folgende Materialien mitzubringen:'}
@@ -194,8 +233,17 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
                 <Chip
                   key={material.id}
                   label={`${material.title} (${material.num_needed} benötigt)`}
-                  color="primary"
+                  color={isCircusMode ? 'default' : 'primary'}
                   variant="outlined"
+                  sx={
+                    isCircusMode
+                      ? {
+                          borderColor: alpha('#d8b87a', 0.5),
+                          color: '#f4ead6',
+                          fontFamily: brandingPack.typography.body,
+                        }
+                      : undefined
+                  }
                 />
               ))}
             </Box>
@@ -207,7 +255,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
       {professions.length > 0 && (
         <Card variant="outlined" sx={cardSx}>
           <CardContent sx={cardContentSx}>
-            <Typography variant="h6" gutterBottom color="primary">
+            <Typography variant="h6" gutterBottom color="primary" sx={headingSx}>
               Fähigkeiten / Professionen
             </Typography>
             <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -215,8 +263,17 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
                 <Chip
                   key={profession.id}
                   label={profession.title}
-                  color="secondary"
+                  color={isCircusMode ? 'default' : 'secondary'}
                   variant="outlined"
+                  sx={
+                    isCircusMode
+                      ? {
+                          borderColor: alpha('#d8b87a', 0.5),
+                          color: '#f4ead6',
+                          fontFamily: brandingPack.typography.body,
+                        }
+                      : undefined
+                  }
                 />
               ))}
             </Box>

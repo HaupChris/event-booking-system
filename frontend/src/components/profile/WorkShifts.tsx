@@ -1,31 +1,14 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-  Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Alert,
-  Grid,
-  Divider,
-  FormControlLabel,
-  Stack,
-  Switch,
-} from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import PendingIcon from '@mui/icons-material/Pending';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import React, { useMemo, useState } from 'react';
+import { Alert, Box, Grid, Typography } from '@mui/material';
+import WorkIcon from '@mui/icons-material/Work';
 import type { ShiftAssignment } from '../../services/profileService';
 import type { ShiftMessage } from '../../services/profileService';
 import ShiftMessageFeed from './ShiftMessageFeed';
+import MissionHeading from '../core/display/MissionHeading';
+import { useThemeMode } from '../styles/theme';
+import { useBrandingPack } from '../../branding/useBrandingPack';
+import ShiftDeclineDialog from './ShiftDeclineDialog';
+import ShiftAssignmentCard from './ShiftAssignmentCard';
 
 interface WorkShiftsProps {
   shifts: ShiftAssignment[];
@@ -44,15 +27,37 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
   onDecline,
   onRefresh,
 }) => {
+  const { mode } = useThemeMode();
+  const brandingPack = useBrandingPack();
+  const isCircusMode = mode === 'circus';
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
   const [selectedShift, setSelectedShift] = useState<ShiftAssignment | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [alternativePreferences, setAlternativePreferences] = useState('');
   const [processing, setProcessing] = useState<number | null>(null);
-  const [showAssignments, setShowAssignments] = useState(true);
-  const [showMessages, setShowMessages] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
+
+  const pendingShifts = useMemo(
+    () =>
+      shifts
+        .filter((shift) => shift.status === 'pending')
+        .sort(
+          (a, b) => new Date(b.assignment_date).getTime() - new Date(a.assignment_date).getTime()
+        ),
+    [shifts]
+  );
+
+  const acceptedShifts = useMemo(
+    () =>
+      shifts
+        .filter((shift) => shift.status === 'accepted')
+        .sort((a, b) => {
+          const aDate = new Date(a.response_date ?? a.assignment_date).getTime();
+          const bDate = new Date(b.response_date ?? b.assignment_date).getTime();
+          return bDate - aDate;
+        }),
+    [shifts]
+  );
 
   const handleAcceptClick = async (shift: ShiftAssignment) => {
     try {
@@ -73,16 +78,17 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
   };
 
   const handleDeclineConfirm = async () => {
-    if (!selectedShift) return;
+    if (!selectedShift) {
+      return;
+    }
 
-    // Validate rejection reason (minimum 20 characters)
-    const MIN_REASON_LENGTH = 20;
+    const minReasonLength = 20;
     const trimmedReason = rejectionReason.trim();
 
-    if (!trimmedReason || trimmedReason.length < MIN_REASON_LENGTH) {
+    if (!trimmedReason || trimmedReason.length < minReasonLength) {
       setErrorMessage(
-        `Bitte gib einen Ablehnungsgrund von mindestens ${MIN_REASON_LENGTH} Zeichen an. ` +
-          `Das hilft uns bei der Planung. Noch ${MIN_REASON_LENGTH - trimmedReason.length} Zeichen benötigt.`
+        `Bitte gib einen Ablehnungsgrund von mindestens ${minReasonLength} Zeichen an. ` +
+          `Das hilft uns bei der Planung. Noch ${minReasonLength - trimmedReason.length} Zeichen benötigt.`
       );
       return;
     }
@@ -111,219 +117,111 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
     setErrorMessage(null);
   };
 
-  const getStatusChip = (status: string) => {
-    switch (status) {
-      case 'accepted':
-        return <Chip icon={<CheckCircleIcon />} label="Angenommen" color="success" size="small" />;
-      case 'declined':
-        return <Chip icon={<CancelIcon />} label="Abgelehnt" color="error" size="small" />;
-      default:
-        return <Chip icon={<PendingIcon />} label="Ausstehend" color="warning" size="small" />;
-    }
-  };
-
   return (
     <Box>
+      <MissionHeading
+        title="Schichten"
+        subtitle="Verwalte deine Zuweisungen und gib schnell Rueckmeldung"
+        icon={<WorkIcon />}
+      />
+
       {!isOnline && (
         <Alert severity="warning" sx={{ mb: 3 }}>
           Du bist offline. Änderungen werden synchronisiert, sobald du wieder online bist.
         </Alert>
       )}
+
       {errorMessage && (
         <Alert severity="error" sx={{ mb: 3 }}>
           {errorMessage}
         </Alert>
       )}
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        color={'text.primary'}
-        spacing={1}
-        sx={{ mb: 2 }}
+
+      <Typography
+        variant="h6"
+        color="text.primary"
+        sx={{ mb: 1.5, fontFamily: isCircusMode ? brandingPack.typography.heading : undefined }}
       >
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showAssignments}
-              onChange={(event) => setShowAssignments(event.target.checked)}
-            />
-          }
-          label="Schichtangebote anzeigen"
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showMessages}
-              onChange={(event) => setShowMessages(event.target.checked)}
-            />
-          }
-          label="Nachrichten anzeigen"
-        />
-      </Stack>
-      {showMessages && <ShiftMessageFeed shiftMessages={shiftMessages} />}
-      {showAssignments && shifts.length === 0 && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          Dir wurden noch keine Schichten zugewiesen. Schau später wieder vorbei!
+        Schichtangebote
+      </Typography>
+
+      {pendingShifts.length === 0 && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          Aktuell gibt es keine offenen Schichtangebote.
         </Alert>
       )}
-      {showAssignments && (
+
+      {pendingShifts.length > 0 && (
         <Grid container spacing={3}>
-          {shifts.map((shift) => (
+          {pendingShifts.map((shift) => (
             <Grid key={shift.assignment_id} size={12}>
-              <Card variant="outlined" sx={{ borderRadius: 2 }}>
-                <CardContent sx={cardContentSx}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="h6" color="primary" sx={{ flexGrow: 1 }}>
-                      {shift.workshift.title}
-                    </Typography>
-                    {getStatusChip(shift.status)}
-                  </Box>
-
-                  {shift.workshift.description && (
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      {shift.workshift.description}
-                    </Typography>
-                  )}
-
-                  <Divider sx={{ my: 2 }} />
-
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <AccessTimeIcon sx={{ mr: 1, color: 'text.secondary' }} fontSize="small" />
-                    <Typography variant="body2">
-                      <strong>{shift.timeslot.title}</strong>
-                    </Typography>
-                  </Box>
-
-                  <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
-                    {shift.timeslot.start_time} - {shift.timeslot.end_time}
-                  </Typography>
-
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ display: 'block', mt: 2 }}
-                  >
-                    Zugewiesen am: {new Date(shift.assignment_date).toLocaleDateString('de-DE')}
-                  </Typography>
-
-                  {shift.response_date && (
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                      Beantwortet am: {new Date(shift.response_date).toLocaleDateString('de-DE')}
-                    </Typography>
-                  )}
-
-                  {shift.rejection_reason && (
-                    <Alert severity="info" sx={{ mt: 2 }}>
-                      <Typography variant="body2">
-                        <strong>Ablehnungsgrund:</strong> {shift.rejection_reason}
-                      </Typography>
-                      {shift.alternative_preferences && (
-                        <Typography variant="body2" sx={{ mt: 1 }}>
-                          <strong>Alternative Präferenzen:</strong> {shift.alternative_preferences}
-                        </Typography>
-                      )}
-                    </Alert>
-                  )}
-
-                  {shift.admin_notes && (
-                    <Alert severity="info" sx={{ mt: 2 }}>
-                      <Typography variant="body2">
-                        <strong>Admin-Notizen:</strong> {shift.admin_notes}
-                      </Typography>
-                    </Alert>
-                  )}
-                </CardContent>
-
-                {shift.status === 'pending' && (
-                  <CardActions
-                    sx={{
-                      justifyContent: 'flex-end',
-                      px: { xs: 2.5, sm: 3 },
-                      pb: { xs: 2.5, sm: 3 },
-                      pt: 0,
-                    }}
-                  >
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleDeclineClick(shift)}
-                      disabled={processing === shift.assignment_id}
-                    >
-                      Ablehnen
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="success"
-                      onClick={() => handleAcceptClick(shift)}
-                      disabled={processing === shift.assignment_id}
-                      startIcon={<CheckCircleIcon />}
-                    >
-                      Annehmen
-                    </Button>
-                  </CardActions>
-                )}
-              </Card>
+              <ShiftAssignmentCard
+                shift={shift}
+                isCircusMode={isCircusMode}
+                headingFont={brandingPack.typography.heading}
+                bodyFont={brandingPack.typography.body}
+                processing={processing}
+                showActions={true}
+                onAccept={handleAcceptClick}
+                onDecline={handleDeclineClick}
+              />
             </Grid>
           ))}
         </Grid>
       )}
-      {/* Decline Dialog */}
-      <Dialog open={declineDialogOpen} onClose={handleDeclineCancel} maxWidth="sm" fullWidth>
-        <DialogTitle>Schicht ablehnen</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Möchtest du uns mitteilen, warum du diese Schicht ablehnst? Das hilft uns bei der
-            Planung.
-          </Typography>
 
-          <TextField
-            fullWidth
-            required
-            label="Ablehnungsgrund (erforderlich, mind. 20 Zeichen)"
-            multiline
-            rows={3}
-            InputProps={{ inputComponent: 'textarea' }}
-            value={rejectionReason}
-            onChange={(e) => setRejectionReason(e.target.value)}
-            placeholder="z.B. Zu dem Zeitpunkt nicht verfügbar..."
-            error={rejectionReason.trim().length > 0 && rejectionReason.trim().length < 20}
-            helperText={
-              rejectionReason.trim().length > 0 && rejectionReason.trim().length < 20
-                ? `Noch ${20 - rejectionReason.trim().length} Zeichen benötigt`
-                : `${rejectionReason.trim().length}/20 Zeichen`
-            }
-            sx={{ mb: 2 }}
-          />
+      <Typography
+        variant="h6"
+        color="text.primary"
+        sx={{
+          mt: 4,
+          mb: 1.5,
+          fontFamily: isCircusMode ? brandingPack.typography.heading : undefined,
+        }}
+      >
+        Angenommene Angebote
+      </Typography>
 
-          <TextField
-            fullWidth
-            label="Alternative Präferenzen (optional)"
-            multiline
-            rows={3}
-            InputProps={{ inputComponent: 'textarea' }}
-            value={alternativePreferences}
-            onChange={(e) => setAlternativePreferences(e.target.value)}
-            placeholder="z.B. Würde lieber am Samstag helfen..."
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeclineCancel}>Abbrechen</Button>
-          <Button
-            onClick={handleDeclineConfirm}
-            variant="contained"
-            color="error"
-            disabled={processing !== null}
-          >
-            Ablehnen bestätigen
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {acceptedShifts.length === 0 && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          Du hast bisher noch keine Schichtangebote angenommen.
+        </Alert>
+      )}
+
+      {acceptedShifts.length > 0 && (
+        <Grid container spacing={3}>
+          {acceptedShifts.map((shift) => (
+            <Grid key={shift.assignment_id} size={12}>
+              <ShiftAssignmentCard
+                shift={shift}
+                isCircusMode={isCircusMode}
+                headingFont={brandingPack.typography.heading}
+                bodyFont={brandingPack.typography.body}
+                processing={processing}
+                showActions={false}
+                onAccept={handleAcceptClick}
+                onDecline={handleDeclineClick}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
+      <Box sx={{ mt: 4 }}>
+        <ShiftMessageFeed shiftMessages={shiftMessages} />
+      </Box>
+
+      <ShiftDeclineDialog
+        open={declineDialogOpen}
+        rejectionReason={rejectionReason}
+        alternativePreferences={alternativePreferences}
+        processing={processing !== null}
+        isCircusMode={isCircusMode}
+        onCancel={handleDeclineCancel}
+        onConfirm={handleDeclineConfirm}
+        onChangeReason={setRejectionReason}
+        onChangeAlternativePreferences={setAlternativePreferences}
+      />
     </Box>
   );
 };

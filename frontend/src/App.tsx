@@ -72,6 +72,9 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ auth, isAdmin, setIsAdmin }) => {
                 endpoint="/api/auth"
                 redirectPath="/form"
                 showRecoveryLink={true}
+                variant="festival"
+                missionBriefing="Crew-Check-in fuer den regulären Festivalbereich."
+                footerId="USER-EINLASS"
               />
             )
           }
@@ -93,6 +96,9 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ auth, isAdmin, setIsAdmin }) => {
                 endpoint="/api/auth/artist"
                 redirectPath="/artist-form"
                 showRecoveryLink={true}
+                variant="festival"
+                missionBriefing="Backstage-Check-in fuer Artists und Bands."
+                footerId="ARTIST-EINLASS"
               />
             )
           }
@@ -114,6 +120,8 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ auth, isAdmin, setIsAdmin }) => {
                 endpoint="/api/auth/admin"
                 redirectPath="/admin/dashboard"
                 setIsAdmin={setIsAdmin}
+                variant="admin"
+                loginLabel="Einloggen"
               />
             )
           }
