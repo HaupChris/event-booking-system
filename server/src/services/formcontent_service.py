@@ -306,6 +306,132 @@ def _load_work_shifts_from_db(cursor: sqlite3.Cursor) -> list[WorkShift]:
     return work_shifts
 
 
+def _load_regular_options_from_db(
+    cursor: sqlite3.Cursor,
+) -> tuple[list[TicketOption], list[BeverageOption], list[FoodOption]]:
+    cursor.execute(
+        """
+        SELECT id, title, COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title, price, amount
+        FROM TicketOptions
+        ORDER BY id ASC
+        """
+    )
+    ticket_rows = cursor.fetchall()
+    ticket_options = [
+        TicketOption(
+            id=int(row[0]),
+            title=row[1],
+            working_title=row[2],
+            price=float(row[3] or 0),
+            amount=_normalize_positive_int(row[4], default=0),
+        )
+        for row in ticket_rows
+    ]
+
+    cursor.execute(
+        """
+        SELECT id, title, COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title, description, price
+        FROM BeverageOptions
+        ORDER BY id ASC
+        """
+    )
+    beverage_rows = cursor.fetchall()
+    beverage_options = [
+        BeverageOption(
+            id=int(row[0]),
+            title=row[1],
+            working_title=row[2],
+            description=row[3] or "",
+            price=float(row[4] or 0),
+        )
+        for row in beverage_rows
+    ]
+
+    cursor.execute(
+        """
+        SELECT id, title, COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title, description, price
+        FROM FoodOptions
+        ORDER BY id ASC
+        """
+    )
+    food_rows = cursor.fetchall()
+    food_options = [
+        FoodOption(
+            id=int(row[0]),
+            title=row[1],
+            working_title=row[2],
+            description=row[3] or "",
+            price=float(row[4] or 0),
+        )
+        for row in food_rows
+    ]
+
+    return ticket_options, beverage_options, food_options
+
+
+def _load_artist_options_from_db(
+    cursor: sqlite3.Cursor,
+) -> tuple[list[TicketOption], list[BeverageOption], list[FoodOption]]:
+    cursor.execute(
+        """
+        SELECT id, title, COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title, price, amount
+        FROM ArtistTicketOptions
+        ORDER BY id ASC
+        """
+    )
+    ticket_rows = cursor.fetchall()
+    ticket_options = [
+        TicketOption(
+            id=int(row[0]),
+            title=row[1],
+            working_title=row[2],
+            price=float(row[3] or 0),
+            amount=_normalize_positive_int(row[4], default=0),
+        )
+        for row in ticket_rows
+    ]
+
+    cursor.execute(
+        """
+        SELECT id, title, COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title, description, price
+        FROM ArtistBeverageOptions
+        ORDER BY id ASC
+        """
+    )
+    beverage_rows = cursor.fetchall()
+    beverage_options = [
+        BeverageOption(
+            id=int(row[0]),
+            title=row[1],
+            working_title=row[2],
+            description=row[3] or "",
+            price=float(row[4] or 0),
+        )
+        for row in beverage_rows
+    ]
+
+    cursor.execute(
+        """
+        SELECT id, title, COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title, description, price
+        FROM ArtistFoodOptions
+        ORDER BY id ASC
+        """
+    )
+    food_rows = cursor.fetchall()
+    food_options = [
+        FoodOption(
+            id=int(row[0]),
+            title=row[1],
+            working_title=row[2],
+            description=row[3] or "",
+            price=float(row[4] or 0),
+        )
+        for row in food_rows
+    ]
+
+    return ticket_options, beverage_options, food_options
+
+
 def update_form_content_with_db_counts(
     form_content_obj: FormContent, db_connect_func: Callable[[], sqlite3.Connection]
 ) -> dict:
@@ -322,6 +448,16 @@ def update_form_content_with_db_counts(
 
         conn = db_connect_func()
         cursor = conn.cursor()
+
+        try:
+            ticket_options, beverage_options, food_options = _load_regular_options_from_db(cursor)
+            form_content_obj.ticket_options = ticket_options
+            form_content_obj.beverage_options = beverage_options
+            form_content_obj.food_options = food_options
+        except sqlite3.OperationalError:
+            logger.warning(
+                "Option columns/tables missing in DB, using JSON fallback for this request"
+            )
 
         try:
             db_work_shifts = _load_work_shifts_from_db(cursor)
@@ -552,6 +688,16 @@ def update_artist_form_content_with_db_counts(
 
         conn = db_connect_func()
         cursor = conn.cursor()
+
+        try:
+            ticket_options, beverage_options, food_options = _load_artist_options_from_db(cursor)
+            form_content_obj.ticket_options = ticket_options
+            form_content_obj.beverage_options = beverage_options
+            form_content_obj.food_options = food_options
+        except sqlite3.OperationalError:
+            logger.warning(
+                "Artist option columns/tables missing in DB, using JSON fallback for this request"
+            )
 
         # TICKETS
         logger.debug("Querying artist ticket booking counts")

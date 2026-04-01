@@ -26,6 +26,7 @@ import {
 import { VisibilityOutlined as ViewIcon } from '@mui/icons-material';
 import type { CombinedBooking } from '../interface';
 import { getUsersForOption } from '../utils/optionsUtils';
+import { getAdminTitle, getFrontendTitle } from '../utils/titleUtils';
 import { spacePalette } from '../../../components/styles/theme';
 import OptionItemModal from './OptionItemModal';
 import { useModal } from '../../../hooks/useModal';
@@ -34,6 +35,7 @@ interface OptionsTableProps {
   options: {
     id: number;
     title: string;
+    working_title?: string;
     price?: number;
     description?: string;
     count: number;
@@ -105,7 +107,7 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
                   }}
                 >
                   <Typography variant="body1" fontWeight="medium" sx={{ flex: 1 }}>
-                    {option.title}
+                    {getAdminTitle(option)}
                   </Typography>
                   <IconButton
                     size="small"
@@ -124,6 +126,14 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
                     {option.description}
                   </Typography>
                 )}
+
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: 'block', mb: 1 }}
+                >
+                  Frontend titel: {getFrontendTitle(option)}
+                </Typography>
 
                 <Box
                   sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
@@ -181,7 +191,10 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
           >
             <TableCell>
               <Typography variant="body1" fontWeight="medium">
-                {option.title}
+                {getAdminTitle(option)}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Frontend titel: {getFrontendTitle(option)}
               </Typography>
             </TableCell>
 
@@ -289,7 +302,8 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
         <OptionItemModal
           open={isOpen}
           onClose={close}
-          title={selectedItem.title}
+          title={getAdminTitle(selectedItem)}
+          frontendTitle={getFrontendTitle(selectedItem)}
           description={selectedItem.description}
           price={selectedItem.price}
           users={getSelectedUsers()}

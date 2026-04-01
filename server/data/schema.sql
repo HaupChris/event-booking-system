@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS OrgaTeamInviters (
 CREATE TABLE IF NOT EXISTS TicketOptions  (
     id INTEGER PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
+    working_title TEXT,
     price REAL NOT NULL,
     amount INTEGER NOT NULL
 );
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS TicketOptions  (
 CREATE TABLE IF NOT EXISTS BeverageOptions  (
     id INTEGER PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
+    working_title TEXT,
     description TEXT,
     price REAL NOT NULL
 );
@@ -32,6 +34,31 @@ CREATE TABLE IF NOT EXISTS BeverageOptions  (
 CREATE TABLE IF NOT EXISTS FoodOptions  (
     id INTEGER PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
+    working_title TEXT,
+    description TEXT,
+    price REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ArtistTicketOptions  (
+    id INTEGER PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    working_title TEXT,
+    price REAL NOT NULL,
+    amount INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ArtistBeverageOptions  (
+    id INTEGER PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    working_title TEXT,
+    description TEXT,
+    price REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ArtistFoodOptions  (
+    id INTEGER PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    working_title TEXT,
     description TEXT,
     price REAL NOT NULL
 );
@@ -81,9 +108,9 @@ CREATE TABLE IF NOT EXISTS Bookings  (
     payment_notes TEXT DEFAULT '',
     payment_date TEXT DEFAULT NULL,
     FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE,
-    FOREIGN KEY(ticket_option_id) REFERENCES TicketOptions(id) ON DELETE SET NULL,
-    FOREIGN KEY(beverage_option_id) REFERENCES BeverageOptions(id) ON DELETE SET NULL,
-    FOREIGN KEY(food_option_id) REFERENCES FoodOptions(id) ON DELETE SET NULL,
+    FOREIGN KEY(ticket_option_id) REFERENCES ArtistTicketOptions(id) ON DELETE SET NULL,
+    FOREIGN KEY(beverage_option_id) REFERENCES ArtistBeverageOptions(id) ON DELETE SET NULL,
+    FOREIGN KEY(food_option_id) REFERENCES ArtistFoodOptions(id) ON DELETE SET NULL,
     FOREIGN KEY(invited_by_id) REFERENCES OrgaTeamInviters(id) ON DELETE SET NULL,
     FOREIGN KEY(first_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL,
     FOREIGN KEY(second_priority_timeslot_id) REFERENCES WorkShifts(id) ON DELETE SET NULL,

@@ -3,19 +3,24 @@
  * Consolidates the common pattern found in BeveragesPage, FoodPage, and TicketsPage.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
+import { ListAlt as ListAltIcon, Settings as SettingsIcon } from '@mui/icons-material';
 import { useFetchData } from '../useFetchData';
 import OptionsTable from './OptionsTable';
 import FilterControls from './FilterControls';
+import OptionCrudTab from './OptionCrudTab';
+import TabSwitcher from './TabSwitcher';
 import type { CombinedBooking } from '../interface';
 import type { FormContent } from '../../userArea/interface';
 import type { ArtistFormContent } from '../../artistArea/interface';
 import { useAdminPageFilters } from '../../../hooks/useAdminPageFilters';
+import type { AdminOptionType } from '../../../services/adminOptionService';
 
 interface OptionItem {
   id: number;
   title: string;
+  working_title?: string;
   price?: number;
   description?: string;
 }
@@ -44,8 +49,10 @@ interface GenericOptionsPageProps {
 }
 
 const GenericOptionsPage: React.FC<GenericOptionsPageProps> = ({ config }) => {
-  const { bookings, regularBookings, artistBookings, formContent, artistFormContent } =
+  const { bookings, regularBookings, artistBookings, formContent, artistFormContent, refetch } =
     useFetchData();
+  const [activeTab, setActiveTab] = useState<'overview' | 'setup'>('overview');
+  const supportsCrud = config.optionType !== 'professions';
 
   const { viewType, setViewType, anchorEl, setAnchorEl } = useAdminPageFilters();
 
@@ -71,6 +78,7 @@ const GenericOptionsPage: React.FC<GenericOptionsPageProps> = ({ config }) => {
             return {
               id: option.id,
               title: option.title,
+              working_title: option.working_title,
               price: option.price,
               description: option.description,
               count,
@@ -88,6 +96,7 @@ const GenericOptionsPage: React.FC<GenericOptionsPageProps> = ({ config }) => {
             return {
               id: option.id,
               title: option.title,
+              working_title: option.working_title,
               price: option.price,
               description: option.description,
               count,
@@ -107,27 +116,48 @@ const GenericOptionsPage: React.FC<GenericOptionsPageProps> = ({ config }) => {
         {config.title}
       </Typography>
 
-      {/* Filter Controls */}
-      <FilterControls
-        viewType={viewType}
-        setViewType={setViewType}
-        anchorEl={anchorEl}
-        setAnchorEl={setAnchorEl}
+      <TabSwitcher
+        tabs={
+          supportsCrud
+            ? [
+                { value: 'overview', label: 'Overview', icon: <ListAltIcon /> },
+                { value: 'setup', label: 'Setup', icon: <SettingsIcon /> },
+              ]
+            : [{ value: 'overview', label: 'Overview', icon: <ListAltIcon /> }]
+        }
+        currentTab={activeTab}
+        onChange={(value) => setActiveTab(value as 'overview' | 'setup')}
       />
 
-      {/* Additional Content (e.g., progress bars) */}
-      {config.additionalContent}
+      {activeTab === 'overview' && (
+        <>
+          {/* Filter Controls */}
+          <FilterControls
+            viewType={viewType}
+            setViewType={setViewType}
+            anchorEl={anchorEl}
+            setAnchorEl={setAnchorEl}
+          />
 
-      {/* Options Table */}
-      <Box sx={{ mt: 2 }}>
-        <OptionsTable
-          options={options}
-          bookings={bookings}
-          optionType={config.optionType}
-          showPrice={config.optionType !== 'professions'}
-          showDescription={config.optionType === 'food' || config.optionType === 'beverage'}
-        />
-      </Box>
+          {/* Additional Content (e.g., progress bars) */}
+          {config.additionalContent}
+
+          {/* Options Table */}
+          <Box sx={{ mt: 2 }}>
+            <OptionsTable
+              options={options}
+              bookings={bookings}
+              optionType={config.optionType}
+              showPrice={config.optionType !== 'professions'}
+              showDescription={config.optionType === 'food' || config.optionType === 'beverage'}
+            />
+          </Box>
+        </>
+      )}
+
+      {supportsCrud && activeTab === 'setup' && (
+        <OptionCrudTab optionType={config.optionType as AdminOptionType} onDataChanged={refetch} />
+      )}
     </Box>
   );
 };

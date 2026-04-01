@@ -21,6 +21,7 @@ interface OptionItemModalProps {
   open: boolean;
   onClose: () => void;
   title: string;
+  frontendTitle?: string;
   description?: string;
   price?: number;
   users: CombinedBooking[];
@@ -32,6 +33,7 @@ const OptionItemModal: React.FC<OptionItemModalProps> = ({
   open,
   onClose,
   title,
+  frontendTitle,
   description,
   price,
   users,
@@ -75,6 +77,12 @@ const OptionItemModal: React.FC<OptionItemModalProps> = ({
           {description && (
             <Typography variant="body2" color="text.secondary">
               {description}
+            </Typography>
+          )}
+
+          {frontendTitle && frontendTitle !== title && (
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+              Frontend titel: {frontendTitle}
             </Typography>
           )}
         </Box>

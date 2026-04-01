@@ -46,6 +46,7 @@ class BeverageOption(Interface):
     title: str
     description: str
     price: float
+    working_title: str = ""
     num_booked: int = 0
 
 
@@ -55,6 +56,7 @@ class FoodOption(Interface):
     title: str
     description: str
     price: float
+    working_title: str = ""
     num_booked: int = 0
 
 
@@ -64,6 +66,7 @@ class TicketOption(Interface):
     title: str
     price: float
     amount: int
+    working_title: str = ""
     num_booked: int = 0
 
 

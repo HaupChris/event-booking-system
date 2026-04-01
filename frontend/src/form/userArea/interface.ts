@@ -27,6 +27,7 @@ export interface Material {
 export interface BeverageOption {
   id: number;
   title: string;
+  working_title?: string;
   description: string;
   price: number;
   num_booked: number;
@@ -35,6 +36,7 @@ export interface BeverageOption {
 export interface FoodOption {
   id: number;
   title: string;
+  working_title?: string;
   description: string;
   price: number;
   num_booked: number;
@@ -43,6 +45,7 @@ export interface FoodOption {
 export interface TicketOption {
   id: number;
   title: string;
+  working_title?: string;
   price: number;
   amount: number;
   num_booked: number;

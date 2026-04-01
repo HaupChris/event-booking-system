@@ -11,6 +11,8 @@ import {
   updateAdminTimeslot,
   updateAdminWorkshift,
 } from '../../../services/adminWorkshiftService';
+import { getAdminTitle } from '../utils/titleUtils';
+import DeleteConfirmDialog from './DeleteConfirmDialog';
 import WorkshiftCrudDialogs from './WorkshiftCrudDialogs';
 import WorkshiftCrudList from './WorkshiftCrudList';
 import {
@@ -40,6 +42,11 @@ const WorkshiftCrudTab: React.FC<WorkshiftCrudTabProps> = ({ onDataChanged }) =>
     message: string;
     severity: 'success' | 'error';
   }>({ open: false, message: '', severity: 'success' });
+  const [deleteTarget, setDeleteTarget] = useState<{
+    type: 'workshift' | 'timeslot';
+    id: number;
+    label: string;
+  } | null>(null);
 
   const showSnackbar = (message: string, severity: 'success' | 'error') => {
     setSnackbar({ open: true, message, severity });
@@ -155,13 +162,51 @@ const WorkshiftCrudTab: React.FC<WorkshiftCrudTabProps> = ({ onDataChanged }) =>
     }
   };
 
-  const handleDeleteWorkshift = async (workshiftId: number) => {
+  const requestDeleteWorkshift = (workshiftId: number) => {
+    const workshift = workshifts.find((item) => item.id === workshiftId);
+    setDeleteTarget({
+      type: 'workshift',
+      id: workshiftId,
+      label: workshift ? getAdminTitle(workshift) : `Workshift #${workshiftId}`,
+    });
+  };
+
+  const requestDeleteTimeslot = (timeslotId: number) => {
+    const timeslot = workshifts
+      .flatMap((workshift) => workshift.time_slots)
+      .find((item) => item.id === timeslotId);
+    setDeleteTarget({
+      type: 'timeslot',
+      id: timeslotId,
+      label: timeslot ? getAdminTitle(timeslot) : `Timeslot #${timeslotId}`,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) {
+      return;
+    }
+
     try {
-      await deleteAdminWorkshift(token, workshiftId);
+      if (deleteTarget.type === 'workshift') {
+        await deleteAdminWorkshift(token, deleteTarget.id);
+      } else {
+        await deleteAdminTimeslot(token, deleteTarget.id);
+      }
       await refreshAfterMutation();
-      showSnackbar('Workshift deleted.', 'success');
+      showSnackbar(
+        deleteTarget.type === 'workshift' ? 'Workshift deleted.' : 'Timeslot deleted.',
+        'success'
+      );
     } catch {
-      showSnackbar('Failed to delete workshift (possibly in use).', 'error');
+      showSnackbar(
+        deleteTarget.type === 'workshift'
+          ? 'Failed to delete workshift (possibly in use).'
+          : 'Failed to delete timeslot (possibly in use).',
+        'error'
+      );
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -204,16 +249,6 @@ const WorkshiftCrudTab: React.FC<WorkshiftCrudTabProps> = ({ onDataChanged }) =>
     }
   };
 
-  const handleDeleteTimeslot = async (timeslotId: number) => {
-    try {
-      await deleteAdminTimeslot(token, timeslotId);
-      await refreshAfterMutation();
-      showSnackbar('Timeslot deleted.', 'success');
-    } catch {
-      showSnackbar('Failed to delete timeslot (possibly in use).', 'error');
-    }
-  };
-
   return (
     <>
       <WorkshiftCrudList
@@ -221,10 +256,10 @@ const WorkshiftCrudTab: React.FC<WorkshiftCrudTabProps> = ({ onDataChanged }) =>
         loading={loading}
         onAddWorkshift={openCreateWorkshiftDialog}
         onEditWorkshift={openEditWorkshiftDialog}
-        onDeleteWorkshift={handleDeleteWorkshift}
+        onDeleteWorkshift={requestDeleteWorkshift}
         onAddTimeslot={openCreateTimeslotDialog}
         onEditTimeslot={openEditTimeslotDialog}
-        onDeleteTimeslot={handleDeleteTimeslot}
+        onDeleteTimeslot={requestDeleteTimeslot}
       />
       <WorkshiftCrudDialogs
         editingWorkshift={Boolean(editingWorkshift)}
@@ -241,6 +276,15 @@ const WorkshiftCrudTab: React.FC<WorkshiftCrudTabProps> = ({ onDataChanged }) =>
         onSaveTimeslot={handleSaveTimeslot}
         snackbar={snackbar}
         onCloseSnackbar={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      />
+
+      <DeleteConfirmDialog
+        open={Boolean(deleteTarget)}
+        title={deleteTarget?.type === 'workshift' ? 'Delete workshift?' : 'Delete timeslot?'}
+        message="Are you sure you want to delete this item? This action cannot be undone."
+        itemName={deleteTarget?.label}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
       />
     </>
   );

@@ -41,6 +41,7 @@ import { useFetchData } from './useFetchData';
 import { TokenContext } from '../../contexts/AuthContext';
 import type { Booking } from '../userArea/interface';
 import type { CombinedBooking } from './interface';
+import { getAdminTitle } from './utils/titleUtils';
 
 interface PaymentManagementModalProps {
   open: boolean;
@@ -49,7 +50,7 @@ interface PaymentManagementModalProps {
   onTogglePaid: () => void;
   onInputChange: (field: keyof Booking, value: Booking[keyof Booking]) => void;
   onSave: () => void;
-  getTicketTitle: (ticketId: number) => string;
+  getTicketTitle: (ticketId: number, bookingType: 'regular' | 'artist') => string;
 }
 
 const PaymentManagementModal: React.FC<PaymentManagementModalProps> = ({
@@ -88,7 +89,7 @@ const PaymentManagementModal: React.FC<PaymentManagementModalProps> = ({
           {editedBooking.first_name} {editedBooking.last_name}
         </Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          {getTicketTitle(editedBooking.ticket_id)} - Expected: €
+          {getTicketTitle(editedBooking.ticket_id, editedBooking.bookingType)} - Expected: €
           {editedBooking.total_price.toFixed(2)}
         </Typography>
 
@@ -172,7 +173,7 @@ const PaymentManagementModal: React.FC<PaymentManagementModalProps> = ({
 };
 
 const PaymentConfirmationsPage: React.FC = () => {
-  const { bookings, formContent, refetch } = useFetchData();
+  const { bookings, formContent, artistFormContent, refetch } = useFetchData();
   const [, setSelectedBooking] = useState<CombinedBooking | null>(null);
   const [editedBooking, setEditedBooking] = useState<CombinedBooking | null>(null);
   const [openModal, setOpenModal] = useState(false);
@@ -274,9 +275,11 @@ const PaymentConfirmationsPage: React.FC = () => {
       setShowSnackbar(true);
     }
   };
-  const getTicketTitle = (ticketId: number) => {
-    const ticket = formContent.ticket_options.find((t) => t.id === ticketId);
-    return ticket ? ticket.title : 'Unknown Ticket';
+  const getTicketTitle = (ticketId: number, bookingType: 'regular' | 'artist') => {
+    const options =
+      bookingType === 'artist' ? artistFormContent.ticket_options : formContent.ticket_options;
+    const ticket = options.find((t) => t.id === ticketId);
+    return ticket ? getAdminTitle(ticket) : 'Unknown Ticket';
   };
 
   const handleCloseSnackbar = () => {
@@ -431,7 +434,7 @@ const PaymentConfirmationsPage: React.FC = () => {
                 <TableCell>
                   {booking.last_name}, {booking.first_name}
                 </TableCell>
-                <TableCell>{getTicketTitle(booking.ticket_id)}</TableCell>
+                <TableCell>{getTicketTitle(booking.ticket_id, booking.bookingType)}</TableCell>
                 <TableCell>€{booking.total_price.toFixed(2)}</TableCell>
                 <TableCell>€{(booking.paid_amount || 0).toFixed(2)}</TableCell>
                 <TableCell>

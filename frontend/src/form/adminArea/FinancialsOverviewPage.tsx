@@ -5,6 +5,7 @@ import FilterControls from './components/FilterControls';
 import type { ViewFilterType } from './utils/optionsUtils';
 import FinancialSummaryCards from './components/FinancialSummaryCards';
 import FinancialDetailTables from './components/FinancialDetailTables';
+import { getAdminTitle } from './utils/titleUtils';
 
 const FinancialsOverviewPage: React.FC = () => {
   const { bookings, formContent, artistFormContent } = useFetchData();
@@ -51,7 +52,7 @@ const FinancialsOverviewPage: React.FC = () => {
 
       const ticket = content.ticket_options.find((t) => t.id === booking.ticket_id);
       if (ticket) {
-        const key = `${booking.bookingType}-${ticket.title}`;
+        const key = `${booking.bookingType}-${getAdminTitle(ticket)}`;
         if (!ticketTotals[key]) {
           ticketTotals[key] = { count: 0, total: 0, isArtist: booking.bookingType === 'artist' };
         }
@@ -61,7 +62,7 @@ const FinancialsOverviewPage: React.FC = () => {
 
       const beverage = content.beverage_options.find((b) => b.id === booking.beverage_id);
       if (beverage && booking.beverage_id !== -1) {
-        const key = `${booking.bookingType}-${beverage.title}`;
+        const key = `${booking.bookingType}-${getAdminTitle(beverage)}`;
         if (!beverageTotals[key]) {
           beverageTotals[key] = {
             count: 0,
@@ -75,7 +76,7 @@ const FinancialsOverviewPage: React.FC = () => {
 
       const food = content.food_options.find((f) => f.id === booking.food_id);
       if (food && booking.food_id !== -1) {
-        const key = `${booking.bookingType}-${food.title}-${food.description}`;
+        const key = `${booking.bookingType}-${getAdminTitle(food)}-${food.description}`;
         if (!foodTotals[key]) {
           foodTotals[key] = { count: 0, total: 0, isArtist: booking.bookingType === 'artist' };
         }

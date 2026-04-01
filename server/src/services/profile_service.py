@@ -159,9 +159,9 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
                         bv.price as beverage_price
                     FROM ArtistBookings ab
                     LEFT JOIN Artists a ON ab.artist_id = a.id
-                    LEFT JOIN TicketOptions t ON ab.ticket_option_id = t.id
-                    LEFT JOIN FoodOptions f ON ab.food_option_id = f.id
-                    LEFT JOIN BeverageOptions bv ON ab.beverage_option_id = bv.id
+                    LEFT JOIN ArtistTicketOptions t ON ab.ticket_option_id = t.id
+                    LEFT JOIN ArtistFoodOptions f ON ab.food_option_id = f.id
+                    LEFT JOIN ArtistBeverageOptions bv ON ab.beverage_option_id = bv.id
                     LEFT JOIN OrgaTeamInviters oti ON ab.invited_by_id = oti.id
                     WHERE ab.profile_uuid = ?
                 """,

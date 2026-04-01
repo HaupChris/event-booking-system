@@ -50,22 +50,43 @@ def _init_db_data(connection: Connection, form_content: FormContent):
         # Insert TicketOptions
         for idx, ticket in enumerate(form_content.ticket_options):
             cursor.execute(
-                "INSERT INTO TicketOptions (id, title, price, amount) VALUES (?, ?, ?, ?)",
-                (idx, ticket.title, ticket.price, ticket.amount),
+                """
+                INSERT INTO TicketOptions (id, title, working_title, price, amount)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    idx,
+                    ticket.title,
+                    ticket.working_title or ticket.title,
+                    ticket.price,
+                    ticket.amount,
+                ),
             )
 
         # Insert BeverageOptions
         for idx, beverage in enumerate(form_content.beverage_options):
             cursor.execute(
-                "INSERT INTO BeverageOptions (id, title, description, price) VALUES (?, ?, ?, ?)",
-                (idx, beverage.title, beverage.description, beverage.price),
+                """
+                INSERT INTO BeverageOptions (id, title, working_title, description, price)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    idx,
+                    beverage.title,
+                    beverage.working_title or beverage.title,
+                    beverage.description,
+                    beverage.price,
+                ),
             )
 
         # Insert FoodOptions
         for idx, food in enumerate(form_content.food_options):
             cursor.execute(
-                "INSERT INTO FoodOptions (id, title, description, price) VALUES (?, ?, ?, ?)",
-                (idx, food.title, food.description, food.price),
+                """
+                INSERT INTO FoodOptions (id, title, working_title, description, price)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (idx, food.title, food.working_title or food.title, food.description, food.price),
             )
 
         # Insert Materials

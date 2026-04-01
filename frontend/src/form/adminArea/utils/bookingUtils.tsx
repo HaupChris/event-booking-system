@@ -25,7 +25,7 @@ export const getTicketTitle = (
     bookingType === 'artist' ? artistFormContent.ticket_options : formContent.ticket_options;
 
   const option = options.find((opt) => opt.id === id);
-  return option ? option.title : 'Unknown';
+  return option ? getAdminTitle(option) : 'Unknown';
 };
 
 /**

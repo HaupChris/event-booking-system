@@ -16,6 +16,7 @@ import FormCard from '../../../components/core/display/FormCard';
 import type { ArtistFormContent } from '../../artistArea/interface';
 import type { FormContent } from '../../userArea/interface';
 import type { CombinedBooking } from '../interface';
+import { getAdminTitle } from '../utils/titleUtils';
 import { calculateTotalPrice, getTimeslotWithWorkshift } from '../utils/bookingUtils';
 
 interface BookingDetailFormFieldsProps {
@@ -151,7 +152,7 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
           >
             {ticketOptions.map((ticket) => (
               <MenuItem key={ticket.id} value={ticket.id}>
-                {ticket.title} - €{ticket.price}
+                {getAdminTitle(ticket)} - €{ticket.price}
               </MenuItem>
             ))}
           </Select>
@@ -170,7 +171,7 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
             <MenuItem value={-1}>No Beverage</MenuItem>
             {beverageOptions.map((beverage) => (
               <MenuItem key={beverage.id} value={beverage.id}>
-                {beverage.title} - €{beverage.price}
+                {getAdminTitle(beverage)} - €{beverage.price}
               </MenuItem>
             ))}
           </Select>
@@ -189,7 +190,7 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
             <MenuItem value={-1}>No Food</MenuItem>
             {foodOptions.map((food) => (
               <MenuItem key={food.id} value={food.id}>
-                {food.title} - €{food.price}
+                {getAdminTitle(food)} - €{food.price}
               </MenuItem>
             ))}
           </Select>
