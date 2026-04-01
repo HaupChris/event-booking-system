@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
-import { Box, Button, alpha } from '@mui/material';
-import { spacePalette } from '../../styles/theme';
+import { Box, Button, Typography, alpha, useTheme } from '@mui/material';
+import { useThemeMode } from '../../styles/theme';
+import { useBrandingPack } from '../../../branding/useBrandingPack';
 
 interface SignaturePadProps {
   currentSignature: string;
@@ -12,9 +13,15 @@ interface SignaturePadProps {
 const SignaturePad: React.FC<SignaturePadProps> = ({
   currentSignature,
   updateCurrentSignature,
-  penColor = spacePalette.primary.main,
+  penColor,
   clearOnResize = false,
 }) => {
+  const theme = useTheme();
+  const { mode } = useThemeMode();
+  const brandingPack = useBrandingPack();
+  const isCircusMode = mode === 'circus';
+  const resolvedPenColor = penColor ?? (isCircusMode ? '#e6c586' : theme.palette.primary.main);
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const drawing = useRef(false);
@@ -52,7 +59,7 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
     if (!ctxRef.current) return;
 
     // Initialize context settings
-    ctxRef.current.strokeStyle = penColor;
+    ctxRef.current.strokeStyle = resolvedPenColor;
     ctxRef.current.lineJoin = 'round';
     ctxRef.current.lineWidth = 2;
 
@@ -145,7 +152,7 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
         window.removeEventListener('resize', handleResize);
       }
     };
-  }, [penColor, clearOnResize, updateCurrentSignature]);
+  }, [resolvedPenColor, clearOnResize, updateCurrentSignature]);
 
   const clearSignature = () => {
     updateCurrentSignature('');
@@ -158,37 +165,102 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        width: '100%',
       }}
     >
       <Box
         sx={{
-          p: 1,
-          border: '1px dashed',
-          borderColor: alpha(spacePalette.primary.main, 0.5),
-          borderRadius: '10px',
-          background: alpha('#000', 0.2),
-          boxShadow: 'inset 0 0 20px rgba(0,0,0,0.3)',
+          p: isCircusMode ? 1.4 : 1,
+          border: isCircusMode ? '2px solid' : '1px dashed',
+          borderColor: isCircusMode
+            ? alpha('#d8b87a', 0.9)
+            : alpha(theme.palette.primary.main, 0.5),
+          borderRadius: isCircusMode ? '14px' : '10px',
+          background: isCircusMode ? 'rgba(26, 11, 18, 0.72)' : alpha('#000', 0.2),
+          boxShadow: isCircusMode
+            ? '0 8px 18px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(244,205,142,0.12)'
+            : 'inset 0 0 20px rgba(0,0,0,0.3)',
           mb: 1,
           width: '100%',
           display: 'flex',
           justifyContent: 'center',
+          position: 'relative',
+          ...(isCircusMode && {
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 7,
+              left: 7,
+              width: 9,
+              height: 9,
+              borderRadius: '50%',
+              backgroundColor: '#8c6539',
+              border: '1px solid #d8b87a',
+            },
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              bottom: 7,
+              right: 7,
+              width: 9,
+              height: 9,
+              borderRadius: '50%',
+              backgroundColor: '#8c6539',
+              border: '1px solid #d8b87a',
+            },
+          }),
         }}
       >
         <canvas
           ref={canvasRef}
           style={{
             touchAction: 'none',
-            width: '300px',
+            width: '100%',
+            maxWidth: '560px',
             height: '200px',
-            border: `2px solid ${alpha(spacePalette.primary.main, 0.5)}`,
-            borderRadius: '10px',
+            border: isCircusMode
+              ? `3px solid ${alpha('#cda163', 0.95)}`
+              : `2px solid ${alpha(theme.palette.primary.main, 0.5)}`,
+            borderRadius: isCircusMode ? '14px' : '10px',
+            background: isCircusMode ? 'rgba(26, 11, 18, 0.62)' : 'transparent',
           }}
-          width={300}
+          width={560}
           height={200}
         />
       </Box>
-      <Button color="primary" onClick={clearSignature} sx={{ mt: 2 }}>
-        Löschen
+
+      {isCircusMode && (
+        <Typography
+          variant="caption"
+          sx={{
+            color: alpha('#e5cf9f', 0.9),
+            fontFamily: brandingPack.typography.body,
+            mb: 0.5,
+          }}
+        >
+          Bitte unterschreibe im Feld mit Maus oder Finger.
+        </Typography>
+      )}
+
+      <Button
+        color="primary"
+        onClick={clearSignature}
+        sx={{
+          mt: 1.2,
+          ...(isCircusMode && {
+            borderRadius: '12px',
+            border: '2px solid',
+            borderColor: alpha('#d8b87a', 0.8),
+            color: '#f4ead6',
+            fontFamily: brandingPack.typography.accent,
+            backgroundColor: 'rgba(74, 41, 24, 0.52)',
+            '&:hover': {
+              backgroundColor: 'rgba(74, 41, 24, 0.72)',
+            },
+          }),
+        }}
+      >
+        Loeschen
       </Button>
     </Box>
   );
