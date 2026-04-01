@@ -12,8 +12,8 @@ from flask import Blueprint, jsonify, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-from src.services.faq_service import get_faqs_grouped_by_category
 from src.services.app_settings_service import get_payment_link
+from src.services.faq_service import get_faqs_grouped_by_category
 from src.services.mail_service import send_profile_recovery_mail
 from src.services.news_service import get_news_for_profile, get_unread_count, mark_news_as_read
 from src.services.profile_service import (
@@ -22,6 +22,14 @@ from src.services.profile_service import (
     get_assigned_shifts,
     get_profile_by_uuid,
     get_profile_uuids_by_email,
+)
+from src.services.rideshare_service import (
+    approve_join_request,
+    cancel_rideshare_post,
+    create_rideshare_post,
+    get_rideshare_board,
+    react_to_rideshare_post,
+    reject_join_request,
 )
 from src.services.shift_message_service import get_shift_messages_for_booking
 from src.utils.logger import get_logger, log_security_event
@@ -116,6 +124,168 @@ def get_shift_messages_for_profile(profile_uuid: str):
         return jsonify({"messages": messages}), 200
     except Exception as e:
         logger.error(f"Shift message feed retrieval failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@profile_bp.route("/<profile_uuid>/rideshare", methods=["GET"])
+@limiter_profile.limit("100/minute")
+def get_rideshare(profile_uuid: str):
+    """Get ride sharing board data for a profile."""
+    client_ip = request.remote_addr
+
+    try:
+        logger.debug(f"Ride sharing board request for UUID {profile_uuid[:8]}... from {client_ip}")
+
+        rideshare = get_rideshare_board(profile_uuid)
+        return jsonify({"rideshare": rideshare}), 200
+
+    except LookupError as e:
+        logger.warning(f"Ride sharing board failed: {str(e)} for UUID {profile_uuid[:8]}...")
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        logger.error(f"Ride sharing board retrieval failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@profile_bp.route("/<profile_uuid>/rideshare/posts", methods=["POST"])
+@limiter_profile.limit("30/minute")
+def create_rideshare(profile_uuid: str):
+    """Create a ride sharing offer or request for a profile."""
+    client_ip = request.remote_addr
+
+    try:
+        logger.info(f"Ride share post create for UUID {profile_uuid[:8]}... from {client_ip}")
+
+        data = request.json or {}
+        post_id = create_rideshare_post(
+            profile_uuid=profile_uuid,
+            post_type=data.get("post_type", ""),
+            origin=data.get("origin", ""),
+            destination=data.get("destination", ""),
+            departure_time=data.get("departure_time", ""),
+            seats_total=data.get("seats_total"),
+            notes=data.get("notes"),
+        )
+        return jsonify({"message": "Ride share post created", "post_id": post_id}), 201
+
+    except LookupError as e:
+        logger.warning(f"Ride share post create failed: {str(e)} for UUID {profile_uuid[:8]}...")
+        return jsonify({"error": str(e)}), 404
+    except ValueError as e:
+        logger.warning(f"Ride share post create validation failed: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        logger.error(f"Ride share post create failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@profile_bp.route("/<profile_uuid>/rideshare/posts/<int:post_id>/react", methods=["POST"])
+@limiter_profile.limit("40/minute")
+def react_to_rideshare(profile_uuid: str, post_id: int):
+    """React to a ride share post (offer or request)."""
+    client_ip = request.remote_addr
+
+    try:
+        logger.info(
+            f"Ride share reaction for UUID {profile_uuid[:8]}..., post {post_id} from {client_ip}"
+        )
+
+        data = request.json or {}
+        join_request_id = react_to_rideshare_post(profile_uuid, post_id, data.get("message"))
+        return jsonify({"message": "Reaction created", "request_id": join_request_id}), 201
+
+    except LookupError as e:
+        logger.warning(
+            f"Ride share reaction failed: {str(e)} for UUID {profile_uuid[:8]}..., post {post_id}"
+        )
+        return jsonify({"error": str(e)}), 404
+    except ValueError as e:
+        logger.warning(f"Ride share reaction validation failed: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        logger.error(f"Ride share reaction failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@profile_bp.route(
+    "/<profile_uuid>/rideshare/join-requests/<int:request_id>/approve", methods=["PUT"]
+)
+@limiter_profile.limit("60/minute")
+def approve_rideshare_join(profile_uuid: str, request_id: int):
+    """Approve a ride share response for an owned post."""
+    client_ip = request.remote_addr
+
+    try:
+        logger.info(
+            f"Ride share join approval for UUID {profile_uuid[:8]}..., request {request_id} from {client_ip}"
+        )
+        approve_join_request(profile_uuid, request_id)
+        return jsonify({"message": "Join request approved"}), 200
+
+    except LookupError as e:
+        logger.warning(
+            f"Ride share join approval failed: {str(e)} for UUID {profile_uuid[:8]}..., request {request_id}"
+        )
+        return jsonify({"error": str(e)}), 404
+    except ValueError as e:
+        logger.warning(f"Ride share join approval validation failed: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        logger.error(f"Ride share join approval failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@profile_bp.route(
+    "/<profile_uuid>/rideshare/join-requests/<int:request_id>/reject", methods=["PUT"]
+)
+@limiter_profile.limit("60/minute")
+def reject_rideshare_join(profile_uuid: str, request_id: int):
+    """Reject a ride share response for an owned post."""
+    client_ip = request.remote_addr
+
+    try:
+        logger.info(
+            f"Ride share join rejection for UUID {profile_uuid[:8]}..., request {request_id} from {client_ip}"
+        )
+        reject_join_request(profile_uuid, request_id)
+        return jsonify({"message": "Join request rejected"}), 200
+
+    except LookupError as e:
+        logger.warning(
+            f"Ride share join rejection failed: {str(e)} for UUID {profile_uuid[:8]}..., request {request_id}"
+        )
+        return jsonify({"error": str(e)}), 404
+    except ValueError as e:
+        logger.warning(f"Ride share join rejection validation failed: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        logger.error(f"Ride share join rejection failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@profile_bp.route("/<profile_uuid>/rideshare/posts/<int:post_id>", methods=["DELETE"])
+@limiter_profile.limit("30/minute")
+def cancel_rideshare(profile_uuid: str, post_id: int):
+    """Cancel an owned ride share post."""
+    client_ip = request.remote_addr
+
+    try:
+        logger.info(
+            f"Ride share post cancel for UUID {profile_uuid[:8]}..., post {post_id} from {client_ip}"
+        )
+        cancel_rideshare_post(profile_uuid, post_id)
+        return jsonify({"message": "Ride share post cancelled"}), 200
+
+    except LookupError as e:
+        logger.warning(
+            f"Ride share post cancel failed: {str(e)} for UUID {profile_uuid[:8]}..., post {post_id}"
+        )
+        return jsonify({"error": str(e)}), 404
+    except ValueError as e:
+        logger.warning(f"Ride share post cancel validation failed: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        logger.error(f"Ride share post cancel failed: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500
 
 

@@ -1,8 +1,10 @@
-import React from 'react';
+/* eslint-disable max-lines, complexity */
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   alpha,
   AppBar,
   Box,
+  Collapse,
   Drawer,
   IconButton,
   List,
@@ -12,13 +14,24 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
+import {
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+  FiberManualRecord as DotIcon,
+  Menu as MenuIcon,
+} from '@mui/icons-material';
 import type { BrandingPack } from '../../branding/types';
+
+export interface ProfileNavSubItem {
+  id: string;
+  label: string;
+}
 
 export interface ProfileNavMenuItem {
   id: string;
   label: string;
   icon: React.ReactNode;
+  children?: ProfileNavSubItem[];
 }
 
 interface ProfileTopNavigationProps {
@@ -35,6 +48,7 @@ interface ProfileTopNavigationProps {
   onSelectView: (viewId: string) => void;
 }
 
+// eslint-disable-next-line complexity, max-lines-per-function
 const ProfileTopNavigation: React.FC<ProfileTopNavigationProps> = ({
   drawerOpen,
   activeView,
@@ -48,6 +62,24 @@ const ProfileTopNavigation: React.FC<ProfileTopNavigationProps> = ({
   onCloseDrawer,
   onSelectView,
 }) => {
+  const parentWithActiveChild = useMemo(
+    () => menuItems.find((item) => item.children?.some((child) => child.id === activeView))?.id,
+    [activeView, menuItems]
+  );
+
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!parentWithActiveChild) {
+      return;
+    }
+    setExpandedSections((previous) => ({ ...previous, [parentWithActiveChild]: true }));
+  }, [parentWithActiveChild]);
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections((previous) => ({ ...previous, [sectionId]: !previous[sectionId] }));
+  };
+
   return (
     <>
       <AppBar
@@ -159,63 +191,172 @@ const ProfileTopNavigation: React.FC<ProfileTopNavigationProps> = ({
           )}
 
           <List>
-            {menuItems.map((item) => (
-              <ListItemButton
-                key={item.id}
-                selected={activeView === item.id}
-                onClick={() => onSelectView(item.id)}
-                sx={
-                  isCircusMode
-                    ? {
-                        mx: 1,
-                        mb: 0.5,
-                        borderRadius: '10px',
-                        border: '1px solid',
-                        borderColor:
-                          activeView === item.id ? alpha('#d8b87a', 0.72) : alpha('#d8b87a', 0.22),
-                        backgroundColor:
-                          activeView === item.id ? alpha('#704214', 0.55) : alpha('#2a120f', 0.5),
-                        '&:hover': {
-                          backgroundColor: alpha('#704214', 0.65),
-                        },
-                      }
-                    : undefined
-                }
-              >
-                <ListItemIcon
-                  sx={{
-                    color: isCircusMode ? '#d8b87a' : undefined,
-                    minWidth: 38,
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.label}
-                  primaryTypographyProps={{
-                    sx: {
-                      fontFamily: isCircusMode ? brandingPack.typography.body : undefined,
-                      color: isCircusMode ? '#f4ead6' : undefined,
-                    },
-                  }}
-                />
-                {item.id === 'news' && unreadCount > 0 && (
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      bgcolor: isCircusMode ? alpha('#b13a2f', 0.85) : 'error.main',
-                      color: '#fff',
-                      px: 1,
-                      py: 0.25,
-                      borderRadius: 1,
-                      fontSize: '0.7rem',
-                    }}
+            {menuItems.map((item) => {
+              const hasChildren = Boolean(item.children && item.children.length > 0);
+              const isChildActive = Boolean(
+                item.children?.some((child) => child.id === activeView)
+              );
+
+              if (!hasChildren) {
+                return (
+                  <ListItemButton
+                    key={item.id}
+                    selected={activeView === item.id}
+                    onClick={() => onSelectView(item.id)}
+                    sx={
+                      isCircusMode
+                        ? {
+                            mx: 1,
+                            mb: 0.5,
+                            borderRadius: '10px',
+                            border: '1px solid',
+                            borderColor:
+                              activeView === item.id
+                                ? alpha('#d8b87a', 0.72)
+                                : alpha('#d8b87a', 0.22),
+                            backgroundColor:
+                              activeView === item.id
+                                ? alpha('#704214', 0.55)
+                                : alpha('#2a120f', 0.5),
+                            '&:hover': {
+                              backgroundColor: alpha('#704214', 0.65),
+                            },
+                          }
+                        : undefined
+                    }
                   >
-                    {unreadCount}
-                  </Typography>
-                )}
-              </ListItemButton>
-            ))}
+                    <ListItemIcon
+                      sx={{
+                        color: isCircusMode ? '#d8b87a' : undefined,
+                        minWidth: 38,
+                      }}
+                    >
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.label}
+                      primaryTypographyProps={{
+                        sx: {
+                          fontFamily: isCircusMode ? brandingPack.typography.body : undefined,
+                          color: isCircusMode ? '#f4ead6' : undefined,
+                        },
+                      }}
+                    />
+                    {item.id === 'news' && unreadCount > 0 && (
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          bgcolor: isCircusMode ? alpha('#b13a2f', 0.85) : 'error.main',
+                          color: '#fff',
+                          px: 1,
+                          py: 0.25,
+                          borderRadius: 1,
+                          fontSize: '0.7rem',
+                        }}
+                      >
+                        {unreadCount}
+                      </Typography>
+                    )}
+                  </ListItemButton>
+                );
+              }
+
+              const expanded = expandedSections[item.id] ?? isChildActive;
+              return (
+                <Box key={item.id}>
+                  <ListItemButton
+                    selected={isChildActive}
+                    onClick={() => toggleSection(item.id)}
+                    sx={
+                      isCircusMode
+                        ? {
+                            mx: 1,
+                            mb: 0.5,
+                            borderRadius: '10px',
+                            border: '1px solid',
+                            borderColor: isChildActive
+                              ? alpha('#d8b87a', 0.72)
+                              : alpha('#d8b87a', 0.22),
+                            backgroundColor: isChildActive
+                              ? alpha('#704214', 0.55)
+                              : alpha('#2a120f', 0.5),
+                          }
+                        : undefined
+                    }
+                  >
+                    <ListItemIcon
+                      sx={{
+                        color: isCircusMode ? '#d8b87a' : undefined,
+                        minWidth: 38,
+                      }}
+                    >
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.label}
+                      primaryTypographyProps={{
+                        sx: {
+                          fontFamily: isCircusMode ? brandingPack.typography.body : undefined,
+                          color: isCircusMode ? '#f4ead6' : undefined,
+                        },
+                      }}
+                    />
+                    {expanded ? (
+                      <ExpandLessIcon sx={{ color: isCircusMode ? '#d8b87a' : undefined }} />
+                    ) : (
+                      <ExpandMoreIcon sx={{ color: isCircusMode ? '#d8b87a' : undefined }} />
+                    )}
+                  </ListItemButton>
+                  <Collapse in={expanded} timeout="auto" unmountOnExit>
+                    <List disablePadding sx={{ pl: 2, pr: 1 }}>
+                      {item.children?.map((child) => (
+                        <ListItemButton
+                          key={child.id}
+                          selected={activeView === child.id}
+                          onClick={() => onSelectView(child.id)}
+                          sx={
+                            isCircusMode
+                              ? {
+                                  mb: 0.5,
+                                  borderRadius: '8px',
+                                  border: '1px solid',
+                                  borderColor:
+                                    activeView === child.id
+                                      ? alpha('#d8b87a', 0.72)
+                                      : alpha('#d8b87a', 0.18),
+                                  backgroundColor:
+                                    activeView === child.id
+                                      ? alpha('#704214', 0.45)
+                                      : alpha('#1f0c0a', 0.45),
+                                }
+                              : { pl: 2 }
+                          }
+                        >
+                          <ListItemIcon
+                            sx={{
+                              minWidth: 24,
+                              color: isCircusMode ? alpha('#d8b87a', 0.9) : undefined,
+                            }}
+                          >
+                            <DotIcon sx={{ fontSize: '0.55rem' }} />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={child.label}
+                            primaryTypographyProps={{
+                              sx: {
+                                fontFamily: isCircusMode ? brandingPack.typography.body : undefined,
+                                fontSize: '0.92rem',
+                                color: isCircusMode ? '#f4ead6' : undefined,
+                              },
+                            }}
+                          />
+                        </ListItemButton>
+                      ))}
+                    </List>
+                  </Collapse>
+                </Box>
+              );
+            })}
           </List>
         </Box>
       </Drawer>

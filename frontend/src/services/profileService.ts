@@ -128,6 +128,77 @@ export interface NewsItem {
   read_date: string | null;
 }
 
+export type RideSharePostType = 'offer' | 'request';
+export type RideSharePostStatus = 'active' | 'cancelled';
+export type RideShareJoinStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+export interface RideSharePost {
+  id: number;
+  owner_profile_uuid: string;
+  owner_display_name: string;
+  post_type: RideSharePostType;
+  origin: string;
+  destination: string;
+  departure_time: string;
+  seats_total: number | null;
+  seats_taken: number;
+  seats_available: number;
+  notes: string | null;
+  status: RideSharePostStatus;
+  created_date: string;
+  updated_date: string;
+  is_own_post: boolean;
+  can_join: boolean;
+  my_request_status: RideShareJoinStatus | null;
+}
+
+export interface RideShareJoinRequest {
+  id: number;
+  post_id: number;
+  post_type: RideSharePostType;
+  post_origin: string;
+  post_destination: string;
+  post_departure_time: string;
+  post_owner_profile_uuid: string;
+  post_owner_display_name: string;
+  requester_profile_uuid: string;
+  requester_display_name: string;
+  message: string | null;
+  status: RideShareJoinStatus;
+  created_date: string;
+  responded_date: string | null;
+  phone_number: string | null;
+}
+
+export interface RideShareContact {
+  relation: 'driver' | 'passenger';
+  profile_uuid: string;
+  display_name: string;
+  phone_number: string;
+  post_id: number;
+  origin: string;
+  destination: string;
+  departure_time: string;
+}
+
+export interface RideShareBoard {
+  offers: RideSharePost[];
+  requests: RideSharePost[];
+  my_posts: RideSharePost[];
+  incoming_join_requests: RideShareJoinRequest[];
+  my_join_requests: RideShareJoinRequest[];
+  visible_contacts: RideShareContact[];
+}
+
+export interface CreateRideSharePostPayload {
+  post_type: RideSharePostType;
+  origin: string;
+  destination: string;
+  departure_time: string;
+  seats_total?: number;
+  notes?: string;
+}
+
 export interface ProfileData {
   user: User;
   booking: Booking;
@@ -209,6 +280,76 @@ export const markNewsAsRead = async (profileUuid: string, newsId: number): Promi
 export const getUnreadNewsCount = async (profileUuid: string): Promise<number> => {
   const response = await axios.get(`${API_BASE_URL}/profile/${profileUuid}/news/unread-count`);
   return response.data.unread_count;
+};
+
+/**
+ * Get ride sharing board data for a profile
+ */
+export const getRideShareBoard = async (profileUuid: string): Promise<RideShareBoard> => {
+  const response = await axios.get(`${API_BASE_URL}/profile/${profileUuid}/rideshare`);
+  return response.data.rideshare;
+};
+
+/**
+ * Create a ride share post
+ */
+export const createRideSharePost = async (
+  profileUuid: string,
+  payload: CreateRideSharePostPayload
+): Promise<number> => {
+  const response = await axios.post(
+    `${API_BASE_URL}/profile/${profileUuid}/rideshare/posts`,
+    payload
+  );
+  return response.data.post_id;
+};
+
+/**
+ * React to a ride share post
+ */
+export const requestRideShareJoin = async (
+  profileUuid: string,
+  postId: number,
+  message?: string
+): Promise<number> => {
+  const response = await axios.post(
+    `${API_BASE_URL}/profile/${profileUuid}/rideshare/posts/${postId}/react`,
+    {
+      message,
+    }
+  );
+  return response.data.request_id;
+};
+
+/**
+ * Approve a ride share join request
+ */
+export const approveRideShareJoinRequest = async (
+  profileUuid: string,
+  requestId: number
+): Promise<void> => {
+  await axios.put(
+    `${API_BASE_URL}/profile/${profileUuid}/rideshare/join-requests/${requestId}/approve`
+  );
+};
+
+/**
+ * Reject a ride share join request
+ */
+export const rejectRideShareJoinRequest = async (
+  profileUuid: string,
+  requestId: number
+): Promise<void> => {
+  await axios.put(
+    `${API_BASE_URL}/profile/${profileUuid}/rideshare/join-requests/${requestId}/reject`
+  );
+};
+
+/**
+ * Cancel own ride share post
+ */
+export const cancelRideSharePost = async (profileUuid: string, postId: number): Promise<void> => {
+  await axios.delete(`${API_BASE_URL}/profile/${profileUuid}/rideshare/posts/${postId}`);
 };
 
 /**

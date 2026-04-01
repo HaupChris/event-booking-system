@@ -26,7 +26,16 @@ const baseMenuItems: ProfileNavMenuItem[] = [
   { id: 'news', label: 'Neuigkeiten', icon: <NewspaperIcon /> },
   { id: 'profile', label: 'Mein Profil', icon: <AccountBoxIcon /> },
   { id: 'shifts', label: 'Schichten', icon: <WorkIcon /> },
-  { id: 'rideshare', label: 'Mitfahrboerse', icon: <DirectionsCarIcon /> },
+  {
+    id: 'rideshare',
+    label: 'Mitfahrboerse',
+    icon: <DirectionsCarIcon />,
+    children: [
+      { id: 'rideshare_create', label: 'Gesuch / Angebot erstellen' },
+      { id: 'rideshare_my', label: 'Meine Eintraege' },
+      { id: 'rideshare_overview', label: 'Uebersicht' },
+    ],
+  },
   { id: 'faqs', label: 'FAQs', icon: <HelpIcon /> },
 ];
 
@@ -34,7 +43,9 @@ const missionBriefings: Record<string, string> = {
   news: 'Neueste Nachrichten fuer deine Festival-Reise.',
   profile: 'Alle Buchungsdaten, Kontakte und Zahlungsinfos an einem Ort.',
   shifts: 'Schichtangebote bestaetigen, ablehnen oder neue Hinweise lesen.',
-  rideshare: 'Mitfahrgelegenheiten rund um die Anreise koordinieren.',
+  rideshare_create: 'Stelle ein Fahrtangebot oder Gesuch fuer die Anreise ein.',
+  rideshare_my: 'Verwalte deine Eintraege und bestaetige eingehende Reaktionen.',
+  rideshare_overview: 'Sieh alle aktiven Angebote und Gesuche der Mitfahrboerse.',
   faqs: 'Antworten auf die wichtigsten Fragen zum Festival.',
 };
 
@@ -67,8 +78,16 @@ const ProfilePage: React.FC = () => {
     : baseMenuItems;
 
   const pageTitle = useMemo(() => {
-    const item = menuItems.find((menuItem) => menuItem.id === activeView);
-    return item ? item.label : 'Wiesenwahn Festival';
+    for (const item of menuItems) {
+      if (item.id === activeView) {
+        return item.label;
+      }
+      const child = item.children?.find((subItem) => subItem.id === activeView);
+      if (child) {
+        return child.label;
+      }
+    }
+    return 'Wiesenwahn Festival';
   }, [activeView, menuItems]);
 
   const profileName = profile?.user
@@ -102,7 +121,9 @@ const ProfilePage: React.FC = () => {
     news: newsView,
     profile: profileView,
     shifts: shiftsView,
-    rideshare: <RideSharing />,
+    rideshare_create: <RideSharing viewMode="create" />,
+    rideshare_my: <RideSharing viewMode="my" />,
+    rideshare_overview: <RideSharing viewMode="overview" />,
     faqs: <FAQs />,
   };
 
