@@ -1,8 +1,9 @@
 import base64
-import os
 import sqlite3
 import uuid
 from contextlib import closing
+from pathlib import Path
+from typing import Any, cast
 
 from src.models.datatypes import ArtistBooking, ArtistBookingWithTimestamp
 from src.services.app_settings_service import get_payment_link
@@ -85,7 +86,7 @@ def get_all_artist_bookings() -> list[ArtistBookingWithTimestamp]:
                 total_price=row[8],
                 timestamp=row[9],
                 signature=row[10] or "",
-                is_paid=True if row[11] == 1 else False,
+                is_paid=row[11] == 1,
                 paid_amount=row[12],
                 payment_notes=row[13],
                 payment_date=row[14],
@@ -163,7 +164,7 @@ def get_artist_booking_by_id(booking_id: int) -> ArtistBookingWithTimestamp | No
             total_price=row[8],
             timestamp=row[9],
             signature=row[10] or "",
-            is_paid=True if row[11] == 1 else False,
+            is_paid=row[11] == 1,
             paid_amount=row[12],
             payment_notes=row[13],
             payment_date=row[14],
@@ -318,21 +319,99 @@ def update_artist_payment(booking_id: int, payment_data: dict) -> bool:
 
 def insert_artist_booking(booking: ArtistBooking) -> tuple[bool, str | None]:
     """
-    Inserts an artist booking if it does not already exist.
+    Backward-compatible single-booking insert helper.
+    """
+    success, profile_uuids = insert_artist_bookings([booking])
+    if not success or not profile_uuids:
+        return False, None
+    return True, profile_uuids[0]
+
+
+def insert_artist_bookings(bookings: list[ArtistBooking]) -> tuple[bool, list[str]]:
+    """
+    Inserts multiple artist bookings atomically.
 
     Returns:
-        Tuple of (success: bool, profile_uuid: Optional[str])
+        Tuple of (success: bool, profile_uuids: list[str])
     """
-    if _artist_booking_exists(booking):
-        return False, None
+    if not bookings:
+        return False, []
 
-    artist_id = _create_artist(booking)
-    booking_id, profile_uuid = _create_artist_booking(artist_id, booking)
-    _assign_artist_materials(booking_id, booking.artist_material_ids)
-    _assign_artist_professions(booking_id, booking.profession_ids)  # Add this line
-    # Save signature as a file
-    _save_artist_signature_image(booking)
-    return True, profile_uuid
+    with closing(_connect_db()) as conn:
+        cursor = conn.cursor()
+
+        for booking in bookings:
+            if _artist_booking_exists_with_cursor(cursor, booking):
+                return False, []
+
+        profile_uuids: list[str] = []
+        try:
+            conn.execute("BEGIN TRANSACTION")
+
+            for booking in bookings:
+                cursor.execute(
+                    """
+                    INSERT INTO Artists (last_name, first_name, email, phone_number)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    (booking.last_name, booking.first_name, booking.email, booking.phone),
+                )
+                artist_id = cast(int, cursor.lastrowid)
+
+                profile_uuid = str(uuid.uuid4())
+                cursor.execute(
+                    """
+                    INSERT INTO ArtistBookings (
+                        artist_id, ticket_option_id, beverage_option_id, food_option_id,
+                        signature, total_price, is_paid, paid_amount, payment_notes, payment_date,
+                        invited_by_id, equipment, special_requests, performance_details, profile_uuid
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        artist_id,
+                        booking.ticket_id,
+                        booking.beverage_id,
+                        booking.food_id,
+                        booking.signature,
+                        booking.total_price,
+                        1 if booking.is_paid else 0,
+                        booking.paid_amount,
+                        booking.payment_notes,
+                        booking.payment_date,
+                        booking.invited_by_id,
+                        booking.equipment,
+                        booking.special_requests,
+                        booking.performance_details,
+                        profile_uuid,
+                    ),
+                )
+                booking_id = cast(int, cursor.lastrowid)
+
+                for material_id in booking.artist_material_ids:
+                    cursor.execute(
+                        "INSERT INTO ArtistBookingMaterials (booking_id, artist_material_id) VALUES (?, ?)",
+                        (booking_id, material_id),
+                    )
+
+                for profession_id in booking.profession_ids:
+                    cursor.execute(
+                        "INSERT INTO ArtistBookingProfessions (booking_id, profession_id) VALUES (?, ?)",
+                        (booking_id, profession_id),
+                    )
+
+                profile_uuids.append(profile_uuid)
+
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            print(f"Error inserting artist bookings: {e}")
+            return False, []
+
+    for booking in bookings:
+        _save_artist_signature_image(booking)
+
+    return True, profile_uuids
 
 
 def get_up_to_date_artist_form_content() -> dict:
@@ -340,7 +419,7 @@ def get_up_to_date_artist_form_content() -> dict:
     Returns the current form content (dict) with booking counts updated based on the DB state.
     """
     form_content_obj = get_artist_form_content_obj()
-    result = update_artist_form_content_with_db_counts(form_content_obj, _connect_db)
+    result = update_artist_form_content_with_db_counts(cast(Any, form_content_obj), _connect_db)  # type: ignore
     result["payment_link"] = get_payment_link()
     result["orga_inviters"] = get_active_orga_team_members()
     return result
@@ -413,15 +492,33 @@ def _artist_booking_exists(booking: ArtistBooking) -> bool:
         cursor.execute(
             """
             SELECT COUNT(*)
-            FROM Artists a 
+            FROM Artists a
             JOIN ArtistBookings b ON a.id = b.artist_id
-            WHERE a.first_name = ? 
-            AND a.last_name = ? 
+            WHERE a.first_name = ?
+            AND a.last_name = ?
             AND a.email = ?
             """,
             (booking.first_name, booking.last_name, booking.email),
         )
         return cursor.fetchone()[0] > 0
+
+
+def _artist_booking_exists_with_cursor(cursor: sqlite3.Cursor, booking: ArtistBooking) -> bool:
+    """
+    Checks if an artist booking already exists with the same name and email.
+    """
+    cursor.execute(
+        """
+        SELECT COUNT(*)
+        FROM Artists a
+        JOIN ArtistBookings b ON a.id = b.artist_id
+        WHERE a.first_name = ?
+        AND a.last_name = ?
+        AND a.email = ?
+        """,
+        (booking.first_name, booking.last_name, booking.email),
+    )
+    return cursor.fetchone()[0] > 0
 
 
 def _create_artist(booking: ArtistBooking) -> int:
@@ -438,7 +535,10 @@ def _create_artist(booking: ArtistBooking) -> int:
             (booking.last_name, booking.first_name, booking.email, booking.phone),
         )
         conn.commit()
-        return cursor.lastrowid
+        artist_id = cursor.lastrowid
+        if artist_id is None:
+            raise RuntimeError("Failed to create artist record")
+        return artist_id
 
 
 def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> tuple[int, str | None]:
@@ -478,7 +578,10 @@ def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> tuple[int,
             ),
         )
         conn.commit()
-        return cursor.lastrowid, profile_uuid
+        booking_id = cursor.lastrowid
+        if booking_id is None:
+            raise RuntimeError("Failed to create artist booking record")
+        return booking_id, profile_uuid
 
 
 def _assign_artist_materials(booking_id: int, material_ids: list[int]) -> None:
@@ -528,12 +631,11 @@ def _save_artist_signature_image(booking: ArtistBooking) -> None:
         # Remove possible 'data:image/png;base64,' prefix
         signature = signature.split(",", 1)[1]
 
-    signature_dir = os.path.join(DB_DIR, "artist_signatures")
-    if not os.path.exists(signature_dir):
-        os.makedirs(signature_dir)
+    signature_dir = Path(DB_DIR) / "artist_signatures"
+    signature_dir.mkdir(parents=True, exist_ok=True)
 
     img_data = base64.b64decode(signature)
-    file_path = os.path.join(signature_dir, f"artist_{booking.last_name}_{booking.first_name}.png")
+    file_path = signature_dir / f"artist_{booking.last_name}_{booking.first_name}.png"
 
-    with open(file_path, "wb") as file:
+    with file_path.open("wb") as file:
         file.write(img_data)

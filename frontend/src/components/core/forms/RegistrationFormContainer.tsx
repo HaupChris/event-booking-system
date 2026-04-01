@@ -9,7 +9,7 @@ import { AuthContext, TokenContext } from '../../../contexts/AuthContext';
 import axios from 'axios';
 import StepNavigation from '../navigation/StepNavigation';
 import { useFormManagement } from '../../../hooks/useFormManagement';
-import rocketImage from '../../../img/rocket.png';
+import taenzerinImage from '../../../img/taenzerin.png';
 import { useBrandingPack } from '../../../branding/useBrandingPack';
 
 /**
@@ -39,6 +39,7 @@ export interface RegistrationFormConfig<
 
   // Validation and form configuration
   validationRules: { [K in keyof Partial<TBooking>]: (value: TBooking[K]) => string };
+  validateStep?: (activeStep: number, booking: TBooking, formContent: TFormContent) => string;
   stepTitles: { [key: number]: string };
   requiredFields: { [key: number]: (keyof TBooking)[] };
 
@@ -154,6 +155,12 @@ export function RegistrationFormContainer<
   }, [booking, config, formContent, updateField]);
 
   const handleStepNext = () => {
+    const customStepError = config.validateStep?.(activeStep, booking, formContent);
+    if (customStepError) {
+      setCurrentError(customStepError);
+      return;
+    }
+
     handleNext(config.requiredFields[activeStep]);
   };
 
@@ -189,10 +196,23 @@ export function RegistrationFormContainer<
       .then((response) => {
         const profileUuid =
           typeof response.data?.profile_uuid === 'string' ? response.data.profile_uuid : '';
+        const profileUuids = Array.isArray(response.data?.profile_uuids)
+          ? response.data.profile_uuids.filter(
+              (uuid: unknown): uuid is string => typeof uuid === 'string' && uuid.trim().length > 0
+            )
+          : [];
+
         if (profileUuid) {
           updateField(
             'profile_uuid' as keyof TBooking,
             profileUuid as unknown as TBooking[keyof TBooking]
+          );
+        }
+
+        if (profileUuids.length > 0) {
+          updateField(
+            'profile_uuids' as keyof TBooking,
+            profileUuids as unknown as TBooking[keyof TBooking]
           );
         }
 
@@ -287,7 +307,7 @@ export function RegistrationFormContainer<
       <StepNavigation
         activeStep={activeStep}
         maxSteps={config.maxSteps}
-        progressImage={rocketImage}
+        progressImage={taenzerinImage}
         hideNavigation={bookingState.isSubmitted}
         onNext={handleStepNext}
         onPrevious={handlePrevious}

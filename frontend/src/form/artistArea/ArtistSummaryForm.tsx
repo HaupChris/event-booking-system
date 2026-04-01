@@ -1,9 +1,11 @@
+/* eslint-disable complexity */
 import React from 'react';
 import { Typography, Box, alpha, Divider, useTheme } from '@mui/material';
 import type { ArtistBooking, ArtistFormContent, ArtistMaterial } from './interface';
 import { artistAreaTexts } from '../constants/texts';
 import PersonIcon from '@mui/icons-material/Person';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import GroupsIcon from '@mui/icons-material/Groups';
 import LocalDrinkIcon from '@mui/icons-material/LocalDrink';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import BackpackIcon from '@mui/icons-material/Backpack';
@@ -33,6 +35,27 @@ interface PerformanceDetails {
   bandMembers?: string | number;
 }
 
+const getTicketLabel = (formContent: ArtistFormContent, value: number): string => {
+  const option = findItemById(formContent.ticket_options, value);
+  return option ? option.title : 'Nicht ausgewaehlt';
+};
+
+const getBeverageLabel = (formContent: ArtistFormContent, value: number): string => {
+  if (value < 0) {
+    return 'Kein Getraenk';
+  }
+  const option = findItemById(formContent.beverage_options, value);
+  return option ? option.title : 'Nicht ausgewaehlt';
+};
+
+const getFoodLabel = (formContent: ArtistFormContent, value: number): string => {
+  if (value < 0) {
+    return 'Kein Essen';
+  }
+  const option = findItemById(formContent.food_options, value);
+  return option ? option.title : 'Nicht ausgewaehlt';
+};
+
 function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) {
   const theme = useTheme();
   const {
@@ -53,6 +76,8 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
   const ticket = findItemById(formContent.ticket_options, ticket_id);
   const beverage = findItemById(formContent.beverage_options, beverage_id);
   const food = findItemById(formContent.food_options, food_id);
+  const bandMembers = currentBooking.band_members ?? [];
+  const isBand = currentBooking.artist_type === 'band';
 
   let parsedPerformanceDetails: PerformanceDetails = {};
   try {
@@ -90,8 +115,34 @@ function ArtistSummaryForm({ currentBooking, formContent }: ArtistSummaryProps) 
           <InfoPair label="Nachname" value={last_name} />
           <InfoPair label="Email" value={email} />
           <InfoPair label="Telefon" value={phone} />
+          {isBand && (
+            <InfoPair
+              label="Act"
+              value={
+                currentBooking.band_name?.trim() || `Band (${bandMembers.length + 1} Personen)`
+              }
+            />
+          )}
         </Box>
       </FormCard>
+
+      {isBand && bandMembers.length > 0 && (
+        <FormCard title="Bandmitglieder" icon={<GroupsIcon />}>
+          <Box sx={{ px: 2, display: 'flex', flexDirection: 'column', gap: 1.25 }}>
+            <InfoPair
+              label="Hauptansprechperson"
+              value={`${first_name} ${last_name} | Ticket: ${getTicketLabel(formContent, ticket_id)} | Getraenk: ${getBeverageLabel(formContent, beverage_id)} | Essen: ${getFoodLabel(formContent, food_id)}`}
+            />
+            {bandMembers.map((member, index) => (
+              <InfoPair
+                key={member.id}
+                label={`Bandmitglied ${index + 1}`}
+                value={`${member.first_name} ${member.last_name} (${member.email}) | Ticket: ${getTicketLabel(formContent, member.ticket_id)} | Getraenk: ${getBeverageLabel(formContent, member.beverage_id)} | Essen: ${getFoodLabel(formContent, member.food_id)}`}
+              />
+            ))}
+          </Box>
+        </FormCard>
+      )}
 
       {currentBooking.profession_ids?.length > 0 ? (
         <FormCard title={artistAreaTexts.summaryForm.professionsTitle} icon={<WorkIcon />}>

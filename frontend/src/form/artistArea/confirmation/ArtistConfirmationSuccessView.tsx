@@ -21,6 +21,8 @@ interface ArtistConfirmationSuccessViewProps {
   onCloseCopied: () => void;
   onCloseRedirect: () => void;
   isCircusMode: boolean;
+  profileUuid: string;
+  profileUuids: string[];
   sectionCardSx?: object;
   buttonSx?: object;
 }
@@ -37,10 +39,15 @@ function ArtistConfirmationSuccessView({
   onCloseCopied,
   onCloseRedirect,
   isCircusMode,
+  profileUuid,
+  profileUuids,
   sectionCardSx,
   buttonSx,
 }: ArtistConfirmationSuccessViewProps) {
   const handleReadOnlyChange = () => undefined;
+  const uniqueProfileUuids = Array.from(
+    new Set([profileUuid, ...profileUuids].filter((uuid) => uuid.trim().length > 0))
+  );
 
   return (
     <ThemedFormLayout
@@ -140,6 +147,47 @@ function ArtistConfirmationSuccessView({
       <Typography variant="subtitle1" sx={{ mt: 3, textAlign: 'center' }}>
         {artistAreaTexts.confirmationForm.successView.footer}
       </Typography>
+
+      <FormCard sx={{ mt: 3, ...(sectionCardSx || {}) }}>
+        <MissionHeading title="Profile" icon={<OpenInNew />} />
+        <Box sx={{ px: 2, pb: 2 }}>
+          <Typography variant="body2" sx={{ mb: 1.5 }}>
+            Jeder Person wurde ein eigenes Profil erstellt. Du kannst die Profile hier direkt
+            oeffnen.
+          </Typography>
+
+          {uniqueProfileUuids.length > 0 ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {uniqueProfileUuids.map((uuid, index) => (
+                <Button
+                  key={uuid}
+                  fullWidth
+                  variant="outlined"
+                  href={`/profile/${uuid}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  startIcon={<OpenInNew />}
+                  sx={{ textTransform: 'none' }}
+                >
+                  {index === 0
+                    ? 'Profil der Hauptansprechperson oeffnen'
+                    : `Profil Bandmitglied ${index} oeffnen`}
+                </Button>
+              ))}
+            </Box>
+          ) : (
+            <Button
+              fullWidth
+              variant="outlined"
+              disabled
+              startIcon={<OpenInNew />}
+              sx={{ textTransform: 'none' }}
+            >
+              Profil-Link wird vorbereitet
+            </Button>
+          )}
+        </Box>
+      </FormCard>
 
       <ArtistConfirmationRedirectModal
         open={redirecting}

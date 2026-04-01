@@ -35,7 +35,11 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
   const food = findItemById(props.formContent.food_options, props.booking.food_id) || {
     title: 'Kein Essen',
   };
-  const betreff = `WWWW ARTIST: ${props.booking.last_name}, ${props.booking.first_name} - ${ticket?.title || 'Ticket nicht gefunden'} - ${beverage.title} - ${food.title} - ${props.booking.total_price}€`;
+  const bandMembers = props.booking.band_members ?? [];
+  const isBand = props.booking.artist_type === 'band' && bandMembers.length > 0;
+  const betreff = isBand
+    ? `WWWW ARTIST BAND: ${props.booking.last_name}, ${props.booking.first_name} + ${bandMembers.length} - Gesamt ${props.booking.total_price}€`
+    : `WWWW ARTIST: ${props.booking.last_name}, ${props.booking.first_name} - ${ticket?.title || 'Ticket nicht gefunden'} - ${beverage.title} - ${food.title} - ${props.booking.total_price}€`;
 
   const [copied, setCopied] = useState(false);
   const [offlineOpen, setOfflineOpen] = useState(false);
@@ -120,6 +124,8 @@ function ArtistConfirmationForm(props: ArtistConfirmationProps) {
         isCircusMode={isCircusMode}
         sectionCardSx={sectionCardSx}
         buttonSx={buttonSx}
+        profileUuid={props.booking.profile_uuid ?? ''}
+        profileUuids={props.booking.profile_uuids ?? []}
       />
     );
   }

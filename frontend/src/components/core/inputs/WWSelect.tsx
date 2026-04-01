@@ -12,6 +12,11 @@ export interface SpaceSelectOption {
   label: string;
 }
 
+type ResponsiveWidth =
+  | string
+  | number
+  | { xs?: string | number; sm?: string | number; md?: string | number };
+
 interface WWSelectProps extends Omit<SelectProps, 'onChange'> {
   options: SpaceSelectOption[];
   value: string | number | null;
@@ -23,14 +28,18 @@ interface WWSelectProps extends Omit<SelectProps, 'onChange'> {
   label?: string;
   renderCustomValue?: (value: string | number) => ReactNode;
   sx?: SxProps<Theme>;
-  minWidth?: string | number | { xs?: string | number; sm?: string | number; md?: string | number };
+  minWidth?: ResponsiveWidth;
+  maxWidth?: ResponsiveWidth;
 }
 
 const getCircusSelectSx = (
   minWidth: WWSelectProps['minWidth'],
+  maxWidth: WWSelectProps['maxWidth'],
   sx: SxProps<Theme> | undefined
 ): SxProps<Theme> => ({
+  width: '100%',
   minWidth,
+  maxWidth,
   borderRadius: '14px',
   bgcolor: 'rgba(26, 11, 18, 0.62)',
   position: 'relative',
@@ -75,6 +84,9 @@ const getCircusSelectSx = (
     py: 0.95,
     fontFamily: '"Merriweather", serif',
     fontSize: { xs: '0.98rem', sm: '1.08rem' },
+    whiteSpace: 'normal',
+    lineHeight: 1.3,
+    textOverflow: 'clip',
   },
   '& .MuiSvgIcon-root': {
     color: '#caa266',
@@ -84,11 +96,14 @@ const getCircusSelectSx = (
 
 const getDefaultSelectSx = (
   minWidth: WWSelectProps['minWidth'],
+  maxWidth: WWSelectProps['maxWidth'],
   theme: Theme,
   brandingPack: ReturnType<typeof useBrandingPack>,
   sx: SxProps<Theme> | undefined
 ): SxProps<Theme> => ({
+  width: '100%',
   minWidth,
+  maxWidth,
   borderRadius: brandingPack.decoration.cardRadius,
   bgcolor: alpha(theme.palette.background.paper, 0.42),
   '& .MuiOutlinedInput-notchedOutline': {
@@ -105,6 +120,9 @@ const getDefaultSelectSx = (
     color: theme.palette.text.primary,
     py: 1.25,
     fontFamily: brandingPack.typography.body,
+    whiteSpace: 'normal',
+    lineHeight: 1.3,
+    textOverflow: 'clip',
   },
   '& .MuiSvgIcon-root': {
     color: alpha(theme.palette.text.primary, 0.7),
@@ -123,6 +141,7 @@ const WWSelect: React.FC<WWSelectProps> = ({
   renderCustomValue,
   sx,
   minWidth = { xs: '100%', sm: '200px' },
+  maxWidth = { xs: '100%', md: '760px' },
   ...selectProps
 }) => {
   const theme = useTheme();
@@ -143,8 +162,8 @@ const WWSelect: React.FC<WWSelectProps> = ({
   const hasValue = value !== null && value !== undefined && value !== '';
 
   const selectSx = isCircusMode
-    ? getCircusSelectSx(minWidth, sx)
-    : getDefaultSelectSx(minWidth, theme, brandingPack, sx);
+    ? getCircusSelectSx(minWidth, maxWidth, sx)
+    : getDefaultSelectSx(minWidth, maxWidth, theme, brandingPack, sx);
 
   const menuPaperSx: SxProps<Theme> = isCircusMode
     ? {
@@ -157,8 +176,18 @@ const WWSelect: React.FC<WWSelectProps> = ({
           color: '#f4ead6',
           fontFamily: '"Merriweather", serif',
           fontSize: '0.98rem',
+          whiteSpace: 'normal',
+          lineHeight: 1.35,
+          alignItems: 'flex-start',
+          py: 1.1,
           '&:hover': {
             bgcolor: 'rgba(205, 161, 99, 0.18)',
+          },
+          '&:nth-of-type(odd)': {
+            bgcolor: 'rgba(255, 255, 255, 0.02)',
+          },
+          '&:nth-of-type(even)': {
+            bgcolor: 'rgba(255, 255, 255, 0.06)',
           },
           '&.Mui-selected': {
             bgcolor: 'rgba(205, 161, 99, 0.24)',
@@ -177,6 +206,16 @@ const WWSelect: React.FC<WWSelectProps> = ({
         '& .MuiMenuItem-root': {
           color: theme.palette.text.primary,
           fontFamily: brandingPack.typography.body,
+          whiteSpace: 'normal',
+          lineHeight: 1.35,
+          alignItems: 'flex-start',
+          py: 1.1,
+          '&:nth-of-type(odd)': {
+            bgcolor: alpha(theme.palette.action.hover, 0.16),
+          },
+          '&:nth-of-type(even)': {
+            bgcolor: alpha(theme.palette.action.hover, 0.28),
+          },
           '&:hover': {
             bgcolor: alpha(theme.palette.primary.main, 0.1),
           },
@@ -197,7 +236,9 @@ const WWSelect: React.FC<WWSelectProps> = ({
       fullWidth={isFullWidth}
       disabled={disabled}
       renderValue={(selected) => {
-        if (!selected) {
+        const isEmptySelected = selected === null || selected === undefined || selected === '';
+
+        if (isEmptySelected) {
           const placeholderSx = isCircusMode
             ? { color: '#d8b87a', fontFamily: '"Merriweather", serif', fontSize: '0.95rem' }
             : {
@@ -217,15 +258,26 @@ const WWSelect: React.FC<WWSelectProps> = ({
         }
 
         // Find the matching option to display its label
-        const selectedOption = options.find((opt) => opt.value === selected);
+        const selectedOption = options.find((opt) => String(opt.value) === String(selected));
 
         return (
           <Typography
             variant="body2"
             sx={
               isCircusMode
-                ? { color: '#f4ead6', fontFamily: '"Merriweather", serif', fontSize: '1rem' }
-                : { color: theme.palette.text.primary, fontFamily: brandingPack.typography.body }
+                ? {
+                    color: '#f4ead6',
+                    fontFamily: '"Merriweather", serif',
+                    fontSize: '1rem',
+                    whiteSpace: 'normal',
+                    lineHeight: 1.3,
+                  }
+                : {
+                    color: theme.palette.text.primary,
+                    fontFamily: brandingPack.typography.body,
+                    whiteSpace: 'normal',
+                    lineHeight: 1.3,
+                  }
             }
           >
             {selectedOption ? selectedOption.label : String(selected)}

@@ -13,11 +13,26 @@ export interface ArtistMaterial {
   num_booked: number;
 }
 
+export type ArtistType = 'dj' | 'band';
+
+export interface ArtistBandMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  ticket_id: number;
+  beverage_id: number;
+  food_id: number;
+}
+
 export interface ArtistBooking {
   last_name: string;
   first_name: string;
   email: string;
   phone: string;
+  artist_type?: ArtistType;
+  band_name?: string;
+  band_members?: ArtistBandMember[];
   invited_by_id: number;
   invited_by_name?: string;
   ticket_id: number;
@@ -30,6 +45,8 @@ export interface ArtistBooking {
   paid_amount: number;
   payment_notes: string;
   payment_date: string;
+  profile_uuid?: string;
+  profile_uuids?: string[];
   equipment: string;
   special_requests: string;
   performance_details: string;

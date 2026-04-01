@@ -1,3 +1,4 @@
+import re
 import time
 
 from flask import Blueprint, jsonify, request
@@ -11,7 +12,7 @@ from src.services.artist_service import (
     get_all_artist_bookings,
     get_artist_booking_by_id,
     get_up_to_date_artist_form_content,
-    insert_artist_booking,
+    insert_artist_bookings,
     update_artist_booking,
     update_artist_payment,
 )
@@ -26,10 +27,61 @@ artist_bp = Blueprint("artist", __name__)
 limiter_artist = Limiter(get_remote_address)
 
 
+def _to_int(value, default: int = -1) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _is_valid_email(value: str) -> bool:
+    return bool(re.fullmatch(r"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$", value, re.I))
+
+
+def _get_option_price(options: list[dict], option_id: int) -> float:
+    for option in options:
+        if _to_int(option.get("id"), -1) == option_id:
+            return float(option.get("price", 0) or 0)
+    return 0.0
+
+
+def _calculate_artist_total_price(
+    form_content_dict: dict, ticket_id: int, beverage_id: int, food_id: int
+) -> float:
+    ticket_price = _get_option_price(form_content_dict.get("ticket_options", []), ticket_id)
+    beverage_price = _get_option_price(form_content_dict.get("beverage_options", []), beverage_id)
+    food_price = _get_option_price(form_content_dict.get("food_options", []), food_id)
+    return ticket_price + beverage_price + food_price
+
+
+def _create_artist_booking_payload(source: dict, total_price: float) -> dict:
+    return {
+        "last_name": str(source.get("last_name", "")).strip(),
+        "first_name": str(source.get("first_name", "")).strip(),
+        "email": str(source.get("email", "")).strip(),
+        "phone": str(source.get("phone", "")).strip(),
+        "invited_by_id": _to_int(source.get("invited_by_id"), -1),
+        "ticket_id": _to_int(source.get("ticket_id"), -1),
+        "beverage_id": _to_int(source.get("beverage_id"), -1),
+        "food_id": _to_int(source.get("food_id"), -1),
+        "artist_material_ids": source.get("artist_material_ids", []),
+        "total_price": total_price,
+        "signature": str(source.get("signature", "")),
+        "is_paid": bool(source.get("is_paid", False)),
+        "paid_amount": float(source.get("paid_amount", 0) or 0),
+        "payment_notes": str(source.get("payment_notes", "")),
+        "payment_date": str(source.get("payment_date", "")),
+        "equipment": str(source.get("equipment", "")),
+        "special_requests": str(source.get("special_requests", "")),
+        "performance_details": str(source.get("performance_details", "")),
+        "profession_ids": source.get("profession_ids", []),
+    }
+
+
 @artist_bp.route("/artist/submitForm", methods=["POST"])
 @limiter_artist.limit("90/minute")
 @jwt_required()
-def submit_artist_form():
+def submit_artist_form():  # noqa: PLR0911, PLR0912, PLR0915
     """Submit artist booking form with comprehensive logging."""
     start_time = time.time()
     client_ip = request.remote_addr
@@ -41,13 +93,74 @@ def submit_artist_form():
             logger.warning(f"Artist booking submission failed: missing JSON body from {client_ip}")
             return jsonify({"error": "Missing JSON body"}), 400
 
-        booking_data = request.json
-        if "id" in booking_data:
-            del booking_data["id"]
+        booking_data = dict(request.json)
+        booking_data.pop("id", None)
 
-        booking = ArtistBooking(**booking_data)
-        artist_name = getattr(booking, "artist_name", "Unknown Artist")
+        artist_type = str(booking_data.get("artist_type", "dj")).lower()
+        raw_band_members = booking_data.get("band_members", [])
+        band_members = raw_band_members if isinstance(raw_band_members, list) else []
+
+        form_content_dict = get_up_to_date_artist_form_content()
+
+        lead_total_price = _calculate_artist_total_price(
+            form_content_dict,
+            _to_int(booking_data.get("ticket_id"), -1),
+            _to_int(booking_data.get("beverage_id"), -1),
+            _to_int(booking_data.get("food_id"), -1),
+        )
+        lead_payload = _create_artist_booking_payload(booking_data, lead_total_price)
+        booking = ArtistBooking(**lead_payload)
+        artist_name = f"{booking.first_name} {booking.last_name}".strip() or "Unknown Artist"
         logger.info(f"Artist booking submission from {artist_name}")
+
+        if not _is_valid_email(booking.email):
+            return jsonify({"error": "Valid email is required"}), 400
+
+        bookings_to_insert = [booking]
+
+        if artist_type == "band":
+            if len(band_members) == 0:
+                return jsonify({"error": "At least one band member is required"}), 400
+
+            for member_data in band_members:
+                if not isinstance(member_data, dict):
+                    return jsonify({"error": "Invalid band member payload"}), 400
+
+                first_name = str(member_data.get("first_name", "")).strip()
+                last_name = str(member_data.get("last_name", "")).strip()
+                email = str(member_data.get("email", "")).strip()
+                if not first_name or not last_name:
+                    return jsonify({"error": "Band member first and last name are required"}), 400
+
+                if not email or not _is_valid_email(email):
+                    return jsonify({"error": "Band member email is required"}), 400
+
+                ticket_id = _to_int(member_data.get("ticket_id"), -1)
+                if ticket_id < 0:
+                    return jsonify({"error": "Band member ticket selection is required"}), 400
+
+                beverage_id = _to_int(member_data.get("beverage_id"), -1)
+                food_id = _to_int(member_data.get("food_id"), -1)
+
+                member_payload = {
+                    **booking_data,
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "email": email,
+                    "ticket_id": ticket_id,
+                    "beverage_id": beverage_id,
+                    "food_id": food_id,
+                    "artist_material_ids": [],
+                    "profession_ids": [],
+                }
+                member_total_price = _calculate_artist_total_price(
+                    form_content_dict, ticket_id, beverage_id, food_id
+                )
+                bookings_to_insert.append(
+                    ArtistBooking(
+                        **_create_artist_booking_payload(member_payload, member_total_price)
+                    )
+                )
 
         if not is_valid_active_orga_team_member(booking.invited_by_id):
             logger.warning(
@@ -55,13 +168,14 @@ def submit_artist_form():
             )
             return jsonify({"error": "Invalid inviter selection"}), 400
 
-        success, profile_uuid = insert_artist_booking(booking)
+        success, profile_uuids = insert_artist_bookings(bookings_to_insert)
 
         if success:
             try:
-                # Send email
-                form_content_dict = get_up_to_date_artist_form_content()
-                send_artist_confirmation_mail(booking, form_content_dict, profile_uuid)
+                for booked_artist, profile_uuid in zip(
+                    bookings_to_insert, profile_uuids, strict=False
+                ):
+                    send_artist_confirmation_mail(booked_artist, form_content_dict, profile_uuid)
                 logger.info(f"Artist booking and confirmation email successful for {artist_name}")
             except Exception as email_error:
                 logger.error(
@@ -71,7 +185,16 @@ def submit_artist_form():
 
             duration = time.time() - start_time
             logger.info(f"Artist booking process completed in {duration:.3f}s for {artist_name}")
-            return jsonify({"msg": "Artist booking successful", "profile_uuid": profile_uuid}), 200
+            return (
+                jsonify(
+                    {
+                        "msg": "Artist booking successful",
+                        "profile_uuid": profile_uuids[0] if profile_uuids else "",
+                        "profile_uuids": profile_uuids,
+                    }
+                ),
+                200,
+            )
         else:
             logger.warning(f"Duplicate artist booking attempt for {artist_name}")
             return jsonify({"error": "Duplicate booking"}), 400

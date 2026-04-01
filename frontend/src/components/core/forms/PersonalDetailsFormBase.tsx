@@ -51,6 +51,7 @@ interface PersonalDetailsFormBaseProps {
   onDevSeedForm?: () => void;
   icon?: React.ReactNode;
   professionIdsField?: 'profession_ids';
+  extraContent?: React.ReactNode;
 }
 
 function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
@@ -101,6 +102,8 @@ function PersonalDetailsFormBase(props: PersonalDetailsFormBaseProps) {
         currentBooking={props.currentBooking}
         formValidation={props.formValidation}
       />
+
+      {props.extraContent}
 
       <Box
         sx={{

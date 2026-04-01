@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ArtistBooking, ArtistFormContent } from './interface';
+import type { ArtistBandMember, ArtistBooking, ArtistFormContent } from './interface';
 import { artistAreaTexts } from '../constants/texts';
 import { calculateTotalPriceArtist } from '../../components/core/utils/Pricing';
 import {
@@ -42,12 +42,77 @@ enum FormSteps {
   Confirmation = 9,
 }
 
+const getBandMembers = (booking: ArtistBooking): ArtistBandMember[] => booking.band_members ?? [];
+
+const validateBandMemberNames = (members: ArtistBandMember[]): boolean => {
+  return members.some((member) => !member.first_name.trim() || !member.last_name.trim());
+};
+
+const getBandMemberEmailIssue = (members: ArtistBandMember[]): 'missing' | 'invalid' | null => {
+  if (members.some((member) => !member.email.trim())) {
+    return 'missing';
+  }
+
+  if (members.some((member) => validateEmail(member.email) !== '')) {
+    return 'invalid';
+  }
+
+  return null;
+};
+
+const validateBandMemberTickets = (members: ArtistBandMember[]): boolean => {
+  return members.some((member) => member.ticket_id < 0);
+};
+
+const validateArtistBandStep = (step: number, booking: ArtistBooking): string => {
+  const isBand = booking.artist_type === 'band';
+  if (!isBand) {
+    return '';
+  }
+
+  const members = getBandMembers(booking);
+
+  if (step === FormSteps.PersonalDetails) {
+    if (members.length === 0) {
+      return 'Bitte fuege mindestens ein weiteres Bandmitglied hinzu.';
+    }
+
+    if (validateBandMemberNames(members)) {
+      return 'Bitte gib fuer jedes Bandmitglied Vor- und Nachnamen an.';
+    }
+
+    const emailIssue = getBandMemberEmailIssue(members);
+    if (emailIssue === 'missing') {
+      return 'Bitte gib fuer jedes Bandmitglied eine E-Mail-Adresse an.';
+    }
+
+    if (emailIssue === 'invalid') {
+      return 'Bitte gib fuer jedes Bandmitglied eine gueltige E-Mail-Adresse an.';
+    }
+  }
+
+  if (step === FormSteps.Ticket) {
+    if (booking.ticket_id < 0) {
+      return 'Bitte waehle ein Ticket fuer die Hauptansprechperson aus.';
+    }
+
+    if (validateBandMemberTickets(members)) {
+      return 'Bitte waehle fuer jedes Bandmitglied ein Ticket aus.';
+    }
+  }
+
+  return '';
+};
+
 function getEmptyArtistBooking(): ArtistBooking {
   return {
     last_name: '',
     first_name: '',
     email: '',
     phone: '',
+    artist_type: 'dj',
+    band_name: '',
+    band_members: [],
     invited_by_id: -1,
     ticket_id: -1,
     beverage_id: -1,
@@ -59,6 +124,8 @@ function getEmptyArtistBooking(): ArtistBooking {
     paid_amount: 0,
     payment_notes: '',
     payment_date: '',
+    profile_uuid: '',
+    profile_uuids: [],
     equipment: '',
     special_requests: '',
     performance_details: '',
@@ -152,11 +219,12 @@ export function ArtistRegistrationFormContainer() {
         storageConfig: {
           storageKey: 'artistBooking',
           versionKey: 'artistFormVersion',
-          currentVersion: '1.1',
+          currentVersion: '1.3',
         },
 
         // Validation and form configuration
         validationRules,
+        validateStep: (activeStep, booking) => validateArtistBandStep(activeStep, booking),
         stepTitles: {
           [FormSteps.PersonalDetails]: artistAreaTexts.personalDetailsForm.title,
           [FormSteps.PerformanceDetails]: artistAreaTexts.performanceDetailsForm.title,
@@ -213,6 +281,11 @@ export function ArtistRegistrationFormContainer() {
             last_name: 'Dev',
             email: `dev.artist.${timestamp}@example.com`,
             phone: '01701234567',
+            artist_type: 'dj' as const,
+            band_name: '',
+            band_members: [],
+            profile_uuid: '',
+            profile_uuids: [],
             invited_by_id: getFirstId(formContent.orga_inviters),
             ticket_id: getFirstId(formContent.ticket_options),
             beverage_id: getFirstId(formContent.beverage_options),
