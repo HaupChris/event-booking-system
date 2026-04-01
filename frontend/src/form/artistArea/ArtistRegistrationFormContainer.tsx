@@ -222,7 +222,14 @@ export function ArtistRegistrationFormContainer() {
                 ? [formContent.artist_materials[0].id]
                 : ([] as number[]),
             signature: DEV_SIGNATURE_IMAGE,
-            performance_details: 'Dev seed: kurzer Test-Auftritt mit 2 Songs.',
+            performance_details: JSON.stringify({
+              preferredDay: '',
+              preferredTime: '',
+              duration: '45',
+              genre: 'Indie / Akustik',
+              description: 'Dev seed: kurzer Test-Auftritt mit 2 Songs.',
+              bandMembers: '1 Person (Solo-Set)',
+            }),
             equipment: 'Mikrofon, XLR-Kabel, 2 Monitorwege',
             special_requests: 'Bitte Soundcheck am Nachmittag einplanen.',
             profession_ids:

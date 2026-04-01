@@ -9,6 +9,10 @@ interface OrnateInputProps {
   onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   type?: string;
   size?: 'default' | 'compact';
+  placeholder?: string;
+  multiline?: boolean;
+  rows?: number;
+  readOnly?: boolean;
 }
 
 export const confettiPieces = [
@@ -31,6 +35,61 @@ const cornerDotSx = {
   border: '1px solid #d8b87a',
 };
 
+const getLabelFontSize = (isCompact: boolean) => {
+  if (isCompact) {
+    return { xs: '0.85rem', sm: '1.05rem' };
+  }
+  return { xs: '1.05rem', sm: '1.9rem' };
+};
+
+const getInputFontSize = (isCompact: boolean) => {
+  if (isCompact) {
+    return { xs: '0.98rem', sm: '1.1rem' };
+  }
+  return { xs: '1.2rem', sm: '2rem' };
+};
+
+const getContainerMinHeight = (multiline: boolean, isCompact: boolean) => {
+  if (multiline) {
+    if (isCompact) {
+      return { xs: 92, sm: 104 };
+    }
+    return { xs: 108, sm: 132 };
+  }
+
+  if (isCompact) {
+    return { xs: 56, sm: 62 };
+  }
+
+  return { xs: 72, sm: 86 };
+};
+
+const getContainerPaddingY = (multiline: boolean, isCompact: boolean) => {
+  if (!multiline) {
+    return 0;
+  }
+  return isCompact ? 0.95 : 1.2;
+};
+
+const getInputPaddingY = (isCompact: boolean) => {
+  return isCompact ? 0.45 : 0.9;
+};
+
+const getTextareaPaddingTop = (isCompact: boolean) => {
+  return isCompact ? 2 : 4;
+};
+
+const getTextareaPaddingBottom = (isCompact: boolean) => {
+  return isCompact ? 4 : 6;
+};
+
+const getRows = (multiline: boolean, rows: number | undefined) => {
+  if (!multiline) {
+    return undefined;
+  }
+  return rows;
+};
+
 export const OrnateInput: React.FC<OrnateInputProps> = ({
   label,
   icon,
@@ -38,8 +97,20 @@ export const OrnateInput: React.FC<OrnateInputProps> = ({
   onChange,
   type = 'text',
   size = 'default',
+  placeholder,
+  multiline = false,
+  rows,
+  readOnly = false,
 }) => {
   const isCompact = size === 'compact';
+  const labelFontSize = getLabelFontSize(isCompact);
+  const inputFontSize = getInputFontSize(isCompact);
+  const minHeight = getContainerMinHeight(multiline, isCompact);
+  const containerPaddingY = getContainerPaddingY(multiline, isCompact);
+  const inputPaddingY = getInputPaddingY(isCompact);
+  const textareaPaddingTop = getTextareaPaddingTop(isCompact);
+  const textareaPaddingBottom = getTextareaPaddingBottom(isCompact);
+  const inputRows = getRows(multiline, rows);
 
   return (
     <Box sx={{ position: 'relative', mb: isCompact ? 1.8 : 3 }}>
@@ -53,7 +124,7 @@ export const OrnateInput: React.FC<OrnateInputProps> = ({
           px: isCompact ? 0.9 : 1.2,
           color: '#d8b87a',
           fontFamily: "'Merriweather', serif",
-          fontSize: isCompact ? { xs: '0.85rem', sm: '1.05rem' } : { xs: '1.05rem', sm: '1.9rem' },
+          fontSize: labelFontSize,
           lineHeight: 1,
           textShadow: '0 1px 2px rgba(0,0,0,0.6)',
         }}
@@ -65,12 +136,13 @@ export const OrnateInput: React.FC<OrnateInputProps> = ({
           position: 'relative',
           border: '3px solid #cda163',
           borderRadius: isCompact ? '14px' : '18px',
-          minHeight: isCompact ? { xs: 56, sm: 62 } : { xs: 72, sm: 86 },
+          minHeight,
           backgroundColor: 'rgba(26, 11, 18, 0.62)',
           backdropFilter: 'blur(1px)',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: multiline ? 'flex-start' : 'center',
           px: isCompact ? { xs: 1.4, sm: 1.8 } : { xs: 2, sm: 3 },
+          py: containerPaddingY,
           gap: isCompact ? 1.1 : 1.8,
           boxShadow: '0 10px 24px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(244,205,142,0.15)',
           '&::before': { ...cornerDotSx, position: 'absolute', top: 7, left: 7 },
@@ -95,13 +167,26 @@ export const OrnateInput: React.FC<OrnateInputProps> = ({
           value={value}
           onChange={onChange}
           type={type}
+          multiline={multiline}
+          rows={inputRows}
+          placeholder={placeholder}
+          readOnly={readOnly}
           sx={{
             flex: 1,
             color: '#f4ead6',
             fontFamily: "'Merriweather', serif",
-            fontSize: isCompact ? { xs: '0.98rem', sm: '1.1rem' } : { xs: '1.2rem', sm: '2rem' },
+            fontSize: inputFontSize,
             textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-            '& input': { py: isCompact ? 0.45 : 0.9 },
+            '& input': { py: inputPaddingY },
+            '& textarea': {
+              paddingTop: textareaPaddingTop,
+              paddingBottom: textareaPaddingBottom,
+              resize: 'vertical',
+            },
+            '& input::placeholder, & textarea::placeholder': {
+              color: 'rgba(229,207,159,0.72)',
+              opacity: 1,
+            },
           }}
         />
         <Box
