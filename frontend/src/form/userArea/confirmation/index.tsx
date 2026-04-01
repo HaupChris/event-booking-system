@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Snackbar, Alert } from '@mui/material';
+import { Snackbar, Alert, alpha } from '@mui/material';
 import { SignalCellularNodata } from '@mui/icons-material';
 import type { Booking, FormContent } from '../interface';
 import type { BookingState } from '../UserRegistrationFormContainer';
@@ -9,6 +9,7 @@ import SuccessView from './SuccessView';
 import ErrorView from './ErrorView';
 import { resolvePaymentLink } from '../../../utils/paymentLink';
 import { createPaymentSubject } from '../../../utils/paymentSubject';
+import { useThemeMode } from '../../../components/styles/theme';
 
 interface ConfirmationFormProps {
   currentBooking: Booking;
@@ -23,6 +24,8 @@ function findItemById<T extends { id: number }>(array: T[], id: number): T | und
 
 function ConfirmationForm(props: ConfirmationFormProps) {
   const { currentBooking, formContent, bookingState } = props;
+  const { mode } = useThemeMode();
+  const isCircusMode = mode === 'circus';
   const paymentLink = resolvePaymentLink(formContent.payment_link);
 
   // Get booking details
@@ -165,6 +168,22 @@ function ConfirmationForm(props: ConfirmationFormProps) {
             severity="error"
             icon={<SignalCellularNodata />}
             variant="filled"
+            sx={
+              isCircusMode
+                ? {
+                    backgroundColor: alpha('#3a1715', 0.96),
+                    border: '1px solid',
+                    borderColor: alpha('#e9a6a1', 0.58),
+                    color: '#f4ead6',
+                    '& .MuiAlert-icon': {
+                      color: '#e9a6a1',
+                    },
+                    '& .MuiAlert-message': {
+                      fontFamily: '"Merriweather", serif',
+                    },
+                  }
+                : undefined
+            }
           >
             Du bist gerade offline. Bitte stelle sicher, dass du mit dem Internet verbunden bist und
             versuche es erneut.
