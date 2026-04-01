@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormProps } from './UserRegistrationFormContainer';
 import WorkShift from '../../components/core/inputs/workShift';
 import type { WorkShift as WorkShiftType } from '../userArea/interface';
-import { Box, Divider, List, Typography, alpha, useTheme } from '@mui/material';
-import { Engineering, PersonAdd } from '@mui/icons-material';
+import { Box, Divider, List, alpha, useTheme } from '@mui/material';
 import { PRIORITIES } from './constants';
 
 import '../../css/workShift.css';
@@ -15,6 +14,11 @@ import FormField from '../../components/core/inputs/FormField';
 import WWSelect from '../../components/core/inputs/WWSelect';
 import WWFAQ from '../../components/core/display/WWFAQ';
 import { userAreaTexts } from '../constants/texts';
+import { useThemeMode } from '../../components/styles/theme';
+import MissionHeading from '../../components/core/display/MissionHeading';
+import { OrnateInput } from './TestDesignFormPrimitives';
+import PersonIcon from '@mui/icons-material/Person';
+import BadgeIcon from '@mui/icons-material/Badge';
 
 function HelpIcon() {
   return null;
@@ -22,6 +26,8 @@ function HelpIcon() {
 
 function WorkShiftForm(props: FormProps) {
   const theme = useTheme();
+  const { mode } = useThemeMode();
+  const isCircusMode = mode === 'circus';
   const { currentBooking, updateBooking, formValidation, formContent } = props;
   // availablePriorities is computed via useMemo below
 
@@ -104,100 +110,120 @@ function WorkShiftForm(props: FormProps) {
     return 0;
   }
 
+  const circusSectionCardSx = isCircusMode
+    ? {
+        border: '2px solid',
+        borderColor: alpha('#d8b87a', 0.9),
+        backgroundColor: alpha('#1a0b12', 0.58),
+        borderRadius: '14px',
+        boxShadow: '0 10px 24px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(244,205,142,0.2)',
+      }
+    : undefined;
+
+  const circusHeadingOverrideSx = isCircusMode
+    ? {
+        '& .MuiTypography-h6': {
+          color: '#f0ddb7',
+          fontFamily: '"Rye", serif',
+        },
+        '& .MuiTypography-body2': {
+          color: alpha('#f4ead6', 0.9),
+        },
+        '& .MuiDivider-root': {
+          borderColor: alpha('#d8b87a', 0.5),
+        },
+      }
+    : undefined;
+
   return (
     <ThemedFormLayout
       missionBriefing={userAreaTexts.workshiftsForm.missionBriefing}
       footerId={userAreaTexts.workshiftsForm.footerId}
     >
       <WWFAQ items={faqItems} title="" description="" icon={<HelpIcon />} sx={{ mb: 3 }} />
-      <FormCard
-        icon={<Engineering sx={{ color: theme.palette.primary.main, mr: 1 }} />}
-        title={userAreaTexts.workshiftsForm.shiftsCountTitle}
-        description={userAreaTexts.workshiftsForm.shiftsCountHelperText}
-        // tooltipText={userAreaTexts.workshiftsForm.shiftsCountHelperText}
-        tooltipPlacement={'top-start'}
-      >
-        <Box display="flex" alignItems="center" justifyContent="center" sx={{ paddingX: 2 }}>
-          <WWSelect
-            options={numberOfShiftsOptions}
-            value={currentBooking.amount_shifts}
-            onChange={updateAmountShifts}
-            sx={{
-              bgcolor: alpha(theme.palette.background.paper, 0.7),
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: alpha(theme.palette.primary.main, 0.3),
-              },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: alpha(theme.palette.primary.main, 0.5),
-              },
-            }}
-            MenuProps={{
-              PaperProps: {
-                sx: {
-                  bgcolor: alpha(theme.palette.background.paper, 0.95),
-                  border: '1px solid',
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
-                },
-              },
-            }}
+      <FormCard tooltipPlacement={'top-start'} sx={circusSectionCardSx}>
+        <Box sx={circusHeadingOverrideSx}>
+          <MissionHeading
+            title={userAreaTexts.workshiftsForm.shiftsCountTitle}
+            subtitle={userAreaTexts.workshiftsForm.shiftsCountHelperText}
+            withDivider={true}
           />
         </Box>
+        <WWSelect
+          options={numberOfShiftsOptions}
+          value={currentBooking.amount_shifts}
+          onChange={updateAmountShifts}
+          minWidth="100%"
+        />
       </FormCard>
+
       <FormCard
-        title={userAreaTexts.workshiftsForm.crewPartner}
-        description={userAreaTexts.workshiftsForm.crewPartnerDescription}
-        icon={<PersonAdd sx={{ color: theme.palette.primary.main, mr: 1 }} />}
-        sx={{ marginTop: 3, marginBottom: 3 }}
+        sx={{
+          marginTop: 3,
+          marginBottom: 3,
+          ...(circusSectionCardSx || {}),
+        }}
       >
+        <Box sx={circusHeadingOverrideSx}>
+          <MissionHeading
+            title={userAreaTexts.workshiftsForm.crewPartner}
+            subtitle={userAreaTexts.workshiftsForm.crewPartnerDescription}
+            withDivider={true}
+          />
+        </Box>
+
         <Box
           sx={{
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
-            marginX: 2,
-            gap: 2,
+            gap: { xs: 1.2, sm: 2 },
           }}
         >
-          <FormField
-            error={!!formValidation.supporter_buddy}
-            id="first_name"
-            label="Vorname"
-            name="first_name"
-            value={supporterBuddyFirstName}
-            onChange={(e) => setSupporterBuddyFirstName(e.target.value)}
-          />
-          <FormField
-            error={!!formValidation.supporter_buddy}
-            id="first_name"
-            label="Nachname"
-            name="first_name"
-            value={supporterBuddyLastName}
-            onChange={(e) => setSupporterBuddyLastName(e.target.value)}
-          />
+          {isCircusMode ? (
+            <>
+              <Box sx={{ flex: 1 }}>
+                <OrnateInput
+                  label="Vorname"
+                  value={supporterBuddyFirstName}
+                  onChange={(e) => setSupporterBuddyFirstName(e.target.value)}
+                  icon={<PersonIcon fontSize="large" />}
+                  size="compact"
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <OrnateInput
+                  label="Nachname"
+                  value={supporterBuddyLastName}
+                  onChange={(e) => setSupporterBuddyLastName(e.target.value)}
+                  icon={<BadgeIcon fontSize="large" />}
+                  size="compact"
+                />
+              </Box>
+            </>
+          ) : (
+            <>
+              <FormField
+                error={!!formValidation.supporter_buddy}
+                id="first_name"
+                label="Vorname"
+                name="first_name"
+                value={supporterBuddyFirstName}
+                onChange={(e) => setSupporterBuddyFirstName(e.target.value)}
+              />
+              <FormField
+                error={!!formValidation.supporter_buddy}
+                id="last_name"
+                label="Nachname"
+                name="last_name"
+                value={supporterBuddyLastName}
+                onChange={(e) => setSupporterBuddyLastName(e.target.value)}
+              />
+            </>
+          )}
         </Box>
       </FormCard>
 
-      {/* Available Shifts Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          mb: 2,
-          mt: 4,
-          borderBottom: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.3),
-          pb: 1,
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{
-            color: theme.palette.primary.main,
-            fontWeight: 'medium',
-          }}
-        >
-          Verfügbare Schichten
-        </Typography>
-      </Box>
+      <MissionHeading title="Verfuegbare Schichten" withDivider={true} />
 
       {/* Work Shifts List */}
       <List>
@@ -221,7 +247,9 @@ function WorkShiftForm(props: FormProps) {
                 <Divider
                   sx={{
                     my: 3,
-                    borderColor: alpha(theme.palette.primary.main, 0.2),
+                    borderColor: isCircusMode
+                      ? alpha('#d8b87a', 0.35)
+                      : alpha(theme.palette.primary.main, 0.2),
                   }}
                 />
               )}

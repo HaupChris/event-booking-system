@@ -73,7 +73,7 @@ function SelectionOptionWithImageCircus(props: SelectionOptionWithImageProps) {
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'flex-start',
-              gap: { xs: 1.25, sm: 2 },
+              gap: { xs: 2, sm: 2 },
             }}
           >
             <Box sx={{ position: 'relative', ml: { xs: 0.6, sm: 0 }, flexShrink: 0 }}>
@@ -91,15 +91,16 @@ function SelectionOptionWithImageCircus(props: SelectionOptionWithImageProps) {
                   boxShadow: '0 5px 14px rgba(0,0,0,0.35)',
                 }}
               />
-              <img
+              <Box
+                component="img"
                 src={portholeImage}
                 alt="curtain-overlay"
-                style={{
+                sx={{
                   position: 'absolute',
-                  top: -12,
-                  left: -12,
-                  width: 98,
-                  height: 98,
+                  top: { xs: -5, sm: 0 },
+                  left: { xs: -5, sm: 0 },
+                  width: { xs: 98, sm: 98 },
+                  height: { xs: 98, sm: 98 },
                   zIndex: 1,
                   pointerEvents: 'none',
                 }}

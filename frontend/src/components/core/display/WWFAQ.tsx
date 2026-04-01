@@ -8,10 +8,12 @@ import {
   AccordionSummary,
   AccordionDetails,
   alpha,
+  useTheme,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
-import { spacePalette } from '../../styles/theme';
+import { useThemeMode } from '../../styles/theme';
+import { useBrandingPack } from '../../../branding/useBrandingPack';
 
 interface FAQItem {
   question: string;
@@ -36,6 +38,11 @@ const WWFAQ: React.FC<WWFAQProps> = ({
   sx,
   defaultExpandedIndex = -1,
 }) => {
+  const theme = useTheme();
+  const { mode } = useThemeMode();
+  const brandingPack = useBrandingPack();
+  const isCircusMode = mode === 'circus';
+
   const [expanded, setExpanded] = useState<string | false>(
     defaultExpandedIndex >= 0 && defaultExpandedIndex < items.length
       ? `panel-${defaultExpandedIndex}`
@@ -46,13 +53,17 @@ const WWFAQ: React.FC<WWFAQProps> = ({
     setExpanded(isExpanded ? panel : false);
   };
 
+  const primaryColor = isCircusMode ? '#d8b87a' : theme.palette.primary.main;
+
   return (
     <Paper
       elevation={2}
       sx={{
-        background: alpha('#020c1b', 0.7),
+        background: isCircusMode ? 'rgba(28, 12, 12, 0.78)' : alpha('#020c1b', 0.7),
         borderRadius: '14px',
-        border: `1px solid ${alpha(spacePalette.primary.main, 0.2)}`,
+        border: isCircusMode
+          ? `2px solid ${alpha('#d8b87a', 0.55)}`
+          : `1px solid ${alpha(primaryColor, 0.2)}`,
         boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
         overflow: 'hidden',
         position: 'relative',
@@ -67,7 +78,7 @@ const WWFAQ: React.FC<WWFAQProps> = ({
               {icon && (
                 <Box
                   sx={{
-                    color: spacePalette.primary.main,
+                    color: isCircusMode ? '#e6c586' : primaryColor,
                     mr: 1.5,
                     display: 'flex',
                     alignItems: 'center',
@@ -80,8 +91,9 @@ const WWFAQ: React.FC<WWFAQProps> = ({
                 variant="h5"
                 component="h2"
                 sx={{
-                  color: alpha('#fff', 0.9),
+                  color: isCircusMode ? '#f4ead6' : alpha('#fff', 0.9),
                   fontWeight: 'medium',
+                  fontFamily: brandingPack.typography.heading,
                 }}
               >
                 {title}
@@ -93,8 +105,9 @@ const WWFAQ: React.FC<WWFAQProps> = ({
             <Typography
               variant="body2"
               sx={{
-                color: alpha('#fff', 0.7),
+                color: isCircusMode ? alpha('#e5cf9f', 0.95) : alpha('#fff', 0.7),
                 ml: icon ? 4.5 : 0,
+                fontFamily: brandingPack.typography.body,
               }}
             >
               {description}
@@ -118,53 +131,103 @@ const WWFAQ: React.FC<WWFAQProps> = ({
                 '&:before': {
                   display: 'none', // Remove the default divider
                 },
-                border: `1px solid ${alpha(spacePalette.primary.main, 0.2)}`,
+                border: isCircusMode
+                  ? `1px solid ${alpha('#d8b87a', 0.45)}`
+                  : `1px solid ${alpha(primaryColor, 0.2)}`,
                 borderRadius: '10px !important', // Important to override Material UI's style
                 overflow: 'hidden',
                 '&.Mui-expanded': {
-                  borderColor: alpha(spacePalette.primary.main, 0.5),
-                  boxShadow: `0 0 10px ${alpha(spacePalette.primary.main, 0.2)}`,
+                  borderColor: isCircusMode ? alpha('#d8b87a', 0.72) : alpha(primaryColor, 0.5),
+                  boxShadow: isCircusMode
+                    ? `0 0 10px ${alpha('#d8b87a', 0.22)}`
+                    : `0 0 10px ${alpha(primaryColor, 0.2)}`,
                 },
               }}
             >
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: spacePalette.primary.main }} />}
+                expandIcon={
+                  <ExpandMoreIcon sx={{ color: isCircusMode ? '#e6c586' : primaryColor }} />
+                }
                 aria-controls={`${panelId}-content`}
                 id={`${panelId}-header`}
                 sx={{
                   borderBottom:
                     expanded === panelId
-                      ? `1px solid ${alpha(spacePalette.primary.main, 0.2)}`
+                      ? isCircusMode
+                        ? `1px solid ${alpha('#d8b87a', 0.35)}`
+                        : `1px solid ${alpha(primaryColor, 0.2)}`
                       : 'none',
                   backgroundColor:
                     expanded === panelId
-                      ? alpha(spacePalette.primary.main, 0.1)
-                      : alpha('#000', 0.2),
+                      ? isCircusMode
+                        ? alpha('#d8b87a', 0.12)
+                        : alpha(primaryColor, 0.1)
+                      : isCircusMode
+                        ? alpha('#2a120f', 0.5)
+                        : alpha('#000', 0.2),
                   '&:hover': {
-                    backgroundColor: alpha(spacePalette.primary.main, 0.1),
+                    backgroundColor: isCircusMode
+                      ? alpha('#d8b87a', 0.12)
+                      : alpha(primaryColor, 0.1),
                   },
                   '& .MuiAccordionSummary-content': {
                     margin: '12px 0',
                   },
                 }}
               >
-                <Typography
-                  sx={{
-                    color: expanded === panelId ? spacePalette.primary.main : alpha('#fff', 0.9),
-                    fontWeight: expanded === panelId ? 'medium' : 'normal',
-                  }}
-                >
-                  {item.question}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.1 }}>
+                  <Box
+                    sx={
+                      isCircusMode
+                        ? {
+                            width: 28,
+                            height: 28,
+                            borderRadius: '50%',
+                            border: '1px solid',
+                            borderColor: alpha('#dfbf84', 0.9),
+                            background:
+                              'radial-gradient(circle at 35% 30%, rgba(72,38,24,0.95) 0%, rgba(38,18,14,0.95) 100%)',
+                            color: '#e6c586',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            '& .MuiSvgIcon-root': {
+                              fontSize: '0.92rem',
+                            },
+                          }
+                        : { color: primaryColor, display: 'flex', alignItems: 'center' }
+                    }
+                  >
+                    <QuestionAnswerIcon />
+                  </Box>
+
+                  <Typography
+                    sx={{
+                      color:
+                        expanded === panelId
+                          ? primaryColor
+                          : isCircusMode
+                            ? '#f4ead6'
+                            : alpha('#fff', 0.9),
+                      fontWeight: expanded === panelId ? 'medium' : 'normal',
+                      fontFamily: isCircusMode
+                        ? '"Merriweather", serif'
+                        : brandingPack.typography.body,
+                    }}
+                  >
+                    {item.question}
+                  </Typography>
+                </Box>
               </AccordionSummary>
               <AccordionDetails
                 sx={{
-                  backgroundColor: alpha('#000', 0.2),
+                  backgroundColor: isCircusMode ? alpha('#2a120f', 0.45) : alpha('#000', 0.2),
                   padding: 3,
                   pt: 2,
-                  color: alpha('#fff', 0.8),
+                  color: isCircusMode ? alpha('#e5cf9f', 0.95) : alpha('#fff', 0.8),
+                  fontFamily: brandingPack.typography.body,
                   '& a': {
-                    color: spacePalette.primary.main,
+                    color: primaryColor,
                     textDecoration: 'none',
                     '&:hover': {
                       textDecoration: 'underline',

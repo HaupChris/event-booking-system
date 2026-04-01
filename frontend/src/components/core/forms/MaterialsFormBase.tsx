@@ -12,13 +12,13 @@ import {
   Chip,
   useTheme,
 } from '@mui/material';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import BackpackIcon from '@mui/icons-material/Backpack';
 import ThemedFormLayout from '../layouts/ThemedFormLayout';
 import FormCard from '../display/FormCard';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import type { Material } from '../../../form/userArea/interface';
 import CircularProgressWithLabel from '../feedback/CircularProgressWithLabel';
+import { useThemeMode } from '../../styles/theme';
+import MissionHeading from '../display/MissionHeading';
 
 interface MaterialsTextProps {
   missionBriefing: string;
@@ -44,6 +44,8 @@ function MaterialsFormBase<TMaterialsField extends string = 'material_ids'>(
   const { texts } = props;
   const materialsPropName = (props.materialsPropName ?? 'material_ids') as TMaterialsField;
   const theme = useTheme();
+  const { mode } = useThemeMode();
+  const isCircusMode = mode === 'circus';
   const selectedMaterialIds =
     (props.currentBooking[materialsPropName] as number[] | undefined) ?? [];
 
@@ -61,27 +63,52 @@ function MaterialsFormBase<TMaterialsField extends string = 'material_ids'>(
   // Get materials array from appropriate prop in formContent
   const materials = props.formContent.materials || [];
 
+  const circusSurfaceBg = 'rgba(26, 11, 18, 0.58)';
+  const circusInnerBg = 'rgba(26, 11, 18, 0.72)';
+
+  const sectionCardSx = isCircusMode
+    ? {
+        border: '2px solid',
+        borderColor: alpha('#d8b87a', 0.9),
+        backgroundColor: `${circusSurfaceBg} !important`,
+        backgroundImage: 'none !important',
+        borderRadius: '14px',
+        boxShadow: '0 10px 24px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(244,205,142,0.2)',
+      }
+    : { border: 'none' };
+
   return (
     <ThemedFormLayout missionBriefing={texts.missionBriefing} footerId={texts.footerId}>
-      <FormCard
-        elevation={2}
-        sx={{ border: 'None' }}
-        title={texts.materialsTitle}
-        icon={
-          <BackpackIcon sx={{ color: theme.palette.primary.main, mr: 1, fontSize: '1.5rem' }} />
-        }
-      >
+      <FormCard elevation={2} sx={sectionCardSx}>
+        <MissionHeading title={texts.materialsTitle} withDivider={true} />
+
         {selectedMaterialIds.length > 0 && (
-          <FormCard
-            selected={true}
-            icon={
-              <InventoryIcon
-                sx={{ color: theme.palette.primary.main, fontSize: '1.2rem', mr: 1 }}
-              />
-            }
-            title={texts.bringingItems(selectedMaterialIds.length)}
+          <Box
+            sx={{
+              mb: 2.2,
+              p: 1.4,
+              border: '1px solid',
+              borderColor: isCircusMode
+                ? alpha('#d8b87a', 0.55)
+                : alpha(theme.palette.primary.main, 0.35),
+              borderRadius: isCircusMode ? '12px' : '8px',
+              backgroundColor: isCircusMode
+                ? circusInnerBg
+                : alpha(theme.palette.background.default, 0.35),
+            }}
           >
-            <Box sx={{ paddingX: 2 }}>
+            <Typography
+              sx={{
+                mb: 1,
+                color: isCircusMode ? '#f0ddb7' : theme.palette.text.primary,
+                fontFamily: isCircusMode ? '"Rye", serif' : undefined,
+                fontSize: isCircusMode ? '1.15rem' : '1rem',
+              }}
+            >
+              {texts.bringingItems(selectedMaterialIds.length)}
+            </Typography>
+
+            <Box>
               {materials
                 .filter((material) => selectedMaterialIds.includes(material.id))
                 .map((material) => (
@@ -93,15 +120,20 @@ function MaterialsFormBase<TMaterialsField extends string = 'material_ids'>(
                     icon={<CheckCircleIcon />}
                     sx={{
                       fontWeight: 'medium',
-                      bgcolor: alpha(theme.palette.primary.main, 0.2),
+                      bgcolor: isCircusMode
+                        ? alpha('#d8b87a', 0.18)
+                        : alpha(theme.palette.primary.main, 0.2),
+                      color: isCircusMode ? '#f4ead6' : theme.palette.text.primary,
                       '& .MuiChip-label': { px: 1 },
                       margin: 0.5,
+                      border: isCircusMode ? '1px solid' : 'none',
+                      borderColor: isCircusMode ? alpha('#d8b87a', 0.5) : undefined,
                     }}
                     onDelete={() => handleToggle(material.id)}
                   />
                 ))}
             </Box>
-          </FormCard>
+          </Box>
         )}
 
         {/* Materials List */}
@@ -124,17 +156,27 @@ function MaterialsFormBase<TMaterialsField extends string = 'material_ids'>(
                   key={material.id}
                   sx={{
                     mb: 2,
-                    backgroundColor: alpha(theme.palette.background.paper, 0.7),
-                    borderRadius: '8px',
+                    backgroundColor: isCircusMode
+                      ? circusInnerBg
+                      : alpha(theme.palette.background.paper, 0.7),
+                    borderRadius: isCircusMode ? '14px' : '8px',
                     border: isSelected ? '2px solid' : '1px solid',
                     borderColor: isSelected
-                      ? theme.palette.primary.main
-                      : alpha(theme.palette.primary.main, 0.3),
+                      ? isCircusMode
+                        ? '#d8b87a'
+                        : theme.palette.primary.main
+                      : isCircusMode
+                        ? alpha('#cda163', 0.55)
+                        : alpha(theme.palette.primary.main, 0.3),
                     position: 'relative',
                     overflow: 'hidden',
-                    boxShadow: isSelected
-                      ? `0 0 12px ${alpha(theme.palette.primary.main, 0.3)}`
-                      : 'none',
+                    boxShadow: isCircusMode
+                      ? isSelected
+                        ? '0 0 12px rgba(216,184,122,0.22), 0 8px 18px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(244,205,142,0.12)'
+                        : '0 8px 18px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(244,205,142,0.12)'
+                      : isSelected
+                        ? `0 0 12px ${alpha(theme.palette.primary.main, 0.3)}`
+                        : 'none',
                   }}
                 >
                   {/* Futuristic scanner line animation for selected option */}
@@ -153,7 +195,9 @@ function MaterialsFormBase<TMaterialsField extends string = 'material_ids'>(
                           position: 'absolute',
                           width: '100%',
                           height: '2px',
-                          background: `linear-gradient(to right, transparent, ${theme.palette.primary.main}, transparent)`,
+                          background: isCircusMode
+                            ? 'linear-gradient(to right, transparent, rgba(216,184,122,0.9), transparent)'
+                            : `linear-gradient(to right, transparent, ${theme.palette.primary.main}, transparent)`,
                           top: 0,
                           animation: 'scanDown 2s infinite',
                         },
@@ -178,7 +222,9 @@ function MaterialsFormBase<TMaterialsField extends string = 'material_ids'>(
                         py: 1.5,
                         px: { xs: 2, sm: 2.5 },
                         '&:hover': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                          backgroundColor: isCircusMode
+                            ? alpha('#d8b87a', 0.12)
+                            : alpha(theme.palette.primary.main, 0.1),
                         },
                       }}
                     >
@@ -195,8 +241,9 @@ function MaterialsFormBase<TMaterialsField extends string = 'material_ids'>(
                           <Typography
                             variant={'subtitle1'}
                             sx={{
-                              color: theme.palette.text.primary,
+                              color: isCircusMode ? '#f4ead6' : theme.palette.text.primary,
                               fontWeight: isSelected ? 'medium' : 'normal',
+                              fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
                             }}
                           >
                             {material.title}
@@ -209,9 +256,11 @@ function MaterialsFormBase<TMaterialsField extends string = 'material_ids'>(
                         checked={isSelected}
                         inputProps={{ 'aria-labelledby': labelId }}
                         sx={{
-                          color: alpha(theme.palette.primary.main, 0.7),
+                          color: isCircusMode
+                            ? alpha('#d8b87a', 0.75)
+                            : alpha(theme.palette.primary.main, 0.7),
                           '&.Mui-checked': {
-                            color: theme.palette.primary.main,
+                            color: isCircusMode ? '#d8b87a' : theme.palette.primary.main,
                           },
                         }}
                       />

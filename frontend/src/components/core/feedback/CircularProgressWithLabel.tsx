@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, CircularProgress, Typography, alpha } from '@mui/material';
-import { spacePalette } from '../../styles/theme';
+import { Box, CircularProgress, Typography, alpha, useTheme } from '@mui/material';
+import { useThemeMode } from '../../styles/theme';
 
 interface CircularProgressWithLabelProps {
   valueCurrent: number;
@@ -11,14 +11,21 @@ const CircularProgressWithLabel: React.FC<CircularProgressWithLabelProps> = ({
   valueCurrent,
   valueMax,
 }) => {
+  const theme = useTheme();
+  const { mode } = useThemeMode();
+  const isCircusMode = mode === 'circus';
   const frac = valueCurrent / valueMax > 1.0 ? 1.0 : valueCurrent / valueMax;
   const progressIsFull = frac >= 1.0;
 
   // Dynamic color based on fill level
   const getProgressColor = () => {
-    if (progressIsFull) return spacePalette.status.error;
-    if (frac > 0.7) return spacePalette.status.warning;
-    return spacePalette.status.success;
+    if (progressIsFull) {
+      return isCircusMode ? '#e57373' : theme.palette.error.main;
+    }
+    if (frac > 0.7) {
+      return isCircusMode ? '#d8b87a' : theme.palette.warning.main;
+    }
+    return isCircusMode ? '#9ccc65' : theme.palette.success.main;
   };
 
   return (
@@ -30,7 +37,7 @@ const CircularProgressWithLabel: React.FC<CircularProgressWithLabelProps> = ({
         size={46}
         sx={{
           color: getProgressColor(),
-          backgroundColor: alpha('#000', 0.3),
+          backgroundColor: isCircusMode ? alpha('#2a120f', 0.6) : alpha('#000', 0.3),
           borderRadius: '50%',
         }}
       />
@@ -50,8 +57,9 @@ const CircularProgressWithLabel: React.FC<CircularProgressWithLabelProps> = ({
           variant="caption"
           component="div"
           sx={{
-            color: alpha('#fff', 0.9),
+            color: isCircusMode ? '#f4ead6' : alpha('#fff', 0.9),
             fontWeight: 'medium',
+            fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
           }}
         >
           {`${valueCurrent}/${valueMax}`}

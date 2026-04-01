@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import TimeSlot from './timeSlot';
 import '../../../css/workShift.css';
 import { PRIORITIES } from '../../../form/userArea/constants';
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import { useThemeMode } from '../../styles/theme';
 
 interface WorkShiftProps {
   workShift: WorkShiftType;
@@ -20,6 +20,8 @@ function WorkShift({
   availablePriorities,
 }: WorkShiftProps) {
   const theme = useTheme();
+  const { mode } = useThemeMode();
+  const isCircusMode = mode === 'circus';
   const maxSelectionsPerWorkshift = Math.max(1, workShift.multiple_selection_possible ?? 1);
 
   const selectedTimeslotIds = useMemo(
@@ -59,41 +61,31 @@ function WorkShift({
     <Box
       sx={{
         mb: 3,
-        p: 0,
-        borderRadius: '10px',
+        p: isCircusMode ? { xs: 1.3, sm: 1.8 } : 0,
+        borderRadius: isCircusMode ? '14px' : '10px',
+        border: isCircusMode ? '2px solid' : 'none',
+        borderColor: isCircusMode ? alpha('#d8b87a', 0.5) : 'transparent',
+        backgroundColor: isCircusMode ? 'rgba(28, 12, 12, 0.66)' : 'transparent',
       }}
     >
-      {/* Shift Title & Description */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          mb: 3,
-        }}
-      >
-        <Box
+      <Box sx={{ display: 'flex', flexDirection: 'column', mb: 3 }}>
+        <Typography
+          variant="h5"
           sx={{
-            display: 'flex',
-            alignItems: 'center',
             mb: 1,
+            fontWeight: 'medium',
+            color: isCircusMode ? '#ead7b2' : theme.palette.primary.main,
+            fontSize: { xs: '1.35rem', sm: '1.5rem' },
+            fontFamily: isCircusMode ? '"Rye", serif' : undefined,
           }}
         >
-          <AssignmentIcon sx={{ color: theme.palette.primary.main, mr: 1 }} />
-          <Typography
-            color="primary"
-            variant="h5"
-            sx={{
-              fontWeight: 'medium',
-            }}
-          >
-            {workShift.title}
-          </Typography>
-        </Box>
+          {workShift.title}
+        </Typography>
 
         <Typography
           sx={{
-            color: alpha(theme.palette.text.primary, 0.7),
-            pl: 4, // Align with title (after icon)
+            color: isCircusMode ? alpha('#e5cf9f', 0.95) : alpha(theme.palette.text.primary, 0.7),
+            fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
           }}
           variant="body2"
         >
@@ -101,7 +93,11 @@ function WorkShift({
         </Typography>
 
         <Typography
-          sx={{ color: alpha(theme.palette.text.primary, 0.65), pl: 4, mt: 0.5 }}
+          sx={{
+            color: isCircusMode ? alpha('#d8b87a', 0.95) : alpha(theme.palette.text.primary, 0.65),
+            mt: 0.5,
+            fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
+          }}
           variant="caption"
         >
           Du kannst hier bis zu {maxSelectionsPerWorkshift} Zeitfenster aus diesem Arbeitsdienst
