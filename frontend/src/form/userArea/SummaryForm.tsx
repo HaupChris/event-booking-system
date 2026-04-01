@@ -16,6 +16,7 @@ import {
   SummaryMaterialsCard,
 } from './summary';
 import '../../css/formSummary.css';
+import { useThemeMode } from '../../components/styles/theme';
 
 function findItemById<T extends { id: number }>(array: T[], id: number): T | undefined {
   return array.find((item) => item.id === id);
@@ -36,6 +37,17 @@ interface SummaryFormProps {
 
 function SummaryForm({ currentBooking, formContent }: SummaryFormProps) {
   const theme = useTheme();
+  const { mode } = useThemeMode();
+  const isCircusMode = mode === 'circus';
+
+  const sectionCardSx = isCircusMode
+    ? {
+        border: '2px solid',
+        borderColor: 'rgba(216, 184, 122, 0.85)',
+        backgroundColor: 'rgba(26, 11, 18, 0.58)',
+        borderRadius: '14px',
+      }
+    : undefined;
 
   const ticket = findItemById(formContent.ticket_options, currentBooking.ticket_id);
   const beverage = findItemById(formContent.beverage_options, currentBooking.beverage_id);
@@ -68,9 +80,17 @@ function SummaryForm({ currentBooking, formContent }: SummaryFormProps) {
         title={userAreaTexts.summaryForm.missionContribution}
         icon={<EuroIcon />}
         selected={true}
+        sx={sectionCardSx}
       >
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Typography variant="h4" fontWeight="bold" sx={{ color: theme.palette.primary.main }}>
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            sx={{
+              color: isCircusMode ? '#e8d2ab' : theme.palette.primary.main,
+              fontFamily: isCircusMode ? '"Rye", serif' : undefined,
+            }}
+          >
             {currentBooking.total_price}€
           </Typography>
         </Box>
@@ -92,6 +112,7 @@ function SummaryForm({ currentBooking, formContent }: SummaryFormProps) {
       <FormCard
         title={userAreaTexts.summaryForm.participationOption}
         icon={<ConfirmationNumberIcon />}
+        sx={sectionCardSx}
       >
         <PriceItem item={ticket} />
       </FormCard>

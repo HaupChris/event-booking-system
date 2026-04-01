@@ -4,6 +4,7 @@ import WorkIcon from '@mui/icons-material/Work';
 import FormCard from '../../../components/core/display/FormCard';
 import { userAreaTexts } from '../../constants/texts';
 import type { Profession } from '../interface';
+import { useThemeMode } from '../../../components/styles/theme';
 
 interface SummaryProfessionsCardProps {
   professionIds: number[];
@@ -12,9 +13,24 @@ interface SummaryProfessionsCardProps {
 
 function SummaryProfessionsCard({ professionIds, professions }: SummaryProfessionsCardProps) {
   const theme = useTheme();
+  const { mode } = useThemeMode();
+  const isCircusMode = mode === 'circus';
 
   return (
-    <FormCard title={userAreaTexts.summaryForm.professionsTitle} icon={<WorkIcon />}>
+    <FormCard
+      title={userAreaTexts.summaryForm.professionsTitle}
+      icon={<WorkIcon />}
+      sx={
+        isCircusMode
+          ? {
+              border: '2px solid',
+              borderColor: alpha('#d8b87a', 0.85),
+              backgroundColor: alpha('#1a0b12', 0.58),
+              borderRadius: '14px',
+            }
+          : undefined
+      }
+    >
       {professionIds.length > 0 ? (
         <Box
           sx={{
@@ -22,10 +38,14 @@ function SummaryProfessionsCard({ professionIds, professions }: SummaryProfessio
             flexWrap: 'wrap',
             gap: 1,
             p: 1.5,
-            bgcolor: alpha(theme.palette.background.default, 0.2),
-            borderRadius: '8px',
+            bgcolor: isCircusMode
+              ? alpha('#2a120f', 0.62)
+              : alpha(theme.palette.background.default, 0.2),
+            borderRadius: isCircusMode ? '12px' : '8px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.2),
+            borderColor: isCircusMode
+              ? alpha('#d8b87a', 0.5)
+              : alpha(theme.palette.primary.main, 0.2),
           }}
         >
           {professionIds.map((id) => {
@@ -36,8 +56,12 @@ function SummaryProfessionsCard({ professionIds, professions }: SummaryProfessio
                 label={profession.title}
                 variant="outlined"
                 sx={{
-                  borderColor: alpha(theme.palette.primary.main, 0.5),
-                  color: theme.palette.text.primary,
+                  borderColor: isCircusMode
+                    ? alpha('#d8b87a', 0.55)
+                    : alpha(theme.palette.primary.main, 0.5),
+                  color: isCircusMode ? '#f4ead6' : theme.palette.text.primary,
+                  fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
+                  backgroundColor: isCircusMode ? alpha('#d8b87a', 0.12) : undefined,
                 }}
               />
             ) : null;
@@ -47,9 +71,10 @@ function SummaryProfessionsCard({ professionIds, professions }: SummaryProfessio
         <Typography
           variant="body1"
           sx={{
-            color: alpha(theme.palette.text.primary, 0.7),
+            color: isCircusMode ? alpha('#e5cf9f', 0.9) : alpha(theme.palette.text.primary, 0.7),
             fontStyle: 'italic',
             pl: 1,
+            fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
           }}
         >
           {userAreaTexts.summaryForm.noProfessionsSelected}

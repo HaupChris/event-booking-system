@@ -6,6 +6,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import FormCard from '../../../components/core/display/FormCard';
 import InfoPair from '../../../components/core/display/InfoPair';
 import { userAreaTexts } from '../../constants/texts';
+import { useThemeMode } from '../../../components/styles/theme';
 
 interface SummaryPersonalCardProps {
   firstName: string;
@@ -16,9 +17,24 @@ interface SummaryPersonalCardProps {
 
 function SummaryPersonalCard({ firstName, lastName, email, phone }: SummaryPersonalCardProps) {
   const theme = useTheme();
+  const { mode } = useThemeMode();
+  const isCircusMode = mode === 'circus';
 
   return (
-    <FormCard title={userAreaTexts.summaryForm.personalData} icon={<PersonIcon />}>
+    <FormCard
+      title={userAreaTexts.summaryForm.personalData}
+      icon={<PersonIcon />}
+      sx={
+        isCircusMode
+          ? {
+              border: '2px solid',
+              borderColor: alpha('#d8b87a', 0.85),
+              backgroundColor: alpha('#1a0b12', 0.58),
+              borderRadius: '14px',
+            }
+          : undefined
+      }
+    >
       <Grid container spacing={2}>
         <Grid
           size={{
@@ -32,8 +48,11 @@ function SummaryPersonalCard({ firstName, lastName, email, phone }: SummaryPerso
               sx={{
                 fontWeight: 'medium',
                 mr: 1,
-                color: alpha(theme.palette.text.primary, 0.7),
+                color: isCircusMode
+                  ? alpha('#e5cf9f', 0.9)
+                  : alpha(theme.palette.text.primary, 0.7),
                 flexShrink: 0,
+                fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
               }}
             >
               Vorname:
@@ -41,10 +60,11 @@ function SummaryPersonalCard({ firstName, lastName, email, phone }: SummaryPerso
             <Typography
               variant="body1"
               sx={{
-                color: theme.palette.text.primary,
+                color: isCircusMode ? '#f4ead6' : theme.palette.text.primary,
                 fontWeight: 'medium',
                 wordBreak: 'break-word',
                 overflowWrap: 'break-word',
+                fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
               }}
             >
               {firstName}
@@ -57,8 +77,11 @@ function SummaryPersonalCard({ firstName, lastName, email, phone }: SummaryPerso
               sx={{
                 fontWeight: 'medium',
                 mr: 1,
-                color: alpha(theme.palette.text.primary, 0.7),
+                color: isCircusMode
+                  ? alpha('#e5cf9f', 0.9)
+                  : alpha(theme.palette.text.primary, 0.7),
                 flexShrink: 0,
+                fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
               }}
             >
               Nachname:
@@ -66,10 +89,11 @@ function SummaryPersonalCard({ firstName, lastName, email, phone }: SummaryPerso
             <Typography
               variant="body1"
               sx={{
-                color: theme.palette.text.primary,
+                color: isCircusMode ? '#f4ead6' : theme.palette.text.primary,
                 fontWeight: 'medium',
                 wordBreak: 'break-word',
                 overflowWrap: 'break-word',
+                fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
               }}
             >
               {lastName}

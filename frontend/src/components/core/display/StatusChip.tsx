@@ -3,6 +3,7 @@ import React from 'react';
 import type { ChipProps } from '@mui/material';
 import { Chip, alpha } from '@mui/material';
 import { spacePalette } from '../../styles/theme';
+import { useThemeMode } from '../../styles/theme';
 
 export type StatusType = 'success' | 'warning' | 'error' | 'info' | 'default';
 
@@ -12,7 +13,25 @@ interface StatusChipProps extends Omit<ChipProps, 'color'> {
 }
 
 const StatusChip: React.FC<StatusChipProps> = ({ status = 'default', glow = false, ...props }) => {
+  const { mode } = useThemeMode();
+  const isCircusMode = mode === 'circus';
+
   const getStatusColor = () => {
+    if (isCircusMode) {
+      switch (status) {
+        case 'success':
+          return '#9ccc65';
+        case 'warning':
+          return '#d8b87a';
+        case 'error':
+          return '#e57373';
+        case 'info':
+          return '#e6c586';
+        default:
+          return '#d8b87a';
+      }
+    }
+
     switch (status) {
       case 'success':
         return spacePalette.status.success;
@@ -33,9 +52,9 @@ const StatusChip: React.FC<StatusChipProps> = ({ status = 'default', glow = fals
     <Chip
       {...props}
       sx={{
-        bgcolor: alpha(statusColor, 0.1),
+        bgcolor: isCircusMode ? alpha(statusColor, 0.18) : alpha(statusColor, 0.1),
         border: '1px solid',
-        borderColor: alpha(statusColor, 0.3),
+        borderColor: isCircusMode ? alpha('#d8b87a', 0.58) : alpha(statusColor, 0.3),
         color: statusColor,
         fontWeight: 'medium',
         fontSize: '0.75rem',

@@ -8,6 +8,7 @@ import InfoPair from '../../../components/core/display/InfoPair';
 import { userAreaTexts } from '../../constants/texts';
 import { PRIORITIES } from '../constants';
 import type { TimeSlot, WorkShift } from '../interface';
+import { useThemeMode } from '../../../components/styles/theme';
 
 interface ShiftSlot {
   shift: WorkShift | undefined;
@@ -30,12 +31,32 @@ function SummaryWorkShiftsCard({
   amountShifts,
 }: SummaryWorkShiftsCardProps) {
   const theme = useTheme();
+  const { mode } = useThemeMode();
+  const isCircusMode = mode === 'circus';
 
   return (
-    <FormCard title={userAreaTexts.summaryForm.deploymentPlan} icon={<WorkIcon />}>
+    <FormCard
+      title={userAreaTexts.summaryForm.deploymentPlan}
+      icon={<WorkIcon />}
+      sx={
+        isCircusMode
+          ? {
+              border: '2px solid',
+              borderColor: alpha('#d8b87a', 0.85),
+              backgroundColor: alpha('#1a0b12', 0.58),
+              borderRadius: '14px',
+            }
+          : undefined
+      }
+    >
       <Typography
         variant="subtitle1"
-        sx={{ fontWeight: 'medium', mb: 2, color: alpha(theme.palette.text.primary, 0.8) }}
+        sx={{
+          fontWeight: 'medium',
+          mb: 2,
+          color: isCircusMode ? '#f4ead6' : alpha(theme.palette.text.primary, 0.8),
+          fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
+        }}
       >
         {userAreaTexts.summaryForm.supportPriorities}
       </Typography>
@@ -73,18 +94,32 @@ function SummaryWorkShiftsCard({
       <Box
         sx={{
           mt: 3,
-          bgcolor: alpha(theme.palette.background.default, 0.2),
-          borderRadius: '8px',
+          bgcolor: isCircusMode
+            ? alpha('#2a120f', 0.62)
+            : alpha(theme.palette.background.default, 0.2),
+          borderRadius: isCircusMode ? '12px' : '8px',
           p: 2,
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.2),
+          borderColor: isCircusMode
+            ? alpha('#d8b87a', 0.5)
+            : alpha(theme.palette.primary.main, 0.2),
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-          <GroupIcon sx={{ mr: 1, color: theme.palette.primary.main, fontSize: '1.2rem' }} />
+          <GroupIcon
+            sx={{
+              mr: 1,
+              color: isCircusMode ? '#d8b87a' : theme.palette.primary.main,
+              fontSize: '1.2rem',
+            }}
+          />
           <Typography
             variant="subtitle1"
-            sx={{ fontWeight: 'medium', color: alpha(theme.palette.text.primary, 0.8) }}
+            sx={{
+              fontWeight: 'medium',
+              color: isCircusMode ? '#f4ead6' : alpha(theme.palette.text.primary, 0.8),
+              fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
+            }}
           >
             {userAreaTexts.summaryForm.supportInfo}
           </Typography>
@@ -113,7 +148,11 @@ function SummaryWorkShiftsCard({
               value={
                 <Typography
                   variant="h6"
-                  sx={{ color: theme.palette.primary.main, fontWeight: 'bold' }}
+                  sx={{
+                    color: isCircusMode ? '#e8d2ab' : theme.palette.primary.main,
+                    fontWeight: 'bold',
+                    fontFamily: isCircusMode ? '"Rye", serif' : undefined,
+                  }}
                 >
                   {amountShifts}
                 </Typography>
