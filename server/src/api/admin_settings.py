@@ -24,7 +24,7 @@ logger = get_logger(__name__)
 
 admin_settings_bp = Blueprint("admin_settings", __name__)
 
-MIN_PASSWORD_LENGTH = 1
+MIN_PASSWORD_LENGTH = 12
 BRANDING_PACK_PATTERN = re.compile(r"^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$")
 
 
@@ -153,7 +153,12 @@ def change_password():
             ), 400
 
         if len(new_password) < MIN_PASSWORD_LENGTH:
-            return jsonify({"msg": "Password must not be empty"}), 400
+            return (
+                jsonify(
+                    {"msg": f"Password must be at least {MIN_PASSWORD_LENGTH} characters long"}
+                ),
+                400,
+            )
 
         success = update_password(role, new_password)
         if not success:

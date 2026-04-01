@@ -3,7 +3,6 @@ Password Service
 ================
 
 Database-backed password management for role-based authentication.
-Falls back to environment variable defaults if no DB row exists.
 """
 
 import os
@@ -26,11 +25,12 @@ else:
     DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
 
 VALID_ROLES = {"admin", "user", "artist"}
+MIN_PASSWORD_LENGTH = 12
 
-ENV_DEFAULTS = {
-    "admin": os.environ.get("ADMIN_PASSWORD", "a"),
-    "user": os.environ.get("PASSWORD", "b"),
-    "artist": os.environ.get("ARTIST_PASSWORD", "artist"),
+ROLE_ENV_VAR_MAP = {
+    "admin": "ADMIN_PASSWORD",
+    "user": "PASSWORD",
+    "artist": "ARTIST_PASSWORD",
 }
 
 
@@ -64,12 +64,8 @@ def verify_password(role: str, password: str) -> bool:
     if stored_hash:
         return check_password_hash(stored_hash, password)
 
-    # Fallback: compare against env var default
-    logger.warning(f"No DB password for role '{role}', falling back to env var")
-    default = ENV_DEFAULTS.get(role)
-    if default is None:
-        return False
-    return password == default
+    logger.error(f"No password hash configured for role '{role}'")
+    return False
 
 
 def update_password(role: str, new_password: str) -> bool:
@@ -78,7 +74,13 @@ def update_password(role: str, new_password: str) -> bool:
         logger.warning(f"Attempted to update password for invalid role: {role}")
         return False
 
-    hashed = generate_password_hash(new_password, method="pbkdf2:sha256", salt_length=8)
+    if len(new_password) < MIN_PASSWORD_LENGTH:
+        logger.warning(
+            f"Rejected password update for role '{role}': minimum length is {MIN_PASSWORD_LENGTH}"
+        )
+        return False
+
+    hashed = generate_password_hash(new_password, method="pbkdf2:sha256", salt_length=16)
     now = datetime.now().isoformat()
 
     try:
@@ -97,3 +99,56 @@ def update_password(role: str, new_password: str) -> bool:
     except sqlite3.Error as e:
         logger.error(f"Error updating password for {role}: {e}", exc_info=True)
         return False
+
+
+def ensure_password_hashes() -> None:
+    """
+    Ensure password hashes exist for all roles.
+
+    If a role is missing in the DB, this function can bootstrap it from the
+    corresponding environment variable. Missing roles without env values fail fast.
+    """
+    missing_role_envs: list[str] = []
+
+    with closing(_connect_db()) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS Passwords (
+                id INTEGER PRIMARY KEY NOT NULL,
+                role TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+            """
+        )
+
+        for role in sorted(VALID_ROLES):
+            cursor.execute("SELECT password_hash FROM Passwords WHERE role = ?", (role,))
+            if cursor.fetchone():
+                continue
+
+            env_key = ROLE_ENV_VAR_MAP[role]
+            raw_password = os.environ.get(env_key, "").strip()
+            if len(raw_password) < MIN_PASSWORD_LENGTH:
+                missing_role_envs.append(env_key)
+                continue
+
+            now = datetime.now().isoformat()
+            hashed = generate_password_hash(raw_password, method="pbkdf2:sha256", salt_length=16)
+            cursor.execute(
+                "INSERT INTO Passwords (role, password_hash, updated_at) VALUES (?, ?, ?)",
+                (role, hashed, now),
+            )
+            logger.warning(
+                f"Bootstrapped missing password hash for role '{role}' from environment variable {env_key}"
+            )
+
+        conn.commit()
+
+    if missing_role_envs:
+        missing_list = ", ".join(sorted(set(missing_role_envs)))
+        raise RuntimeError(
+            "Missing password hash configuration for one or more roles. "
+            f"Set strong values (>= {MIN_PASSWORD_LENGTH} chars) for: {missing_list}"
+        )

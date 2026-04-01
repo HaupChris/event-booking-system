@@ -23,6 +23,13 @@ admin_profiles_bp = Blueprint("admin_profiles", __name__)
 limiter_admin_profiles = Limiter(get_remote_address)
 
 
+def _ensure_admin_identity():
+    identity = get_jwt_identity()
+    if identity != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    return None
+
+
 @admin_profiles_bp.route("/profiles/stats", methods=["GET"])
 @limiter_admin_profiles.limit("200/minute")
 @jwt_required()
@@ -51,6 +58,10 @@ def get_profiles_stats():
     admin_user = get_jwt_identity()
 
     try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
         logger.info(f"Profile stats request from admin {admin_user} at {client_ip}")
 
         stats = get_profile_stats()
@@ -84,6 +95,10 @@ def send_profile_link():
     admin_user = get_jwt_identity()
 
     try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
         logger.info(f"Send profile link request from admin {admin_user} at {client_ip}")
 
         # Validate request
@@ -138,6 +153,10 @@ def bulk_send_profile_links():
     admin_user = get_jwt_identity()
 
     try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
         logger.info(f"Bulk send profile links request from admin {admin_user} at {client_ip}")
 
         # Validate request

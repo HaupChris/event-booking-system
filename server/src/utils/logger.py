@@ -1,4 +1,5 @@
 import glob
+import json
 import logging
 import logging.handlers
 import os
@@ -152,7 +153,7 @@ def log_request():
     # Log basic request info
     access_logger.info(
         f"[{g.request_id}] {request.method} {request.path} "
-        f'from {request.remote_addr} | User-Agent: {request.headers.get("User-Agent", "Unknown")}'
+        f"from {request.remote_addr} | User-Agent: {request.headers.get('User-Agent', 'Unknown')}"
     )
 
     # Log auth status if present
@@ -169,7 +170,7 @@ def log_response(response):
 
     access_logger.info(
         f"[{request_id}] Response: {response.status_code} | "
-        f'Size: {response.content_length or "unknown"} bytes'
+        f"Size: {response.content_length or 'unknown'} bytes"
     )
 
     return response
@@ -323,7 +324,7 @@ def enhanced_log_request():
     # Basic request logging
     access_logger.info(
         f"[{g.request_id}] {request.method} {request.path} "
-        f'from {request.remote_addr} | User-Agent: {request.headers.get("User-Agent", "Unknown")}'
+        f"from {request.remote_addr} | User-Agent: {request.headers.get('User-Agent', 'Unknown')}"
     )
 
     # Security monitoring
@@ -345,7 +346,19 @@ def enhanced_log_request():
 
         # Check request body if present
         if request.content_length and request.content_length > 0:
-            request_data = request.get_data(as_text=True)[:1000]  # First 1000 chars
+            request_data = request.get_data(as_text=True)
+
+            # Best-effort redaction for sensitive/large fields.
+            try:
+                parsed = json.loads(request_data)
+                if isinstance(parsed, dict):
+                    if "signature" in parsed:
+                        parsed["signature"] = "<redacted>"
+                    request_data = json.dumps(parsed)
+            except json.JSONDecodeError:
+                pass
+
+            request_data = request_data[:1000]  # First 1000 chars
 
             suspicious_patterns = detect_suspicious_patterns(request_data)
             if suspicious_patterns:
@@ -380,7 +393,7 @@ def log_authentication_event(event_type: str, user_identity: str, success: bool)
             "AUTH_SUCCESS", {"user_identity": user_identity, "endpoint": request.endpoint}
         )
     else:
-        track_failed_authentication(request.remote_addr, request.endpoint)
+        track_failed_authentication(request.remote_addr or "unknown", request.endpoint or "unknown")
         log_security_event(
             "AUTH_FAILURE", {"user_identity": user_identity, "endpoint": request.endpoint}
         )

@@ -8,7 +8,6 @@ from src.utils.logger import (
     get_logger,
     log_authentication_event,
     log_security_event,
-    track_failed_authentication,
 )
 
 logger = get_logger(__name__)
@@ -20,7 +19,7 @@ logger.info("Authentication module initialized (DB-backed passwords)")
 
 
 @auth_bp.route("/admin", methods=["POST"])
-# @limiter_auth.limit("40/minute")
+@limiter_auth.limit("20/minute")
 def authenticate_admin():
     """Admin authentication endpoint with comprehensive logging."""
     client_ip = request.remote_addr
@@ -44,7 +43,6 @@ def authenticate_admin():
         # Check password
         if not verify_password("admin", password):
             logger.warning(f"Admin auth failed: invalid password from {client_ip}")
-            track_failed_authentication(client_ip, "admin")
             log_authentication_event("ADMIN_AUTH", "admin", False)
             return jsonify({"msg": "Bad password"}), 401
 
@@ -65,7 +63,7 @@ def authenticate_admin():
 
 
 @auth_bp.route("", methods=["POST"])  # e.g. /api/auth
-# @limiter_auth.limit("100/minute")
+@limiter_auth.limit("40/minute")
 def authenticate():
     """User authentication endpoint with comprehensive logging."""
     client_ip = request.remote_addr
@@ -89,7 +87,6 @@ def authenticate():
         # Check password
         if not verify_password("user", password):
             logger.warning(f"User auth failed: invalid password from {client_ip}")
-            track_failed_authentication(client_ip, "user")
             log_authentication_event("USER_AUTH", "user", False)
             return jsonify({"msg": "Bad password"}), 401
 
@@ -110,7 +107,7 @@ def authenticate():
 
 
 @auth_bp.route("/artist", methods=["POST"])
-# @limiter_auth.limit("40/minute")
+@limiter_auth.limit("20/minute")
 def authenticate_artist():
     """Artist authentication endpoint with comprehensive logging."""
     client_ip = request.remote_addr
@@ -134,7 +131,6 @@ def authenticate_artist():
         # Check password
         if not verify_password("artist", password):
             logger.warning(f"Artist auth failed: invalid password from {client_ip}")
-            track_failed_authentication(client_ip, "artist")
             log_authentication_event("ARTIST_AUTH", "artist", False)
             return jsonify({"msg": "Bad password"}), 401
 

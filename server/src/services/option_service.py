@@ -43,6 +43,14 @@ BOOKING_COLUMN_MAP: dict[OptionType, str] = {
     "food": "food_option_id",
 }
 
+ALLOWED_TABLE_NAMES = set(TABLE_NAME_MAP.values()) | set(BOOKING_TABLE_MAP.values())
+
+
+def _assert_allowed_table_name(table_name: str) -> str:
+    if table_name not in ALLOWED_TABLE_NAMES:
+        raise ValueError(f"Unexpected table name: {table_name}")
+    return table_name
+
 
 def _connect_db() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_FILE_PATH)
@@ -51,6 +59,7 @@ def _connect_db() -> sqlite3.Connection:
 
 
 def _table_has_column(cursor: sqlite3.Cursor, table_name: str, column_name: str) -> bool:
+    table_name = _assert_allowed_table_name(table_name)
     cursor.execute(f"PRAGMA table_info({table_name})")
     return any(row[1] == column_name for row in cursor.fetchall())
 
@@ -85,6 +94,7 @@ def _load_option_seed(path: Path, key: str) -> list[dict[str, Any]]:
 def _seed_ticket_table_if_empty(
     cursor: sqlite3.Cursor, table_name: str, options: list[dict[str, Any]]
 ) -> None:
+    table_name = _assert_allowed_table_name(table_name)
     cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
     if int(cursor.fetchone()[0]) > 0:
         return
@@ -112,6 +122,7 @@ def _seed_ticket_table_if_empty(
 def _seed_described_option_table_if_empty(
     cursor: sqlite3.Cursor, table_name: str, options: list[dict[str, Any]]
 ) -> None:
+    table_name = _assert_allowed_table_name(table_name)
     cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
     if int(cursor.fetchone()[0]) > 0:
         return
@@ -252,7 +263,7 @@ def ensure_option_schema() -> None:
 
 
 def _resolve_table_name(scope: OptionScope, option_type: OptionType) -> str:
-    return TABLE_NAME_MAP[(scope, option_type)]
+    return _assert_allowed_table_name(TABLE_NAME_MAP[(scope, option_type)])
 
 
 def get_options(scope: OptionScope, option_type: OptionType) -> list[dict[str, Any]]:
@@ -413,7 +424,7 @@ def update_option(  # noqa: PLR0913
 
 def delete_option(scope: OptionScope, option_type: OptionType, option_id: int) -> tuple[bool, str]:
     table_name = _resolve_table_name(scope, option_type)
-    usage_table = BOOKING_TABLE_MAP[scope]
+    usage_table = _assert_allowed_table_name(BOOKING_TABLE_MAP[scope])
     usage_column = BOOKING_COLUMN_MAP[option_type]
 
     with closing(_connect_db()) as conn:

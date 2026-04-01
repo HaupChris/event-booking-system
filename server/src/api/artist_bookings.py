@@ -19,6 +19,7 @@ from src.services.artist_service import (
 from src.services.mail_service import send_artist_confirmation_mail
 from src.services.orga_team_service import is_valid_active_orga_team_member
 from src.utils.logger import get_logger, log_security_event
+from src.utils.signature import decode_signature_to_blob
 
 # Initialize logger
 logger = get_logger(__name__)
@@ -95,6 +96,11 @@ def submit_artist_form():  # noqa: PLR0911, PLR0912, PLR0915
 
         booking_data = dict(request.json)
         booking_data.pop("id", None)
+
+        try:
+            decode_signature_to_blob(str(booking_data.get("signature", "")))
+        except ValueError as signature_error:
+            return jsonify({"error": str(signature_error)}), 400
 
         artist_type = str(booking_data.get("artist_type", "dj")).lower()
         raw_band_members = booking_data.get("band_members", [])

@@ -18,6 +18,7 @@ from src.services.mail_service import send_confirmation_mail
 from src.services.orga_team_service import is_valid_active_orga_team_member
 from src.services.workshift_service import validate_booking_timeslot_selection
 from src.utils.logger import get_logger, log_security_event
+from src.utils.signature import decode_signature_to_blob
 
 # Initialize logger
 logger = get_logger(__name__)
@@ -45,6 +46,11 @@ def submit_form():
         booking_data = request.json
         if "id" in booking_data:
             del booking_data["id"]
+
+        try:
+            decode_signature_to_blob(str(booking_data.get("signature", "")))
+        except ValueError as signature_error:
+            return jsonify({"error": str(signature_error)}), 400
 
         # Create booking object
         booking = Booking(**booking_data)
@@ -75,10 +81,11 @@ def submit_form():
         success, profile_uuid = insert_booking(booking)
 
         if success:
+            resolved_profile_uuid = profile_uuid or ""
             # Send email
             try:
                 form_content_dict = get_up_to_date_form_content()
-                send_confirmation_mail(booking, form_content_dict, profile_uuid)
+                send_confirmation_mail(booking, form_content_dict, resolved_profile_uuid)
                 logger.info(
                     f"Booking and confirmation email successful for {booking.first_name} {booking.last_name}"
                 )
@@ -93,7 +100,9 @@ def submit_form():
             logger.info(
                 f"Booking process completed in {duration:.3f}s for {booking.first_name} {booking.last_name}"
             )
-            return jsonify({"msg": "Booking successful", "profile_uuid": profile_uuid}), 200
+            return jsonify(
+                {"msg": "Booking successful", "profile_uuid": resolved_profile_uuid}
+            ), 200
         else:
             logger.warning(
                 f"Duplicate booking attempt for {booking.first_name} {booking.last_name} ({booking.email})"

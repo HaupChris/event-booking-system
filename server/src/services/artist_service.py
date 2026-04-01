@@ -1,18 +1,17 @@
-import base64
 import sqlite3
 import uuid
 from contextlib import closing
-from pathlib import Path
 from typing import Any, cast
 
 from src.models.datatypes import ArtistBooking, ArtistBookingWithTimestamp
 from src.services.app_settings_service import get_payment_link
-from src.services.booking_service import DB_DIR, DB_FILE_PATH
+from src.services.booking_service import DB_FILE_PATH
 from src.services.formcontent_service import (
     get_artist_form_content_obj,
     update_artist_form_content_with_db_counts,
 )
 from src.services.orga_team_service import get_active_orga_team_members
+from src.utils.signature import MAX_SIGNATURE_BYTES, decode_signature_to_blob
 
 
 def get_all_artist_bookings() -> list[ArtistBookingWithTimestamp]:
@@ -85,7 +84,7 @@ def get_all_artist_bookings() -> list[ArtistBookingWithTimestamp]:
                 food_id=row[7],
                 total_price=row[8],
                 timestamp=row[9],
-                signature=row[10] or "",
+                signature="",
                 is_paid=row[11] == 1,
                 paid_amount=row[12],
                 payment_notes=row[13],
@@ -163,7 +162,7 @@ def get_artist_booking_by_id(booking_id: int) -> ArtistBookingWithTimestamp | No
             food_id=row[7],
             total_price=row[8],
             timestamp=row[9],
-            signature=row[10] or "",
+            signature="",
             is_paid=row[11] == 1,
             paid_amount=row[12],
             payment_notes=row[13],
@@ -359,6 +358,7 @@ def insert_artist_bookings(bookings: list[ArtistBooking]) -> tuple[bool, list[st
                 artist_id = cast(int, cursor.lastrowid)
 
                 profile_uuid = str(uuid.uuid4())
+                signature_blob = _to_signature_blob(booking.signature)
                 cursor.execute(
                     """
                     INSERT INTO ArtistBookings (
@@ -373,7 +373,7 @@ def insert_artist_bookings(bookings: list[ArtistBooking]) -> tuple[bool, list[st
                         booking.ticket_id,
                         booking.beverage_id,
                         booking.food_id,
-                        booking.signature,
+                        sqlite3.Binary(signature_blob),
                         booking.total_price,
                         1 if booking.is_paid else 0,
                         booking.paid_amount,
@@ -407,9 +407,6 @@ def insert_artist_bookings(bookings: list[ArtistBooking]) -> tuple[bool, list[st
             conn.rollback()
             print(f"Error inserting artist bookings: {e}")
             return False, []
-
-    for booking in bookings:
-        _save_artist_signature_image(booking)
 
     return True, profile_uuids
 
@@ -483,6 +480,16 @@ def _connect_db() -> sqlite3.Connection:
     return sqlite3.connect(DB_FILE_PATH)
 
 
+def _to_signature_blob(signature: str | bytes) -> bytes:
+    if isinstance(signature, bytes):
+        if not signature:
+            raise ValueError("Signature is required")
+        if len(signature) > MAX_SIGNATURE_BYTES:
+            raise ValueError("Signature is too large")
+        return signature
+    return decode_signature_to_blob(signature)
+
+
 def _artist_booking_exists(booking: ArtistBooking) -> bool:
     """
     Checks if an artist booking already exists with the same name and email.
@@ -547,6 +554,7 @@ def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> tuple[int,
     """
     # Generate unique profile UUID
     profile_uuid = str(uuid.uuid4())
+    signature_blob = _to_signature_blob(booking.signature)
 
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
@@ -564,7 +572,7 @@ def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> tuple[int,
                 booking.ticket_id,
                 booking.beverage_id,
                 booking.food_id,
-                booking.signature,
+                sqlite3.Binary(signature_blob),
                 booking.total_price,
                 booking.is_paid,
                 booking.paid_amount,
@@ -620,22 +628,3 @@ def _assign_artist_professions(booking_id: int, profession_ids: list[int]) -> No
                 (booking_id, profession_id),
             )
         conn.commit()
-
-
-def _save_artist_signature_image(booking: ArtistBooking) -> None:
-    """
-    Decodes the signature from base64 and saves it as an image.
-    """
-    signature = booking.signature
-    if "," in signature:
-        # Remove possible 'data:image/png;base64,' prefix
-        signature = signature.split(",", 1)[1]
-
-    signature_dir = Path(DB_DIR) / "artist_signatures"
-    signature_dir.mkdir(parents=True, exist_ok=True)
-
-    img_data = base64.b64decode(signature)
-    file_path = signature_dir / f"artist_{booking.last_name}_{booking.first_name}.png"
-
-    with file_path.open("wb") as file:
-        file.write(img_data)

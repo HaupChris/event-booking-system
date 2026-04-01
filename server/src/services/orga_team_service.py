@@ -19,6 +19,14 @@ else:
     DB_DIR = (Path(__file__).resolve().parent / "../../db").resolve()
     DB_FILE_PATH = str(DB_DIR / "bookings.db")
 
+ALLOWED_SCHEMA_TABLES = {"OrgaTeamInviters", "Bookings", "ArtistBookings"}
+
+
+def _assert_allowed_schema_table(table_name: str) -> str:
+    if table_name not in ALLOWED_SCHEMA_TABLES:
+        raise ValueError(f"Unexpected schema table name: {table_name}")
+    return table_name
+
 
 def _connect_db() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_FILE_PATH)
@@ -27,6 +35,7 @@ def _connect_db() -> sqlite3.Connection:
 
 
 def _table_has_column(cursor: sqlite3.Cursor, table_name: str, column_name: str) -> bool:
+    table_name = _assert_allowed_schema_table(table_name)
     cursor.execute(f"PRAGMA table_info({table_name})")
     return any(row[1] == column_name for row in cursor.fetchall())
 

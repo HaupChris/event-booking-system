@@ -1,6 +1,8 @@
+import os
 import sys
 from collections import defaultdict
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask, request
@@ -23,6 +25,7 @@ from src.api.health import health_bp
 from src.api.profile import profile_bp
 from src.api.settings import settings_bp
 from src.api.shift_assignments import shift_assignments_bp
+from src.services.password_service import ensure_password_hashes
 from src.utils.config import load_config
 from src.utils.logger import (
     get_logger,
@@ -32,21 +35,30 @@ from src.utils.logger import (
     setup_logging,
 )
 
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(dotenv_path=BASE_DIR / ".env")
 
 app = Flask(__name__)
 
-# Setup CORS
-CORS(app)
-
 # Load config from environment
 load_config(app)
+
+# Setup CORS
+cors_origins_raw = os.environ.get(
+    "CORS_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173",
+)
+allowed_origins = [origin.strip() for origin in cors_origins_raw.split(",") if origin.strip()]
+CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
 
 # Setup logging
 setup_logging(app)
 
 # Setup JWT
 jwt = JWTManager(app)
+
+# Ensure secure role password setup before serving requests
+ensure_password_hashes()
 
 rate_limit_violations = defaultdict(list)
 
@@ -176,4 +188,5 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="127.0.0.1", port=5001)
+    debug_enabled = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+    app.run(debug=debug_enabled, host="127.0.0.1", port=5001)

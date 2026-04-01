@@ -44,7 +44,7 @@ def health_check():
             health_status["status"] = "unhealthy"
             health_status["checks"]["database"] = {
                 "status": "unhealthy",
-                "message": f"Database connection failed: {str(db_error)}",
+                "message": "Database connection failed",
             }
             logger.error(f"Database health check failed: {str(db_error)}")
 
@@ -69,12 +69,12 @@ def health_check():
             health_status["status"] = "degraded"
             health_status["checks"]["logging"] = {
                 "status": "unhealthy",
-                "message": f"Logging check failed: {str(log_error)}",
+                "message": "Logging check failed",
             }
             logger.error(f"Logging health check failed: {str(log_error)}")
 
         # Check environment variables
-        required_env_vars = ["JWT_SECRET_KEY", "PASSWORD", "ADMIN_PASSWORD"]
+        required_env_vars = ["JWT_SECRET_KEY"]
         missing_vars = []
 
         for var in required_env_vars:
@@ -85,7 +85,7 @@ def health_check():
             health_status["status"] = "degraded"
             health_status["checks"]["environment"] = {
                 "status": "unhealthy",
-                "message": f"Missing environment variables: {', '.join(missing_vars)}",
+                "message": "Required environment configuration missing",
             }
             logger.warning(f"Missing environment variables: {missing_vars}")
         else:

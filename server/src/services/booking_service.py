@@ -1,4 +1,3 @@
-import base64
 import os
 import sqlite3
 import time
@@ -16,6 +15,11 @@ from src.services.option_service import ensure_option_schema
 from src.services.orga_team_service import get_active_orga_team_members
 from src.services.workshift_service import ensure_workshift_schema
 from src.utils.logger import get_logger
+from src.utils.signature import (
+    MAX_SIGNATURE_BYTES,
+    decode_signature_to_blob,
+    migrate_signatures_to_blob,
+)
 
 logger = get_logger(__name__)
 
@@ -36,12 +40,6 @@ else:
     REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, "schema.sql")
 
 
-# Ensure database is initialized on import
-init_db(DB_FILE_PATH, [REGULAR_SCHEMA_PATH], get_form_content_obj())
-ensure_option_schema()
-ensure_workshift_schema()
-
-
 def _connect_db() -> sqlite3.Connection:
     """
     Returns a new SQLite connection.
@@ -53,6 +51,24 @@ def _connect_db() -> sqlite3.Connection:
     except sqlite3.Error as e:
         logger.error(f"Failed to connect to database: {e}", exc_info=True)
         raise
+
+
+# Ensure database is initialized on import
+init_db(DB_FILE_PATH, [REGULAR_SCHEMA_PATH], get_form_content_obj())
+ensure_option_schema()
+ensure_workshift_schema()
+with closing(_connect_db()) as _init_conn:
+    migrate_signatures_to_blob(_init_conn)
+
+
+def _to_signature_blob(signature: str | bytes) -> bytes:
+    if isinstance(signature, bytes):
+        if not signature:
+            raise ValueError("Signature is required")
+        if len(signature) > MAX_SIGNATURE_BYTES:
+            raise ValueError("Signature is too large")
+        return signature
+    return decode_signature_to_blob(signature)
 
 
 def booking_exists(booking: Booking) -> bool:
@@ -100,10 +116,12 @@ def create_user(booking: Booking) -> int:
             )
             conn.commit()
             user_id = cursor.lastrowid
+            if user_id is None:
+                return -1
             logger.info(
                 f"User created successfully with ID {user_id}: {booking.first_name} {booking.last_name}"
             )
-            return user_id
+            return int(user_id)
     except sqlite3.Error as e:
         logger.error(
             f"Database error creating user {booking.first_name} {booking.last_name}: {e}",
@@ -124,6 +142,7 @@ def create_booking(user_id: int, booking: Booking) -> tuple[int, str | None]:
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
+            signature_blob = _to_signature_blob(booking.signature)
             cursor.execute(
                 """
                             INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, food_option_id,
@@ -145,7 +164,7 @@ def create_booking(user_id: int, booking: Booking) -> tuple[int, str | None]:
                     booking.amount_shifts,
                     booking.supporter_buddy,
                     booking.invited_by_id,
-                    booking.signature,
+                    sqlite3.Binary(signature_blob),
                     booking.total_price,
                     booking.is_paid,
                     booking.paid_amount,
@@ -156,10 +175,12 @@ def create_booking(user_id: int, booking: Booking) -> tuple[int, str | None]:
             )
             conn.commit()
             booking_id = cursor.lastrowid
+            if booking_id is None:
+                return -1, None
             logger.info(
                 f"Booking created successfully with ID {booking_id} (UUID: {profile_uuid[:8]}...) for user {user_id}"
             )
-            return booking_id, profile_uuid
+            return int(booking_id), profile_uuid
     except sqlite3.Error as e:
         logger.error(f"Database error creating booking for user {user_id}: {e}", exc_info=True)
         return -1, None
@@ -190,35 +211,6 @@ def assign_materials(booking_id: int, material_ids: list[int]) -> None:
     except Exception as e:
         logger.error(
             f"Unexpected error assigning materials {material_ids} to booking_id {booking_id}: {str(e)}",
-            exc_info=True,
-        )
-
-
-def save_signature_image(booking: Booking) -> None:
-    """
-    Decodes the signature from base64 and saves it as an image.
-    """
-    try:
-        logger.info(
-            f"Saving signature image of booking {booking.first_name + ' ' + booking.last_name}"
-        )
-        signature = booking.signature
-        if "," in signature:
-            # Remove possible 'data:image/png;base64,' prefix
-            signature = signature.split(",", 1)[1]
-
-        signature_dir = os.path.join(DB_DIR, "signatures")
-        if not os.path.exists(signature_dir):
-            os.makedirs(signature_dir)
-
-        img_data = base64.b64decode(signature)
-        file_path = os.path.join(signature_dir, f"{booking.last_name}_{booking.first_name}.png")
-
-        with open(file_path, "wb") as file:
-            file.write(img_data)
-    except Exception as e:
-        logger.error(
-            f"Failed to save the signature image of booking {booking.first_name + ' ' + booking.last_name}: {str(e)}",
             exc_info=True,
         )
 
@@ -381,7 +373,7 @@ def get_all_bookings() -> list[BookingWithTimestamp]:
                     invited_by_name=row[14] or "",
                     total_price=row[15],
                     timestamp=row[16],
-                    signature=row[17] or "",
+                    signature="",
                     is_paid=True if row[18] == 1 else False,
                     paid_amount=row[19],
                     payment_notes=row[20],

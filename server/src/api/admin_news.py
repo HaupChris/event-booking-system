@@ -29,6 +29,13 @@ admin_news_bp = Blueprint("admin_news", __name__)
 limiter_admin_news = Limiter(get_remote_address)
 
 
+def _ensure_admin_identity():
+    identity = get_jwt_identity()
+    if identity != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    return None
+
+
 @admin_news_bp.route("/news", methods=["GET"])
 @limiter_admin_news.limit("200/minute")
 @jwt_required()
@@ -43,6 +50,10 @@ def get_news_list():
     admin_user = get_jwt_identity()
 
     try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
         logger.info(f"News list request from admin {admin_user} at {client_ip}")
 
         include_inactive = request.args.get("include_inactive", "false").lower() == "true"
@@ -69,6 +80,10 @@ def get_news_item(news_id: int):
     admin_user = get_jwt_identity()
 
     try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
         logger.debug(f"News item {news_id} request from admin {admin_user} at {client_ip}")
 
         news = get_news_by_id(news_id)
@@ -104,6 +119,10 @@ def create_news_item():
     admin_user = get_jwt_identity()
 
     try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
         logger.info(f"News creation request from admin {admin_user} at {client_ip}")
 
         # Validate request
@@ -158,6 +177,10 @@ def update_news_item(news_id: int):
     admin_user = get_jwt_identity()
 
     try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
         logger.info(
             f"News update request for item {news_id} from admin {admin_user} at {client_ip}"
         )
@@ -207,6 +230,10 @@ def delete_news_item(news_id: int):
     admin_user = get_jwt_identity()
 
     try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
         logger.info(
             f"News deletion request for item {news_id} from admin {admin_user} at {client_ip}"
         )
