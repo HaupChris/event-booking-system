@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import {
-  AppBar,
-  Toolbar,
   IconButton,
   Typography,
   Drawer,
@@ -9,8 +7,11 @@ import {
   ListItemIcon,
   ListItemText,
   Box,
-  Paper,
+  Divider,
+  useMediaQuery,
 } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
   Home,
@@ -33,8 +34,8 @@ import {
 import ListItemButton from '@mui/material/ListItemButton';
 import { CSVLink } from 'react-csv';
 import { getExportDataByTab } from './services/exportService';
+import { adminTheme } from './theme/adminTheme';
 
-// Import all page components
 import HomePage from './HomePage';
 import BookingsPage from './BookingsPage';
 import TicketsPage from './TicketsPage';
@@ -53,35 +54,58 @@ import FAQManagementPage from './FAQManagementPage';
 import SettingsPage from './SettingsPage';
 import OrgaTeamPage from './OrgaTeamPage';
 
-// Define all possible dashboard tabs
-interface DashboardTab {
+const SIDEBAR_WIDTH = 240;
+
+interface NavItem {
   id: string;
   label: string;
   icon: React.JSX.Element;
-  permissions: string[];
 }
 
-const dashboardTabs: DashboardTab[] = [
-  { id: 'home', label: 'Home', icon: <Home />, permissions: ['read'] },
-  { id: 'bookings', label: 'Bookings', icon: <People />, permissions: ['read'] },
-  { id: 'tickets', label: 'Tickets', icon: <LocalActivity />, permissions: ['read'] },
-  { id: 'beverages', label: 'Beer', icon: <SportsBar />, permissions: ['read'] },
-  { id: 'food', label: 'Food', icon: <LunchDining />, permissions: ['read'] },
-  { id: 'materials', label: 'Material', icon: <Handyman />, permissions: ['read'] },
-  { id: 'workShifts', label: 'Support', icon: <Work />, permissions: ['read'] },
-  { id: 'professions', label: 'Professions', icon: <School />, permissions: ['read'] },
-  { id: 'financials', label: 'Financials', icon: <EuroSymbol />, permissions: ['financial'] },
-  { id: 'payments', label: 'Payments', icon: <PointOfSale />, permissions: ['financial'] },
+const navGroups: { label: string; items: NavItem[] }[] = [
   {
-    id: 'shiftAssignments',
-    label: 'Shift Assignments',
-    icon: <AssignmentInd />,
-    permissions: ['read'],
+    label: 'Overview',
+    items: [
+      { id: 'home', label: 'Home', icon: <Home /> },
+      { id: 'bookings', label: 'Bookings', icon: <People /> },
+    ],
   },
-  { id: 'settings', label: 'Settings', icon: <Settings />, permissions: ['read'] },
-  { id: 'orgaTeam', label: 'Orga Team', icon: <Groups />, permissions: ['read'] },
-  { id: 'news', label: 'News Management', icon: <Newspaper />, permissions: ['read'] },
-  { id: 'faqs', label: 'FAQ Management', icon: <Help />, permissions: ['read'] },
+  {
+    label: 'Options',
+    items: [
+      { id: 'tickets', label: 'Tickets', icon: <LocalActivity /> },
+      { id: 'beverages', label: 'Beer', icon: <SportsBar /> },
+      { id: 'food', label: 'Food', icon: <LunchDining /> },
+      { id: 'materials', label: 'Material', icon: <Handyman /> },
+      { id: 'workShifts', label: 'Support', icon: <Work /> },
+      { id: 'professions', label: 'Professions', icon: <School /> },
+    ],
+  },
+  {
+    label: 'Finance',
+    items: [
+      { id: 'financials', label: 'Financials', icon: <EuroSymbol /> },
+      { id: 'payments', label: 'Payments', icon: <PointOfSale /> },
+    ],
+  },
+  {
+    label: 'Operations',
+    items: [
+      { id: 'shiftAssignments', label: 'Shift Assignments', icon: <AssignmentInd /> },
+      { id: 'orgaTeam', label: 'Orga Team', icon: <Groups /> },
+    ],
+  },
+  {
+    label: 'Content',
+    items: [
+      { id: 'news', label: 'News', icon: <Newspaper /> },
+      { id: 'faqs', label: 'FAQ', icon: <Help /> },
+    ],
+  },
+  {
+    label: 'System',
+    items: [{ id: 'settings', label: 'Settings', icon: <Settings /> }],
+  },
 ];
 
 const exportableTabs = new Set([
@@ -97,27 +121,16 @@ const exportableTabs = new Set([
 ]);
 
 function Dashboard() {
-  // Use fetch hook for data
   const { regularBookings, artistBookings, formContent, artistFormContent } = useFetchData();
-
   const [activeTab, setActiveTab] = useState('home');
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const isDesktop = useMediaQuery(adminTheme.breakpoints.up('md'));
 
-  // Assume admin permissions for this implementation
-  const adminPermissions = ['read', 'financial', 'shift_management'];
+  const activeItem = navGroups.flatMap((g) => g.items).find((i) => i.id === activeTab);
 
-  // Filter tabs based on admin permissions
-  const authorizedTabs = dashboardTabs.filter((tab) =>
-    tab.permissions.some((perm) => adminPermissions.includes(perm))
-  );
-
-  const handleDrawerToggle = () => {
-    setDrawerOpen(!drawerOpen);
-  };
-
-  const handleMenuClick = (tabId: string) => {
+  const handleNavClick = (tabId: string) => {
     setActiveTab(tabId);
-    setDrawerOpen(false);
+    if (!isDesktop) setMobileOpen(false);
   };
 
   const renderPage = () => {
@@ -159,77 +172,140 @@ function Dashboard() {
     }
   };
 
-  const getExportData = () => {
-    return getExportDataByTab(
-      activeTab,
-      regularBookings,
-      artistBookings,
-      formContent,
-      artistFormContent
-    );
-  };
+  const getExportData = () =>
+    getExportDataByTab(activeTab, regularBookings, artistBookings, formContent, artistFormContent);
 
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <AppBar position="fixed">
-        <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerToggle}>
-            <MenuIcon />
-          </IconButton>
-          <Box display="flex" flexGrow={1} justifyContent="center">
-            <Typography variant="h6" display="flex" alignItems="center">
-              {/* Display the active tab icon */}
-              {authorizedTabs.find((tab) => tab.id === activeTab)?.icon}
-              <span style={{ marginLeft: '8px' }}>
-                {authorizedTabs.find((tab) => tab.id === activeTab)?.label}
-              </span>
-            </Typography>
-          </Box>
-
-          {/* Export button - only show for tabs with data */}
-          {exportableTabs.has(activeTab) && (
-            <CSVLink
-              data={getExportData()}
-              filename={`${activeTab}_data.csv`}
-              style={{ textDecoration: 'none' }}
-            >
-              <IconButton edge="end" color="inherit">
-                <Download />
-              </IconButton>
-            </CSVLink>
-          )}
-        </Toolbar>
-      </AppBar>
-
-      <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
-        <List>
-          {authorizedTabs.map((tab) => (
-            <ListItemButton
-              onClick={() => handleMenuClick(tab.id)}
-              key={tab.id}
-              selected={activeTab === tab.id}
-            >
-              <ListItemIcon>{tab.icon}</ListItemIcon>
-              <ListItemText primary={tab.label} />
-            </ListItemButton>
-          ))}
-        </List>
-      </Drawer>
-
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          paddingTop: { xs: '4em', sm: '5em', lg: '6em' },
-          overflowY: 'auto',
-          paddingX: { sm: '0', md: '2em' },
-        }}
+  const sidebarContent = (
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', pt: 2 }}>
+      <Typography
+        variant="h6"
+        sx={{ px: 2.5, mb: 2, fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}
       >
-        <Paper elevation={3} sx={{ p: 3 }}>
-          {renderPage()}
-        </Paper>
+        Admin
+      </Typography>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+        {navGroups.map((group, gi) => (
+          <React.Fragment key={group.label}>
+            {gi > 0 && <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.08)' }} />}
+            <Typography
+              variant="caption"
+              sx={{
+                px: 2.5,
+                py: 0.5,
+                display: 'block',
+                color: 'rgba(255,255,255,0.4)',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                fontSize: '0.65rem',
+              }}
+            >
+              {group.label}
+            </Typography>
+            <List dense disablePadding>
+              {group.items.map((item) => (
+                <ListItemButton
+                  key={item.id}
+                  selected={activeTab === item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  sx={{ py: 0.75 }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>{item.icon}</ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{ fontSize: '0.85rem' }}
+                  />
+                </ListItemButton>
+              ))}
+            </List>
+          </React.Fragment>
+        ))}
       </Box>
     </Box>
+  );
+
+  return (
+    <ThemeProvider theme={adminTheme}>
+      <CssBaseline />
+      <Box sx={{ display: 'flex', height: '100vh' }}>
+        {/* Desktop sidebar */}
+        {isDesktop && (
+          <Box
+            component="nav"
+            sx={{
+              width: SIDEBAR_WIDTH,
+              flexShrink: 0,
+              bgcolor: adminTheme.palette.background?.default,
+            }}
+          >
+            <Drawer variant="permanent" sx={{ '& .MuiDrawer-paper': { width: SIDEBAR_WIDTH } }}>
+              {sidebarContent}
+            </Drawer>
+          </Box>
+        )}
+
+        {/* Mobile drawer */}
+        {!isDesktop && (
+          <Drawer
+            variant="temporary"
+            open={mobileOpen}
+            onClose={() => setMobileOpen(false)}
+            sx={{ '& .MuiDrawer-paper': { width: SIDEBAR_WIDTH } }}
+          >
+            {sidebarContent}
+          </Drawer>
+        )}
+
+        {/* Main content */}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            bgcolor: 'background.default',
+          }}
+        >
+          {/* Top bar */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              px: { xs: 2, md: 3 },
+              py: 1.5,
+              borderBottom: 1,
+              borderColor: 'divider',
+              bgcolor: 'background.paper',
+            }}
+          >
+            {!isDesktop && (
+              <IconButton onClick={() => setMobileOpen(true)} sx={{ mr: 1 }}>
+                <MenuIcon />
+              </IconButton>
+            )}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
+              {activeItem?.icon}
+              <Typography variant="h6">{activeItem?.label ?? 'Home'}</Typography>
+            </Box>
+            {exportableTabs.has(activeTab) && (
+              <CSVLink
+                data={getExportData()}
+                filename={`${activeTab}_data.csv`}
+                style={{ textDecoration: 'none' }}
+              >
+                <IconButton size="small" sx={{ color: 'text.secondary' }}>
+                  <Download />
+                </IconButton>
+              </CSVLink>
+            )}
+          </Box>
+
+          {/* Page content */}
+          <Box sx={{ flexGrow: 1, overflowY: 'auto', p: { xs: 2, md: 3 } }}>{renderPage()}</Box>
+        </Box>
+      </Box>
+    </ThemeProvider>
   );
 }
 

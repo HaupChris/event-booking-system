@@ -6,7 +6,7 @@ import TabSwitcher from './components/TabSwitcher';
 import type { Person } from './components/PeopleList';
 import PeopleList from './components/PeopleList';
 import FilterControls from './components/FilterControls';
-import FormCard from '../../components/core/display/FormCard';
+import AdminCard from './components/AdminCard';
 import type { ViewFilterType } from './utils/optionsUtils';
 import OptionsTable from './components/OptionsTable';
 
@@ -183,7 +183,7 @@ const ProfessionsPage: React.FC = () => {
           />
 
           {/* Professions Grid */}
-          <FormCard>
+          <AdminCard>
             <Box sx={{ p: 2 }}>
               <OptionsTable
                 options={professionOptions}
@@ -191,7 +191,7 @@ const ProfessionsPage: React.FC = () => {
                 optionType={'professions'}
               />
             </Box>
-          </FormCard>
+          </AdminCard>
         </>
       )}
 

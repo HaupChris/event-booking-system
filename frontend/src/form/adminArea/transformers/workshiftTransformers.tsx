@@ -8,7 +8,7 @@ import { Box, Typography, Paper, Chip, Grid, alpha } from '@mui/material';
 import { Work as WorkIcon, AccessTime as AccessTimeIcon } from '@mui/icons-material';
 import type { ProgressItem } from '../components/ProgressList';
 import type { Person } from '../components/PeopleList';
-import { spacePalette } from '../../../components/styles/theme';
+import { adminPalette } from '../theme/adminPalette';
 import {
   getTimeslotCount,
   getTimeslotsForUser,
@@ -91,7 +91,7 @@ export const transformWorkshiftsToProgressItems = ({
                       display: 'flex',
                       flexDirection: 'column',
                       bgcolor: alpha(
-                        progress >= 100 ? spacePalette.status.success : spacePalette.primary.main,
+                        progress >= 100 ? adminPalette.primary.dark : adminPalette.primary.main,
                         0.05
                       ),
                     }}
@@ -203,14 +203,14 @@ export const transformBookingsToPeopleItems = ({
                 sx={{
                   p: 1.5,
                   mb: 1,
-                  bgcolor: alpha(spacePalette.primary.main, 0.05),
+                  bgcolor: alpha(adminPalette.primary.main, 0.05),
                   borderLeft: 2,
                   borderColor:
                     timeslot.priority === 1
-                      ? spacePalette.status.success
+                      ? adminPalette.primary.dark
                       : timeslot.priority === 2
-                        ? spacePalette.primary.main
-                        : spacePalette.status.warning,
+                        ? adminPalette.primary.main
+                        : adminPalette.status.warning,
                 }}
               >
                 <Box

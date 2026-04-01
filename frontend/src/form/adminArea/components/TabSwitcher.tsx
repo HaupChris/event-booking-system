@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Tab, Tabs, useMediaQuery, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { spacePalette } from '../../../components/styles/theme';
+import { adminPalette } from '../theme/adminPalette';
 
 interface TabOption {
   value: string;
@@ -27,7 +27,7 @@ const TabSwitcher: React.FC<TabSwitcherProps> = ({ tabs, currentTab, onChange })
     <Box
       sx={{
         borderBottom: 1,
-        borderColor: alpha(spacePalette.primary.main, 0.2),
+        borderColor: adminPalette.divider,
         mb: 3,
       }}
     >
@@ -43,11 +43,11 @@ const TabSwitcher: React.FC<TabSwitcherProps> = ({ tabs, currentTab, onChange })
             minWidth: isMobile ? 'auto' : 120,
           },
           '& .Mui-selected': {
-            color: spacePalette.primary.main,
+            color: adminPalette.primary.main,
             fontWeight: 'medium',
           },
           '& .MuiTabs-indicator': {
-            backgroundColor: spacePalette.primary.main,
+            backgroundColor: adminPalette.primary.main,
           },
         }}
       >

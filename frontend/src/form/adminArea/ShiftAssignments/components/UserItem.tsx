@@ -11,7 +11,7 @@ import {
 } from '@mui/icons-material';
 import type { ShiftAssignment, UserWithAssignments } from '../types';
 import type { FormContent } from '../../../userArea/interface';
-import { spacePalette } from '../../../../components/styles/theme';
+import { adminPalette } from '../../theme/adminPalette';
 import ListItemButton from '@mui/material/ListItemButton';
 import { getAdminTitle } from '../../utils/titleUtils';
 
@@ -84,11 +84,11 @@ const UserItem: React.FC<UserItemProps> = ({
   // Determine background color based on matching priority
   const getBackgroundColor = () => {
     if (isSelected) {
-      return alpha(spacePalette.primary.main, 0.15);
+      return alpha(adminPalette.primary.main, 0.15);
     }
     if (matchingPriority) {
       // Light highlight for matching timeslot
-      return alpha(spacePalette.status.success, 0.08);
+      return alpha(adminPalette.primary.dark, 0.08);
     }
     return 'background.paper';
   };
@@ -96,10 +96,10 @@ const UserItem: React.FC<UserItemProps> = ({
   // Determine border color
   const getBorderColor = () => {
     if (isSelected) {
-      return spacePalette.primary.main;
+      return adminPalette.primary.main;
     }
     if (matchingPriority) {
-      return alpha(spacePalette.status.success, 0.3);
+      return alpha(adminPalette.primary.dark, 0.3);
     }
     return 'divider';
   };
@@ -152,10 +152,10 @@ const UserItem: React.FC<UserItemProps> = ({
         bgcolor: getBackgroundColor(),
         '&:hover': {
           bgcolor: isSelected
-            ? alpha(spacePalette.primary.main, 0.2)
+            ? alpha(adminPalette.primary.main, 0.2)
             : matchingPriority
-              ? alpha(spacePalette.status.success, 0.12)
-              : alpha(spacePalette.primary.main, 0.05),
+              ? alpha(adminPalette.primary.dark, 0.12)
+              : alpha(adminPalette.primary.main, 0.05),
         },
         transition: 'all 0.2s ease',
       }}
@@ -213,12 +213,12 @@ const UserItem: React.FC<UserItemProps> = ({
         {/* Shifts info */}
         <Box
           sx={{
-            bgcolor: alpha('#000', 0.1),
+            bgcolor: adminPalette.background.default,
             borderRadius: 1,
             p: 1,
             mb: 1,
             border: '1px solid',
-            borderColor: alpha('#fff', 0.1),
+            borderColor: adminPalette.divider,
           }}
         >
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -268,11 +268,11 @@ const UserItem: React.FC<UserItemProps> = ({
         {/* Priority Details */}
         <Box
           sx={{
-            bgcolor: alpha('#000', 0.1),
+            bgcolor: adminPalette.background.default,
             borderRadius: 1,
             p: 1,
             border: '1px solid',
-            borderColor: alpha('#fff', 0.1),
+            borderColor: adminPalette.divider,
           }}
         >
           <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
@@ -295,7 +295,7 @@ const UserItem: React.FC<UserItemProps> = ({
                   minWidth: 20,
                   color:
                     selectedTimeslot === priority.timeslotId
-                      ? spacePalette.status.success
+                      ? adminPalette.primary.dark
                       : 'text.secondary',
                 }}
               >

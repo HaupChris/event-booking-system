@@ -17,7 +17,7 @@ import {
   ArrowUpward as ArrowUpwardIcon,
   ArrowDownward as ArrowDownwardIcon,
 } from '@mui/icons-material';
-import { spacePalette } from '../../../components/styles/theme';
+import { adminPalette } from '../theme/adminPalette';
 
 interface SortOption {
   value: string;
@@ -58,9 +58,9 @@ const FilterSortBar: React.FC<FilterSortBarProps> = ({
         mb: 2,
         gap: 1,
         p: 2,
-        backgroundColor: alpha(spacePalette.primary.main, 0.05),
+        backgroundColor: alpha(adminPalette.primary.main, 0.05),
         borderRadius: 1,
-        border: `1px solid ${alpha(spacePalette.primary.main, 0.1)}`,
+        border: `1px solid ${adminPalette.divider}`,
       }}
     >
       <Box sx={{ display: 'flex', gap: 1, width: isMobile ? '100%' : 'auto' }}>{children}</Box>

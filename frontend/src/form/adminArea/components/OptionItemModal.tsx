@@ -15,7 +15,7 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material';
 import type { CombinedBooking } from '../interface';
 import { alpha } from '@mui/material/styles';
-import { spacePalette } from '../../../components/styles/theme';
+import { adminPalette } from '../theme/adminPalette';
 
 interface OptionItemModalProps {
   open: boolean;
@@ -54,7 +54,7 @@ const OptionItemModal: React.FC<OptionItemModalProps> = ({
           borderRadius: 2,
           boxShadow: 24,
           p: 3,
-          border: `1px solid ${alpha(spacePalette.primary.main, 0.3)}`,
+          border: `1px solid ${alpha(adminPalette.primary.main, 0.3)}`,
           maxHeight: '90vh',
           overflow: 'auto',
         }}
@@ -107,7 +107,7 @@ const OptionItemModal: React.FC<OptionItemModalProps> = ({
                   sx={{
                     bgcolor:
                       user.bookingType === 'artist'
-                        ? alpha(spacePalette.primary.main, 0.05)
+                        ? alpha(adminPalette.primary.main, 0.05)
                         : 'transparent',
                   }}
                 >

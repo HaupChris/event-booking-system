@@ -31,7 +31,7 @@ import {
 import { TokenContext } from '../../contexts/AuthContext';
 import { useFetchData } from './useFetchData';
 import type { CombinedBooking } from './interface';
-import FormCard from '../../components/core/display/FormCard';
+import AdminCard from './components/AdminCard';
 import BookingTable from './components/BookingTable';
 import BookingDetailModal from './components/BookingDetailModal';
 import { filterBookings, getInviterFilterData, sortBookings } from './utils/bookingUtils';
@@ -162,7 +162,7 @@ const BookingsPage: React.FC = () => {
   return (
     <Box sx={{ p: 2 }}>
       {/* Control panel */}
-      <FormCard title="Bookings Management" sx={{ mb: 3 }}>
+      <AdminCard title="Bookings Management" sx={{ mb: 3 }}>
         <Box
           sx={{
             display: 'flex',
@@ -243,7 +243,7 @@ const BookingsPage: React.FC = () => {
             </Menu>
           </Box>
         </Box>
-      </FormCard>
+      </AdminCard>
 
       {/* Search and Sort Controls */}
       <Box

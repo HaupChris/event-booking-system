@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { CheckCircle, Cancel, PendingActions } from '@mui/icons-material';
 import type { ShiftAssignment } from '../types';
-import { spacePalette } from '../../../../components/styles/theme';
+import { adminPalette } from '../../theme/adminPalette';
 import type { BookingWithTimestamp } from '../../../userArea/interface';
 import { getAdminTitle } from '../../utils/titleUtils';
 
@@ -39,10 +39,10 @@ const TimeslotItem: React.FC<TimeslotItemProps> = ({
   bookings,
 }) => {
   const getTimeslotStatusColor = () => {
-    if (timeslot.is_filled) return spacePalette.status.success;
-    if (timeslot.fill_percentage >= 75) return spacePalette.status.warning;
-    if (timeslot.fill_percentage >= 50) return spacePalette.status.info;
-    return spacePalette.status.error;
+    if (timeslot.is_filled) return adminPalette.primary.dark;
+    if (timeslot.fill_percentage >= 75) return adminPalette.status.warning;
+    if (timeslot.fill_percentage >= 50) return adminPalette.status.info;
+    return adminPalette.status.error;
   };
 
   const getStatusText = () => {
@@ -94,12 +94,12 @@ const TimeslotItem: React.FC<TimeslotItemProps> = ({
         onClick={() => onSelect(timeslot.id)}
         sx={{
           border: 1,
-          borderColor: isSelected ? spacePalette.primary.main : 'divider',
+          borderColor: isSelected ? adminPalette.primary.main : 'divider',
           borderRadius: 1,
           m: 1,
-          bgcolor: isSelected ? alpha(spacePalette.primary.main, 0.1) : 'background.paper',
+          bgcolor: isSelected ? alpha(adminPalette.primary.main, 0.1) : 'background.paper',
           '&:hover': {
-            bgcolor: isSelected ? alpha(spacePalette.primary.main, 0.2) : alpha(statusColor, 0.1),
+            bgcolor: isSelected ? alpha(adminPalette.primary.main, 0.2) : alpha(statusColor, 0.1),
           },
         }}
       >

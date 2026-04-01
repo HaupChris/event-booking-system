@@ -23,7 +23,7 @@ import axios from 'axios';
 import type { CombinedBooking } from '../interface';
 import type { FormContent } from '../../userArea/interface';
 import { alpha } from '@mui/material/styles';
-import { spacePalette } from '../../../components/styles/theme';
+import { adminPalette } from '../theme/adminPalette';
 import type { ArtistFormContent } from '../../artistArea/interface';
 import BookingDetailFormFields from './BookingDetailFormFields';
 
@@ -131,7 +131,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
             borderRadius: 2,
             boxShadow: 24,
             p: 2,
-            border: `2px solid ${alpha(spacePalette.primary.main, 0.3)}`,
+            border: `2px solid ${alpha(adminPalette.primary.main, 0.3)}`,
             maxHeight: '90vh',
             overflow: 'auto',
           }}
@@ -148,7 +148,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                 onClick={toggleEditMode}
                 sx={{
                   mr: 1,
-                  color: editMode ? spacePalette.status.success : spacePalette.primary.main,
+                  color: editMode ? adminPalette.status.success : adminPalette.primary.main,
                 }}
               >
                 {editMode ? <SaveIcon onClick={handleSaveChanges} /> : <EditIcon />}
@@ -157,7 +157,7 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
                 onClick={handleDeleteClick}
                 sx={{
                   mr: 1,
-                  color: spacePalette.status.error,
+                  color: adminPalette.status.error,
                 }}
               >
                 <Delete />

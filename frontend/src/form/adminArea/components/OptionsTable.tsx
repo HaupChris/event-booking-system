@@ -27,7 +27,7 @@ import { VisibilityOutlined as ViewIcon } from '@mui/icons-material';
 import type { CombinedBooking } from '../interface';
 import { getUsersForOption } from '../utils/optionsUtils';
 import { getAdminTitle, getFrontendTitle } from '../utils/titleUtils';
-import { spacePalette } from '../../../components/styles/theme';
+import { adminPalette } from '../theme/adminPalette';
 import OptionItemModal from './OptionItemModal';
 import { useModal } from '../../../hooks/useModal';
 
@@ -76,7 +76,7 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
         <Typography
           variant="subtitle2"
           sx={{
-            bgcolor: alpha(spacePalette.primary.main, 0.08),
+            bgcolor: alpha(adminPalette.primary.main, 0.08),
             px: 2,
             py: 1,
             borderRadius: 1,
@@ -93,7 +93,7 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
               variant="outlined"
               sx={{
                 '&:hover': {
-                  bgcolor: alpha(spacePalette.primary.main, 0.02),
+                  bgcolor: alpha(adminPalette.primary.main, 0.02),
                 },
               }}
             >
@@ -113,7 +113,7 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
                     size="small"
                     onClick={() => open(option)}
                     sx={{
-                      color: spacePalette.primary.main,
+                      color: adminPalette.primary.main,
                       ml: 1,
                     }}
                   >
@@ -142,8 +142,8 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
                     label={`${option.count} selected`}
                     size="small"
                     sx={{
-                      bgcolor: alpha(spacePalette.primary.main, 0.15),
-                      color: spacePalette.primary.main,
+                      bgcolor: alpha(adminPalette.primary.main, 0.15),
+                      color: adminPalette.primary.main,
                       fontWeight: 'bold',
                     }}
                   />
@@ -170,7 +170,7 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
           <TableCell
             colSpan={showDescription ? 5 : 4}
             sx={{
-              bgcolor: alpha(spacePalette.primary.main, 0.08),
+              bgcolor: alpha(adminPalette.primary.main, 0.08),
               fontWeight: 'bold',
               fontSize: '0.9rem',
               py: 1,
@@ -185,7 +185,7 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
             hover
             sx={{
               '&:hover': {
-                bgcolor: alpha(spacePalette.primary.main, 0.02),
+                bgcolor: alpha(adminPalette.primary.main, 0.02),
               },
             }}
           >
@@ -219,8 +219,8 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
                 label={option.count}
                 size="small"
                 sx={{
-                  bgcolor: alpha(spacePalette.primary.main, 0.15),
-                  color: spacePalette.primary.main,
+                  bgcolor: alpha(adminPalette.primary.main, 0.15),
+                  color: adminPalette.primary.main,
                   fontWeight: 'bold',
                   minWidth: 45,
                 }}
@@ -246,9 +246,9 @@ const OptionsTable: React.FC<OptionsTableProps> = ({
                 size="small"
                 onClick={() => open(option)}
                 sx={{
-                  color: spacePalette.primary.main,
+                  color: adminPalette.primary.main,
                   '&:hover': {
-                    bgcolor: alpha(spacePalette.primary.main, 0.1),
+                    bgcolor: alpha(adminPalette.primary.main, 0.1),
                   },
                 }}
               >

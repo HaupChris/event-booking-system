@@ -21,7 +21,7 @@ import {
 } from '@mui/icons-material';
 import type { CombinedBooking } from '../interface';
 import type { FormContent } from '../../userArea/interface';
-import { spacePalette } from '../../../components/styles/theme';
+import { adminPalette } from '../theme/adminPalette';
 import { getTicketTitle } from '../utils/bookingUtils';
 import type { ArtistFormContent } from '../../artistArea/interface';
 
@@ -64,7 +64,7 @@ const BookingTable: React.FC<BookingTableProps> = ({
     <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 1 }}>
       <Table size="medium">
         <TableHead>
-          <TableRow sx={{ bgcolor: alpha(spacePalette.primary.main, 0.1) }}>
+          <TableRow sx={{ bgcolor: alpha(adminPalette.primary.main, 0.1) }}>
             {columnVisibility.type && <TableCell>Type</TableCell>}
             {columnVisibility.name && <TableCell>Name</TableCell>}
             {columnVisibility.email && <TableCell>Email</TableCell>}
@@ -82,10 +82,10 @@ const BookingTable: React.FC<BookingTableProps> = ({
               sx={{
                 bgcolor:
                   booking.bookingType === 'artist'
-                    ? alpha(spacePalette.primary.main, 0.08)
+                    ? alpha(adminPalette.primary.main, 0.08)
                     : 'transparent',
                 '&:hover': {
-                  bgcolor: alpha(spacePalette.primary.main, 0.05),
+                  bgcolor: alpha(adminPalette.primary.main, 0.05),
                 },
               }}
             >
@@ -154,9 +154,9 @@ const BookingTable: React.FC<BookingTableProps> = ({
                   onClick={() => onOpenDetails(booking)}
                   size="small"
                   sx={{
-                    color: spacePalette.primary.main,
+                    color: adminPalette.primary.main,
                     '&:hover': {
-                      backgroundColor: alpha(spacePalette.primary.main, 0.1),
+                      backgroundColor: alpha(adminPalette.primary.main, 0.1),
                     },
                   }}
                 >

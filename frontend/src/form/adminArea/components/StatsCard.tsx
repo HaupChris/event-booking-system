@@ -11,7 +11,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { spacePalette } from '../../../components/styles/theme';
+import { adminPalette } from '../theme/adminPalette';
 
 interface StatsCardProps {
   title: string;
@@ -41,15 +41,15 @@ const StatsCard: React.FC<StatsCardProps> = ({
   const getColor = () => {
     switch (color) {
       case 'success':
-        return spacePalette.status.success;
+        return adminPalette.status.success;
       case 'warning':
-        return spacePalette.status.warning;
+        return adminPalette.status.warning;
       case 'error':
-        return spacePalette.status.error;
+        return adminPalette.status.error;
       case 'info':
-        return spacePalette.status.info;
+        return adminPalette.status.info;
       default:
-        return spacePalette.primary.main;
+        return adminPalette.primary.main;
     }
   };
 
@@ -62,8 +62,8 @@ const StatsCard: React.FC<StatsCardProps> = ({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        bgcolor: alpha(mainColor, 0.05),
-        border: `1px solid ${alpha(mainColor, 0.2)}`,
+        bgcolor: alpha(mainColor, 0.06),
+        border: `1px solid ${alpha(mainColor, 0.35)}`,
         borderRadius: 2,
       }}
     >
@@ -87,7 +87,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
           <Typography
             variant="h6"
             sx={{
-              color: alpha('#fff', 0.9),
+              color: adminPalette.text.primary,
               fontSize: isMobile ? '1rem' : '1.125rem',
               fontWeight: 'medium',
             }}
@@ -124,7 +124,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
           <Typography
             variant="body2"
             sx={{
-              color: alpha('#fff', 0.7),
+              color: adminPalette.text.secondary,
               mb: 2,
             }}
           >

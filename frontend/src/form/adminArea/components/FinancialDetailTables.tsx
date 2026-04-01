@@ -14,8 +14,8 @@ import {
   Typography,
 } from '@mui/material';
 import { ConfirmationNumber, LocalDining, Paid, SportsBar } from '@mui/icons-material';
-import FormCard from '../../../components/core/display/FormCard';
-import { spacePalette } from '../../../components/styles/theme';
+import AdminCard from './AdminCard';
+import { adminPalette } from '../theme/adminPalette';
 import type { ViewFilterType } from '../utils/optionsUtils';
 
 type CategoryTotals = Record<string, { count: number; total: number; isArtist: boolean }>;
@@ -47,12 +47,12 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
           },
         }}
       >
-        <FormCard sx={{ height: '100%' }} title="Ticket Sales" icon={<ConfirmationNumber />}>
+        <AdminCard sx={{ height: '100%' }} title="Ticket Sales" icon={<ConfirmationNumber />}>
           <Box sx={{ p: 2 }}>
             <TableContainer component={Paper} variant="outlined">
               <Table size="small">
                 <TableHead>
-                  <TableRow sx={{ bgcolor: alpha(spacePalette.primary.main, 0.05) }}>
+                  <TableRow sx={{ bgcolor: alpha(adminPalette.primary.main, 0.05) }}>
                     <TableCell>Ticket Type</TableCell>
                     <TableCell align="right">Count</TableCell>
                     <TableCell align="right">Total (EUR)</TableCell>
@@ -63,7 +63,7 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                     <TableRow
                       key={key}
                       sx={{
-                        bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent',
+                        bgcolor: isArtist ? alpha(adminPalette.primary.main, 0.08) : 'transparent',
                       }}
                     >
                       <TableCell>
@@ -78,7 +78,7 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                       <TableCell align="right">{total.toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
-                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha('#000', 0.04) } }}>
+                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha(adminPalette.text.primary, 0.04) } }}>
                     <TableCell>Total Tickets</TableCell>
                     <TableCell align="right">
                       {Object.values(ticketTotals).reduce((sum, { count }) => sum + count, 0)}
@@ -93,13 +93,13 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
               </Table>
             </TableContainer>
           </Box>
-        </FormCard>
-        <FormCard sx={{ height: '100%' }} title="Beverage Sales" icon={<SportsBar />}>
+        </AdminCard>
+        <AdminCard sx={{ height: '100%' }} title="Beverage Sales" icon={<SportsBar />}>
           <Box sx={{ p: 2 }}>
             <TableContainer component={Paper} variant="outlined">
               <Table size="small">
                 <TableHead>
-                  <TableRow sx={{ bgcolor: alpha(spacePalette.primary.main, 0.05) }}>
+                  <TableRow sx={{ bgcolor: alpha(adminPalette.primary.main, 0.05) }}>
                     <TableCell>Beverage Type</TableCell>
                     <TableCell align="right">Count</TableCell>
                     <TableCell align="right">Total (EUR)</TableCell>
@@ -110,7 +110,7 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                     <TableRow
                       key={key}
                       sx={{
-                        bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent',
+                        bgcolor: isArtist ? alpha(adminPalette.primary.main, 0.08) : 'transparent',
                       }}
                     >
                       <TableCell>
@@ -125,7 +125,7 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                       <TableCell align="right">{total.toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
-                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha('#000', 0.04) } }}>
+                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha(adminPalette.text.primary, 0.04) } }}>
                     <TableCell>Total Beverages</TableCell>
                     <TableCell align="right">
                       {Object.values(beverageTotals).reduce((sum, { count }) => sum + count, 0)}
@@ -140,13 +140,13 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
               </Table>
             </TableContainer>
           </Box>
-        </FormCard>
-        <FormCard sx={{ height: '100%' }} title="Food Sales" icon={<LocalDining />}>
+        </AdminCard>
+        <AdminCard sx={{ height: '100%' }} title="Food Sales" icon={<LocalDining />}>
           <Box sx={{ p: 2 }}>
             <TableContainer component={Paper} variant="outlined">
               <Table size="small">
                 <TableHead>
-                  <TableRow sx={{ bgcolor: alpha(spacePalette.primary.main, 0.05) }}>
+                  <TableRow sx={{ bgcolor: alpha(adminPalette.primary.main, 0.05) }}>
                     <TableCell>Food Type</TableCell>
                     <TableCell align="right">Count</TableCell>
                     <TableCell align="right">Total (EUR)</TableCell>
@@ -157,7 +157,7 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                     <TableRow
                       key={key}
                       sx={{
-                        bgcolor: isArtist ? alpha(spacePalette.primary.main, 0.08) : 'transparent',
+                        bgcolor: isArtist ? alpha(adminPalette.primary.main, 0.08) : 'transparent',
                       }}
                     >
                       <TableCell>
@@ -174,7 +174,7 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                       <TableCell align="right">{total.toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
-                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha('#000', 0.04) } }}>
+                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha(adminPalette.text.primary, 0.04) } }}>
                     <TableCell>Total Food</TableCell>
                     <TableCell align="right">
                       {Object.values(foodTotals).reduce((sum, { count }) => sum + count, 0)}
@@ -189,15 +189,15 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
               </Table>
             </TableContainer>
           </Box>
-        </FormCard>
+        </AdminCard>
       </Box>
       <Paper
         sx={{
           mt: 3,
           p: 3,
-          bgcolor: alpha(spacePalette.primary.main, 0.1),
+          bgcolor: alpha(adminPalette.primary.main, 0.1),
           borderRadius: 2,
-          border: `1px solid ${alpha(spacePalette.primary.main, 0.2)}`,
+          border: `1px solid ${adminPalette.divider}`,
         }}
       >
         <Box

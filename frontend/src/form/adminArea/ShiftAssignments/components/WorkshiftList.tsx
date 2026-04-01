@@ -21,7 +21,7 @@ import type {
 } from '../../../userArea/interface';
 import type { ShiftAssignment } from '../types';
 import TimeslotItem from './TimeslotItem';
-import { spacePalette } from '../../../../components/styles/theme';
+import { adminPalette } from '../../theme/adminPalette';
 import { getAdminTitle } from '../../utils/titleUtils';
 
 interface TimeslotWithAssignments extends TimeSlot {
@@ -103,10 +103,10 @@ const WorkshiftList: React.FC<WorkshiftListProps> = ({
 
   // Helper function to get workshift status color
   const getWorkshiftStatusColor = (workshift: WorkshiftWithTimeslots) => {
-    if (workshift.is_workshift_fully_assigned) return spacePalette.status.success;
-    if (workshift.workshift_fill_percentage >= 75) return spacePalette.status.warning;
-    if (workshift.workshift_fill_percentage >= 50) return spacePalette.status.info;
-    return spacePalette.status.error;
+    if (workshift.is_workshift_fully_assigned) return adminPalette.primary.dark;
+    if (workshift.workshift_fill_percentage >= 75) return adminPalette.status.warning;
+    if (workshift.workshift_fill_percentage >= 50) return adminPalette.status.info;
+    return adminPalette.status.error;
   };
 
   // Helper function to get workshift status text and icon

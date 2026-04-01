@@ -10,7 +10,7 @@ import {
 } from '@mui/icons-material';
 import { useFetchData } from './useFetchData';
 import StatsCard from './components/StatsCard';
-import FormCard from '../../components/core/display/FormCard';
+import AdminCard from './components/AdminCard';
 import type { TicketOption, BeverageOption, FoodOption } from '../userArea/interface';
 import {
   calculateDayVisitors,
@@ -195,7 +195,7 @@ function HomePage() {
         }}
       >
         {/* Tickets */}
-        <FormCard
+        <AdminCard
           sx={{ height: '100%' }}
           title="Ticket Bookings"
           icon={<LocalActivityIcon />}
@@ -227,10 +227,10 @@ function HomePage() {
               </React.Fragment>
             ))}
           </List>
-        </FormCard>
+        </AdminCard>
 
         {/* Beverages */}
-        <FormCard
+        <AdminCard
           sx={{ height: '100%' }}
           title="Beer Bookings"
           icon={<SportsBarIcon />}
@@ -262,10 +262,10 @@ function HomePage() {
               </React.Fragment>
             ))}
           </List>
-        </FormCard>
+        </AdminCard>
 
         {/* Food */}
-        <FormCard
+        <AdminCard
           sx={{ height: '100%' }}
           title="Food Bookings"
           icon={<RestaurantIcon />}
@@ -297,7 +297,7 @@ function HomePage() {
               </React.Fragment>
             ))}
           </List>
-        </FormCard>
+        </AdminCard>
       </Box>
     </Box>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import LocalActivityIcon from '@mui/icons-material/LocalActivity';
 import { useFetchData } from './useFetchData';
-import FormCard from '../../components/core/display/FormCard';
+import AdminCard from './components/AdminCard';
 import GenericOptionsPage from './components/GenericOptionsPage';
 import { useAdminPageFilters } from '../../hooks/useAdminPageFilters';
 import { LinearProgressWithLabel } from '../../components/core/feedback/LinearProgressWithLabel';
@@ -28,7 +28,7 @@ const TicketsPage: React.FC = () => {
 
   // Additional content showing day capacity
   const capacityContent = (
-    <FormCard
+    <AdminCard
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -36,7 +36,7 @@ const TicketsPage: React.FC = () => {
       }}
     >
       {(viewType === 'all' || viewType === 'regular') && (
-        <FormCard title={'Visitors'}>
+        <AdminCard title={'Visitors'}>
           <LinearProgressWithLabel
             label={`Donnerstag ${visitorsThursday}/${maxVisitorsPerDay}`}
             value={(visitorsThursday * 100) / maxVisitorsPerDay}
@@ -49,10 +49,10 @@ const TicketsPage: React.FC = () => {
             label={`Samstag ${visitorsSaturday}/${maxVisitorsPerDay}`}
             value={(visitorsSaturday * 100) / maxVisitorsPerDay}
           />
-        </FormCard>
+        </AdminCard>
       )}
       {(viewType === 'all' || viewType === 'artist') && (
-        <FormCard title={'Artists'}>
+        <AdminCard title={'Artists'}>
           <LinearProgressWithLabel
             label={`Donnerstag ${artistsThursday}/${maxArtistsPerDay}`}
             value={(artistsThursday * 100) / maxArtistsPerDay}
@@ -65,9 +65,9 @@ const TicketsPage: React.FC = () => {
             label={`Samstag ${artistsSaturday}/${maxArtistsPerDay}`}
             value={(artistsSaturday * 100) / maxArtistsPerDay}
           />
-        </FormCard>
+        </AdminCard>
       )}
-    </FormCard>
+    </AdminCard>
   );
 
   return (

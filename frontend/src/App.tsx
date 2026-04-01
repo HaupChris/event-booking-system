@@ -45,7 +45,7 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ auth, isAdmin, setIsAdmin }) => {
         width: '100vw',
         height: '100vh',
         overflow: 'auto',
-        backgroundColor: isAdminRoute ? '#121212' : 'transparent',
+        backgroundColor: isAdminRoute ? '#f8fafc' : 'transparent',
       }}
     >
       {!isAdminRoute && <BackgroundWrapper />}

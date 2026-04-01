@@ -24,7 +24,7 @@ import TabSwitcher from './components/TabSwitcher';
 import ProgressList from './components/ProgressList';
 import PeopleList from './components/PeopleList';
 import FilterSortBar from './components/FilterSortBar';
-import FormCard from '../../components/core/display/FormCard';
+import AdminCard from './components/AdminCard';
 import type { ViewFilterType } from './utils/optionsUtils';
 import { useModal } from '../../hooks/useModal';
 import { useSort } from '../../hooks/useSort';
@@ -129,7 +129,7 @@ const MaterialsPage: React.FC = () => {
       />
 
       {/* View Type Controls */}
-      <FormCard sx={{ mb: 3 }}>
+      <AdminCard sx={{ mb: 3 }}>
         <Box sx={{ p: 1 }}>
           <TabSwitcher
             tabs={[
@@ -141,7 +141,7 @@ const MaterialsPage: React.FC = () => {
             onChange={(value) => setViewType(value as ViewFilterType)}
           />
         </Box>
-      </FormCard>
+      </AdminCard>
 
       {/* Material Overview Tab */}
       {activeTab === 'materials' && (

@@ -18,7 +18,7 @@ import {
   ExpandLess as ExpandLessIcon,
   MoreHoriz as MoreHorizIcon,
 } from '@mui/icons-material';
-import { spacePalette } from '../../../components/styles/theme';
+import { adminPalette } from '../theme/adminPalette';
 
 export interface Person {
   id: string | number;
@@ -51,14 +51,14 @@ const PeopleList: React.FC<PeopleListProps> = ({ people, onPersonDetails }) => {
             sx={{
               bgcolor:
                 person.type === 'artist'
-                  ? alpha(spacePalette.primary.main, 0.08)
+                  ? alpha(adminPalette.primary.main, 0.08)
                   : 'background.paper',
               borderRadius: 1,
               '&:hover': {
                 bgcolor:
                   person.type === 'artist'
-                    ? alpha(spacePalette.primary.main, 0.12)
-                    : alpha('#fff', 0.1),
+                    ? alpha(adminPalette.primary.main, 0.12)
+                    : alpha(adminPalette.text.primary, 0.08),
               },
               boxShadow: 1,
             }}
@@ -101,7 +101,7 @@ const PeopleList: React.FC<PeopleListProps> = ({ people, onPersonDetails }) => {
                 }}
                 sx={{
                   mr: 1,
-                  color: spacePalette.primary.main,
+                  color: adminPalette.primary.main,
                 }}
               >
                 <MoreHorizIcon />

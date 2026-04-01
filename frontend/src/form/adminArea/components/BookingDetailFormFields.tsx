@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import FormCard from '../../../components/core/display/FormCard';
+import AdminCard from './AdminCard';
 import type { ArtistFormContent } from '../../artistArea/interface';
 import type { FormContent } from '../../userArea/interface';
 import type { CombinedBooking } from '../interface';
@@ -212,7 +212,7 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
         />
       </Grid>
 
-      <FormCard title={'Professions'} sx={{ ml: 2, width: '100%' }}>
+      <AdminCard title={'Professions'} sx={{ ml: 2, width: '100%' }}>
         {editedBooking.profession_ids.length === 0
           ? 'Keine Professions angegeben.'
           : editedBooking.profession_ids.map((professionId) => {
@@ -228,12 +228,12 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
                 <Chip key={professionId} label={professionTitle} color="primary" size="small" />
               ) : null;
             })}
-      </FormCard>
+      </AdminCard>
 
       {editedBooking.bookingType === 'regular' && (
         <>
           <Grid size={12}>
-            <FormCard title="Support Shift Preferences" sx={{ mt: 2 }}>
+            <AdminCard title="Support Shift Preferences" sx={{ mt: 2 }}>
               {['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3'].map(
                 (priority, index) => {
                   const timeslotValue = editedBooking[priority as keyof CombinedBooking] as number;
@@ -249,7 +249,7 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
                   );
                 }
               )}
-            </FormCard>
+            </AdminCard>
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -279,7 +279,7 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
 
       {editedBooking.bookingType === 'artist' && (
         <Grid size={12}>
-          <FormCard title="Artist Information" sx={{ mt: 2 }}>
+          <AdminCard title="Artist Information" sx={{ mt: 2 }}>
             <TextField
               fullWidth
               multiline
@@ -313,12 +313,12 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
               disabled={!editMode}
               margin="normal"
             />
-          </FormCard>
+          </AdminCard>
         </Grid>
       )}
 
       <Grid size={12}>
-        <FormCard title="Payment Status" sx={{ mt: 2 }}>
+        <AdminCard title="Payment Status" sx={{ mt: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 2 }}>
             <FormControl fullWidth margin="normal">
               <InputLabel>Paid</InputLabel>
@@ -355,7 +355,7 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
               InputLabelProps={{ shrink: true }}
             />
           </Box>
-        </FormCard>
+        </AdminCard>
       </Grid>
     </Grid>
   );

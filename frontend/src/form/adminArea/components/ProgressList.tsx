@@ -18,7 +18,7 @@ import {
   ExpandLess as ExpandLessIcon,
   MoreHoriz as MoreHorizIcon,
 } from '@mui/icons-material';
-import { spacePalette } from '../../../components/styles/theme';
+import { adminPalette } from '../theme/adminPalette';
 
 export interface ProgressItem {
   id: number | string;
@@ -51,10 +51,10 @@ const ProgressList: React.FC<ProgressListProps> = ({ items, onItemDetails, subti
 
   const getProgressColor = (current: number, total: number) => {
     const progress = calculateProgress(current, total);
-    if (progress >= 100) return spacePalette.status.success;
-    if (progress >= 75) return spacePalette.primary.main;
-    if (progress >= 50) return spacePalette.status.warning;
-    return spacePalette.status.error;
+    if (progress >= 100) return adminPalette.status.success;
+    if (progress >= 75) return adminPalette.primary.main;
+    if (progress >= 50) return adminPalette.status.warning;
+    return adminPalette.status.error;
   };
 
   return (
