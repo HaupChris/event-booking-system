@@ -78,7 +78,7 @@ const getCategoryLabel = (category: string | null) => {
 
 const getCardSx = (isCircusMode: boolean, isNew: boolean) => {
   const cardSx = {
-    mb: 3,
+    mb: 1.75,
     borderRadius: isCircusMode ? '12px' : 2,
     borderLeft: isNew ? '4px solid' : undefined,
     borderLeftColor: isNew ? (isCircusMode ? '#d8b87a' : 'primary.main') : undefined,
@@ -122,7 +122,7 @@ const NewsFeedCard: React.FC<NewsFeedCardProps> = ({
   return (
     <Card key={item.id} variant="outlined" sx={getCardSx(isCircusMode, isNew)}>
       <CardHeader
-        sx={{ px: { xs: 2.5, sm: 3 }, pt: { xs: 2.5, sm: 3 }, pb: 1.5 }}
+        sx={{ px: { xs: 2, sm: 2.5 }, pt: { xs: 2, sm: 2.5 }, pb: 1.25 }}
         avatar={getCategoryIcon(item.category)}
         action={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -189,7 +189,7 @@ const NewsFeedCard: React.FC<NewsFeedCardProps> = ({
         }
       />
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-        <CardContent sx={{ p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } }}>
+        <CardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
           <Typography
             variant="body1"
             sx={{

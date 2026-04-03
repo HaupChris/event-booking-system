@@ -101,13 +101,13 @@ const FAQs: React.FC = () => {
         {!loading &&
           !error &&
           categories.map((category) => (
-            <Box key={category.id} sx={{ mb: 4 }}>
+            <Box key={category.id} sx={{ mb: 3 }}>
               <Typography
                 variant="h6"
                 gutterBottom
                 sx={{
                   mt: 2,
-                  mb: 1,
+                  mb: 0.75,
                   fontWeight: 600,
                   fontFamily: isCircusMode ? brandingPack.typography.heading : undefined,
                 }}
@@ -163,7 +163,16 @@ const FAQs: React.FC = () => {
           ))}
       </Box>
 
-      <Box sx={{ mt: 4, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
+      <Box
+        sx={{
+          mt: 3,
+          p: 2,
+          borderRadius: 1.5,
+          backgroundColor: isCircusMode ? 'rgba(28, 12, 12, 0.65)' : 'action.hover',
+          border: '1px solid',
+          borderColor: isCircusMode ? alpha('#cda163', 0.4) : 'divider',
+        }}
+      >
         <Typography
           variant="body2"
           color="text.secondary"

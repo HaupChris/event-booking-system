@@ -7,6 +7,7 @@ import {
   Work as WorkIcon,
   DirectionsCar as DirectionsCarIcon,
   Help as HelpIcon,
+  AccessTime as AccessTimeIcon,
 } from '@mui/icons-material';
 import { useProfile } from '../hooks/useProfile';
 import OfflineIndicator from '../components/core/pwa/OfflineIndicator';
@@ -22,11 +23,20 @@ import WorkShifts from '../components/profile/WorkShifts';
 import RideSharing from '../components/profile/RideSharing';
 import FAQs from '../components/profile/FAQs';
 import { getFrontendSettings } from '../services/frontendSettingsService';
+import MissionHeading from '../components/core/display/MissionHeading';
 
-const rideShareNotice = (
-  <Alert severity="info" sx={{ mt: 1 }}>
-    Die Mitfahrboerse wird zeitnah zum Festival aktiviert. Bitte schau spaeter nochmal vorbei.
-  </Alert>
+const RideShareNotice: React.FC = () => (
+  <Box sx={{ pb: 1 }}>
+    <MissionHeading
+      title="Mitfahrboerse"
+      subtitle="Noch kurz Geduld bis zum Start"
+      icon={<AccessTimeIcon />}
+    />
+    <Alert severity="info" sx={{ mt: 1.5 }}>
+      Die Mitfahrboerse wird zeitnah zum Festival aktiviert. Danach kannst du direkt Angebote und
+      Gesuche einstellen.
+    </Alert>
+  </Box>
 );
 
 const baseMenuItems: ProfileNavMenuItem[] = [
@@ -193,7 +203,7 @@ const ProfilePage: React.FC = () => {
     rideshare_create: <RideSharing viewMode="create" />,
     rideshare_my: <RideSharing viewMode="my" />,
     rideshare_overview: <RideSharing viewMode="overview" />,
-    rideshare_notice: rideShareNotice,
+    rideshare_notice: <RideShareNotice />,
     faqs: <FAQs />,
   };
 
@@ -245,6 +255,9 @@ const ProfilePage: React.FC = () => {
           pt: '64px',
           overflowY: 'auto',
           backgroundColor: 'background.default',
+          backgroundImage: isCircusMode
+            ? 'radial-gradient(circle at 15% 20%, rgba(216,184,122,0.12), transparent 45%), radial-gradient(circle at 85% 10%, rgba(153,87,42,0.18), transparent 42%)'
+            : 'none',
         }}
       >
         <Container maxWidth="lg" sx={{ py: { xs: 2, md: 3 }, px: { xs: 2, sm: 3 } }}>

@@ -142,7 +142,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
         color="text.primary"
         sx={{ mb: 1.5, fontFamily: isCircusMode ? brandingPack.typography.heading : undefined }}
       >
-        Schichtangebote
+        Schichtangebote ({pendingShifts.length})
       </Typography>
 
       {pendingShifts.length === 0 && (
@@ -152,7 +152,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
       )}
 
       {pendingShifts.length > 0 && (
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           {pendingShifts.map((shift) => (
             <Grid key={shift.assignment_id} size={12}>
               <ShiftAssignmentCard
@@ -179,7 +179,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
           fontFamily: isCircusMode ? brandingPack.typography.heading : undefined,
         }}
       >
-        Angenommene Angebote
+        Angenommene Angebote ({acceptedShifts.length})
       </Typography>
 
       {acceptedShifts.length === 0 && (
@@ -189,7 +189,7 @@ const WorkShifts: React.FC<WorkShiftsProps> = ({
       )}
 
       {acceptedShifts.length > 0 && (
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           {acceptedShifts.map((shift) => (
             <Grid key={shift.assignment_id} size={12}>
               <ShiftAssignmentCard
