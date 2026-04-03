@@ -97,7 +97,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
         boxShadow: '0 8px 22px rgba(0,0,0,0.36)',
       }
     : { borderRadius: 2 };
-  const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
+  const cardContentSx = { p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } };
   const formatTime = (time?: string) => (time ? time.slice(0, 5) : '');
   const { details: performanceDetails, rawValue: rawPerformanceDetails } =
     parseArtistPerformanceDetails(booking.performance_details);
@@ -108,7 +108,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
     isArtist && (hasStructuredPerformanceDetails || Boolean(rawPerformanceDetails));
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={2}>
       {/* Work Shift Priorities (for regular users) */}
       {!isArtist && booking.work_shift_priorities && booking.work_shift_priorities.length > 0 && (
         <Card variant="outlined" sx={cardSx}>
@@ -118,7 +118,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
             </Typography>
             <List disablePadding>
               {booking.work_shift_priorities.map((priority) => (
-                <ListItem key={priority.priority} sx={{ px: 0 }}>
+                <ListItem key={priority.priority} sx={{ px: 0, py: 0.5 }}>
                   <ListItemText
                     primary={`Priorität ${priority.priority}: ${
                       priority.workshift_title
@@ -168,7 +168,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ profile }) => {
             {hasStructuredPerformanceDetails ? (
               <List disablePadding>
                 {artistPerformanceFields.map((field) => (
-                  <ListItem key={field.label} sx={{ px: 0 }}>
+                  <ListItem key={field.label} sx={{ px: 0, py: 0.5 }}>
                     <ListItemText
                       primary={field.label}
                       secondary={field.value}

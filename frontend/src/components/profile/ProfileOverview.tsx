@@ -61,14 +61,14 @@ const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile }) => {
   };
 
   return (
-    <Box>
+    <Box sx={{ pb: 0.5 }}>
       <MissionHeading
         title="Profil Uebersicht"
         subtitle="Deine wichtigsten Daten, Zahlungen und Buchungsdetails"
         icon={<AccountBoxIcon />}
       />
 
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <ProfileContactCard user={user} />
         </Grid>

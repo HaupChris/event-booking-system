@@ -21,7 +21,6 @@ import BeverageSelectionForm from './BeverageSelectionForm';
 import WorkShiftForm from './WorkshiftsForm';
 import MaterialsForm from './MaterialsForm';
 import SignatureForm from './SignatureForm';
-import TestDesignFormStep from './TestDesignFormStep';
 
 const DEV_SIGNATURE_IMAGE =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2w0WQAAAAASUVORK5CYII=';
@@ -63,16 +62,15 @@ const getTimeslotPriorities = (formContent: FormContent): [number, number, numbe
 // Form steps enum
 enum FormSteps {
   NameAndAddress = 0,
-  Test = 1,
-  Ticket = 2,
-  Beverage = 3,
-  Food = 4,
-  Workshift = 5,
-  Material = 6,
-  AwarenessCode = 7,
-  Signature = 8,
-  Summary = 9,
-  Confirmation = 10,
+  Ticket = 1,
+  Beverage = 2,
+  Food = 3,
+  Workshift = 4,
+  Material = 5,
+  AwarenessCode = 6,
+  Signature = 7,
+  Summary = 8,
+  Confirmation = 9,
 }
 
 // Empty booking initializer
@@ -206,7 +204,6 @@ export function UserRegistrationFormContainer() {
         validationRules,
         stepTitles: {
           [FormSteps.NameAndAddress]: userAreaTexts.personalDetailsForm.title,
-          [FormSteps.Test]: '',
           [FormSteps.Ticket]: userAreaTexts.ticketSelectionForm.title,
           [FormSteps.Beverage]: userAreaTexts.beverageSelectionForm.title,
           [FormSteps.Food]: userAreaTexts.foodSelectionForm.title,
@@ -225,7 +222,6 @@ export function UserRegistrationFormContainer() {
             'phone',
             'invited_by_id',
           ],
-          [FormSteps.Test]: [],
           [FormSteps.Ticket]: ['ticket_id'],
           [FormSteps.Beverage]: [],
           [FormSteps.Food]: [],
@@ -245,7 +241,6 @@ export function UserRegistrationFormContainer() {
         // Step components mapping
         stepComponents: {
           [FormSteps.NameAndAddress]: PersonalDetailsForm,
-          [FormSteps.Test]: TestDesignFormStep,
           [FormSteps.Ticket]: TicketForm,
           [FormSteps.Beverage]: BeverageSelectionForm,
           [FormSteps.Food]: FoodSelectionForm,

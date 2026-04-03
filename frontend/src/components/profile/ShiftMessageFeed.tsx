@@ -13,7 +13,7 @@ interface ShiftMessageFeedProps {
 
 const formatTime = (value: string) => value?.slice(0, 5);
 
-const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
+const cardContentSx = { p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } };
 
 function ShiftMessageFeed({ shiftMessages }: ShiftMessageFeedProps) {
   const { mode } = useThemeMode();
@@ -39,7 +39,7 @@ function ShiftMessageFeed({ shiftMessages }: ShiftMessageFeedProps) {
       )}
 
       {sortedMessages.length > 0 && (
-        <Stack spacing={2}>
+        <Stack spacing={1.5}>
           {sortedMessages.map((message) => (
             <Card
               key={message.id}
@@ -59,11 +59,11 @@ function ShiftMessageFeed({ shiftMessages }: ShiftMessageFeedProps) {
                     justifyContent: 'space-between',
                     alignItems: 'flex-start',
                     gap: 2,
-                    mb: 1,
+                    mb: 0.75,
                   }}
                 >
                   <Typography
-                    variant="h6"
+                    variant="subtitle1"
                     sx={{ fontFamily: isCircusMode ? brandingPack.typography.heading : undefined }}
                   >
                     {message.title}

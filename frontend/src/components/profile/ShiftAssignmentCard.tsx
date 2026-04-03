@@ -49,7 +49,7 @@ const ShiftAssignmentCard: React.FC<ShiftAssignmentCardProps> = ({
   onAccept,
   onDecline,
 }) => {
-  const cardContentSx = { p: { xs: 2.5, sm: 3 }, '&:last-child': { pb: { xs: 2.5, sm: 3 } } };
+  const cardContentSx = { p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } };
   const assignmentCardSx = isCircusMode
     ? {
         borderRadius: '12px',
@@ -71,7 +71,7 @@ const ShiftAssignmentCard: React.FC<ShiftAssignmentCardProps> = ({
           }}
         >
           <Typography
-            variant="h6"
+            variant="subtitle1"
             color="primary"
             sx={{ flexGrow: 1, fontFamily: isCircusMode ? headingFont : undefined }}
           >
@@ -90,7 +90,7 @@ const ShiftAssignmentCard: React.FC<ShiftAssignmentCardProps> = ({
           </Typography>
         )}
 
-        <Divider sx={{ my: 2 }} />
+        <Divider sx={{ my: 1.5 }} />
 
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
           <AccessTimeIcon
@@ -110,7 +110,7 @@ const ShiftAssignmentCard: React.FC<ShiftAssignmentCardProps> = ({
           {shift.timeslot.start_time} - {shift.timeslot.end_time}
         </Typography>
 
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2 }}>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5 }}>
           Zugewiesen am: {new Date(shift.assignment_date).toLocaleDateString('de-DE')}
         </Typography>
 
@@ -134,8 +134,8 @@ const ShiftAssignmentCard: React.FC<ShiftAssignmentCardProps> = ({
         <CardActions
           sx={{
             justifyContent: 'flex-end',
-            px: { xs: 2.5, sm: 3 },
-            pb: { xs: 2.5, sm: 3 },
+            px: { xs: 2, sm: 2.5 },
+            pb: { xs: 2, sm: 2.5 },
             pt: 0,
           }}
         >
