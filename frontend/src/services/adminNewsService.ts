@@ -14,8 +14,18 @@ export interface NewsItem {
   title: string;
   content: string;
   category: string | null;
+  category_label?: string | null;
+  category_icon?: string | null;
   author: string | null;
   published_date: string;
+  is_active: boolean;
+}
+
+export interface NewsCategory {
+  id: number;
+  category_key: string;
+  label: string;
+  icon: string;
   is_active: boolean;
 }
 
@@ -31,6 +41,18 @@ export interface UpdateNewsRequest {
   content?: string;
   category?: string;
   author?: string;
+}
+
+export interface CreateNewsCategoryRequest {
+  category_key: string;
+  label: string;
+  icon: string;
+}
+
+export interface UpdateNewsCategoryRequest {
+  label?: string;
+  icon?: string;
+  is_active?: boolean;
 }
 
 /**
@@ -126,4 +148,65 @@ export const deleteNews = async (
     console.error('Error deleting news:', error);
     throw error;
   }
+};
+
+/**
+ * Get all news categories
+ */
+export const getAllNewsCategories = async (
+  token: string,
+  includeInactive = false
+): Promise<NewsCategory[]> => {
+  const response = await axios.get(`${API_BASE_URL}/api/admin/news/categories`, {
+    params: { include_inactive: includeInactive },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data.categories;
+};
+
+/**
+ * Create a news category
+ */
+export const createNewsCategory = async (
+  token: string,
+  data: CreateNewsCategoryRequest
+): Promise<number> => {
+  const response = await axios.post(`${API_BASE_URL}/api/admin/news/categories`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return response.data.id;
+};
+
+/**
+ * Update a news category
+ */
+export const updateNewsCategory = async (
+  token: string,
+  categoryId: number,
+  data: UpdateNewsCategoryRequest
+): Promise<void> => {
+  await axios.put(`${API_BASE_URL}/api/admin/news/categories/${categoryId}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+/**
+ * Deactivate a news category
+ */
+export const deactivateNewsCategory = async (token: string, categoryId: number): Promise<void> => {
+  await axios.delete(`${API_BASE_URL}/api/admin/news/categories/${categoryId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };

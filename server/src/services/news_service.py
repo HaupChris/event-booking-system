@@ -11,7 +11,8 @@ Business logic for news feed management including:
 import os
 import sqlite3
 from contextlib import closing
-from datetime import datetime
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 from src.utils.logger import get_logger
@@ -23,8 +24,20 @@ IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 if IN_DOCKER:
     DB_FILE_PATH = "/app/user_data/bookings.db"
 else:
-    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")
-    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
+    DB_DIR = Path(__file__).resolve().parent.parent.parent / "db"
+    DB_FILE_PATH = str(DB_DIR / "bookings.db")
+
+DEFAULT_NEWS_CATEGORIES = [
+    ("announcement", "Ankuendigung", "announcement"),
+    ("timetable", "Zeitplan", "calendar"),
+    ("workshop", "Workshop", "workshop"),
+    ("anreise", "Anreise", "travel"),
+    ("general", "Allgemein", "info"),
+]
+
+
+def _now_iso() -> str:
+    return datetime.now(tz=UTC).isoformat()
 
 
 def _connect_db() -> sqlite3.Connection:
@@ -38,6 +51,49 @@ def _connect_db() -> sqlite3.Connection:
         raise
 
 
+def _ensure_news_tables(cursor: sqlite3.Cursor) -> None:
+    cursor.executescript("""
+        CREATE TABLE IF NOT EXISTS News (
+            id INTEGER PRIMARY KEY NOT NULL,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            category TEXT,
+            published_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+            author TEXT,
+            is_active INTEGER DEFAULT 1
+        );
+
+        CREATE TABLE IF NOT EXISTS NewsReadStatus (
+            id INTEGER PRIMARY KEY NOT NULL,
+            booking_id INTEGER NOT NULL,
+            news_id INTEGER NOT NULL,
+            read_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(booking_id) REFERENCES Bookings(id) ON DELETE CASCADE,
+            FOREIGN KEY(news_id) REFERENCES News(id) ON DELETE CASCADE,
+            UNIQUE(booking_id, news_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS NewsCategories (
+            id INTEGER PRIMARY KEY NOT NULL,
+            category_key TEXT NOT NULL UNIQUE,
+            label TEXT NOT NULL,
+            icon TEXT NOT NULL DEFAULT 'announcement',
+            is_active INTEGER DEFAULT 1,
+            created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_date DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+    for category_key, label, icon in DEFAULT_NEWS_CATEGORIES:
+        cursor.execute(
+            """
+            INSERT OR IGNORE INTO NewsCategories (category_key, label, icon, is_active)
+            VALUES (?, ?, ?, 1)
+            """,
+            (category_key, label, icon),
+        )
+
+
 def get_all_news(include_inactive: bool = False) -> list[dict[str, Any]]:
     """Get all news items."""
     try:
@@ -45,24 +101,44 @@ def get_all_news(include_inactive: bool = False) -> list[dict[str, Any]]:
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
+            _ensure_news_tables(cursor)
+            conn.commit()
 
             if include_inactive:
-                cursor.execute(
-                    """
-                    SELECT id, title, content, category, published_date, author, is_active
-                    FROM News
+                cursor.execute("""
+                    SELECT
+                        n.id,
+                        n.title,
+                        n.content,
+                        n.category,
+                        n.published_date,
+                        n.author,
+                        n.is_active,
+                        COALESCE(c.label, n.category) as category_label,
+                        c.icon as category_icon
+                    FROM News n
+                    LEFT JOIN NewsCategories c
+                        ON n.category = c.category_key
                     ORDER BY published_date DESC
-                """
-                )
+                """)
             else:
-                cursor.execute(
-                    """
-                    SELECT id, title, content, category, published_date, author, is_active
-                    FROM News
-                    WHERE is_active = 1
-                    ORDER BY published_date DESC
-                """
-                )
+                cursor.execute("""
+                    SELECT
+                        n.id,
+                        n.title,
+                        n.content,
+                        n.category,
+                        n.published_date,
+                        n.author,
+                        n.is_active,
+                        COALESCE(c.label, n.category) as category_label,
+                        c.icon as category_icon
+                    FROM News n
+                    LEFT JOIN NewsCategories c
+                        ON n.category = c.category_key
+                    WHERE n.is_active = 1
+                    ORDER BY n.published_date DESC
+                """)
 
             news_items = [dict(row) for row in cursor.fetchall()]
 
@@ -81,12 +157,25 @@ def get_news_by_id(news_id: int) -> dict[str, Any] | None:
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
+            _ensure_news_tables(cursor)
+            conn.commit()
 
             cursor.execute(
                 """
-                SELECT id, title, content, category, published_date, author, is_active
-                FROM News
-                WHERE id = ?
+                SELECT
+                    n.id,
+                    n.title,
+                    n.content,
+                    n.category,
+                    n.published_date,
+                    n.author,
+                    n.is_active,
+                    COALESCE(c.label, n.category) as category_label,
+                    c.icon as category_icon
+                FROM News n
+                LEFT JOIN NewsCategories c
+                    ON n.category = c.category_key
+                WHERE n.id = ?
             """,
                 (news_id,),
             )
@@ -104,27 +193,36 @@ def get_news_by_id(news_id: int) -> dict[str, Any] | None:
         raise
 
 
-def create_news(title: str, content: str, category: str = None, author: str = None) -> int:
+def create_news(
+    title: str,
+    content: str,
+    category: str | None = None,
+    author: str | None = None,
+) -> int:
     """Create a new news item."""
     try:
         logger.debug(f"Creating news item: {title}")
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
+            _ensure_news_tables(cursor)
 
             cursor.execute(
                 """
                 INSERT INTO News (title, content, category, author, published_date, is_active)
                 VALUES (?, ?, ?, ?, ?, 1)
             """,
-                (title, content, category, author, datetime.now().isoformat()),
+                (title, content, category, author, _now_iso()),
             )
 
             conn.commit()
             news_id = cursor.lastrowid
 
+            if news_id is None:
+                raise ValueError("Failed to create news item")
+
             logger.info(f"News item created with ID {news_id}: {title}")
-            return news_id
+            return int(news_id)
 
     except sqlite3.Error as e:
         logger.error(f"Database error creating news: {e}", exc_info=True)
@@ -132,7 +230,11 @@ def create_news(title: str, content: str, category: str = None, author: str = No
 
 
 def update_news(
-    news_id: int, title: str = None, content: str = None, category: str = None, author: str = None
+    news_id: int,
+    title: str | None = None,
+    content: str | None = None,
+    category: str | None = None,
+    author: str | None = None,
 ) -> bool:
     """Update an existing news item."""
     try:
@@ -140,10 +242,11 @@ def update_news(
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
+            _ensure_news_tables(cursor)
 
             # Build update query dynamically based on provided fields
             updates = []
-            params = []
+            params: list[Any] = []
 
             if title is not None:
                 updates.append("title = ?")
@@ -193,6 +296,7 @@ def delete_news(news_id: int, soft_delete: bool = True) -> bool:
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
+            _ensure_news_tables(cursor)
 
             if soft_delete:
                 cursor.execute("UPDATE News SET is_active = 0 WHERE id = ?", (news_id,))
@@ -213,6 +317,108 @@ def delete_news(news_id: int, soft_delete: bool = True) -> bool:
         raise
 
 
+def get_news_categories(include_inactive: bool = False) -> list[dict[str, Any]]:
+    """Get available news categories."""
+    with closing(_connect_db()) as conn:
+        cursor = conn.cursor()
+        _ensure_news_tables(cursor)
+        conn.commit()
+
+        if include_inactive:
+            cursor.execute("""
+                SELECT id, category_key, label, icon, is_active
+                FROM NewsCategories
+                ORDER BY label ASC
+                """)
+        else:
+            cursor.execute("""
+                SELECT id, category_key, label, icon, is_active
+                FROM NewsCategories
+                WHERE is_active = 1
+                ORDER BY label ASC
+                """)
+
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def create_news_category(category_key: str, label: str, icon: str) -> int:
+    """Create a custom news category."""
+    normalized_key = category_key.strip().lower()
+    normalized_label = label.strip()
+    normalized_icon = icon.strip().lower()
+
+    if not normalized_key:
+        raise ValueError("category_key is required")
+    if not normalized_label:
+        raise ValueError("label is required")
+    if not normalized_icon:
+        raise ValueError("icon is required")
+
+    with closing(_connect_db()) as conn:
+        cursor = conn.cursor()
+        _ensure_news_tables(cursor)
+        cursor.execute(
+            """
+            INSERT INTO NewsCategories (category_key, label, icon, is_active, updated_date)
+            VALUES (?, ?, ?, 1, ?)
+            """,
+            (normalized_key, normalized_label, normalized_icon, _now_iso()),
+        )
+        conn.commit()
+        if cursor.lastrowid is None:
+            raise ValueError("Failed to create category")
+        return int(cursor.lastrowid)
+
+
+def update_news_category(
+    category_id: int,
+    label: str | None = None,
+    icon: str | None = None,
+    is_active: bool | None = None,
+) -> bool:
+    """Update label/icon/active-state for a category."""
+    updates: list[str] = []
+    params: list[Any] = []
+
+    if label is not None:
+        normalized_label = label.strip()
+        if not normalized_label:
+            raise ValueError("label cannot be empty")
+        updates.append("label = ?")
+        params.append(normalized_label)
+
+    if icon is not None:
+        normalized_icon = icon.strip().lower()
+        if not normalized_icon:
+            raise ValueError("icon cannot be empty")
+        updates.append("icon = ?")
+        params.append(normalized_icon)
+
+    if is_active is not None:
+        updates.append("is_active = ?")
+        params.append(1 if is_active else 0)
+
+    if not updates:
+        return False
+
+    updates.append("updated_date = ?")
+    params.append(_now_iso())
+    params.append(category_id)
+
+    with closing(_connect_db()) as conn:
+        cursor = conn.cursor()
+        _ensure_news_tables(cursor)
+        query = f"UPDATE NewsCategories SET {', '.join(updates)} WHERE id = ?"
+        cursor.execute(query, params)
+        conn.commit()
+        return cursor.rowcount > 0
+
+
+def deactivate_news_category(category_id: int) -> bool:
+    """Deactivate a category without deleting existing news entries."""
+    return update_news_category(category_id=category_id, is_active=False)
+
+
 def get_news_for_profile(profile_uuid: str) -> list[dict[str, Any]]:
     """
     Get all active news items with read status for a specific profile.
@@ -222,6 +428,8 @@ def get_news_for_profile(profile_uuid: str) -> list[dict[str, Any]]:
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
+            _ensure_news_tables(cursor)
+            conn.commit()
 
             # First, get the booking_id for this profile
             cursor.execute(
@@ -248,11 +456,15 @@ def get_news_for_profile(profile_uuid: str) -> list[dict[str, Any]]:
                     n.title,
                     n.content,
                     n.category,
+                    COALESCE(c.label, n.category) as category_label,
+                    c.icon as category_icon,
                     n.published_date,
                     n.author,
                     CASE WHEN nrs.id IS NOT NULL THEN 1 ELSE 0 END as is_read,
                     nrs.read_date
                 FROM News n
+                LEFT JOIN NewsCategories c
+                    ON n.category = c.category_key
                 LEFT JOIN NewsReadStatus nrs
                     ON n.id = nrs.news_id AND nrs.booking_id = ?
                 WHERE n.is_active = 1
@@ -261,20 +473,21 @@ def get_news_for_profile(profile_uuid: str) -> list[dict[str, Any]]:
                 (booking_id,),
             )
 
-            news_items = []
-            for row in cursor.fetchall():
-                news_items.append(
-                    {
-                        "id": row["id"],
-                        "title": row["title"],
-                        "content": row["content"],
-                        "category": row["category"],
-                        "published_date": row["published_date"],
-                        "author": row["author"],
-                        "is_read": bool(row["is_read"]),
-                        "read_date": row["read_date"],
-                    }
-                )
+            news_items = [
+                {
+                    "id": row["id"],
+                    "title": row["title"],
+                    "content": row["content"],
+                    "category": row["category"],
+                    "category_label": row["category_label"],
+                    "category_icon": row["category_icon"],
+                    "published_date": row["published_date"],
+                    "author": row["author"],
+                    "is_read": bool(row["is_read"]),
+                    "read_date": row["read_date"],
+                }
+                for row in cursor.fetchall()
+            ]
 
             logger.debug(f"Found {len(news_items)} news items for profile {profile_uuid}")
             return news_items
@@ -291,6 +504,8 @@ def mark_news_as_read(profile_uuid: str, news_id: int) -> bool:
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
+            _ensure_news_tables(cursor)
+            conn.commit()
 
             # Get the booking_id for this profile
             cursor.execute(
@@ -315,7 +530,7 @@ def mark_news_as_read(profile_uuid: str, news_id: int) -> bool:
                 INSERT OR IGNORE INTO NewsReadStatus (booking_id, news_id, read_date)
                 VALUES (?, ?, ?)
             """,
-                (booking_id, news_id, datetime.now().isoformat()),
+                (booking_id, news_id, _now_iso()),
             )
 
             conn.commit()
@@ -339,6 +554,8 @@ def get_unread_count(profile_uuid: str) -> int:
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
+            _ensure_news_tables(cursor)
+            conn.commit()
 
             # Get the booking_id for this profile
             cursor.execute(
@@ -368,7 +585,7 @@ def get_unread_count(profile_uuid: str) -> int:
                 (booking_id,),
             )
 
-            count = cursor.fetchone()["count"]
+            count = int(cursor.fetchone()["count"])
 
             logger.debug(f"Profile {profile_uuid} has {count} unread news items")
             return count

@@ -202,6 +202,47 @@ CREATE TABLE IF NOT EXISTS ArtistBookingProfessions
     FOREIGN KEY (profession_id) REFERENCES Professions (id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS News (
+    id INTEGER PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    category TEXT,
+    published_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    author TEXT,
+    is_active INTEGER DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS NewsReadStatus (
+    id INTEGER PRIMARY KEY NOT NULL,
+    booking_id INTEGER NOT NULL,
+    news_id INTEGER NOT NULL,
+    read_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(booking_id) REFERENCES Bookings(id) ON DELETE CASCADE,
+    FOREIGN KEY(news_id) REFERENCES News(id) ON DELETE CASCADE,
+    UNIQUE(booking_id, news_id)
+);
+
+CREATE TABLE IF NOT EXISTS NewsCategories (
+    id INTEGER PRIMARY KEY NOT NULL,
+    category_key TEXT NOT NULL UNIQUE,
+    label TEXT NOT NULL,
+    icon TEXT NOT NULL DEFAULT 'announcement',
+    is_active INTEGER DEFAULT 1,
+    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT OR IGNORE INTO NewsCategories (category_key, label, icon, is_active)
+VALUES ('announcement', 'Ankuendigung', 'announcement', 1);
+INSERT OR IGNORE INTO NewsCategories (category_key, label, icon, is_active)
+VALUES ('timetable', 'Zeitplan', 'calendar', 1);
+INSERT OR IGNORE INTO NewsCategories (category_key, label, icon, is_active)
+VALUES ('workshop', 'Workshop', 'workshop', 1);
+INSERT OR IGNORE INTO NewsCategories (category_key, label, icon, is_active)
+VALUES ('anreise', 'Anreise', 'travel', 1);
+INSERT OR IGNORE INTO NewsCategories (category_key, label, icon, is_active)
+VALUES ('general', 'Allgemein', 'info', 1);
+
 CREATE TABLE IF NOT EXISTS ShiftAssignments (
     id INTEGER PRIMARY KEY NOT NULL,
     booking_id INTEGER NOT NULL,

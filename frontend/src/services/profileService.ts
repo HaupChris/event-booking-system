@@ -122,6 +122,8 @@ export interface NewsItem {
   title: string;
   content: string;
   category: string | null;
+  category_label?: string | null;
+  category_icon?: string | null;
   published_date: string;
   author: string | null;
   is_read: boolean;

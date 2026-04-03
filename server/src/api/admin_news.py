@@ -15,10 +15,14 @@ from flask_limiter.util import get_remote_address
 
 from src.services.news_service import (
     create_news,
+    create_news_category,
+    deactivate_news_category,
     delete_news,
     get_all_news,
     get_news_by_id,
+    get_news_categories,
     update_news,
+    update_news_category,
 )
 from src.utils.logger import get_logger
 
@@ -68,6 +72,113 @@ def get_news_list():
 
     except Exception as e:
         logger.error(f"News list retrieval failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@admin_news_bp.route("/news/categories", methods=["GET"])
+@limiter_admin_news.limit("200/minute")
+@jwt_required()
+def get_news_categories_list():
+    """Get all available news categories (admin)."""
+    try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
+        include_inactive = request.args.get("include_inactive", "false").lower() == "true"
+        categories = get_news_categories(include_inactive=include_inactive)
+        return jsonify({"categories": categories}), 200
+    except Exception as e:
+        logger.error(f"News category list retrieval failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@admin_news_bp.route("/news/categories", methods=["POST"])
+@limiter_admin_news.limit("60/minute")
+@jwt_required()
+def create_news_category_item():
+    """Create a custom news category (admin)."""
+    try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
+        if not request.json:
+            return jsonify({"error": "Missing JSON body"}), 400
+
+        data = request.json
+        category_key = str(data.get("category_key", "")).strip().lower()
+        label = str(data.get("label", "")).strip()
+        icon = str(data.get("icon", "")).strip().lower()
+
+        if not category_key or not label or not icon:
+            return jsonify({"error": "category_key, label and icon are required"}), 400
+
+        category_id = create_news_category(category_key=category_key, label=label, icon=icon)
+        return jsonify({"message": "Category created", "id": category_id}), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        logger.error(f"News category creation failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@admin_news_bp.route("/news/categories/<int:category_id>", methods=["PUT"])
+@limiter_admin_news.limit("60/minute")
+@jwt_required()
+def update_news_category_item(category_id: int):
+    """Update a custom news category (admin)."""
+    try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
+        if not request.json:
+            return jsonify({"error": "Missing JSON body"}), 400
+
+        data = request.json
+        label = data.get("label")
+        icon = data.get("icon")
+        is_active = data.get("is_active")
+
+        if is_active is not None and not isinstance(is_active, bool):
+            return jsonify({"error": "is_active must be a boolean"}), 400
+
+        was_updated = update_news_category(
+            category_id=category_id,
+            label=str(label) if label is not None else None,
+            icon=str(icon) if icon is not None else None,
+            is_active=is_active,
+        )
+        response = (
+            (jsonify({"message": "Category updated"}), 200)
+            if was_updated
+            else (jsonify({"error": "Category not found or no changes"}), 404)
+        )
+        return response
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        logger.error(f"News category update failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@admin_news_bp.route("/news/categories/<int:category_id>", methods=["DELETE"])
+@limiter_admin_news.limit("30/minute")
+@jwt_required()
+def deactivate_news_category_item(category_id: int):
+    """Deactivate a news category (admin)."""
+    try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
+        success = deactivate_news_category(category_id)
+        if not success:
+            return jsonify({"error": "Category not found"}), 404
+        return jsonify({"message": "Category deactivated"}), 200
+    except Exception as e:
+        logger.error(f"News category deactivation failed: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500
 
 

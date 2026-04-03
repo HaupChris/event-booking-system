@@ -31,6 +31,8 @@ import type { NewsItem } from '../../services/profileService';
 import MissionHeading from '../core/display/MissionHeading';
 import { useThemeMode } from '../styles/theme';
 import { useBrandingPack } from '../../branding/useBrandingPack';
+import MarkdownContent from '../core/display/MarkdownContent';
+import { getNewsCategoryIconFromKey } from '../../utils/newsCategoryIcons';
 
 interface NewsFeedProps {
   news: NewsItem[];
@@ -61,6 +63,13 @@ const getCategoryIcon = (category: string | null) => {
   }
 };
 
+const resolveCategoryIcon = (item: NewsItem) => {
+  if (item.category_icon) {
+    return getNewsCategoryIconFromKey(item.category_icon);
+  }
+  return getCategoryIcon(item.category);
+};
+
 const getCategoryLabel = (category: string | null) => {
   switch (category?.toLowerCase()) {
     case 'anreise':
@@ -75,6 +84,9 @@ const getCategoryLabel = (category: string | null) => {
       return 'Allgemein';
   }
 };
+
+const resolveCategoryLabel = (item: NewsItem) =>
+  item.category_label || getCategoryLabel(item.category);
 
 const getCardSx = (isCircusMode: boolean, isNew: boolean) => {
   const cardSx = {
@@ -123,7 +135,7 @@ const NewsFeedCard: React.FC<NewsFeedCardProps> = ({
     <Card key={item.id} variant="outlined" sx={getCardSx(isCircusMode, isNew)}>
       <CardHeader
         sx={{ px: { xs: 2, sm: 2.5 }, pt: { xs: 2, sm: 2.5 }, pb: 1.25 }}
-        avatar={getCategoryIcon(item.category)}
+        avatar={resolveCategoryIcon(item)}
         action={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {isNew && <Badge badgeContent={<FiberNewIcon fontSize="small" />} color="primary" />}
@@ -152,7 +164,7 @@ const NewsFeedCard: React.FC<NewsFeedCardProps> = ({
             </Typography>
             {item.category && (
               <Chip
-                label={getCategoryLabel(item.category)}
+                label={resolveCategoryLabel(item)}
                 size="small"
                 color={isCircusMode ? 'default' : 'primary'}
                 variant="outlined"
@@ -190,16 +202,18 @@ const NewsFeedCard: React.FC<NewsFeedCardProps> = ({
       />
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
         <CardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
-          <Typography
-            variant="body1"
+          <Box
             sx={{
-              whiteSpace: 'pre-wrap',
               color: isCircusMode ? '#f4ead6' : theme.palette.text.primary,
               fontFamily: isCircusMode ? bodyFont : undefined,
+              '& p': {
+                mt: 0,
+                mb: 1.25,
+              },
             }}
           >
-            {item.content}
-          </Typography>
+            <MarkdownContent content={item.content} />
+          </Box>
 
           {item.read_date && (
             <Typography

@@ -1,330 +1,340 @@
-/* eslint-disable max-lines */
-/**
- * News Management Page
- * ====================
- * Admin page for managing news items
- */
-
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
-  Box,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  IconButton,
-  Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Snackbar,
   Alert,
-  CircularProgress,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Stack,
 } from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import type { CreateNewsRequest, NewsCategory, NewsItem } from '../../services/adminNewsService';
+import {
+  createNews,
+  createNewsCategory,
+  deactivateNewsCategory,
+  deleteNews,
+  getAllNews,
+  getAllNewsCategories,
+  updateNews,
+} from '../../services/adminNewsService';
 import { TokenContext } from '../../contexts/AuthContext';
-import type { NewsItem, CreateNewsRequest } from '../../services/adminNewsService';
-import { getAllNews, createNews, updateNews, deleteNews } from '../../services/adminNewsService';
+import NewsComposerCard from './components/news/NewsComposerCard';
+import NewsPreviewCard from './components/news/NewsPreviewCard';
+import NewsHistoryCard from './components/news/NewsHistoryCard';
+import { getActiveCount } from './components/news/newsManagement.utils';
+import NewsCategoryManagerDialog from './components/news/NewsCategoryManagerDialog';
+import { DEFAULT_NEWS_ICON_KEY } from '../../utils/newsCategoryIcons';
 
-const NEWS_CATEGORIES = [
-  { value: 'announcement', label: 'Ankündigung' },
-  { value: 'timetable', label: 'Zeitplan' },
-  { value: 'workshop', label: 'Workshop' },
-  { value: 'anreise', label: 'Anreise' },
-  { value: 'general', label: 'Allgemein' },
-];
+const emptyForm: CreateNewsRequest = {
+  title: '',
+  content: '',
+  category: 'general',
+};
 
-const NewsManagementPage: React.FC = () => {
+function NewsManagementPage() {
   const { token } = useContext(TokenContext);
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
-  const [formData, setFormData] = useState<CreateNewsRequest>({
-    title: '',
-    content: '',
-    category: 'general',
-  });
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error' | 'info';
-  }>({ open: false, message: '', severity: 'info' });
 
-  const showSnackbar = useCallback((message: string, severity: 'success' | 'error' | 'info') => {
-    setSnackbar({ open: true, message, severity });
-  }, []);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [categories, setCategories] = useState<NewsCategory[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const [editingNewsId, setEditingNewsId] = useState<number | null>(null);
+  const [formData, setFormData] = useState<CreateNewsRequest>(emptyForm);
+
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+
+  const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
+  const [newsToDeactivate, setNewsToDeactivate] = useState<NewsItem | null>(null);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [newCategoryKey, setNewCategoryKey] = useState('');
+  const [newCategoryLabel, setNewCategoryLabel] = useState('');
+  const [newCategoryIcon, setNewCategoryIcon] = useState(DEFAULT_NEWS_ICON_KEY);
 
   const loadNews = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getAllNews(token, true); // Include inactive
-      setNews(data);
-    } catch (error) {
-      console.error('Error loading news:', error);
-      showSnackbar('Failed to load news', 'error');
+      setError(null);
+      setNews(await getAllNews(token, true));
+    } catch (loadError) {
+      console.error('Error loading news:', loadError);
+      setError('News konnten nicht geladen werden.');
     } finally {
       setLoading(false);
     }
-  }, [showSnackbar, token]);
+  }, [token]);
+
+  const loadCategories = useCallback(async () => {
+    try {
+      const categoryItems = await getAllNewsCategories(token, true);
+      const activeCategories = categoryItems.filter((item) => item.is_active);
+      setCategories(activeCategories);
+    } catch (loadError) {
+      console.error('Error loading news categories:', loadError);
+      setError('Kategorien konnten nicht geladen werden.');
+    }
+  }, [token]);
 
   useEffect(() => {
     loadNews().then();
   }, [loadNews]);
 
-  const handleOpenCreateDialog = () => {
-    setSelectedNews(null);
-    setFormData({ title: '', content: '', category: 'general' });
-    setEditDialogOpen(true);
+  useEffect(() => {
+    loadCategories().then();
+  }, [loadCategories]);
+
+  useEffect(() => {
+    if (categories.length === 0) {
+      return;
+    }
+
+    const hasSelectedCategory = categories.some((item) => item.category_key === formData.category);
+    if (!hasSelectedCategory) {
+      setFormData((previous) => ({ ...previous, category: categories[0].category_key }));
+    }
+  }, [categories, formData.category]);
+
+  const resetForm = () => {
+    setFormData(emptyForm);
+    setEditingNewsId(null);
   };
 
-  const handleOpenEditDialog = (newsItem: NewsItem) => {
-    setSelectedNews(newsItem);
-    setFormData({
-      title: newsItem.title,
-      content: newsItem.content,
-      category: newsItem.category || 'general',
-    });
-    setEditDialogOpen(true);
-  };
+  const handleSubmit = async () => {
+    if (!formData.title?.trim() || !formData.content?.trim()) {
+      setError('Bitte Titel und Inhalt ausfuellen.');
+      return;
+    }
 
-  const handleCloseEditDialog = () => {
-    setEditDialogOpen(false);
-    setSelectedNews(null);
-    setFormData({ title: '', content: '', category: 'general' });
-  };
-
-  const handleSaveNews = async () => {
     try {
-      if (selectedNews) {
-        // Update existing
-        await updateNews(token, selectedNews.id, formData);
-        showSnackbar('News updated successfully', 'success');
+      setSaving(true);
+      setError(null);
+      setSuccess(null);
+
+      if (editingNewsId !== null) {
+        await updateNews(token, editingNewsId, {
+          title: formData.title.trim(),
+          content: formData.content,
+          category: formData.category,
+        });
+        setSuccess('News-Eintrag aktualisiert.');
       } else {
-        // Create new
-        await createNews(token, formData);
-        showSnackbar('News created successfully', 'success');
+        await createNews(token, {
+          title: formData.title.trim(),
+          content: formData.content,
+          category: formData.category,
+        });
+        setSuccess('News-Eintrag erstellt.');
       }
-      handleCloseEditDialog();
-      loadNews().then();
-    } catch (error) {
-      console.error('Error saving news:', error);
-      showSnackbar('Failed to save news', 'error');
+
+      resetForm();
+      await loadNews();
+    } catch (submitError) {
+      console.error('Error saving news:', submitError);
+      setError('News konnten nicht gespeichert werden.');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleOpenDeleteDialog = (newsItem: NewsItem) => {
-    setSelectedNews(newsItem);
-    setDeleteDialogOpen(true);
+  const handleEdit = (item: NewsItem) => {
+    setEditingNewsId(item.id);
+    setFormData({
+      title: item.title,
+      content: item.content,
+      category: item.category || 'general',
+    });
+    setError(null);
+    setSuccess(null);
   };
 
-  const handleCloseDeleteDialog = () => {
-    setDeleteDialogOpen(false);
-    setSelectedNews(null);
+  const openDeactivateDialog = (item: NewsItem) => {
+    setNewsToDeactivate(item);
+    setDeactivateDialogOpen(true);
   };
 
-  const handleDeleteNews = async () => {
-    if (!selectedNews) return;
+  const closeDeactivateDialog = () => {
+    setDeactivateDialogOpen(false);
+    setNewsToDeactivate(null);
+  };
+
+  const handleDeactivate = async () => {
+    if (!newsToDeactivate) {
+      return;
+    }
 
     try {
-      await deleteNews(token, selectedNews.id, false); // Soft delete
-      showSnackbar('News deactivated successfully', 'success');
-      handleCloseDeleteDialog();
-      loadNews().then();
-    } catch (error) {
-      console.error('Error deleting news:', error);
-      showSnackbar('Failed to delete news', 'error');
+      setSaving(true);
+      setError(null);
+      setSuccess(null);
+      await deleteNews(token, newsToDeactivate.id, false);
+      if (editingNewsId === newsToDeactivate.id) {
+        resetForm();
+      }
+      closeDeactivateDialog();
+      setSuccess('News-Eintrag deaktiviert.');
+      await loadNews();
+    } catch (deactivateError) {
+      console.error('Error deactivating news:', deactivateError);
+      setError('News-Eintrag konnte nicht deaktiviert werden.');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('de-DE', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const filteredNews = useMemo(
+    () =>
+      news.filter((item) => {
+        const categoryMatches =
+          categoryFilter === 'all' || (item.category || 'general') === categoryFilter;
+
+        const statusMatches =
+          statusFilter === 'all' ||
+          (statusFilter === 'active' && item.is_active) ||
+          (statusFilter === 'inactive' && !item.is_active);
+
+        return categoryMatches && statusMatches;
+      }),
+    [categoryFilter, news, statusFilter]
+  );
+
+  const activeCount = useMemo(() => getActiveCount(news), [news]);
+
+  const normalizedCategoryKey = newCategoryKey
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '_');
+  const canCreateCategory = Boolean(normalizedCategoryKey) && Boolean(newCategoryLabel.trim());
+
+  const handleCreateCategory = async () => {
+    if (!canCreateCategory) {
+      setError('Bitte Kategorie-Key und Anzeigename ausfuellen.');
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError(null);
+      await createNewsCategory(token, {
+        category_key: normalizedCategoryKey,
+        label: newCategoryLabel.trim(),
+        icon: newCategoryIcon,
+      });
+      setSuccess('Kategorie angelegt.');
+      setNewCategoryKey('');
+      setNewCategoryLabel('');
+      setNewCategoryIcon(DEFAULT_NEWS_ICON_KEY);
+      await loadCategories();
+    } catch (createError) {
+      console.error('Error creating category:', createError);
+      setError('Kategorie konnte nicht angelegt werden.');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const getCategoryLabel = (category: string | null) => {
-    const found = NEWS_CATEGORIES.find((c) => c.value === category);
-    return found ? found.label : 'Allgemein';
+  const handleDeactivateCategory = async (category: NewsCategory) => {
+    try {
+      setSaving(true);
+      setError(null);
+      await deactivateNewsCategory(token, category.id);
+      setSuccess('Kategorie deaktiviert.');
+      await loadCategories();
+    } catch (deactivateError) {
+      console.error('Error deactivating category:', deactivateError);
+      setError('Kategorie konnte nicht deaktiviert werden.');
+    } finally {
+      setSaving(false);
+    }
   };
-
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
 
   return (
-    <Box>
-      {/* Header */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">News Management ({news.length} items)</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreateDialog}>
-          Create News
-        </Button>
+    <Box sx={{ p: 2 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: {
+            xs: '1fr',
+            lg: 'minmax(320px, 5fr) minmax(420px, 7fr)',
+          },
+        }}
+      >
+        <NewsComposerCard
+          formData={formData}
+          categories={categories}
+          isEditing={editingNewsId !== null}
+          saving={saving}
+          onChangeForm={setFormData}
+          onSubmit={handleSubmit}
+          onReset={resetForm}
+          onOpenCategoryManager={() => setCategoryDialogOpen(true)}
+        />
+
+        <Stack spacing={2}>
+          <NewsPreviewCard formData={formData} />
+          <NewsHistoryCard
+            news={filteredNews}
+            categories={categories}
+            activeCount={activeCount}
+            categoryFilter={categoryFilter}
+            statusFilter={statusFilter}
+            loading={loading}
+            saving={saving}
+            onChangeCategoryFilter={setCategoryFilter}
+            onChangeStatusFilter={setStatusFilter}
+            onEdit={handleEdit}
+            onDeactivate={openDeactivateDialog}
+          />
+        </Stack>
       </Box>
 
-      {/* News Table */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Category</TableCell>
-              <TableCell>Author</TableCell>
-              <TableCell>Published</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {news.map((item) => (
-              <TableRow key={item.id} hover>
-                <TableCell>
-                  <Typography variant="body2" fontWeight="medium">
-                    {item.title}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={getCategoryLabel(item.category)}
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                  />
-                </TableCell>
-                <TableCell>{item.author || '-'}</TableCell>
-                <TableCell>{formatDate(item.published_date)}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={item.is_active ? 'Active' : 'Inactive'}
-                    size="small"
-                    color={item.is_active ? 'success' : 'default'}
-                  />
-                </TableCell>
-                <TableCell align="right">
-                  <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
-                    <IconButton size="small" onClick={() => handleOpenEditDialog(item)}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => handleOpenDeleteDialog(item)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Create/Edit Dialog */}
-      <Dialog open={editDialogOpen} onClose={handleCloseEditDialog} maxWidth="md" fullWidth>
-        <DialogTitle>{selectedNews ? 'Edit News' : 'Create News'}</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <TextField
-              fullWidth
-              label="Title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              required
-            />
-
-            <FormControl fullWidth>
-              <InputLabel>Category</InputLabel>
-              <Select
-                value={formData.category || 'general'}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                label="Category"
-              >
-                {NEWS_CATEGORIES.map((cat) => (
-                  <MenuItem key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <TextField
-              fullWidth
-              label="Content"
-              value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              multiline
-              rows={8}
-              InputProps={{ inputComponent: 'textarea' }}
-              required
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseEditDialog}>Cancel</Button>
-          <Button
-            onClick={handleSaveNews}
-            variant="contained"
-            disabled={!formData.title.trim() || !formData.content.trim()}
-          >
-            {selectedNews ? 'Update' : 'Create'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
-        <DialogTitle>Deactivate News</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to deactivate "{selectedNews?.title}"? It will no longer be
-            visible to users.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
-          <Button onClick={handleDeleteNews} variant="contained" color="error">
-            Deactivate
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Snackbar */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-        >
-          {snackbar.message}
+      {error && (
+        <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>
+          {error}
         </Alert>
-      </Snackbar>
+      )}
+      {success && (
+        <Alert severity="success" sx={{ mt: 2 }} onClose={() => setSuccess(null)}>
+          {success}
+        </Alert>
+      )}
+
+      <Dialog open={deactivateDialogOpen} onClose={closeDeactivateDialog}>
+        <DialogTitle>News-Eintrag deaktivieren?</DialogTitle>
+        <DialogContent>
+          {`"${newsToDeactivate?.title || ''}" wird danach nicht mehr im Newsfeed angezeigt.`}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeactivateDialog} disabled={saving}>
+            Abbrechen
+          </Button>
+          <Button color="error" variant="contained" onClick={handleDeactivate} disabled={saving}>
+            Deaktivieren
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <NewsCategoryManagerDialog
+        open={categoryDialogOpen}
+        categories={categories}
+        loading={saving}
+        newCategoryKey={newCategoryKey}
+        newCategoryLabel={newCategoryLabel}
+        newCategoryIcon={newCategoryIcon}
+        onClose={() => setCategoryDialogOpen(false)}
+        onChangeKey={setNewCategoryKey}
+        onChangeLabel={setNewCategoryLabel}
+        onChangeIcon={setNewCategoryIcon}
+        onCreateCategory={handleCreateCategory}
+        onDeactivateCategory={handleDeactivateCategory}
+      />
     </Box>
   );
-};
+}
 
 export default NewsManagementPage;
