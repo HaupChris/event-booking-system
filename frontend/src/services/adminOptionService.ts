@@ -12,6 +12,7 @@ export interface AdminOptionItem {
   working_title: string;
   price: number;
   amount?: number;
+  requires_workshift?: boolean;
   description?: string;
 }
 
@@ -43,6 +44,7 @@ export const createAdminOption = async (
     working_title?: string;
     price?: number;
     amount?: number;
+    requires_workshift?: boolean;
     description?: string;
   }
 ): Promise<void> => {
@@ -61,6 +63,7 @@ export const updateAdminOption = async (
     working_title?: string;
     price?: number;
     amount?: number;
+    requires_workshift?: boolean;
     description?: string;
   }
 ): Promise<void> => {

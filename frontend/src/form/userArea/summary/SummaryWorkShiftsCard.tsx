@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import React from 'react';
 import { Box, Typography, Grid, alpha, useTheme } from '@mui/material';
 import WorkIcon from '@mui/icons-material/Work';
@@ -16,6 +17,7 @@ interface ShiftSlot {
 }
 
 interface SummaryWorkShiftsCardProps {
+  requiresWorkshift: boolean;
   shiftSlot1: ShiftSlot;
   shiftSlot2: ShiftSlot;
   shiftSlot3: ShiftSlot;
@@ -24,6 +26,7 @@ interface SummaryWorkShiftsCardProps {
 }
 
 function SummaryWorkShiftsCard({
+  requiresWorkshift,
   shiftSlot1,
   shiftSlot2,
   shiftSlot3,
@@ -33,6 +36,35 @@ function SummaryWorkShiftsCard({
   const theme = useTheme();
   const { mode } = useThemeMode();
   const isCircusMode = mode === 'circus';
+
+  if (!requiresWorkshift) {
+    return (
+      <FormCard
+        title={userAreaTexts.summaryForm.deploymentPlan}
+        icon={<WorkIcon />}
+        sx={
+          isCircusMode
+            ? {
+                border: '2px solid',
+                borderColor: alpha('#d8b87a', 0.85),
+                backgroundColor: alpha('#1a0b12', 0.58),
+                borderRadius: '14px',
+              }
+            : undefined
+        }
+      >
+        <Typography
+          variant="body1"
+          sx={{
+            color: isCircusMode ? '#f4ead6' : alpha(theme.palette.text.primary, 0.85),
+            fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
+          }}
+        >
+          Fuer dein gewaehltes Ticket sind keine Arbeitsdienste erforderlich.
+        </Typography>
+      </FormCard>
+    );
+  }
 
   return (
     <FormCard

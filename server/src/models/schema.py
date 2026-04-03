@@ -51,8 +51,8 @@ def _init_db_data(connection: Connection, form_content: FormContent):
         for idx, ticket in enumerate(form_content.ticket_options):
             cursor.execute(
                 """
-                INSERT INTO TicketOptions (id, title, working_title, price, amount)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO TicketOptions (id, title, working_title, price, amount, requires_workshift)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
                     idx,
@@ -60,6 +60,7 @@ def _init_db_data(connection: Connection, form_content: FormContent):
                     ticket.working_title or ticket.title,
                     ticket.price,
                     ticket.amount,
+                    1 if ticket.requires_workshift else 0,
                 ),
             )
 

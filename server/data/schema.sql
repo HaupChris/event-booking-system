@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS TicketOptions  (
     title TEXT NOT NULL,
     working_title TEXT,
     price REAL NOT NULL,
-    amount INTEGER NOT NULL
+    amount INTEGER NOT NULL,
+    requires_workshift INTEGER NOT NULL DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS BeverageOptions  (
@@ -44,7 +45,8 @@ CREATE TABLE IF NOT EXISTS ArtistTicketOptions  (
     title TEXT NOT NULL,
     working_title TEXT,
     price REAL NOT NULL,
-    amount INTEGER NOT NULL
+    amount INTEGER NOT NULL,
+    requires_workshift INTEGER NOT NULL DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS ArtistBeverageOptions  (

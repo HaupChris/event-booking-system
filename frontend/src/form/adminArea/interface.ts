@@ -31,6 +31,7 @@ export interface CombinedBooking {
   material_ids?: number[];
   amount_shifts?: number;
   supporter_buddy?: string;
+  requires_workshift?: boolean;
 
   // Artist-specific fields (optional for regular users)
   equipment?: string;

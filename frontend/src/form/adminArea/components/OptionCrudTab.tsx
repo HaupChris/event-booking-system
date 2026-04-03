@@ -85,6 +85,7 @@ const OptionCrudTab: React.FC<OptionCrudTabProps> = ({ optionType, onDataChanged
       working_title: option.working_title,
       price: String(option.price ?? 0),
       amount: String(option.amount ?? 0),
+      requires_workshift: option.requires_workshift !== false,
       description: option.description || '',
     });
     setOptionDialogOpen(true);
@@ -121,6 +122,7 @@ const OptionCrudTab: React.FC<OptionCrudTabProps> = ({ optionType, onDataChanged
       working_title: workingTitle,
       price,
       amount: optionType === 'ticket' ? Math.floor(amount) : undefined,
+      requires_workshift: optionType === 'ticket' ? optionForm.requires_workshift : undefined,
       description:
         optionType === 'beverage' || optionType === 'food' ? optionForm.description : undefined,
     };

@@ -96,6 +96,12 @@ const OptionCrudList: React.FC<OptionCrudListProps> = ({
                     Verfuegbare Anzahl: {option.amount ?? 0}
                   </Typography>
                 )}
+                {showAmount && (
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                    Arbeitsdienst erforderlich:{' '}
+                    {option.requires_workshift === false ? 'Nein' : 'Ja'}
+                  </Typography>
+                )}
               </Box>
               <Box>
                 <IconButton size="small" onClick={() => onEditOption(option)}>

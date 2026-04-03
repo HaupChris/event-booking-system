@@ -54,6 +54,8 @@ const UserList: React.FC<UserListProps> = ({
       )!.title;
       const ticket_days = ticketTitle.match(/\(([^)]+)\)/)?.[1] || '';
       const days_count = ticket_days.split(',').length; // Count days by splitting on comma
+      const requiresWorkshift = booking.requires_workshift !== false;
+      const requiredShiftCount = requiresWorkshift ? booking.amount_shifts : 0;
       return {
         booking_id: booking.id,
         first_name: booking.first_name,
@@ -61,14 +63,15 @@ const UserList: React.FC<UserListProps> = ({
         email: booking.email,
         ticket_days: ticket_days,
         days_count: days_count,
+        requires_workshift: requiresWorkshift,
         supporter_buddy: booking.supporter_buddy || '',
-        amount_shifts: booking.amount_shifts,
+        amount_shifts: requiredShiftCount,
         timeslot_priority_1: booking.timeslot_priority_1,
         timeslot_priority_2: booking.timeslot_priority_2,
         timeslot_priority_3: booking.timeslot_priority_3,
         assigned_shifts: userAssignments,
         assigned_count: userAssignments.length,
-        is_fully_assigned: userAssignments.length >= booking.amount_shifts,
+        is_fully_assigned: userAssignments.length >= requiredShiftCount,
       };
     });
   }, [regularBookings, assignments, formContent.ticket_options]);

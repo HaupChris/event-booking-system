@@ -35,6 +35,9 @@ const StatisticsGrid: React.FC<StatisticsGridProps> = ({
   const declinedCount = assignments.filter((a) => a.status === 'declined').length;
   const acceptanceRate =
     assignments.length > 0 ? Math.round((acceptedCount / assignments.length) * 100) : 0;
+  const userCompletionRate = totalUsers > 0 ? (fullyAssignedUsers / totalUsers) * 100 : 0;
+  const shiftProgressRate =
+    totalShiftsWanted > 0 ? (totalShiftsAssigned / totalShiftsWanted) * 100 : 0;
 
   return (
     <Box
@@ -55,7 +58,7 @@ const StatisticsGrid: React.FC<StatisticsGridProps> = ({
         icon={<PeopleIcon fontSize="large" />}
         color="primary"
         subtitle={`${fullyAssignedUsers} fully assigned`}
-        progress={(fullyAssignedUsers / totalUsers) * 100}
+        progress={userCompletionRate}
         fullHeight
       />
       <StatsCard
@@ -64,7 +67,7 @@ const StatisticsGrid: React.FC<StatisticsGridProps> = ({
         icon={<AssignmentIcon fontSize="large" />}
         color="info"
         subtitle="Assigned vs Requested"
-        progress={(totalShiftsAssigned / totalShiftsWanted) * 100}
+        progress={shiftProgressRate}
         fullHeight
       />
       <StatsCard
@@ -77,11 +80,11 @@ const StatisticsGrid: React.FC<StatisticsGridProps> = ({
       />
       <StatsCard
         title="Completion Rate"
-        value={`${Math.round((fullyAssignedUsers / totalUsers) * 100)}%`}
+        value={`${Math.round(userCompletionRate)}%`}
         icon={<CheckCircleIcon fontSize="large" />}
         color="success"
         subtitle="Users fully assigned"
-        progress={(fullyAssignedUsers / totalUsers) * 100}
+        progress={userCompletionRate}
         fullHeight
       />
       <StatsCard

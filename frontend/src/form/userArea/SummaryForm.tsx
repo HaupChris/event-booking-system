@@ -120,6 +120,7 @@ function SummaryForm({ currentBooking, formContent }: SummaryFormProps) {
       <SummaryCateringCard beverage={beverage} food={food} discount={discount} />
 
       <SummaryWorkShiftsCard
+        requiresWorkshift={ticket?.requires_workshift !== false}
         shiftSlot1={shiftSlot1}
         shiftSlot2={shiftSlot2}
         shiftSlot3={shiftSlot3}

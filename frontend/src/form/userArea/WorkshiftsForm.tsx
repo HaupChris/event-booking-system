@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormProps } from './UserRegistrationFormContainer';
 import WorkShift from '../../components/core/inputs/workShift';
 import type { WorkShift as WorkShiftType } from '../userArea/interface';
-import { Box, Divider, List, alpha, useTheme } from '@mui/material';
+import { Box, Divider, List, Typography, alpha, useTheme } from '@mui/material';
 import { PRIORITIES } from './constants';
 
 import '../../css/workShift.css';
@@ -37,6 +37,10 @@ function WorkShiftForm(props: FormProps) {
   const [supporterBuddyLastName, setSupporterBuddyLastName] = useState(
     currentBooking.supporter_buddy.split(' ')[1] || ''
   );
+  const selectedTicket = formContent.ticket_options.find(
+    (ticket) => ticket.id === currentBooking.ticket_id
+  );
+  const requiresWorkshift = selectedTicket?.requires_workshift !== false;
 
   const numberOfShiftsOptions = [
     { value: 1, label: '1 Schicht' },
@@ -48,11 +52,52 @@ function WorkShiftForm(props: FormProps) {
   updateBookingRef.current = updateBooking;
 
   useEffect(() => {
+    if (!requiresWorkshift) {
+      return;
+    }
+
     updateBookingRef.current(
       'supporter_buddy',
       supporterBuddyFirstName + ' ' + supporterBuddyLastName
     );
-  }, [supporterBuddyFirstName, supporterBuddyLastName]);
+  }, [requiresWorkshift, supporterBuddyFirstName, supporterBuddyLastName]);
+
+  useEffect(() => {
+    if (requiresWorkshift) {
+      return;
+    }
+
+    if (currentBooking.timeslot_priority_1 !== -1) {
+      updateBookingRef.current('timeslot_priority_1', -1);
+    }
+    if (currentBooking.timeslot_priority_2 !== -1) {
+      updateBookingRef.current('timeslot_priority_2', -1);
+    }
+    if (currentBooking.timeslot_priority_3 !== -1) {
+      updateBookingRef.current('timeslot_priority_3', -1);
+    }
+    if (currentBooking.amount_shifts !== 0) {
+      updateBookingRef.current('amount_shifts', 0);
+    }
+    if (currentBooking.supporter_buddy !== '') {
+      updateBookingRef.current('supporter_buddy', '');
+    }
+    if (supporterBuddyFirstName !== '') {
+      setSupporterBuddyFirstName('');
+    }
+    if (supporterBuddyLastName !== '') {
+      setSupporterBuddyLastName('');
+    }
+  }, [
+    currentBooking.amount_shifts,
+    currentBooking.supporter_buddy,
+    currentBooking.timeslot_priority_1,
+    currentBooking.timeslot_priority_2,
+    currentBooking.timeslot_priority_3,
+    requiresWorkshift,
+    supporterBuddyFirstName,
+    supporterBuddyLastName,
+  ]);
 
   const availablePriorities = useMemo(() => {
     const available = [PRIORITIES.FIRST, PRIORITIES.SECOND, PRIORITIES.THIRD];
@@ -137,125 +182,155 @@ function WorkShiftForm(props: FormProps) {
 
   return (
     <ThemedFormLayout
-      missionBriefing={userAreaTexts.workshiftsForm.missionBriefing}
+      missionBriefing={
+        requiresWorkshift
+          ? userAreaTexts.workshiftsForm.missionBriefing
+          : 'Fuer dein ausgewaehltes Ticket ist kein Arbeitsdienst erforderlich.'
+      }
       footerId={userAreaTexts.workshiftsForm.footerId}
     >
-      <WWFAQ items={faqItems} title="" description="" icon={<HelpIcon />} sx={{ mb: 3 }} />
-      <FormCard tooltipPlacement={'top-start'} sx={circusSectionCardSx}>
-        <Box sx={circusHeadingOverrideSx}>
-          <MissionHeading
-            title={userAreaTexts.workshiftsForm.shiftsCountTitle}
-            subtitle={userAreaTexts.workshiftsForm.shiftsCountHelperText}
-            withDivider={true}
-          />
-        </Box>
-        <WWSelect
-          options={numberOfShiftsOptions}
-          value={currentBooking.amount_shifts}
-          onChange={updateAmountShifts}
-          minWidth="100%"
-        />
-      </FormCard>
-
-      <FormCard
-        sx={{
-          marginTop: 3,
-          marginBottom: 3,
-          ...(circusSectionCardSx || {}),
-        }}
-      >
-        <Box sx={circusHeadingOverrideSx}>
-          <MissionHeading
-            title={userAreaTexts.workshiftsForm.crewPartner}
-            subtitle={userAreaTexts.workshiftsForm.crewPartnerDescription}
-            withDivider={true}
-          />
-        </Box>
-
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            gap: { xs: 1.2, sm: 2 },
-          }}
-        >
-          {isCircusMode ? (
-            <>
-              <Box sx={{ flex: 1 }}>
-                <OrnateInput
-                  label="Vorname"
-                  value={supporterBuddyFirstName}
-                  onChange={(e) => setSupporterBuddyFirstName(e.target.value)}
-                  icon={<PersonIcon fontSize="large" />}
-                  size="compact"
-                />
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                <OrnateInput
-                  label="Nachname"
-                  value={supporterBuddyLastName}
-                  onChange={(e) => setSupporterBuddyLastName(e.target.value)}
-                  icon={<BadgeIcon fontSize="large" />}
-                  size="compact"
-                />
-              </Box>
-            </>
-          ) : (
-            <>
-              <FormField
-                error={!!formValidation.supporter_buddy}
-                id="first_name"
-                label="Vorname"
-                name="first_name"
-                value={supporterBuddyFirstName}
-                onChange={(e) => setSupporterBuddyFirstName(e.target.value)}
+      {!requiresWorkshift ? (
+        <FormCard tooltipPlacement={'top-start'} sx={circusSectionCardSx}>
+          <Typography
+            variant="h6"
+            sx={{
+              mb: 1,
+              color: isCircusMode ? '#f0ddb7' : theme.palette.text.primary,
+              fontFamily: isCircusMode ? '"Rye", serif' : undefined,
+            }}
+          >
+            Kein Arbeitsdienst notwendig
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: isCircusMode ? alpha('#f4ead6', 0.9) : theme.palette.text.secondary,
+              fontFamily: isCircusMode ? '"Merriweather", serif' : undefined,
+            }}
+          >
+            Mit diesem Ticket kannst du ohne Schichtprioritaeten fortfahren.
+          </Typography>
+        </FormCard>
+      ) : (
+        <>
+          <WWFAQ items={faqItems} title="" description="" icon={<HelpIcon />} sx={{ mb: 3 }} />
+          <FormCard tooltipPlacement={'top-start'} sx={circusSectionCardSx}>
+            <Box sx={circusHeadingOverrideSx}>
+              <MissionHeading
+                title={userAreaTexts.workshiftsForm.shiftsCountTitle}
+                subtitle={userAreaTexts.workshiftsForm.shiftsCountHelperText}
+                withDivider={true}
               />
-              <FormField
-                error={!!formValidation.supporter_buddy}
-                id="last_name"
-                label="Nachname"
-                name="last_name"
-                value={supporterBuddyLastName}
-                onChange={(e) => setSupporterBuddyLastName(e.target.value)}
-              />
-            </>
-          )}
-        </Box>
-      </FormCard>
+            </Box>
+            <WWSelect
+              options={numberOfShiftsOptions}
+              value={currentBooking.amount_shifts}
+              onChange={updateAmountShifts}
+              minWidth="100%"
+            />
+          </FormCard>
 
-      <MissionHeading title="Verfuegbare Schichten" withDivider={true} />
-
-      {/* Work Shifts List */}
-      <List>
-        {formContent.work_shifts
-          .filter((workshift) => workshift.title.toLowerCase() !== 'already employed')
-          .sort(compareWorkshiftsByNumBooked)
-          .concat(
-            formContent.work_shifts.filter(
-              (workshift) => workshift.title.toLowerCase() === 'already employed'
-            )
-          )
-          .map((workShift, index) => (
-            <React.Fragment key={workShift.id}>
-              <WorkShift
-                workShift={workShift}
-                availablePriorities={availablePriorities}
-                currentBooking={currentBooking}
-                updateBooking={updateBooking}
+          <FormCard
+            sx={{
+              marginTop: 3,
+              marginBottom: 3,
+              ...(circusSectionCardSx || {}),
+            }}
+          >
+            <Box sx={circusHeadingOverrideSx}>
+              <MissionHeading
+                title={userAreaTexts.workshiftsForm.crewPartner}
+                subtitle={userAreaTexts.workshiftsForm.crewPartnerDescription}
+                withDivider={true}
               />
-              {index < formContent.work_shifts.length - 1 && (
-                <Divider
-                  sx={{
-                    my: 3,
-                    borderColor: isCircusMode
-                      ? alpha('#d8b87a', 0.35)
-                      : alpha(theme.palette.primary.main, 0.2),
-                  }}
-                />
+            </Box>
+
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: { xs: 1.2, sm: 2 },
+              }}
+            >
+              {isCircusMode ? (
+                <>
+                  <Box sx={{ flex: 1 }}>
+                    <OrnateInput
+                      label="Vorname"
+                      value={supporterBuddyFirstName}
+                      onChange={(e) => setSupporterBuddyFirstName(e.target.value)}
+                      icon={<PersonIcon fontSize="large" />}
+                      size="compact"
+                    />
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <OrnateInput
+                      label="Nachname"
+                      value={supporterBuddyLastName}
+                      onChange={(e) => setSupporterBuddyLastName(e.target.value)}
+                      icon={<BadgeIcon fontSize="large" />}
+                      size="compact"
+                    />
+                  </Box>
+                </>
+              ) : (
+                <>
+                  <FormField
+                    error={!!formValidation.supporter_buddy}
+                    id="first_name"
+                    label="Vorname"
+                    name="first_name"
+                    value={supporterBuddyFirstName}
+                    onChange={(e) => setSupporterBuddyFirstName(e.target.value)}
+                  />
+                  <FormField
+                    error={!!formValidation.supporter_buddy}
+                    id="last_name"
+                    label="Nachname"
+                    name="last_name"
+                    value={supporterBuddyLastName}
+                    onChange={(e) => setSupporterBuddyLastName(e.target.value)}
+                  />
+                </>
               )}
-            </React.Fragment>
-          ))}
-      </List>
+            </Box>
+          </FormCard>
+
+          <MissionHeading title="Verfuegbare Schichten" withDivider={true} />
+
+          {/* Work Shifts List */}
+          <List>
+            {formContent.work_shifts
+              .filter((workshift) => workshift.title.toLowerCase() !== 'already employed')
+              .sort(compareWorkshiftsByNumBooked)
+              .concat(
+                formContent.work_shifts.filter(
+                  (workshift) => workshift.title.toLowerCase() === 'already employed'
+                )
+              )
+              .map((workShift, index) => (
+                <React.Fragment key={workShift.id}>
+                  <WorkShift
+                    workShift={workShift}
+                    availablePriorities={availablePriorities}
+                    currentBooking={currentBooking}
+                    updateBooking={updateBooking}
+                  />
+                  {index < formContent.work_shifts.length - 1 && (
+                    <Divider
+                      sx={{
+                        my: 3,
+                        borderColor: isCircusMode
+                          ? alpha('#d8b87a', 0.35)
+                          : alpha(theme.palette.primary.main, 0.2),
+                      }}
+                    />
+                  )}
+                </React.Fragment>
+              ))}
+          </List>
+        </>
+      )}
     </ThemedFormLayout>
   );
 }

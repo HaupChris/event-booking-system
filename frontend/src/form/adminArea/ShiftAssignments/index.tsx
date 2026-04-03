@@ -43,15 +43,18 @@ function ShiftAssignmentsPage() {
   }, [fetchAssignments]);
 
   // Calculate statistics
+  const getRequiredShiftCount = (booking: (typeof regularBookings)[number]) =>
+    booking.requires_workshift === false ? 0 : booking.amount_shifts;
+
   const totalUsers = regularBookings.length;
   const totalShiftsWanted = regularBookings.reduce(
-    (sum, booking) => sum + booking.amount_shifts,
+    (sum, booking) => sum + getRequiredShiftCount(booking),
     0
   );
   const totalShiftsAssigned = assignments.length;
   const fullyAssignedUsers = regularBookings.filter((booking) => {
     const userAssignments = assignments.filter((a) => a.booking_id === booking.id);
-    return userAssignments.length >= booking.amount_shifts;
+    return userAssignments.length >= getRequiredShiftCount(booking);
   }).length;
 
   const totalTimeslots = formContent.work_shifts.reduce((sum, ws) => sum + ws.time_slots.length, 0);

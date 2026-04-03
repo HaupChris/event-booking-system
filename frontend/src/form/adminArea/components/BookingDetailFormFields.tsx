@@ -1,6 +1,7 @@
-/* eslint-disable max-lines-per-function */
+/* eslint-disable max-lines, max-lines-per-function */
 import React from 'react';
 import {
+  Alert,
   Box,
   Chip,
   FormControl,
@@ -55,6 +56,8 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
     editedBooking.bookingType === 'artist'
       ? artistFormContent.orga_inviters
       : formContent.orga_inviters;
+  const selectedTicket = ticketOptions.find((ticket) => ticket.id === editedBooking.ticket_id);
+  const ticketRequiresWorkshift = selectedTicket?.requires_workshift !== false;
 
   const pricingAwareInputChange = (
     field: keyof CombinedBooking,
@@ -234,20 +237,26 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
         <>
           <Grid size={12}>
             <AdminCard title="Support Shift Preferences" sx={{ mt: 2 }}>
-              {['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3'].map(
-                (priority, index) => {
-                  const timeslotValue = editedBooking[priority as keyof CombinedBooking] as number;
-                  const timeslotInfo = getTimeslotWithWorkshift(timeslotValue, formContent);
-                  return (
-                    <Typography key={priority} variant="body2" sx={{ mb: 1 }}>
-                      <strong>{`Priority ${index + 1}:`}</strong> {timeslotInfo.workshiftTitle} -{' '}
-                      {timeslotInfo.timeslotTitle}
-                      {timeslotInfo.timeslotStart && timeslotInfo.timeslotEnd
-                        ? ` (${timeslotInfo.timeslotStart} - ${timeslotInfo.timeslotEnd})`
-                        : ''}
-                    </Typography>
-                  );
-                }
+              {!ticketRequiresWorkshift ? (
+                <Alert severity="info">Dieses Ticket erfordert keinen Arbeitsdienst.</Alert>
+              ) : (
+                ['timeslot_priority_1', 'timeslot_priority_2', 'timeslot_priority_3'].map(
+                  (priority, index) => {
+                    const timeslotValue = editedBooking[
+                      priority as keyof CombinedBooking
+                    ] as number;
+                    const timeslotInfo = getTimeslotWithWorkshift(timeslotValue, formContent);
+                    return (
+                      <Typography key={priority} variant="body2" sx={{ mb: 1 }}>
+                        <strong>{`Priority ${index + 1}:`}</strong> {timeslotInfo.workshiftTitle} -{' '}
+                        {timeslotInfo.timeslotTitle}
+                        {timeslotInfo.timeslotStart && timeslotInfo.timeslotEnd
+                          ? ` (${timeslotInfo.timeslotStart} - ${timeslotInfo.timeslotEnd})`
+                          : ''}
+                      </Typography>
+                    );
+                  }
+                )
               )}
             </AdminCard>
           </Grid>
@@ -259,7 +268,7 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
               type="number"
               value={editedBooking.amount_shifts}
               onChange={(event) => onInputChange('amount_shifts', parseInt(event.target.value, 10))}
-              disabled={!editMode}
+              disabled={!editMode || !ticketRequiresWorkshift}
               margin="normal"
             />
           </Grid>
@@ -270,7 +279,7 @@ const BookingDetailFormFields: React.FC<BookingDetailFormFieldsProps> = ({
               label="Supporter Buddy"
               value={editedBooking.supporter_buddy}
               onChange={(event) => onInputChange('supporter_buddy', event.target.value)}
-              disabled={!editMode}
+              disabled={!editMode || !ticketRequiresWorkshift}
               margin="normal"
             />
           </Grid>

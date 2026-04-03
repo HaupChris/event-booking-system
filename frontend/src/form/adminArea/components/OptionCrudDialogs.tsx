@@ -3,10 +3,12 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   Snackbar,
   TextField,
 } from '@mui/material';
@@ -84,13 +86,31 @@ const OptionCrudDialogs: React.FC<OptionCrudDialogsProps> = ({
               type="number"
             />
             {showAmount && (
-              <TextField
-                label="Amount"
-                value={optionForm.amount}
-                onChange={(event) => onOptionChange({ ...optionForm, amount: event.target.value })}
-                size="small"
-                type="number"
-              />
+              <>
+                <TextField
+                  label="Amount"
+                  value={optionForm.amount}
+                  onChange={(event) =>
+                    onOptionChange({ ...optionForm, amount: event.target.value })
+                  }
+                  size="small"
+                  type="number"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={optionForm.requires_workshift}
+                      onChange={(event) =>
+                        onOptionChange({
+                          ...optionForm,
+                          requires_workshift: event.target.checked,
+                        })
+                      }
+                    />
+                  }
+                  label="Arbeitsdienst erforderlich"
+                />
+              </>
             )}
           </Box>
         </DialogContent>

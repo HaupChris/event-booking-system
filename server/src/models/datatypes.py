@@ -67,6 +67,7 @@ class TicketOption(Interface):
     price: float
     amount: int
     working_title: str = ""
+    requires_workshift: bool = True
     num_booked: int = 0
 
 
@@ -118,6 +119,7 @@ class Booking(Interface):
     payment_date: str
     profile_uuid: str = ""
     invited_by_name: str = ""
+    requires_workshift: bool = True
     artist_material_ids: list[int] = field(default_factory=list)
     profession_ids: list[int] = field(default_factory=list)
 

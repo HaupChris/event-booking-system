@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import React from 'react';
 import { Box, Typography, Chip, alpha, Alert } from '@mui/material';
 import {
@@ -32,6 +33,8 @@ const UserItem: React.FC<UserItemProps> = ({
   formContent,
   shiftAssignments,
 }) => {
+  const requiresWorkshift = user.requires_workshift;
+
   // Get workshift and timeslot details for a given timeslot ID
   const isAssignedToSelectedTimeslot =
     shiftAssignments.find((shift) => shift.timeslot_id === selectedTimeslot) !== undefined;
@@ -168,6 +171,18 @@ const UserItem: React.FC<UserItemProps> = ({
               {user.first_name} {user.last_name} ({user.ticket_days})
             </Typography>
 
+            {!requiresWorkshift && (
+              <Chip
+                label="Kein Arbeitsdienst erforderlich"
+                color="info"
+                size="small"
+                sx={{
+                  height: 20,
+                  '& .MuiChip-label': { fontSize: '0.75rem' },
+                }}
+              />
+            )}
+
             {/* Priority badge if timeslot is selected and matches */}
             {matchingPriority && (
               <Chip
@@ -197,8 +212,14 @@ const UserItem: React.FC<UserItemProps> = ({
           </Box>
 
           <Chip
-            label={user.is_fully_assigned ? 'Complete' : 'Incomplete'}
-            color={user.is_fully_assigned ? 'success' : 'warning'}
+            label={
+              requiresWorkshift
+                ? user.is_fully_assigned
+                  ? 'Complete'
+                  : 'Incomplete'
+                : 'Not required'
+            }
+            color={requiresWorkshift ? (user.is_fully_assigned ? 'success' : 'warning') : 'info'}
             size="small"
           />
         </Box>
@@ -222,7 +243,9 @@ const UserItem: React.FC<UserItemProps> = ({
           }}
         >
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            Shifts: {user.assigned_count} / {user.amount_shifts}
+            {requiresWorkshift
+              ? `Shifts: ${user.assigned_count} / ${user.amount_shifts}`
+              : `Freiwillige Zuweisungen: ${user.assigned_count}`}
           </Typography>
           {shiftAssignments.map((shiftAssignment) => (
             <Box key={shiftAssignment.id} sx={{ mb: 1 }}>
@@ -278,54 +301,62 @@ const UserItem: React.FC<UserItemProps> = ({
           <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
             Work Shift Preferences:
           </Typography>
-          {priorities.map((priority) => (
-            <Box
-              key={priority.priority}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                mb: 0.5,
-                opacity: priority.details ? 1 : 0.5,
-              }}
-            >
+          {!requiresWorkshift ? (
+            <Typography variant="caption" color="info.main" sx={{ display: 'block' }}>
+              Dieser User muss keine Arbeitsdienste auswaehlen.
+            </Typography>
+          ) : (
+            priorities.map((priority) => (
               <Box
+                key={priority.priority}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  minWidth: 20,
-                  color:
-                    selectedTimeslot === priority.timeslotId
-                      ? adminPalette.primary.dark
-                      : 'text.secondary',
+                  mb: 0.5,
+                  opacity: priority.details ? 1 : 0.5,
                 }}
               >
-                {priority.icon}
-              </Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    minWidth: 20,
+                    color:
+                      selectedTimeslot === priority.timeslotId
+                        ? adminPalette.primary.dark
+                        : 'text.secondary',
+                  }}
+                >
+                  {priority.icon}
+                </Box>
 
-              <Typography
-                variant="caption"
-                color={selectedTimeslot === priority.timeslotId ? 'success.main' : 'text.secondary'}
-                sx={{
-                  ml: 0.5,
-                  fontWeight: selectedTimeslot === priority.timeslotId ? 'bold' : 'normal',
-                }}
-              >
-                {priority.details ? (
-                  <>
-                    {priority.details.workshiftTitle} - {priority.details.timeslotTitle}
-                    {priority.details.timeRange && (
-                      <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>
-                        {' '}
-                        ({priority.details.timeRange})
-                      </span>
-                    )}
-                  </>
-                ) : (
-                  'Nicht ausgewählt'
-                )}
-              </Typography>
-            </Box>
-          ))}
+                <Typography
+                  variant="caption"
+                  color={
+                    selectedTimeslot === priority.timeslotId ? 'success.main' : 'text.secondary'
+                  }
+                  sx={{
+                    ml: 0.5,
+                    fontWeight: selectedTimeslot === priority.timeslotId ? 'bold' : 'normal',
+                  }}
+                >
+                  {priority.details ? (
+                    <>
+                      {priority.details.workshiftTitle} - {priority.details.timeslotTitle}
+                      {priority.details.timeRange && (
+                        <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                          {' '}
+                          ({priority.details.timeRange})
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    'Nicht ausgewählt'
+                  )}
+                </Typography>
+              </Box>
+            ))
+          )}
         </Box>
       </Box>
     </ListItemButton>

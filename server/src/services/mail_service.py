@@ -12,6 +12,16 @@ from src.services.app_settings_service import get_payment_link
 load_dotenv()
 
 
+def _require_mail_credentials() -> tuple[str, str]:
+    gmail_user = os.environ.get("GMAIL_USER")
+    gmail_password = os.environ.get("GMAIL_PASS")
+
+    if not gmail_user or not gmail_password:
+        raise RuntimeError("Missing mail credentials: GMAIL_USER and GMAIL_PASS must be set")
+
+    return str(gmail_user), str(gmail_password)
+
+
 def get_booking_details(booking: Booking, form_content: dict) -> str:
     """
     Returns a human-readable textual summary of the booking in German.
@@ -46,6 +56,10 @@ def get_booking_details(booking: Booking, form_content: dict) -> str:
         else "Essensoption: Nicht gefunden"
     )
 
+    requires_workshift = True
+    if ticket_option is not None:
+        requires_workshift = ticket_option.get("requires_workshift", True) is not False
+
     # Format timeslot info
     def format_timeslot_info(timeslot_id):
         for ws in form_content["work_shifts"]:
@@ -54,15 +68,16 @@ def get_booking_details(booking: Booking, form_content: dict) -> str:
                     return f"{ws['title']}, Zeitfenster: {ts['title']}, Von: {ts['start_time']}, Bis: {ts['end_time']}"
         return "Zeitfenster: Nicht gefunden"
 
-    timeslot_info = "Du hast folgende Prioritäten für deine Supporterschicht gewählt:\n"
-    for i, ts_id in enumerate(
-        [booking.timeslot_priority_1, booking.timeslot_priority_2, booking.timeslot_priority_3]
-    ):
-        timeslot_info += f"Priorität {i + 1}: {format_timeslot_info(ts_id)}\n"
+    if requires_workshift:
+        timeslot_info = "Du hast folgende Prioritäten für deine Supporterschicht gewählt:\n"
+        for i, ts_id in enumerate(
+            [booking.timeslot_priority_1, booking.timeslot_priority_2, booking.timeslot_priority_3]
+        ):
+            timeslot_info += f"Priorität {i + 1}: {format_timeslot_info(ts_id)}\n"
 
-    timeslot_info += (
-        f"Du hast dich bereit erklärt, maximal {booking.amount_shifts} Schicht(en) zu übernehmen.\n"
-    )
+        timeslot_info += f"Du hast dich bereit erklärt, maximal {booking.amount_shifts} Schicht(en) zu übernehmen.\n"
+    else:
+        timeslot_info = "Für dieses Ticket ist kein Arbeitsdienst erforderlich.\n"
 
     # Materials
     if booking.material_ids:
@@ -84,7 +99,9 @@ def get_booking_details(booking: Booking, form_content: dict) -> str:
     return details
 
 
-def send_confirmation_mail(booking: Booking, form_content: dict, profile_uuid: str = None) -> None:
+def send_confirmation_mail(
+    booking: Booking, form_content: dict, profile_uuid: str | None = None
+) -> None:
     """
     Sends a confirmation email to the user based on the booking details.
 
@@ -93,8 +110,7 @@ def send_confirmation_mail(booking: Booking, form_content: dict, profile_uuid: s
         form_content: Form content dictionary
         profile_uuid: Unique profile UUID for accessing profile page
     """
-    gmail_user = os.environ.get("GMAIL_USER")
-    gmail_password = os.environ.get("GMAIL_PASS")
+    gmail_user, gmail_password = _require_mail_credentials()
 
     # Get base URL from environment or use default
     base_url = os.environ.get("APP_BASE_URL", "http://localhost:3000")
@@ -312,7 +328,7 @@ def send_confirmation_mail(booking: Booking, form_content: dict, profile_uuid: s
 
 
 def send_artist_confirmation_mail(
-    booking: ArtistBooking, form_content: dict, profile_uuid: str = None
+    booking: ArtistBooking, form_content: dict, profile_uuid: str | None = None
 ) -> None:
     """
     Sends a confirmation email to the artist based on the booking details.
@@ -322,8 +338,7 @@ def send_artist_confirmation_mail(
         form_content: Form content dictionary
         profile_uuid: Unique profile UUID for accessing profile page
     """
-    gmail_user = os.environ.get("GMAIL_USER")
-    gmail_password = os.environ.get("GMAIL_PASS")
+    gmail_user, gmail_password = _require_mail_credentials()
 
     # Get base URL from environment or use default
     base_url = os.environ.get("APP_BASE_URL", "http://localhost:3000")
@@ -648,8 +663,7 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
         email: The email address to send to
         profiles: List of dicts with 'profile_uuid', 'name', 'booking_type', 'timestamp'
     """
-    gmail_user = os.environ.get("GMAIL_USER")
-    gmail_password = os.environ.get("GMAIL_PASS")
+    gmail_user, gmail_password = _require_mail_credentials()
 
     # Get base URL from environment or use default
     base_url = os.environ.get("APP_BASE_URL", "http://localhost:3000")

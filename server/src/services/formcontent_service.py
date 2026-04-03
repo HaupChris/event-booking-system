@@ -311,7 +311,13 @@ def _load_regular_options_from_db(
 ) -> tuple[list[TicketOption], list[BeverageOption], list[FoodOption]]:
     cursor.execute(
         """
-        SELECT id, title, COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title, price, amount
+        SELECT
+            id,
+            title,
+            COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title,
+            price,
+            amount,
+            requires_workshift
         FROM TicketOptions
         ORDER BY id ASC
         """
@@ -324,6 +330,7 @@ def _load_regular_options_from_db(
             working_title=row[2],
             price=float(row[3] or 0),
             amount=_normalize_positive_int(row[4], default=0),
+            requires_workshift=bool(row[5]),
         )
         for row in ticket_rows
     ]
@@ -374,7 +381,13 @@ def _load_artist_options_from_db(
 ) -> tuple[list[TicketOption], list[BeverageOption], list[FoodOption]]:
     cursor.execute(
         """
-        SELECT id, title, COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title, price, amount
+        SELECT
+            id,
+            title,
+            COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title,
+            price,
+            amount,
+            requires_workshift
         FROM ArtistTicketOptions
         ORDER BY id ASC
         """
@@ -387,6 +400,7 @@ def _load_artist_options_from_db(
             working_title=row[2],
             price=float(row[3] or 0),
             amount=_normalize_positive_int(row[4], default=0),
+            requires_workshift=bool(row[5]),
         )
         for row in ticket_rows
     ]

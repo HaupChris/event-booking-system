@@ -48,6 +48,7 @@ export interface TicketOption {
   working_title?: string;
   price: number;
   amount: number;
+  requires_workshift?: boolean;
   num_booked: number;
 }
 
@@ -96,6 +97,7 @@ export interface Booking {
   payment_date: string;
   profile_uuid: string;
   profession_ids: Array<number>;
+  requires_workshift?: boolean;
 }
 
 export interface BookingWithTimestamp extends Booking {

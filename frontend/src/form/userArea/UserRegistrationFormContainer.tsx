@@ -59,6 +59,11 @@ const getTimeslotPriorities = (formContent: FormContent): [number, number, numbe
   return [selectedIds[0] ?? -1, selectedIds[1] ?? -1, selectedIds[2] ?? -1];
 };
 
+const ticketRequiresWorkshift = (formContent: FormContent, ticketId: number): boolean => {
+  const selectedTicket = formContent.ticket_options.find((ticket) => ticket.id === ticketId);
+  return selectedTicket?.requires_workshift !== false;
+};
+
 // Form steps enum
 enum FormSteps {
   NameAndAddress = 0,
@@ -202,6 +207,29 @@ export function UserRegistrationFormContainer() {
 
         // Validation and form configuration
         validationRules,
+        validateStep: (activeStep, booking, formContent) => {
+          if (activeStep !== FormSteps.Workshift) {
+            return '';
+          }
+
+          if (!ticketRequiresWorkshift(formContent, booking.ticket_id)) {
+            return '';
+          }
+
+          if (
+            booking.timeslot_priority_1 === -1 ||
+            booking.timeslot_priority_2 === -1 ||
+            booking.timeslot_priority_3 === -1
+          ) {
+            return 'Bitte gib drei Prioritaeten an.';
+          }
+
+          if (booking.amount_shifts < 1) {
+            return 'Bitte waehle mindestens eine Schicht aus.';
+          }
+
+          return '';
+        },
         stepTitles: {
           [FormSteps.NameAndAddress]: userAreaTexts.personalDetailsForm.title,
           [FormSteps.Ticket]: userAreaTexts.ticketSelectionForm.title,
@@ -225,12 +253,7 @@ export function UserRegistrationFormContainer() {
           [FormSteps.Ticket]: ['ticket_id'],
           [FormSteps.Beverage]: [],
           [FormSteps.Food]: [],
-          [FormSteps.Workshift]: [
-            'timeslot_priority_1',
-            'timeslot_priority_2',
-            'timeslot_priority_3',
-            'amount_shifts',
-          ],
+          [FormSteps.Workshift]: [],
           [FormSteps.Material]: [],
           [FormSteps.Signature]: ['signature'],
           [FormSteps.AwarenessCode]: [],

@@ -27,6 +27,7 @@ export interface UserWithAssignments {
   ticket_days: string;
   days_count: number;
   email: string;
+  requires_workshift: boolean;
   supporter_buddy: string;
   amount_shifts: number;
   timeslot_priority_1: number;

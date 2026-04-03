@@ -15,6 +15,7 @@ from src.services.booking_service import (
     update_booking_payment,
 )
 from src.services.mail_service import send_confirmation_mail
+from src.services.option_service import ticket_requires_workshift
 from src.services.orga_team_service import is_valid_active_orga_team_member
 from src.services.workshift_service import validate_booking_timeslot_selection
 from src.utils.logger import get_logger, log_security_event
@@ -64,18 +65,28 @@ def submit_form():
             )
             return jsonify({"error": "Invalid inviter selection"}), 400
 
-        selection_valid, selection_error = validate_booking_timeslot_selection(
-            [
-                booking.timeslot_priority_1,
-                booking.timeslot_priority_2,
-                booking.timeslot_priority_3,
-            ]
-        )
-        if not selection_valid:
-            logger.warning(
-                f"Booking submission failed: invalid timeslot selection for {booking.email}: {selection_error}"
+        requires_workshift = ticket_requires_workshift(booking.ticket_id, scope="regular")
+        booking.requires_workshift = requires_workshift
+
+        if requires_workshift:
+            selection_valid, selection_error = validate_booking_timeslot_selection(
+                [
+                    booking.timeslot_priority_1,
+                    booking.timeslot_priority_2,
+                    booking.timeslot_priority_3,
+                ]
             )
-            return jsonify({"error": selection_error}), 400
+            if not selection_valid:
+                logger.warning(
+                    f"Booking submission failed: invalid timeslot selection for {booking.email}: {selection_error}"
+                )
+                return jsonify({"error": selection_error}), 400
+        else:
+            booking.timeslot_priority_1 = -1
+            booking.timeslot_priority_2 = -1
+            booking.timeslot_priority_3 = -1
+            booking.amount_shifts = 0
+            booking.supporter_buddy = ""
 
         # Attempt to insert booking
         success, profile_uuid = insert_booking(booking)
@@ -100,14 +111,20 @@ def submit_form():
             logger.info(
                 f"Booking process completed in {duration:.3f}s for {booking.first_name} {booking.last_name}"
             )
-            return jsonify(
-                {"msg": "Booking successful", "profile_uuid": resolved_profile_uuid}
-            ), 200
+            response_payload = {
+                "msg": "Booking successful",
+                "profile_uuid": resolved_profile_uuid,
+            }
+            response_status = 200
         else:
             logger.warning(
                 f"Duplicate booking attempt for {booking.first_name} {booking.last_name} ({booking.email})"
             )
-            return jsonify({"error": "Duplicate booking"}), 400
+
+            response_payload = {"error": "Duplicate booking"}
+            response_status = 400
+
+        return jsonify(response_payload), response_status
 
     except Exception as e:
         duration = time.time() - start_time

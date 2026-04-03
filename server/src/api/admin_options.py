@@ -53,6 +53,20 @@ def _to_int(value: Any, default: int = 0) -> int:
     return parsed if parsed >= 0 else default
 
 
+def _to_bool(value: Any, default: bool = True) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    if isinstance(value, str):
+        lowered = value.strip().lower()
+        if lowered in {"true", "1", "yes", "on"}:
+            return True
+        if lowered in {"false", "0", "no", "off"}:
+            return False
+    return default
+
+
 @admin_options_bp.route("/options/<string:scope>/<string:option_type>", methods=["GET"])
 @limiter_admin_options.limit("200/minute")
 @jwt_required()
@@ -106,6 +120,7 @@ def create_option_endpoint(scope: str, option_type: str):
         working_title=str(data.get("working_title") or "").strip() or None,
         price=_to_float(data.get("price", 0.0)),
         amount=amount,
+        requires_workshift=_to_bool(data.get("requires_workshift", True), default=True),
         description=str(data.get("description") or "").strip(),
     )
 
@@ -152,6 +167,10 @@ def update_option_endpoint(scope: str, option_type: str, option_id: int):  # noq
         if price < 0:
             return jsonify({"error": "Price must be a non-negative number"}), 400
 
+    requires_workshift: bool | None = None
+    if "requires_workshift" in data:
+        requires_workshift = _to_bool(data.get("requires_workshift"), default=True)
+
     success = update_option(
         scope=normalized_scope,
         option_type=normalized_option_type,
@@ -160,6 +179,7 @@ def update_option_endpoint(scope: str, option_type: str, option_id: int):  # noq
         working_title=str(working_title).strip() if working_title is not None else None,
         price=price,
         amount=amount,
+        requires_workshift=requires_workshift,
         description=str(data.get("description") or "").strip() if "description" in data else None,
     )
 

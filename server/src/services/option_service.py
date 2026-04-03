@@ -80,6 +80,20 @@ def _normalize_non_negative_float(value: Any, default: float = 0.0) -> float:
     return parsed if parsed >= 0 else default
 
 
+def _normalize_bool(value: Any, default: bool = True) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    if isinstance(value, str):
+        lowered = value.strip().lower()
+        if lowered in {"true", "1", "yes", "on"}:
+            return True
+        if lowered in {"false", "0", "no", "off"}:
+            return False
+    return default
+
+
 def _load_option_seed(path: Path, key: str) -> list[dict[str, Any]]:
     if not path.exists():
         return []
@@ -106,8 +120,8 @@ def _seed_ticket_table_if_empty(
         working_title = str(option.get("working_title", "")).strip() or title
         cursor.execute(
             f"""
-            INSERT INTO {table_name} (id, title, working_title, price, amount)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO {table_name} (id, title, working_title, price, amount, requires_workshift)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
             (
                 idx,
@@ -115,6 +129,7 @@ def _seed_ticket_table_if_empty(
                 working_title,
                 _normalize_non_negative_float(option.get("price", 0.0)),
                 _normalize_non_negative_int(option.get("amount", 0)),
+                1 if _normalize_bool(option.get("requires_workshift"), default=True) else 0,
             ),
         )
 
@@ -157,7 +172,8 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
             title TEXT NOT NULL,
             working_title TEXT,
             price REAL NOT NULL,
-            amount INTEGER NOT NULL
+            amount INTEGER NOT NULL,
+            requires_workshift INTEGER NOT NULL DEFAULT 1
         )
         """
     )
@@ -190,7 +206,8 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
             title TEXT NOT NULL,
             working_title TEXT,
             price REAL NOT NULL,
-            amount INTEGER NOT NULL
+            amount INTEGER NOT NULL,
+            requires_workshift INTEGER NOT NULL DEFAULT 1
         )
         """
     )
@@ -238,6 +255,19 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
             """
         )
 
+    for ticket_table in ["TicketOptions", "ArtistTicketOptions"]:
+        if not _table_has_column(cursor, ticket_table, "requires_workshift"):
+            cursor.execute(
+                f"ALTER TABLE {ticket_table} ADD COLUMN requires_workshift INTEGER NOT NULL DEFAULT 1"
+            )
+        cursor.execute(
+            f"""
+            UPDATE {ticket_table}
+            SET requires_workshift = 1
+            WHERE requires_workshift IS NULL
+            """
+        )
+
     regular_ticket_seed = _load_option_seed(REGULAR_FORM_CONTENT_PATH, "ticket_options")
     regular_beverage_seed = _load_option_seed(REGULAR_FORM_CONTENT_PATH, "beverage_options")
     regular_food_seed = _load_option_seed(REGULAR_FORM_CONTENT_PATH, "food_options")
@@ -280,7 +310,8 @@ def get_options(scope: OptionScope, option_type: OptionType) -> list[dict[str, A
                     title,
                     COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title,
                     price,
-                    amount
+                    amount,
+                    requires_workshift
                 FROM {table_name}
                 ORDER BY id ASC
                 """
@@ -293,6 +324,7 @@ def get_options(scope: OptionScope, option_type: OptionType) -> list[dict[str, A
                     "working_title": row["working_title"],
                     "price": float(row["price"] or 0),
                     "amount": _normalize_non_negative_int(row["amount"], default=0),
+                    "requires_workshift": bool(row["requires_workshift"]),
                 }
                 for row in rows
             ]
@@ -330,6 +362,7 @@ def create_option(  # noqa: PLR0913
     price: float = 0.0,
     amount: int = 0,
     description: str = "",
+    requires_workshift: bool = True,
 ) -> int:
     table_name = _resolve_table_name(scope, option_type)
     clean_title = title.strip()
@@ -342,14 +375,15 @@ def create_option(  # noqa: PLR0913
         if option_type == "ticket":
             cursor.execute(
                 f"""
-                INSERT INTO {table_name} (title, working_title, price, amount)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO {table_name} (title, working_title, price, amount, requires_workshift)
+                VALUES (?, ?, ?, ?, ?)
                 """,
                 (
                     clean_title,
                     clean_working_title,
                     _normalize_non_negative_float(price),
                     _normalize_non_negative_int(amount),
+                    1 if _normalize_bool(requires_workshift, default=True) else 0,
                 ),
             )
         else:
@@ -380,6 +414,7 @@ def update_option(  # noqa: PLR0913
     price: float | None = None,
     amount: int | None = None,
     description: str | None = None,
+    requires_workshift: bool | None = None,
 ) -> bool:
     table_name = _resolve_table_name(scope, option_type)
 
@@ -405,6 +440,10 @@ def update_option(  # noqa: PLR0913
         if option_type == "ticket" and amount is not None:
             updates.append("amount = ?")
             values.append(_normalize_non_negative_int(amount))
+
+        if option_type == "ticket" and requires_workshift is not None:
+            updates.append("requires_workshift = ?")
+            values.append(1 if _normalize_bool(requires_workshift, default=True) else 0)
 
         if option_type in {"beverage", "food"} and description is not None:
             updates.append("description = ?")
@@ -446,6 +485,28 @@ def delete_option(scope: OptionScope, option_type: OptionType, option_id: int) -
         cursor.execute(f"DELETE FROM {table_name} WHERE id = ?", (option_id,))
         conn.commit()
         return True, "Option deleted"
+
+
+def ticket_requires_workshift(ticket_id: int, scope: OptionScope = "regular") -> bool:
+    table_name = _resolve_table_name(scope, "ticket")
+
+    with closing(_connect_db()) as conn:
+        _ensure_schema(conn)
+        cursor = conn.cursor()
+        cursor.execute(
+            f"""
+            SELECT requires_workshift
+            FROM {table_name}
+            WHERE id = ?
+            """,
+            (ticket_id,),
+        )
+        row = cursor.fetchone()
+
+        if row is None:
+            return True
+
+        return bool(row["requires_workshift"])
 
 
 ensure_option_schema()

@@ -302,33 +302,35 @@ def get_all_bookings() -> list[BookingWithTimestamp]:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                           SELECT b.id as booking_id,
-                                  u.last_name,
-                                  u.first_name,
-                                  u.email,
-                                  u.phone_number,
-                                  b.ticket_option_id,
-                                  b.beverage_option_id,
-                                  b.food_option_id,
-                                  b.first_priority_timeslot_id,
-                                  b.second_priority_timeslot_id,
-                                  b.third_priority_timeslot_id,
-                                  b.amount_shifts,
-                                   b.supporter_buddy,
-                                   b.invited_by_id,
-                                   ot.name as invited_by_name,
-                                   b.total_price,
-                                   b.Timestamp,
-                                  b.signature,
-                                  b.is_paid,
-                                  b.paid_amount,
-                                  b.payment_notes,
-                                   b.payment_date,
-                                   b.profile_uuid
-                            FROM Users u
-                                     JOIN Bookings b ON u.id = b.user_id
-                                     LEFT JOIN OrgaTeamInviters ot ON b.invited_by_id = ot.id
-                            """
+                            SELECT b.id as booking_id,
+                                   u.last_name,
+                                   u.first_name,
+                                   u.email,
+                                   u.phone_number,
+                                   b.ticket_option_id,
+                                   b.beverage_option_id,
+                                   b.food_option_id,
+                                   b.first_priority_timeslot_id,
+                                   b.second_priority_timeslot_id,
+                                   b.third_priority_timeslot_id,
+                                   b.amount_shifts,
+                                    b.supporter_buddy,
+                                    b.invited_by_id,
+                                    ot.name as invited_by_name,
+                                    b.total_price,
+                                    b.Timestamp,
+                                   b.signature,
+                                   b.is_paid,
+                                   b.paid_amount,
+                                   b.payment_notes,
+                                    b.payment_date,
+                                    b.profile_uuid,
+                                    COALESCE(t.requires_workshift, 1) as requires_workshift
+                             FROM Users u
+                                      JOIN Bookings b ON u.id = b.user_id
+                                      LEFT JOIN TicketOptions t ON b.ticket_option_id = t.id
+                                      LEFT JOIN OrgaTeamInviters ot ON b.invited_by_id = ot.id
+                             """
             )
             rows = cursor.fetchall()
 
@@ -381,6 +383,7 @@ def get_all_bookings() -> list[BookingWithTimestamp]:
                     profession_ids=profession_ids,
                     material_ids=material_ids,
                     profile_uuid=row[22],
+                    requires_workshift=bool(row[23]),
                 )
                 bookings.append(booking)
             duration = time.time() - start_time
