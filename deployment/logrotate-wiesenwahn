@@ -1,0 +1,10 @@
+/opt/wiesenwahn/logs/*.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    dateext
+    dateformat -%Y%m%d
+}

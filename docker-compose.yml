@@ -21,6 +21,6 @@ services:
     image: ghcr.io/${REPO_OWNER}/wiesenwahn-frontend:latest
     restart: always
     ports:
-      - "8080:80"  # Exposed only on localhost for Nginx to proxy
+      - "127.0.0.1:8080:80"  # Only accessible via host nginx reverse proxy
     depends_on:
       - backend

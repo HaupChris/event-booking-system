@@ -1,0 +1,11 @@
+# Wiesenwahn backup crontab
+# Install with: crontab deployment/crontab
+
+# Daily backup at 2:00 AM
+0 2 * * * /bin/bash /opt/wiesenwahn/backup.sh daily
+
+# Weekly backup on Sunday at 3:00 AM
+0 3 * * 0 /bin/bash /opt/wiesenwahn/backup.sh weekly
+
+# Monthly backup on the 1st of each month at 4:00 AM
+0 4 1 * * /bin/bash /opt/wiesenwahn/backup.sh monthly
