@@ -1,5 +1,5 @@
-import os
 import sqlite3
+from pathlib import Path
 from sqlite3 import Connection
 
 from src.models.datatypes import FormContent
@@ -10,21 +10,20 @@ def init_db(db_file_path: str, schema_paths: list[str], form_content: FormConten
     Creates the SQLite database and applies the schema if not already done.
     """
     # Ensure the directory exists
-    db_dir = os.path.dirname(db_file_path)
-    os.makedirs(db_dir, exist_ok=True)
+    db_dir = Path(db_file_path).parent
+    db_dir.mkdir(parents=True, exist_ok=True)
 
     # Connect to the DB
     conn = sqlite3.connect(db_file_path)
 
     # Read schema.sql
     for schema_path in schema_paths:
-        with open(schema_path) as f:
+        with Path(schema_path).open() as f:
             schema_script = f.read()
             conn.executescript(schema_script)
             conn.commit()
 
-        _init_db_data(conn, form_content)
-
+    _init_db_data(conn, form_content)
     conn.close()
 
 
@@ -51,7 +50,8 @@ def _init_db_data(connection: Connection, form_content: FormContent):
         for idx, ticket in enumerate(form_content.ticket_options):
             cursor.execute(
                 """
-                INSERT INTO TicketOptions (id, title, working_title, price, amount, requires_workshift)
+                INSERT OR IGNORE INTO TicketOptions
+                    (id, title, working_title, price, amount, requires_workshift)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
@@ -68,7 +68,7 @@ def _init_db_data(connection: Connection, form_content: FormContent):
         for idx, beverage in enumerate(form_content.beverage_options):
             cursor.execute(
                 """
-                INSERT INTO BeverageOptions (id, title, working_title, description, price)
+                INSERT OR IGNORE INTO BeverageOptions (id, title, working_title, description, price)
                 VALUES (?, ?, ?, ?, ?)
                 """,
                 (
@@ -84,7 +84,7 @@ def _init_db_data(connection: Connection, form_content: FormContent):
         for idx, food in enumerate(form_content.food_options):
             cursor.execute(
                 """
-                INSERT INTO FoodOptions (id, title, working_title, description, price)
+                INSERT OR IGNORE INTO FoodOptions (id, title, working_title, description, price)
                 VALUES (?, ?, ?, ?, ?)
                 """,
                 (idx, food.title, food.working_title or food.title, food.description, food.price),
@@ -93,7 +93,7 @@ def _init_db_data(connection: Connection, form_content: FormContent):
         # Insert Materials
         for idx, material in enumerate(form_content.materials):
             cursor.execute(
-                "INSERT INTO Materials (id, title, num_needed) VALUES (?, ?, ?)",
+                "INSERT OR IGNORE INTO Materials (id, title, num_needed) VALUES (?, ?, ?)",
                 (idx, material.title, material.num_needed),
             )
 
@@ -102,7 +102,8 @@ def _init_db_data(connection: Connection, form_content: FormContent):
             # Insert WorkShift
             cursor.execute(
                 """
-                INSERT INTO WorkShifts (id, title, working_title, description, multiple_selection_possible)
+                INSERT OR IGNORE INTO WorkShifts
+                    (id, title, working_title, description, multiple_selection_possible)
                 VALUES (?, ?, ?, ?, ?)
                 """,
                 (
@@ -115,12 +116,12 @@ def _init_db_data(connection: Connection, form_content: FormContent):
             )
 
             # Insert TimeSlots for this WorkShift
-            for ts_idx, timeslot in enumerate(workshift.time_slots):
+            for timeslot in workshift.time_slots:
                 cursor.execute(
                     """
-                    INSERT INTO TimeSlots
+                INSERT OR IGNORE INTO TimeSlots
                         (id, title, working_title, start_time, end_time, num_needed, workshift_id)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         timeslot.id,
@@ -138,6 +139,4 @@ def _init_db_data(connection: Connection, form_content: FormContent):
 
     except Exception as e:
         connection.rollback()
-        print(f"Error initializing database: {e}")
-    finally:
-        connection.close()
+        raise RuntimeError(f"Error initializing database: {e}") from e

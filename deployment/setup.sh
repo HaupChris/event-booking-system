@@ -57,7 +57,7 @@ sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/ssh
 sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
 sed -i 's/^#\?X11Forwarding.*/X11Forwarding no/' /etc/ssh/sshd_config
 sed -i 's/^#\?MaxAuthTries.*/MaxAuthTries 3/' /etc/ssh/sshd_config
-systemctl restart sshd
+systemctl restart ssh
 
 echo "=== 6/8: fail2ban ==="
 cat > /etc/fail2ban/jail.local << 'EOF'

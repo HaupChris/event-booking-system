@@ -40,6 +40,15 @@ def _table_has_column(cursor: sqlite3.Cursor, table_name: str, column_name: str)
     return any(row[1] == column_name for row in cursor.fetchall())
 
 
+def _table_exists(cursor: sqlite3.Cursor, table_name: str) -> bool:
+    table_name = _assert_allowed_schema_table(table_name)
+    cursor.execute(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
+        (table_name,),
+    )
+    return cursor.fetchone() is not None
+
+
 def _ensure_schema(conn: sqlite3.Connection) -> None:
     cursor = conn.cursor()
     cursor.execute(
@@ -55,10 +64,14 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
         """
     )
 
-    if not _table_has_column(cursor, "Bookings", "invited_by_id"):
+    if _table_exists(cursor, "Bookings") and not _table_has_column(
+        cursor, "Bookings", "invited_by_id"
+    ):
         cursor.execute("ALTER TABLE Bookings ADD COLUMN invited_by_id INTEGER")
 
-    if not _table_has_column(cursor, "ArtistBookings", "invited_by_id"):
+    if _table_exists(cursor, "ArtistBookings") and not _table_has_column(
+        cursor, "ArtistBookings", "invited_by_id"
+    ):
         cursor.execute("ALTER TABLE ArtistBookings ADD COLUMN invited_by_id INTEGER")
 
     conn.commit()
@@ -180,6 +193,3 @@ def is_valid_active_orga_team_member(member_id: int) -> bool:
             (member_id,),
         )
         return cursor.fetchone() is not None
-
-
-ensure_orga_team_schema()
