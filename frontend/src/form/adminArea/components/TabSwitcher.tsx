@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Tab, Tabs, useMediaQuery, useTheme } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import { adminPalette } from '../theme/adminPalette';
 
 interface TabOption {

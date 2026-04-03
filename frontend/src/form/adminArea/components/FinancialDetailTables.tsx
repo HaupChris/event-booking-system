@@ -78,7 +78,14 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                       <TableCell align="right">{total.toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
-                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha(adminPalette.text.primary, 0.04) } }}>
+                  <TableRow
+                    sx={{
+                      '& td': {
+                        fontWeight: 'bold',
+                        bgcolor: alpha(adminPalette.text.primary, 0.04),
+                      },
+                    }}
+                  >
                     <TableCell>Total Tickets</TableCell>
                     <TableCell align="right">
                       {Object.values(ticketTotals).reduce((sum, { count }) => sum + count, 0)}
@@ -125,7 +132,14 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                       <TableCell align="right">{total.toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
-                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha(adminPalette.text.primary, 0.04) } }}>
+                  <TableRow
+                    sx={{
+                      '& td': {
+                        fontWeight: 'bold',
+                        bgcolor: alpha(adminPalette.text.primary, 0.04),
+                      },
+                    }}
+                  >
                     <TableCell>Total Beverages</TableCell>
                     <TableCell align="right">
                       {Object.values(beverageTotals).reduce((sum, { count }) => sum + count, 0)}
@@ -174,7 +188,14 @@ const FinancialDetailTables: React.FC<FinancialDetailTablesProps> = ({
                       <TableCell align="right">{total.toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
-                  <TableRow sx={{ '& td': { fontWeight: 'bold', bgcolor: alpha(adminPalette.text.primary, 0.04) } }}>
+                  <TableRow
+                    sx={{
+                      '& td': {
+                        fontWeight: 'bold',
+                        bgcolor: alpha(adminPalette.text.primary, 0.04),
+                      },
+                    }}
+                  >
                     <TableCell>Total Food</TableCell>
                     <TableCell align="right">
                       {Object.values(foodTotals).reduce((sum, { count }) => sum + count, 0)}
