@@ -129,7 +129,7 @@ export interface NewsItem {
 }
 
 export type RideSharePostType = 'offer' | 'request';
-export type RideSharePostStatus = 'active' | 'cancelled';
+export type RideSharePostStatus = 'active' | 'completed' | 'cancelled';
 export type RideShareJoinStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
 
 export interface RideSharePost {
@@ -145,6 +145,7 @@ export interface RideSharePost {
   seats_available: number;
   notes: string | null;
   status: RideSharePostStatus;
+  is_completed: boolean;
   created_date: string;
   updated_date: string;
   is_own_post: boolean;
@@ -156,6 +157,7 @@ export interface RideShareJoinRequest {
   id: number;
   post_id: number;
   post_type: RideSharePostType;
+  post_status: RideSharePostStatus;
   post_origin: string;
   post_destination: string;
   post_departure_time: string;
@@ -163,7 +165,6 @@ export interface RideShareJoinRequest {
   post_owner_display_name: string;
   requester_profile_uuid: string;
   requester_display_name: string;
-  message: string | null;
   status: RideShareJoinStatus;
   created_date: string;
   responded_date: string | null;
@@ -309,14 +310,10 @@ export const createRideSharePost = async (
  */
 export const requestRideShareJoin = async (
   profileUuid: string,
-  postId: number,
-  message?: string
+  postId: number
 ): Promise<number> => {
   const response = await axios.post(
-    `${API_BASE_URL}/profile/${profileUuid}/rideshare/posts/${postId}/react`,
-    {
-      message,
-    }
+    `${API_BASE_URL}/profile/${profileUuid}/rideshare/posts/${postId}/react`
   );
   return response.data.request_id;
 };
@@ -350,6 +347,13 @@ export const rejectRideShareJoinRequest = async (
  */
 export const cancelRideSharePost = async (profileUuid: string, postId: number): Promise<void> => {
   await axios.delete(`${API_BASE_URL}/profile/${profileUuid}/rideshare/posts/${postId}`);
+};
+
+/**
+ * Mark own ride share post as completed
+ */
+export const completeRideSharePost = async (profileUuid: string, postId: number): Promise<void> => {
+  await axios.put(`${API_BASE_URL}/profile/${profileUuid}/rideshare/posts/${postId}/complete`);
 };
 
 /**

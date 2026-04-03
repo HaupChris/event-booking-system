@@ -14,8 +14,10 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from src.services.app_settings_service import (
     get_frontend_branding_pack,
     get_payment_link,
+    get_rideshare_enabled,
     set_frontend_branding_pack,
     set_payment_link,
+    set_rideshare_enabled,
 )
 from src.services.password_service import VALID_ROLES, update_password
 from src.utils.logger import get_logger
@@ -131,9 +133,52 @@ def update_branding_pack_setting():
     )
 
 
+@admin_settings_bp.route("/settings/rideshare-enabled", methods=["GET"])
+@jwt_required()
+def get_rideshare_enabled_setting():
+    """Return whether rideshare is enabled for profile pages."""
+    unauthorized_response = _ensure_admin_identity()
+    if unauthorized_response:
+        return unauthorized_response
+
+    return jsonify({"rideshare_enabled": get_rideshare_enabled()}), 200
+
+
+@admin_settings_bp.route("/settings/rideshare-enabled", methods=["PUT"])
+@jwt_required()
+def update_rideshare_enabled_setting():
+    """Update rideshare enable/disable toggle."""
+    unauthorized_response = _ensure_admin_identity()
+    if unauthorized_response:
+        return unauthorized_response
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"msg": "Missing JSON body"}), 400
+
+    rideshare_enabled = data.get("rideshare_enabled")
+    if not isinstance(rideshare_enabled, bool):
+        return jsonify({"msg": "rideshare_enabled must be a boolean"}), 400
+
+    success = set_rideshare_enabled(rideshare_enabled)
+    if not success:
+        return jsonify({"msg": "Failed to update rideshare toggle"}), 500
+
+    logger.info("Rideshare toggle updated via admin settings")
+    return (
+        jsonify(
+            {
+                "msg": "Rideshare toggle updated successfully",
+                "rideshare_enabled": rideshare_enabled,
+            }
+        ),
+        200,
+    )
+
+
 @admin_settings_bp.route("/settings/password", methods=["PUT"])
 @jwt_required()
-def change_password():
+def change_password():  # noqa: PLR0911
     """Update the password for a given role."""
     try:
         unauthorized_response = _ensure_admin_identity()
@@ -148,9 +193,10 @@ def change_password():
         new_password = data.get("new_password", "")
 
         if not role or role not in VALID_ROLES:
-            return jsonify(
-                {"msg": f"Invalid role. Must be one of: {', '.join(sorted(VALID_ROLES))}"}
-            ), 400
+            return (
+                jsonify({"msg": f"Invalid role. Must be one of: {', '.join(sorted(VALID_ROLES))}"}),
+                400,
+            )
 
         if len(new_password) < MIN_PASSWORD_LENGTH:
             return (

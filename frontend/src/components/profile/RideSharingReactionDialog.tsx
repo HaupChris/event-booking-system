@@ -7,28 +7,22 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
-import NotesIcon from '@mui/icons-material/Notes';
-import { OrnateInput } from '../../form/userArea/TestDesignFormPrimitives';
 import type { RideSharePost } from '../../services/profileService';
 import { formatDateTime } from './RideSharingCards';
 
 interface RideSharingReactionDialogProps {
   open: boolean;
   selectedPost: RideSharePost | null;
-  message: string;
   submitting: boolean;
   onClose: () => void;
-  onChangeMessage: (value: string) => void;
   onSend: () => void;
 }
 
 const RideSharingReactionDialog: React.FC<RideSharingReactionDialogProps> = ({
   open,
   selectedPost,
-  message,
   submitting,
   onClose,
-  onChangeMessage,
   onSend,
 }) => {
   return (
@@ -42,23 +36,21 @@ const RideSharingReactionDialog: React.FC<RideSharingReactionDialogProps> = ({
             ? `${selectedPost.origin} -> ${selectedPost.destination} am ${formatDateTime(selectedPost.departure_time)}`
             : ''}
         </Typography>
-        <OrnateInput
-          size="compact"
-          label="Nachricht (optional)"
-          icon={<NotesIcon />}
-          value={message}
-          onChange={(event) => onChangeMessage(event.target.value)}
-          multiline={true}
-          rows={3}
-          placeholder="Kurze Nachricht zur Abstimmung"
-        />
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Mit dem Senden wird eine Kontaktanfrage erstellt. Die andere Person kann sie bestaetigen
+          oder ablehnen.
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Bei Bestaetigung werden beidseitig Telefonnummern freigegeben. Es werden keine
+          Chat-Nachrichten gespeichert.
+        </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={submitting}>
           Abbrechen
         </Button>
         <Button variant="contained" onClick={onSend} disabled={submitting}>
-          Senden
+          Kontakt anfragen
         </Button>
       </DialogActions>
     </Dialog>

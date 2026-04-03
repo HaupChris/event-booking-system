@@ -12,7 +12,7 @@ from flask import Blueprint, jsonify, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-from src.services.app_settings_service import get_payment_link
+from src.services.app_settings_service import get_payment_link, get_rideshare_enabled
 from src.services.faq_service import get_faqs_grouped_by_category
 from src.services.mail_service import send_profile_recovery_mail
 from src.services.news_service import get_news_for_profile, get_unread_count, mark_news_as_read
@@ -26,6 +26,7 @@ from src.services.profile_service import (
 from src.services.rideshare_service import (
     approve_join_request,
     cancel_rideshare_post,
+    complete_rideshare_post,
     create_rideshare_post,
     get_rideshare_board,
     react_to_rideshare_post,
@@ -39,6 +40,19 @@ logger = get_logger(__name__)
 
 profile_bp = Blueprint("profile", __name__)
 limiter_profile = Limiter(get_remote_address)
+
+
+def _ensure_rideshare_enabled():
+    if get_rideshare_enabled():
+        return None
+    return (
+        jsonify(
+            {
+                "error": "Rideshare is currently disabled and will be enabled shortly before festival."
+            }
+        ),
+        403,
+    )
 
 
 @profile_bp.route("/<profile_uuid>", methods=["GET"])
@@ -134,6 +148,10 @@ def get_rideshare(profile_uuid: str):
     client_ip = request.remote_addr
 
     try:
+        disabled_response = _ensure_rideshare_enabled()
+        if disabled_response:
+            return disabled_response
+
         logger.debug(f"Ride sharing board request for UUID {profile_uuid[:8]}... from {client_ip}")
 
         rideshare = get_rideshare_board(profile_uuid)
@@ -154,6 +172,10 @@ def create_rideshare(profile_uuid: str):
     client_ip = request.remote_addr
 
     try:
+        disabled_response = _ensure_rideshare_enabled()
+        if disabled_response:
+            return disabled_response
+
         logger.info(f"Ride share post create for UUID {profile_uuid[:8]}... from {client_ip}")
 
         data = request.json or {}
@@ -186,12 +208,15 @@ def react_to_rideshare(profile_uuid: str, post_id: int):
     client_ip = request.remote_addr
 
     try:
+        disabled_response = _ensure_rideshare_enabled()
+        if disabled_response:
+            return disabled_response
+
         logger.info(
             f"Ride share reaction for UUID {profile_uuid[:8]}..., post {post_id} from {client_ip}"
         )
 
-        data = request.json or {}
-        join_request_id = react_to_rideshare_post(profile_uuid, post_id, data.get("message"))
+        join_request_id = react_to_rideshare_post(profile_uuid, post_id)
         return jsonify({"message": "Reaction created", "request_id": join_request_id}), 201
 
     except LookupError as e:
@@ -216,6 +241,10 @@ def approve_rideshare_join(profile_uuid: str, request_id: int):
     client_ip = request.remote_addr
 
     try:
+        disabled_response = _ensure_rideshare_enabled()
+        if disabled_response:
+            return disabled_response
+
         logger.info(
             f"Ride share join approval for UUID {profile_uuid[:8]}..., request {request_id} from {client_ip}"
         )
@@ -244,6 +273,10 @@ def reject_rideshare_join(profile_uuid: str, request_id: int):
     client_ip = request.remote_addr
 
     try:
+        disabled_response = _ensure_rideshare_enabled()
+        if disabled_response:
+            return disabled_response
+
         logger.info(
             f"Ride share join rejection for UUID {profile_uuid[:8]}..., request {request_id} from {client_ip}"
         )
@@ -270,6 +303,10 @@ def cancel_rideshare(profile_uuid: str, post_id: int):
     client_ip = request.remote_addr
 
     try:
+        disabled_response = _ensure_rideshare_enabled()
+        if disabled_response:
+            return disabled_response
+
         logger.info(
             f"Ride share post cancel for UUID {profile_uuid[:8]}..., post {post_id} from {client_ip}"
         )
@@ -286,6 +323,36 @@ def cancel_rideshare(profile_uuid: str, post_id: int):
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         logger.error(f"Ride share post cancel failed: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@profile_bp.route("/<profile_uuid>/rideshare/posts/<int:post_id>/complete", methods=["PUT"])
+@limiter_profile.limit("30/minute")
+def complete_rideshare(profile_uuid: str, post_id: int):
+    """Mark an owned ride share post as completed."""
+    client_ip = request.remote_addr
+
+    try:
+        disabled_response = _ensure_rideshare_enabled()
+        if disabled_response:
+            return disabled_response
+
+        logger.info(
+            f"Ride share post complete for UUID {profile_uuid[:8]}..., post {post_id} from {client_ip}"
+        )
+        complete_rideshare_post(profile_uuid, post_id)
+        return jsonify({"message": "Ride share post marked as completed"}), 200
+
+    except LookupError as e:
+        logger.warning(
+            f"Ride share post complete failed: {str(e)} for UUID {profile_uuid[:8]}..., post {post_id}"
+        )
+        return jsonify({"error": str(e)}), 404
+    except ValueError as e:
+        logger.warning(f"Ride share post complete validation failed: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        logger.error(f"Ride share post complete failed: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500
 
 

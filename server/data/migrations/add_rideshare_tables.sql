@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS RideSharePosts (
     seats_total INTEGER,
     notes TEXT,
     status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'cancelled')),
+    is_completed INTEGER NOT NULL DEFAULT 0,
+    completed_date TEXT,
     created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_date DATETIME DEFAULT CURRENT_TIMESTAMP
 );

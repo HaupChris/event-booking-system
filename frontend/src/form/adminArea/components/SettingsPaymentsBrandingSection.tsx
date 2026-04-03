@@ -1,5 +1,14 @@
 import React from 'react';
-import { Box, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  FormControlLabel,
+  MenuItem,
+  Stack,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { Save } from '@mui/icons-material';
 
@@ -20,6 +29,11 @@ interface SettingsPaymentsBrandingSectionProps {
   savingBrandingPack: boolean;
   onBrandingPackDraftChange: (value: string) => void;
   onBrandingPackSave: () => void;
+  rideshareEnabled: boolean;
+  rideshareEnabledDraft: boolean;
+  savingRideShareEnabled: boolean;
+  onToggleRideShareEnabledDraft: (value: boolean) => void;
+  onRideShareEnabledSave: () => void;
   primaryButtonSx: SxProps<Theme>;
 }
 
@@ -35,6 +49,11 @@ const SettingsPaymentsBrandingSection: React.FC<SettingsPaymentsBrandingSectionP
   savingBrandingPack,
   onBrandingPackDraftChange,
   onBrandingPackSave,
+  rideshareEnabled,
+  rideshareEnabledDraft,
+  savingRideShareEnabled,
+  onToggleRideShareEnabledDraft,
+  onRideShareEnabledSave,
   primaryButtonSx,
 }) => {
   return (
@@ -104,6 +123,38 @@ const SettingsPaymentsBrandingSection: React.FC<SettingsPaymentsBrandingSectionP
             }}
           >
             {savingBrandingPack ? 'Saving...' : 'Save'}
+          </Button>
+        </Stack>
+      </Box>
+
+      <Box>
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
+          Mitfahrboerse
+        </Typography>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems="center">
+          <FormControlLabel
+            control={
+              <Switch
+                checked={rideshareEnabledDraft}
+                onChange={(event) => onToggleRideShareEnabledDraft(event.target.checked)}
+              />
+            }
+            label={rideshareEnabledDraft ? 'Aktiviert' : 'Deaktiviert'}
+            sx={{ mr: 'auto', ml: 0 }}
+          />
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<Save />}
+            disabled={savingRideShareEnabled || rideshareEnabledDraft === rideshareEnabled}
+            onClick={onRideShareEnabledSave}
+            sx={{
+              ...primaryButtonSx,
+              minWidth: { xs: '100%', md: 150 },
+              height: 40,
+            }}
+          >
+            {savingRideShareEnabled ? 'Saving...' : 'Save'}
           </Button>
         </Stack>
       </Box>

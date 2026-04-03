@@ -11,6 +11,7 @@ logger = get_logger(__name__)
 POST_TYPE_OFFER = "offer"
 POST_TYPE_REQUEST = "request"
 ACTIVE_STATUS = "active"
+COMPLETED_STATUS = "completed"
 PENDING_STATUS = "pending"
 APPROVED_STATUS = "approved"
 REJECTED_STATUS = "rejected"
@@ -33,6 +34,8 @@ def _ensure_rideshare_schema(cursor: sqlite3.Cursor) -> None:
             seats_total INTEGER,
             notes TEXT,
             status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'cancelled')),
+            is_completed INTEGER NOT NULL DEFAULT 0,
+            completed_date TEXT,
             created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_date DATETIME DEFAULT CURRENT_TIMESTAMP
         );
@@ -65,6 +68,29 @@ def _ensure_rideshare_schema(cursor: sqlite3.Cursor) -> None:
         CREATE INDEX IF NOT EXISTS idx_rideshare_join_requester
             ON RideShareJoinRequests(requester_profile_uuid);
         """)
+
+    cursor.execute("PRAGMA table_info(RideSharePosts)")
+    columns = {str(row[1]) for row in cursor.fetchall()}
+    schema_changed = False
+
+    if "is_completed" not in columns:
+        cursor.execute(
+            "ALTER TABLE RideSharePosts ADD COLUMN is_completed INTEGER NOT NULL DEFAULT 0"
+        )
+        schema_changed = True
+
+    if "completed_date" not in columns:
+        cursor.execute("ALTER TABLE RideSharePosts ADD COLUMN completed_date TEXT")
+        schema_changed = True
+
+    if schema_changed:
+        cursor.connection.commit()
+
+
+def _resolve_post_status(status: str, is_completed: bool) -> str:
+    if is_completed:
+        return COMPLETED_STATUS
+    return status
 
 
 def _compose_display_name(first_name: str | None, last_name: str | None) -> str:
@@ -209,7 +235,9 @@ def _serialize_post(
     if post_type == POST_TYPE_OFFER and seats_total is not None:
         seats_available = max(int(seats_total) - seats_taken, 0)
 
-    is_active = str(row["status"]) == ACTIVE_STATUS
+    is_completed = bool(row["is_completed"])
+    effective_status = _resolve_post_status(str(row["status"]), is_completed)
+    is_active = effective_status == ACTIVE_STATUS
     can_join_offer = post_type == POST_TYPE_OFFER and seats_available > 0
     can_react_to_request = post_type == POST_TYPE_REQUEST
     can_join = (
@@ -231,7 +259,8 @@ def _serialize_post(
         "seats_taken": seats_taken,
         "seats_available": seats_available,
         "notes": row["notes"],
-        "status": row["status"],
+        "status": effective_status,
+        "is_completed": is_completed,
         "created_date": row["created_date"],
         "updated_date": row["updated_date"],
         "is_own_post": row["owner_profile_uuid"] == viewer_profile_uuid,
@@ -269,6 +298,7 @@ def get_rideshare_board(profile_uuid: str) -> dict[str, Any]:  # noqa: PLR0915
             SELECT *
             FROM RideSharePosts
             WHERE status = ?
+              AND COALESCE(is_completed, 0) = 0
             ORDER BY departure_time ASC, created_date DESC
             """,
             (ACTIVE_STATUS,),
@@ -319,7 +349,6 @@ def get_rideshare_board(profile_uuid: str) -> dict[str, Any]:  # noqa: PLR0915
                 jr.id,
                 jr.post_id,
                 jr.requester_profile_uuid,
-                jr.message,
                 jr.status,
                 jr.created_date,
                 jr.responded_date,
@@ -327,7 +356,9 @@ def get_rideshare_board(profile_uuid: str) -> dict[str, Any]:  # noqa: PLR0915
                 p.destination,
                 p.departure_time,
                 p.owner_profile_uuid,
-                p.post_type
+                p.post_type,
+                p.status as post_status,
+                p.is_completed
             FROM RideShareJoinRequests jr
             JOIN RideSharePosts p ON p.id = jr.post_id
             WHERE p.owner_profile_uuid = ?
@@ -358,9 +389,11 @@ def get_rideshare_board(profile_uuid: str) -> dict[str, Any]:  # noqa: PLR0915
                     "post_owner_profile_uuid": row["owner_profile_uuid"],
                     "post_owner_display_name": viewer["display_name"],
                     "post_type": row["post_type"],
+                    "post_status": _resolve_post_status(
+                        str(row["post_status"]), bool(row["is_completed"])
+                    ),
                     "requester_profile_uuid": row["requester_profile_uuid"],
                     "requester_display_name": requester["display_name"],
-                    "message": row["message"],
                     "status": row["status"],
                     "created_date": row["created_date"],
                     "responded_date": row["responded_date"],
@@ -376,7 +409,6 @@ def get_rideshare_board(profile_uuid: str) -> dict[str, Any]:  # noqa: PLR0915
                 jr.id,
                 jr.post_id,
                 jr.requester_profile_uuid,
-                jr.message,
                 jr.status,
                 jr.created_date,
                 jr.responded_date,
@@ -384,7 +416,9 @@ def get_rideshare_board(profile_uuid: str) -> dict[str, Any]:  # noqa: PLR0915
                 p.destination,
                 p.departure_time,
                 p.owner_profile_uuid,
-                p.post_type
+                p.post_type,
+                p.status as post_status,
+                p.is_completed
             FROM RideShareJoinRequests jr
             JOIN RideSharePosts p ON p.id = jr.post_id
             WHERE jr.requester_profile_uuid = ?
@@ -406,9 +440,11 @@ def get_rideshare_board(profile_uuid: str) -> dict[str, Any]:  # noqa: PLR0915
                     "post_owner_profile_uuid": row["owner_profile_uuid"],
                     "post_owner_display_name": owner["display_name"],
                     "post_type": row["post_type"],
+                    "post_status": _resolve_post_status(
+                        str(row["post_status"]), bool(row["is_completed"])
+                    ),
                     "requester_profile_uuid": row["requester_profile_uuid"],
                     "requester_display_name": viewer["display_name"],
-                    "message": row["message"],
                     "status": row["status"],
                     "created_date": row["created_date"],
                     "responded_date": row["responded_date"],
@@ -567,7 +603,7 @@ def create_rideshare_post(  # noqa: PLR0913
         return int(cursor.lastrowid)
 
 
-def request_join_offer(profile_uuid: str, post_id: int, message: str | None = None) -> int:
+def request_join_offer(profile_uuid: str, post_id: int) -> int:
     with closing(_connect_db()) as conn:
         conn.execute("BEGIN IMMEDIATE")
         cursor = conn.cursor()
@@ -578,7 +614,7 @@ def request_join_offer(profile_uuid: str, post_id: int, message: str | None = No
 
         cursor.execute(
             """
-            SELECT id, owner_profile_uuid, post_type, status, seats_total
+            SELECT id, owner_profile_uuid, post_type, status, is_completed, seats_total
             FROM RideSharePosts
             WHERE id = ?
             """,
@@ -588,7 +624,7 @@ def request_join_offer(profile_uuid: str, post_id: int, message: str | None = No
         if not post:
             raise LookupError("Ride share post not found")
 
-        if post["status"] != ACTIVE_STATUS:
+        if post["status"] != ACTIVE_STATUS or bool(post["is_completed"]):
             raise ValueError("This post is no longer active")
         if post["owner_profile_uuid"] == profile_uuid:
             raise ValueError("You cannot react to your own post")
@@ -609,7 +645,6 @@ def request_join_offer(profile_uuid: str, post_id: int, message: str | None = No
         )
         existing = cursor.fetchone()
 
-        normalized_message = message.strip() if message and message.strip() else None
         now = _now_iso()
 
         if existing:
@@ -620,13 +655,13 @@ def request_join_offer(profile_uuid: str, post_id: int, message: str | None = No
             cursor.execute(
                 """
                 UPDATE RideShareJoinRequests
-                SET message = ?,
+                SET message = NULL,
                     status = ?,
                     created_date = ?,
                     responded_date = NULL
                 WHERE id = ?
                 """,
-                (normalized_message, PENDING_STATUS, now, int(existing["id"])),
+                (PENDING_STATUS, now, int(existing["id"])),
             )
             request_id = int(existing["id"])
         else:
@@ -635,7 +670,7 @@ def request_join_offer(profile_uuid: str, post_id: int, message: str | None = No
                 INSERT INTO RideShareJoinRequests (post_id, requester_profile_uuid, message, status)
                 VALUES (?, ?, ?, ?)
                 """,
-                (post_id, profile_uuid, normalized_message, PENDING_STATUS),
+                (post_id, profile_uuid, None, PENDING_STATUS),
             )
             if cursor.lastrowid is None:
                 raise ValueError("Failed to create join request")
@@ -645,8 +680,8 @@ def request_join_offer(profile_uuid: str, post_id: int, message: str | None = No
         return request_id
 
 
-def react_to_rideshare_post(profile_uuid: str, post_id: int, message: str | None = None) -> int:
-    return request_join_offer(profile_uuid=profile_uuid, post_id=post_id, message=message)
+def react_to_rideshare_post(profile_uuid: str, post_id: int) -> int:
+    return request_join_offer(profile_uuid=profile_uuid, post_id=post_id)
 
 
 def approve_join_request(profile_uuid: str, request_id: int) -> bool:
@@ -667,6 +702,7 @@ def approve_join_request(profile_uuid: str, request_id: int) -> bool:
                 p.owner_profile_uuid,
                 p.post_type,
                 p.status AS post_status,
+                p.is_completed,
                 p.seats_total
             FROM RideShareJoinRequests jr
             JOIN RideSharePosts p ON p.id = jr.post_id
@@ -680,7 +716,7 @@ def approve_join_request(profile_uuid: str, request_id: int) -> bool:
 
         if row["owner_profile_uuid"] != profile_uuid:
             raise ValueError("You can only manage responses for your own posts")
-        if row["post_status"] != ACTIVE_STATUS:
+        if row["post_status"] != ACTIVE_STATUS or bool(row["is_completed"]):
             raise ValueError("This post is no longer active")
         if row["status"] != PENDING_STATUS:
             raise ValueError("Only pending requests can be approved")
@@ -721,7 +757,8 @@ def reject_join_request(profile_uuid: str, request_id: int) -> bool:
                 jr.status,
                 p.owner_profile_uuid,
                 p.post_type,
-                p.status AS post_status
+                p.status AS post_status,
+                p.is_completed
             FROM RideShareJoinRequests jr
             JOIN RideSharePosts p ON p.id = jr.post_id
             WHERE jr.id = ?
@@ -734,7 +771,7 @@ def reject_join_request(profile_uuid: str, request_id: int) -> bool:
 
         if row["owner_profile_uuid"] != profile_uuid:
             raise ValueError("You can only manage responses for your own posts")
-        if row["post_status"] != ACTIVE_STATUS:
+        if row["post_status"] != ACTIVE_STATUS or bool(row["is_completed"]):
             raise ValueError("This post is no longer active")
         if row["status"] != PENDING_STATUS:
             raise ValueError("Only pending requests can be rejected")
@@ -752,6 +789,60 @@ def reject_join_request(profile_uuid: str, request_id: int) -> bool:
         return True
 
 
+def complete_rideshare_post(profile_uuid: str, post_id: int) -> bool:
+    with closing(_connect_db()) as conn:
+        conn.execute("BEGIN IMMEDIATE")
+        cursor = conn.cursor()
+        _ensure_rideshare_schema(cursor)
+
+        if not _get_profile_identity(cursor, profile_uuid):
+            raise LookupError("Profile not found")
+
+        cursor.execute(
+            """
+            SELECT id, owner_profile_uuid, status, is_completed
+            FROM RideSharePosts
+            WHERE id = ?
+            """,
+            (post_id,),
+        )
+        post = cursor.fetchone()
+        if not post:
+            raise LookupError("Post not found")
+        if post["owner_profile_uuid"] != profile_uuid:
+            raise ValueError("You can only complete your own posts")
+
+        if post["status"] == CANCELLED_STATUS:
+            raise ValueError("Removed posts cannot be marked as completed")
+
+        if bool(post["is_completed"]):
+            return True
+
+        now = _now_iso()
+        cursor.execute(
+            """
+            UPDATE RideSharePosts
+            SET is_completed = 1,
+                completed_date = ?,
+                updated_date = ?
+            WHERE id = ?
+            """,
+            (now, now, post_id),
+        )
+        cursor.execute(
+            """
+            UPDATE RideShareJoinRequests
+            SET status = ?,
+                responded_date = ?
+            WHERE post_id = ? AND status = ?
+            """,
+            (CANCELLED_STATUS, now, post_id, PENDING_STATUS),
+        )
+
+        conn.commit()
+        return True
+
+
 def cancel_rideshare_post(profile_uuid: str, post_id: int) -> bool:
     with closing(_connect_db()) as conn:
         conn.execute("BEGIN IMMEDIATE")
@@ -763,7 +854,7 @@ def cancel_rideshare_post(profile_uuid: str, post_id: int) -> bool:
 
         cursor.execute(
             """
-            SELECT id, owner_profile_uuid, status
+            SELECT id, owner_profile_uuid, status, is_completed
             FROM RideSharePosts
             WHERE id = ?
             """,
@@ -783,6 +874,7 @@ def cancel_rideshare_post(profile_uuid: str, post_id: int) -> bool:
             """
             UPDATE RideSharePosts
             SET status = ?,
+                is_completed = 0,
                 updated_date = ?
             WHERE id = ?
             """,

@@ -25,6 +25,7 @@ interface RideSharingBoardProps {
   submitting: boolean;
   viewMode: 'overview' | 'my';
   onOpenJoinDialog: (post: RideSharePost) => void;
+  onCompletePost: (postId: number) => void;
   onCancelPost: (postId: number) => void;
   onApprove: (requestId: number) => void;
   onReject: (requestId: number) => void;
@@ -37,6 +38,7 @@ const RideSharingBoard: React.FC<RideSharingBoardProps> = ({
   submitting,
   viewMode,
   onOpenJoinDialog,
+  onCompletePost,
   onCancelPost,
   onApprove,
   onReject,
@@ -54,7 +56,7 @@ const RideSharingBoard: React.FC<RideSharingBoardProps> = ({
         <>
           <Typography variant="h6" sx={headingSx}>
             <LocalOfferIcon fontSize="small" sx={{ mr: 1, verticalAlign: 'text-bottom' }} />
-            Fahrtangebote
+            Fahrtangebote ({board.offers.length})
           </Typography>
           {board.offers.length === 0 ? (
             <Alert severity="info">Aktuell gibt es keine aktiven Angebote.</Alert>
@@ -74,7 +76,7 @@ const RideSharingBoard: React.FC<RideSharingBoardProps> = ({
 
           <Typography variant="h6" sx={headingSx}>
             <PersonSearchIcon fontSize="small" sx={{ mr: 1, verticalAlign: 'text-bottom' }} />
-            Fahrtgesuche
+            Fahrtgesuche ({board.requests.length})
           </Typography>
           {board.requests.length === 0 ? (
             <Alert severity="info">Aktuell gibt es keine aktiven Gesuche.</Alert>
@@ -98,7 +100,7 @@ const RideSharingBoard: React.FC<RideSharingBoardProps> = ({
         <>
           <Typography variant="h6" sx={headingSx}>
             <RouteIcon fontSize="small" sx={{ mr: 1, verticalAlign: 'text-bottom' }} />
-            Meine Eintraege
+            Meine Eintraege ({board.my_posts.length})
           </Typography>
           {board.my_posts.length === 0 ? (
             <Alert severity="info">Du hast noch keinen Eintrag erstellt.</Alert>
@@ -110,6 +112,7 @@ const RideSharingBoard: React.FC<RideSharingBoardProps> = ({
                   post={post}
                   cardSx={cardSx}
                   submitting={submitting}
+                  onComplete={onCompletePost}
                   onCancel={onCancelPost}
                 />
               ))}

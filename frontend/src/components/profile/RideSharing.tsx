@@ -11,6 +11,7 @@ import { useBrandingPack } from '../../branding/useBrandingPack';
 import {
   approveRideShareJoinRequest,
   cancelRideSharePost,
+  completeRideSharePost,
   createRideSharePost,
   getRideShareBoard,
   rejectRideShareJoinRequest,
@@ -63,7 +64,6 @@ const RideSharing: React.FC<RideSharingProps> = ({ viewMode }) => {
 
   const [reactDialogOpen, setReactDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<RideSharePost | null>(null);
-  const [reactMessage, setReactMessage] = useState('');
 
   const clearFeedback = () => {
     setErrorMessage(null);
@@ -158,7 +158,7 @@ const RideSharing: React.FC<RideSharingProps> = ({ viewMode }) => {
     await runWithProfileUuid(async (uuid) => {
       try {
         setSubmitting(true);
-        await requestRideShareJoin(uuid, selectedPost.id, reactMessage);
+        await requestRideShareJoin(uuid, selectedPost.id);
         setReactDialogOpen(false);
         setSuccessMessage(
           selectedPost.post_type === 'offer'
@@ -222,6 +222,24 @@ const RideSharing: React.FC<RideSharingProps> = ({ viewMode }) => {
     });
   };
 
+  const handleCompletePost = async (postId: number) => {
+    await runWithProfileUuid(async (uuid) => {
+      try {
+        setSubmitting(true);
+        clearFeedback();
+        await completeRideSharePost(uuid, postId);
+        setSuccessMessage('Eintrag als erledigt markiert. Neue Reaktionen sind jetzt geschlossen.');
+        await loadBoard();
+      } catch (error) {
+        setErrorMessage(
+          getErrorMessage(error, 'Eintrag konnte nicht als erledigt markiert werden.')
+        );
+      } finally {
+        setSubmitting(false);
+      }
+    });
+  };
+
   return (
     <FormCard selected={true} sx={{ mt: 0 }}>
       <MissionHeading
@@ -240,6 +258,11 @@ const RideSharing: React.FC<RideSharingProps> = ({ viewMode }) => {
           {successMessage}
         </Alert>
       )}
+
+      <Alert severity="info" sx={{ mb: 2 }}>
+        Ablauf: Eintrag erstellen {'->'} Kontakt anfragen {'->'} Freigabe bestaetigen {'->'}
+        Telefonnummern sichtbar. Die Plattform speichert keine Chat-Unterhaltungen.
+      </Alert>
 
       {viewMode === 'create' && (
         <RideSharingCreateForm
@@ -281,10 +304,10 @@ const RideSharing: React.FC<RideSharingProps> = ({ viewMode }) => {
           onOpenJoinDialog={(post) => {
             clearFeedback();
             setSelectedPost(post);
-            setReactMessage('');
             setReactDialogOpen(true);
           }}
           onCancelPost={handleCancelPost}
+          onCompletePost={handleCompletePost}
           onApprove={handleApprove}
           onReject={handleReject}
         />
@@ -293,10 +316,8 @@ const RideSharing: React.FC<RideSharingProps> = ({ viewMode }) => {
       <RideSharingReactionDialog
         open={reactDialogOpen}
         selectedPost={selectedPost}
-        message={reactMessage}
         submitting={submitting}
         onClose={() => setReactDialogOpen(false)}
-        onChangeMessage={setReactMessage}
         onSend={handleSendReaction}
       />
     </FormCard>

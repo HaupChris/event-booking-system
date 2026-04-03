@@ -5,6 +5,7 @@ const API_BASE_URL = API_URL || 'http://localhost:5001';
 
 export interface FrontendSettingsResponse {
   branding_pack?: string;
+  rideshare_enabled?: boolean;
 }
 
 export const getFrontendSettings = async (): Promise<FrontendSettingsResponse> => {

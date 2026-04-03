@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import React from 'react';
 import { alpha, Box, Button, Card, CardContent, Chip, Typography } from '@mui/material';
 import type {
@@ -5,6 +6,30 @@ import type {
   RideShareJoinRequest,
   RideSharePost,
 } from '../../services/profileService';
+
+const compactCardContentSx = { p: 1.5, '&:last-child': { pb: 1.5 } };
+
+const getReactionDisabledReason = (post: RideSharePost): string | null => {
+  if (post.is_own_post) {
+    return 'Dein eigener Eintrag';
+  }
+  if (post.status === 'completed') {
+    return 'Bereits als erledigt markiert';
+  }
+  if (post.status === 'cancelled') {
+    return 'Eintrag wurde entfernt';
+  }
+  if (post.my_request_status === 'pending') {
+    return 'Du hast bereits eine offene Anfrage';
+  }
+  if (post.my_request_status === 'approved') {
+    return 'Kontakt wurde bereits freigegeben';
+  }
+  if (post.post_type === 'offer' && post.seats_available <= 0) {
+    return 'Keine freien Plaetze';
+  }
+  return null;
+};
 
 export const formatDateTime = (value: string) => {
   const date = new Date(value);
@@ -57,15 +82,15 @@ export function RideShareOfferCard({
 }: OfferCardProps) {
   return (
     <Card variant="outlined" sx={cardSx}>
-      <CardContent>
+      <CardContent sx={compactCardContentSx}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
               {offer.origin}
               {' -> '}
               {offer.destination}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="caption" color="text.secondary">
               {formatDateTime(offer.departure_time)} | von {offer.owner_display_name}
             </Typography>
           </Box>
@@ -77,24 +102,39 @@ export function RideShareOfferCard({
         </Box>
 
         {offer.notes && (
-          <Typography variant="body2" sx={{ mt: 1.5 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 1,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
             {offer.notes}
           </Typography>
         )}
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
           {offer.is_own_post ? (
             <Chip size="small" color="info" label="Dein Angebot" />
           ) : (
             <Button
+              size="small"
               variant="outlined"
               disabled={!offer.can_join || submitting}
               onClick={() => onOpenJoinDialog(offer)}
             >
-              Beitritt anfragen
+              Kontakt anfragen
             </Button>
           )}
         </Box>
+        {!offer.can_join && !offer.is_own_post && (
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+            {getReactionDisabledReason(offer)}
+          </Typography>
+        )}
       </CardContent>
     </Card>
   );
@@ -115,34 +155,49 @@ export function RideShareRequestPostCard({
 }: RequestPostCardProps) {
   return (
     <Card variant="outlined" sx={cardSx}>
-      <CardContent>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+      <CardContent sx={compactCardContentSx}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
           {post.origin}
           {' -> '}
           {post.destination}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="caption" color="text.secondary">
           {formatDateTime(post.departure_time)} | von {post.owner_display_name}
         </Typography>
         {post.notes && (
-          <Typography variant="body2" sx={{ mt: 1.5 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 1,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
             {post.notes}
           </Typography>
         )}
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
           {post.is_own_post ? (
             <Chip size="small" color="info" label="Dein Gesuch" />
           ) : (
             <Button
+              size="small"
               variant="outlined"
               disabled={!post.can_join || submitting}
               onClick={() => onOpenJoinDialog(post)}
             >
-              Auf Gesuch reagieren
+              Kontakt anfragen
             </Button>
           )}
         </Box>
+        {!post.can_join && !post.is_own_post && (
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+            {getReactionDisabledReason(post)}
+          </Typography>
+        )}
       </CardContent>
     </Card>
   );
@@ -152,21 +207,28 @@ interface MyPostCardProps {
   post: RideSharePost;
   cardSx: object;
   submitting: boolean;
+  onComplete: (postId: number) => void;
   onCancel: (postId: number) => void;
 }
 
-export function RideShareMyPostCard({ post, cardSx, submitting, onCancel }: MyPostCardProps) {
+export function RideShareMyPostCard({
+  post,
+  cardSx,
+  submitting,
+  onComplete,
+  onCancel,
+}: MyPostCardProps) {
   return (
     <Card variant="outlined" sx={cardSx}>
-      <CardContent>
+      <CardContent sx={compactCardContentSx}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
               {post.origin}
               {' -> '}
               {post.destination}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="caption" color="text.secondary">
               {formatDateTime(post.departure_time)}
             </Typography>
           </Box>
@@ -178,29 +240,52 @@ export function RideShareMyPostCard({ post, cardSx, submitting, onCancel }: MyPo
         </Box>
 
         {post.post_type === 'offer' && (
-          <Typography variant="body2" sx={{ mt: 1 }}>
+          <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
             Freie Plaetze: {post.seats_available} / {post.seats_total ?? 0}
           </Typography>
         )}
 
         {post.notes && (
-          <Typography variant="body2" sx={{ mt: 1 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 1,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
             {post.notes}
           </Typography>
         )}
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
           {post.status === 'active' ? (
-            <Button
-              variant="outlined"
-              color="error"
-              disabled={submitting}
-              onClick={() => onCancel(post.id)}
-            >
-              Stornieren
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                size="small"
+                variant="outlined"
+                color="success"
+                disabled={submitting}
+                onClick={() => onComplete(post.id)}
+              >
+                Erledigt
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                color="error"
+                disabled={submitting}
+                onClick={() => onCancel(post.id)}
+              >
+                Entfernen
+              </Button>
+            </Box>
+          ) : post.status === 'completed' ? (
+            <Chip size="small" color="success" label="Erledigt" />
           ) : (
-            <Chip size="small" label="Storniert" />
+            <Chip size="small" label="Entfernt" />
           )}
         </Box>
       </CardContent>
@@ -223,15 +308,19 @@ export function RideShareIncomingJoinRequestCard({
   onApprove,
   onReject,
 }: IncomingJoinRequestCardProps) {
+  const isRemoved = requestItem.post_status === 'cancelled';
+  const isCompleted = requestItem.post_status === 'completed';
+  const isClosed = isRemoved || isCompleted;
+
   return (
     <Card variant="outlined" sx={cardSx}>
-      <CardContent>
+      <CardContent sx={compactCardContentSx}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
               {requestItem.requester_display_name}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="caption" color="text.secondary">
               {requestItem.post_type === 'offer' ? 'Angebot' : 'Gesuch'}
               {' | '}
               {requestItem.post_origin}
@@ -239,14 +328,12 @@ export function RideShareIncomingJoinRequestCard({
               {requestItem.post_destination} | {formatDateTime(requestItem.post_departure_time)}
             </Typography>
           </Box>
-          {getJoinStatusChip(requestItem.status)}
+          {isClosed ? (
+            <Chip size="small" label={isRemoved ? 'Entfernt' : 'Erledigt'} />
+          ) : (
+            getJoinStatusChip(requestItem.status)
+          )}
         </Box>
-
-        {requestItem.message && (
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            Nachricht: {requestItem.message}
-          </Typography>
-        )}
 
         {requestItem.phone_number && (
           <Typography variant="body2" sx={{ mt: 1 }}>
@@ -254,9 +341,22 @@ export function RideShareIncomingJoinRequestCard({
           </Typography>
         )}
 
-        {requestItem.status === 'pending' && (
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
+        {isRemoved && (
+          <Typography variant="caption" color="warning.main" sx={{ display: 'block', mt: 1 }}>
+            Dieser Eintrag wurde entfernt.
+          </Typography>
+        )}
+
+        {isCompleted && (
+          <Typography variant="caption" color="info.main" sx={{ display: 'block', mt: 1 }}>
+            Dieser Eintrag wurde als erledigt markiert.
+          </Typography>
+        )}
+
+        {requestItem.status === 'pending' && !isClosed && (
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 1 }}>
             <Button
+              size="small"
               variant="outlined"
               color="error"
               disabled={submitting}
@@ -265,6 +365,7 @@ export function RideShareIncomingJoinRequestCard({
               Ablehnen
             </Button>
             <Button
+              size="small"
               variant="contained"
               color="success"
               disabled={submitting}
@@ -285,15 +386,19 @@ interface MyJoinRequestCardProps {
 }
 
 export function RideShareMyJoinRequestCard({ requestItem, cardSx }: MyJoinRequestCardProps) {
+  const isRemoved = requestItem.post_status === 'cancelled';
+  const isCompleted = requestItem.post_status === 'completed';
+  const isClosed = isRemoved || isCompleted;
+
   return (
     <Card variant="outlined" sx={cardSx}>
-      <CardContent>
+      <CardContent sx={compactCardContentSx}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
               Bei {requestItem.post_owner_display_name}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="caption" color="text.secondary">
               {requestItem.post_type === 'offer' ? 'Angebot' : 'Gesuch'}
               {' | '}
               {requestItem.post_origin}
@@ -301,11 +406,27 @@ export function RideShareMyJoinRequestCard({ requestItem, cardSx }: MyJoinReques
               {requestItem.post_destination} | {formatDateTime(requestItem.post_departure_time)}
             </Typography>
           </Box>
-          {getJoinStatusChip(requestItem.status)}
+          {isClosed ? (
+            <Chip size="small" label={isRemoved ? 'Entfernt' : 'Erledigt'} />
+          ) : (
+            getJoinStatusChip(requestItem.status)
+          )}
         </Box>
 
+        {isRemoved && (
+          <Typography variant="caption" color="warning.main" sx={{ display: 'block', mt: 1 }}>
+            Dieses Angebot/Gesuch wurde entfernt.
+          </Typography>
+        )}
+
+        {isCompleted && (
+          <Typography variant="caption" color="info.main" sx={{ display: 'block', mt: 1 }}>
+            Dieses Angebot/Gesuch wurde als erledigt markiert.
+          </Typography>
+        )}
+
         {requestItem.phone_number && (
-          <Typography variant="body2" sx={{ mt: 1 }}>
+          <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
             Handy: {requestItem.phone_number}
           </Typography>
         )}
@@ -326,17 +447,17 @@ export function RideShareVisibleContactCard({ contact, cardSx }: VisibleContactC
       variant="outlined"
       sx={cardSx}
     >
-      <CardContent>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+      <CardContent sx={compactCardContentSx}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
           {contact.display_name}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="caption" color="text.secondary">
           Rolle: {contact.relation === 'driver' ? 'Fahrer:in' : 'Mitfahrer:in'}
         </Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>
+        <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
           Handy: {contact.phone_number}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
           {contact.origin}
           {' -> '}
           {contact.destination} | {formatDateTime(contact.departure_time)}

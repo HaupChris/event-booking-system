@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Alert, Box, CircularProgress, Container } from '@mui/material';
 import {
@@ -21,6 +21,13 @@ import ProfileOverview from '../components/profile/ProfileOverview';
 import WorkShifts from '../components/profile/WorkShifts';
 import RideSharing from '../components/profile/RideSharing';
 import FAQs from '../components/profile/FAQs';
+import { getFrontendSettings } from '../services/frontendSettingsService';
+
+const rideShareNotice = (
+  <Alert severity="info" sx={{ mt: 1 }}>
+    Die Mitfahrboerse wird zeitnah zum Festival aktiviert. Bitte schau spaeter nochmal vorbei.
+  </Alert>
+);
 
 const baseMenuItems: ProfileNavMenuItem[] = [
   { id: 'news', label: 'Neuigkeiten', icon: <NewspaperIcon /> },
@@ -46,6 +53,7 @@ const missionBriefings: Record<string, string> = {
   rideshare_create: 'Stelle ein Fahrtangebot oder Gesuch fuer die Anreise ein.',
   rideshare_my: 'Verwalte deine Eintraege und bestaetige eingehende Reaktionen.',
   rideshare_overview: 'Sieh alle aktiven Angebote und Gesuche der Mitfahrboerse.',
+  rideshare_notice: 'Die Mitfahrboerse wird kurz vor dem Festival freigeschaltet.',
   faqs: 'Antworten auf die wichtigsten Fragen zum Festival.',
 };
 
@@ -53,6 +61,7 @@ const ProfilePage: React.FC = () => {
   const { profileUuid } = useParams<{ profileUuid: string }>();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeView, setActiveView] = useState('news');
+  const [isRideShareEnabled, setIsRideShareEnabled] = useState(true);
   const { mode } = useThemeMode();
   const isCircusMode = mode === 'circus';
   const brandingPack = useBrandingPack();
@@ -73,9 +82,69 @@ const ProfilePage: React.FC = () => {
   } = useProfile({ profileUuid: profileUuid || '', enableOffline: true });
 
   const isArtistProfile = Boolean(profile?.user?.is_artist);
-  const menuItems = isArtistProfile
-    ? baseMenuItems.filter((item) => item.id !== 'shifts')
-    : baseMenuItems;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchFrontendSettings = async () => {
+      try {
+        const settings = await getFrontendSettings();
+        if (!isMounted) {
+          return;
+        }
+        setIsRideShareEnabled(settings.rideshare_enabled ?? true);
+      } catch {
+        if (isMounted) {
+          setIsRideShareEnabled(true);
+        }
+      }
+    };
+
+    void fetchFrontendSettings();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const menuItems = useMemo(() => {
+    const mappedItems = baseMenuItems.map((item) => {
+      if (item.id !== 'rideshare') {
+        return item;
+      }
+
+      if (isRideShareEnabled) {
+        return item;
+      }
+
+      return {
+        ...item,
+        children: [{ id: 'rideshare_notice', label: 'Info' }],
+      };
+    });
+
+    if (isArtistProfile) {
+      return mappedItems.filter((item) => item.id !== 'shifts');
+    }
+
+    return mappedItems;
+  }, [isArtistProfile, isRideShareEnabled]);
+
+  useEffect(() => {
+    const isRideShareView = activeView.startsWith('rideshare_');
+    if (!isRideShareView) {
+      return;
+    }
+
+    if (!isRideShareEnabled && activeView !== 'rideshare_notice') {
+      setActiveView('rideshare_notice');
+      return;
+    }
+
+    if (isRideShareEnabled && activeView === 'rideshare_notice') {
+      setActiveView('rideshare_overview');
+    }
+  }, [activeView, isRideShareEnabled]);
 
   const pageTitle = useMemo(() => {
     for (const item of menuItems) {
@@ -124,6 +193,7 @@ const ProfilePage: React.FC = () => {
     rideshare_create: <RideSharing viewMode="create" />,
     rideshare_my: <RideSharing viewMode="my" />,
     rideshare_overview: <RideSharing viewMode="overview" />,
+    rideshare_notice: rideShareNotice,
     faqs: <FAQs />,
   };
 

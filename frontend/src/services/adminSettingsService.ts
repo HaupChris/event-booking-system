@@ -11,6 +11,10 @@ export interface BrandingPackResponse {
   branding_pack: string;
 }
 
+export interface RideShareEnabledResponse {
+  rideshare_enabled: boolean;
+}
+
 export const updatePassword = async (
   token: string,
   role: string,
@@ -71,6 +75,35 @@ export const updateBrandingPack = async (token: string, brandingPack: string): P
   await axios.put(
     `${API_BASE_URL}/api/admin/settings/branding-pack`,
     { branding_pack: brandingPack },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+};
+
+export const getRideShareEnabled = async (token: string): Promise<RideShareEnabledResponse> => {
+  const response = await axios.get<RideShareEnabledResponse>(
+    `${API_BASE_URL}/api/admin/settings/rideshare-enabled`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const updateRideShareEnabled = async (
+  token: string,
+  rideshareEnabled: boolean
+): Promise<void> => {
+  await axios.put(
+    `${API_BASE_URL}/api/admin/settings/rideshare-enabled`,
+    { rideshare_enabled: rideshareEnabled },
     {
       headers: {
         Authorization: `Bearer ${token}`,

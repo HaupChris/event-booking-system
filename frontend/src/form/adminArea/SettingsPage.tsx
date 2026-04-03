@@ -21,9 +21,11 @@ import { TokenContext } from '../../contexts/AuthContext';
 import {
   getBrandingPack,
   getPaymentLink,
+  getRideShareEnabled,
   updatePassword,
   updateBrandingPack,
   updatePaymentLink,
+  updateRideShareEnabled,
 } from '../../services/adminSettingsService';
 import { resolvePaymentLink } from '../../utils/paymentLink';
 import { getBrandingPackOptions } from '../../branding/packs';
@@ -69,6 +71,9 @@ const SettingsPage: React.FC = () => {
   const [brandingPack, setBrandingPack] = useState('');
   const [brandingPackDraft, setBrandingPackDraft] = useState('');
   const [savingBrandingPack, setSavingBrandingPack] = useState(false);
+  const [rideshareEnabled, setRideshareEnabled] = useState(true);
+  const [rideshareEnabledDraft, setRideshareEnabledDraft] = useState(true);
+  const [savingRideShareEnabled, setSavingRideShareEnabled] = useState(false);
   const [passwordVisibility, setPasswordVisibility] = useState<
     Record<RoleKey, RolePasswordVisibility>
   >({
@@ -125,6 +130,15 @@ const SettingsPage: React.FC = () => {
       })
       .catch(() => {
         showSnackbar('Failed to load branding pack.', 'error');
+      });
+
+    getRideShareEnabled(token)
+      .then((response) => {
+        setRideshareEnabled(response.rideshare_enabled);
+        setRideshareEnabledDraft(response.rideshare_enabled);
+      })
+      .catch(() => {
+        showSnackbar('Failed to load rideshare toggle.', 'error');
       });
   }, [showSnackbar, token]);
 
@@ -199,6 +213,19 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleRideShareEnabledSave = async () => {
+    try {
+      setSavingRideShareEnabled(true);
+      await updateRideShareEnabled(token, rideshareEnabledDraft);
+      setRideshareEnabled(rideshareEnabledDraft);
+      showSnackbar('Rideshare toggle updated.', 'success');
+    } catch {
+      showSnackbar('Failed to update rideshare toggle.', 'error');
+    } finally {
+      setSavingRideShareEnabled(false);
+    }
+  };
+
   const selectedRoleLabel = ROLES.find((role) => role.key === activeRole)?.label || 'Admin';
   const selectedPasswords = passwords[activeRole];
   const selectedVisibility = passwordVisibility[activeRole];
@@ -237,6 +264,11 @@ const SettingsPage: React.FC = () => {
                 savingBrandingPack={savingBrandingPack}
                 onBrandingPackDraftChange={setBrandingPackDraft}
                 onBrandingPackSave={handleBrandingPackSave}
+                rideshareEnabled={rideshareEnabled}
+                rideshareEnabledDraft={rideshareEnabledDraft}
+                savingRideShareEnabled={savingRideShareEnabled}
+                onToggleRideShareEnabledDraft={setRideshareEnabledDraft}
+                onRideShareEnabledSave={handleRideShareEnabledSave}
                 primaryButtonSx={primaryButtonSx}
               />
             </Box>
