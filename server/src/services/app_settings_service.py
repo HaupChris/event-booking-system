@@ -20,7 +20,7 @@ IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 if IN_DOCKER:
     DB_FILE_PATH = "/app/user_data/bookings.db"
 else:
-    DB_DIR = Path(__file__).resolve().parent.parent / "db"
+    DB_DIR = Path(__file__).resolve().parent.parent.parent / "db"
     DB_FILE_PATH = str(DB_DIR / "bookings.db")
 
 PAYMENT_LINK_KEY = "payment_link"
