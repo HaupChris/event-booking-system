@@ -258,48 +258,18 @@ export function RegistrationFormContainer<
       return null;
     }
 
-    // Check if component needs form props
-    const componentName =
-      typeof StepComponent === 'string'
-        ? StepComponent
-        : (StepComponent as { displayName?: string; name?: string }).displayName ||
-          (StepComponent as { displayName?: string; name?: string }).name ||
-          '';
-    const needsFormProps =
-      !componentName?.includes('Confirmation') &&
-      !componentName?.includes('Summary') &&
-      !componentName?.includes('AwarenessCode');
-
-    if (needsFormProps) {
-      return (
-        <StepComponent
-          updateBooking={updateBooking}
-          currentBooking={booking}
-          formValidation={formValidation}
-          formContent={formContent}
-          onDevSeedForm={activeStep === 0 ? handleDevSeedForm : undefined}
-        />
-      );
-    } else {
-      // Special handling for confirmation, summary, and awareness code forms
-      // Pass all possible props and let the component use what it needs
-      const SpecialComponent = StepComponent as React.ComponentType<{
-        currentBooking: TBooking;
-        booking: TBooking;
-        formContent: TFormContent;
-        submitBooking: () => void;
-        bookingState: BookingState;
-      }>;
-      return (
-        <SpecialComponent
-          currentBooking={booking}
-          booking={booking}
-          formContent={formContent}
-          submitBooking={submitBooking}
-          bookingState={bookingState}
-        />
-      );
-    }
+    return (
+      <StepComponent
+        updateBooking={updateBooking}
+        currentBooking={booking}
+        booking={booking}
+        formValidation={formValidation}
+        formContent={formContent}
+        onDevSeedForm={activeStep === 0 ? handleDevSeedForm : undefined}
+        submitBooking={submitBooking}
+        bookingState={bookingState}
+      />
+    );
   };
 
   return (
