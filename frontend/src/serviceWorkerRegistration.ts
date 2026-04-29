@@ -13,6 +13,8 @@ type Config = {
   onUpdate?: (registration: ServiceWorkerRegistration) => void;
 };
 
+let refreshing = false;
+
 export interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
@@ -51,6 +53,24 @@ function registerValidSW(swUrl: string, config?: Config) {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
+      const requestImmediateActivation = () => {
+        if (registration.waiting) {
+          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+      };
+
+      if (navigator.serviceWorker.controller) {
+        requestImmediateActivation();
+      }
+
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) {
+          return;
+        }
+        refreshing = true;
+        window.location.reload();
+      });
+
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker === null) {
@@ -63,6 +83,8 @@ function registerValidSW(swUrl: string, config?: Config) {
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
               }
+
+              requestImmediateActivation();
             } else {
               // Execute callback
               if (config && config.onSuccess) {

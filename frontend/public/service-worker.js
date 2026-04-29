@@ -1,19 +1,18 @@
 /* eslint-disable no-restricted-globals */
 
 // Service Worker for Wiesenwahn PWA
-const CACHE_NAME = 'wiesenwahn-v2';
-const API_CACHE = 'wiesenwahn-api-v2';
-const PROFILE_CACHE = 'wiesenwahn-profile-v2';
+const CACHE_NAME = 'wiesenwahn-v3';
+const API_CACHE = 'wiesenwahn-api-v3';
+const PROFILE_CACHE = 'wiesenwahn-profile-v3';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache on install
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/logo192.png',
   '/logo512.png',
   '/favicon.ico',
+  OFFLINE_URL,
 ];
 
 // Install event - cache static assets
@@ -130,6 +129,32 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // App navigations - Network first to avoid stale app shell
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, response.clone());
+            });
+          }
+
+          return response;
+        })
+        .catch(() => {
+          return caches.match(request).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+
+            return caches.match(OFFLINE_URL);
+          });
+        })
+    );
+    return;
+  }
+
   // Static assets - Cache first, fall back to network
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
@@ -154,10 +179,6 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => {
-          // If both cache and network fail, show offline page for navigation requests
-          if (request.mode === 'navigate') {
-            return caches.match(OFFLINE_URL);
-          }
           return new Response('Offline', { status: 503 });
         });
     })
