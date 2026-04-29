@@ -53,11 +53,53 @@ def _connect_db() -> sqlite3.Connection:
         raise
 
 
+def _table_has_column(cursor: sqlite3.Cursor, table_name: str, column_name: str) -> bool:
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    return any(row[1] == column_name for row in cursor.fetchall())
+
+
+def ensure_profile_uuid_schema(conn: sqlite3.Connection) -> None:
+    """
+    Ensure profile UUID columns exist for booking tables and backfill missing values.
+
+    This keeps fresh and legacy databases compatible with profile-link features.
+    """
+    cursor = conn.cursor()
+
+    for table_name in ("Bookings", "ArtistBookings"):
+        if not _table_has_column(cursor, table_name, "profile_uuid"):
+            logger.warning(f"Adding missing profile_uuid column to {table_name}")
+            cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN profile_uuid TEXT")
+
+        cursor.execute(
+            f"SELECT id FROM {table_name} WHERE profile_uuid IS NULL OR profile_uuid = ''"
+        )
+        missing_ids = [row[0] for row in cursor.fetchall()]
+
+        for row_id in missing_ids:
+            cursor.execute(
+                f"UPDATE {table_name} SET profile_uuid = ? WHERE id = ?",
+                (str(uuid.uuid4()), row_id),
+            )
+
+        index_name = f"idx_{table_name.lower()}_profile_uuid"
+        cursor.execute(
+            f"""
+            CREATE UNIQUE INDEX IF NOT EXISTS {index_name}
+            ON {table_name}(profile_uuid)
+            WHERE profile_uuid IS NOT NULL AND profile_uuid != ''
+            """
+        )
+
+    conn.commit()
+
+
 # Ensure database is initialized on import
 init_db(DB_FILE_PATH, [REGULAR_SCHEMA_PATH], get_form_content_obj())
 ensure_option_schema()
 ensure_workshift_schema()
 with closing(_connect_db()) as _init_conn:
+    ensure_profile_uuid_schema(_init_conn)
     migrate_signatures_to_blob(_init_conn)
 
 
