@@ -44,7 +44,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
   variant = 'festival',
   missionBriefing,
   footerId,
-  loginLabel = 'Startklar!',
+  loginLabel = 'Zur Show!',
 }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -165,50 +165,9 @@ const LoginPage: React.FC<LoginPageProps> = ({
           maxWidth={560}
         >
           <Box sx={{ maxWidth: 420, mx: 'auto', width: '100%' }}>
-            <Box sx={{ textAlign: 'center', mb: 2.2 }}>
-              <Typography
-                sx={{
-                  fontFamily: brandingPack.typography.display,
-                  fontSize: { xs: '1.85rem', sm: '2.25rem' },
-                  color: 'primary.main',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-                  lineHeight: 1.1,
-                }}
-              >
-                Zirkus Wiesenwahn
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  mt: 0.6,
-                  color: 'text.secondary',
-                  fontFamily: brandingPack.typography.body,
-                  fontStyle: 'italic',
-                }}
-              >
-                Hereinspaziert zur Festival-Anmeldung.
-              </Typography>
-            </Box>
-
             <MissionHeading title="Zugang zum Festivalbereich" icon={<LockOpenIcon />} />
-
             <FormCard selected={true} sx={{ mt: 0 }}>
               <Box component="form" onSubmit={handleSubmit} noValidate sx={{ px: 1, pb: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                  <VpnKeyIcon sx={{ color: 'primary.main' }} />
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: 'text.secondary',
-                      fontFamily: brandingPack.typography.body,
-                    }}
-                  >
-                    Passwort eingeben und los geht's.
-                  </Typography>
-                </Box>
-
                 <OrnateInput
                   label="Passwort *"
                   type="password"
@@ -218,7 +177,6 @@ const LoginPage: React.FC<LoginPageProps> = ({
                   size="compact"
                   onChange={(e) => setPassword(e.target.value)}
                 />
-
                 <Button
                   type="submit"
                   fullWidth

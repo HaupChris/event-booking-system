@@ -68,13 +68,13 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ auth, isAdmin, setIsAdmin }) => {
               <Navigate replace to="/form" />
             ) : (
               <LoginPage
-                title="User Login"
+                title="Zirkus Wiesenwahn"
                 endpoint="/api/auth"
                 redirectPath="/form"
                 showRecoveryLink={true}
                 variant="festival"
-                missionBriefing="Crew-Check-in fuer den regulären Festivalbereich."
-                footerId="USER-EINLASS"
+                missionBriefing="Crew-Check-in fuer den Festivalbereich."
+                footerId="Hereinspaziert Hereinspaziert!"
               />
             )
           }
