@@ -312,6 +312,9 @@ def insert_booking(booking: Booking) -> tuple[bool, str | None]:
             logger.error(f"Failed to create booking for user {user_id}")
             return False, None
 
+        assign_materials(booking_id, booking.material_ids)
+        assign_professions(booking_id, booking.profession_ids)
+
         duration = time.time() - start_time
         logger.info(
             f"Booking insertion completed in {duration:.3f}s for {booking.first_name} {booking.last_name} (ID: {booking_id}, UUID: {profile_uuid[:8] if profile_uuid else 'None'}...)"

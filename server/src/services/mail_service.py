@@ -217,12 +217,14 @@ def send_confirmation_mail(
 
       .btn {{
         display: inline-block;
-        background: linear-gradient(180deg, #d6963a 0%, #ac6724 100%);
-        color: #2b140e;
+        background-color: #2e5e98;
+        background-image: linear-gradient(180deg, #3c6fb1 0%, #2e5e98 100%);
+        color: #ffffff;
+        font-weight: 700;
         padding: 10px 20px;
         text-decoration: none;
         border-radius: 3px;
-        border: 1px solid rgba(243, 215, 159, 0.75);
+        border: 1px solid #9fc5f3;
         margin: 15px 0;
         text-align: center;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -230,8 +232,9 @@ def send_confirmation_mail(
       }}
 
       .btn:hover {{
-        background: linear-gradient(180deg, #e5a648 0%, #b67128 100%);
-        color: #2b140e;
+        background-color: #467fc9;
+        background-image: linear-gradient(180deg, #4f8cdc 0%, #467fc9 100%);
+        color: #ffffff;
       }}
 
       .footer {{
@@ -435,12 +438,14 @@ def send_artist_confirmation_mail(
 
       .btn {{
         display: inline-block;
-        background: linear-gradient(180deg, #d6963a 0%, #ac6724 100%);
-        color: #2b140e;
+        background-color: #2e5e98;
+        background-image: linear-gradient(180deg, #3c6fb1 0%, #2e5e98 100%);
+        color: #ffffff;
+        font-weight: 700;
         padding: 10px 20px;
         text-decoration: none;
         border-radius: 3px;
-        border: 1px solid rgba(243, 215, 159, 0.75);
+        border: 1px solid #9fc5f3;
         margin: 15px 0;
         text-align: center;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -448,8 +453,9 @@ def send_artist_confirmation_mail(
       }}
 
       .btn:hover {{
-        background: linear-gradient(180deg, #e5a648 0%, #b67128 100%);
-        color: #2b140e;
+        background-color: #467fc9;
+        background-image: linear-gradient(180deg, #4f8cdc 0%, #467fc9 100%);
+        color: #ffffff;
       }}
 
       .footer {{
@@ -704,12 +710,14 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
 
       .btn {{
         display: inline-block;
-        background: linear-gradient(180deg, #d6963a 0%, #ac6724 100%);
-        color: #2b140e;
+        background-color: #2e5e98;
+        background-image: linear-gradient(180deg, #3c6fb1 0%, #2e5e98 100%);
+        color: #ffffff;
+        font-weight: 700;
         padding: 10px 20px;
         text-decoration: none;
         border-radius: 3px;
-        border: 1px solid rgba(243, 215, 159, 0.75);
+        border: 1px solid #9fc5f3;
         margin: 10px 0;
         text-align: center;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -717,8 +725,9 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
       }}
 
       .btn:hover {{
-        background: linear-gradient(180deg, #e5a648 0%, #b67128 100%);
-        color: #2b140e;
+        background-color: #467fc9;
+        background-image: linear-gradient(180deg, #4f8cdc 0%, #467fc9 100%);
+        color: #ffffff;
       }}
 
       .footer {{
