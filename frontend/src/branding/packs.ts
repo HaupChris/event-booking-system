@@ -33,9 +33,9 @@ const BRANDING_PACKS: Record<string, BrandingPack> = {
   },
   'ww-2026-space': {
     id: 'ww-2026-space',
-    label: 'Wiesenwahn 2026 - Space',
+    label: 'Wiesenwahn 2026 - Zirkus',
     year: 2026,
-    motto: 'Weiher Wald und Weltall-Wahn',
+    motto: 'Zirkus Wiesenwahn',
     defaultThemeMode: 'dark',
     typography: {
       display: '"DSEG7Classic", monospace',

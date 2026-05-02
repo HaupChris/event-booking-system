@@ -1,55 +1,55 @@
 {
   "ticket_options": [
     {
-      "title": "Interstellarer Flug (Do, Fr, Sa)",
+      "title": "Zirkuswochenende (Do, Fr, Sa)",
       "price": 40.0,
       "amount": 130
     },
     {
-      "title": "Wochenend-Orbit (Fr, Sa)",
+      "title": "Wochenendmanege (Fr, Sa)",
       "price": 30.0,
       "amount": 0
     },
     {
-      "title": "Früher Start (Do, Fr)",
+      "title": "Früher Einlass (Do, Fr)",
       "price": 30.0,
       "amount": 0
     },
     {
-      "title": "Zwei-Phasen-Flug (Do, Sa)",
+      "title": "Zwei-Tage-Ticket (Do, Sa)",
       "price": 30.0,
       "amount": 0
     },
     {
-      "title": "Starttag (Nur Do)",
+      "title": "Donnerstagsticket (Nur Do)",
       "price": 20.0,
       "amount": 0
     },
     {
-      "title": "Zwischenstopp (Nur Fr)",
+      "title": "Freitagsticket (Nur Fr)",
       "price": 20.0,
       "amount": 0
     },
     {
-      "title": "Landetag (Nur Sa)",
+      "title": "Samstagsticket (Nur Sa)",
       "price": 20.0,
       "amount": 0
     }
   ],
   "beverage_options": [
     {
-      "title": "Kurzer Tankstopp",
-      "description": "Treibstoff für 1 Festivaltag (5 Liter Bier)",
+      "title": "Kleine Bierflatrate",
+      "description": "Bierflatrate für 1 Festivaltag (5 Liter Bier)",
       "price": 10.0
     },
     {
-      "title": "Zweites Antriebsmodul",
-      "description": "Treibstoff für 2 Festivaltage (10 Liter Bier)",
+      "title": "Mittlere Bierflatrate",
+      "description": "Bierflatrate für 2 Festivaltage (10 Liter Bier)",
       "price": 19.0
     },
     {
-      "title": "Hyperraum Antrieb",
-      "description": "Treibstoff für 3 Festivaltage (15 Liter Bier)",
+      "title": "Große Bierflatrate",
+      "description": "Bierflatrate für 3 Festivaltage (15 Liter Bier)",
       "price": 28.0
     }
   ],
@@ -87,8 +87,8 @@
   ],
   "work_shifts": [
     {
-      "title": "Aufbau der Startrampe",
-      "description": "Errichte mit uns Bühne und Bierzelte, damit unser Festival-Raumschiff startklar wird! Einsatz am Wochenende vor Festivalbeginn.",
+      "title": "Aufbau von Bühne und Gelände",
+      "description": "Errichte mit uns Bühne und Bierzelte, damit das Festival startklar wird. Einsatz am Wochenende vor Festivalbeginn.",
       "time_slots": [
         {
           "title": "23.08.2025",
@@ -99,8 +99,8 @@
       ]
     },
     {
-      "title": "Zurück am Boden",
-      "description": "Abbau und Aufräumen nach der Festival-Landung. Frühschicht erhält Frühstück, Spätschicht Pizza zum Abschluss.",
+      "title": "Der Zirkus zieht weiter.",
+      "description": "Abbau und Aufräumen nach dem Festival. Frühschicht erhält Frühstück, Spätschicht Pizza zum Abschluss.",
       "time_slots": [
         {
           "title": "Sonntag früh",
@@ -117,7 +117,7 @@
       ]
     },
     {
-      "title": "Abgefallene Teile bergen",
+      "title": "Aftershow Party",
       "description": "Verstauen übriger Materialien und Abtransport des restlichen Festival-Mülls.",
       "time_slots": [
         {
@@ -135,7 +135,7 @@
       ]
     },
     {
-      "title": "Antriebsmodul abkoppeln",
+      "title": "Generatoren und Stromversorgung",
       "description": "Überwache und tanke unsere Generatoren, damit das Festival zuverlässig mit Energie versorgt ist.",
       "time_slots": [
         {
@@ -177,8 +177,8 @@
       ]
     },
     {
-      "title": "Clear the Orbit",
-      "description": "Morgendliches Müllsammeln zur Erhaltung der Festivalbasis.",
+      "title": "Morgendliche Geländerunde",
+      "description": "Morgendliches Müllsammeln, damit das Festivalgelände sauber bleibt.",
       "time_slots": [
         {
           "title": "Freitag",
@@ -195,7 +195,7 @@
       ]
     },
     {
-      "title": "Ab damit ins Schwarze Loch",
+      "title": "Sanitär-Check",
       "description": "Regelmäßige Kontrolle der WCs auf Klopapier, Seife und Sauberkeit. Reinigung der Toilette wenn nötig.",
       "time_slots": [
         {
@@ -231,8 +231,8 @@
       ]
     },
     {
-      "title": "Willkommen an Bord",
-      "description": "Empfang neuer Astronaut:innen, Bändchenvergabe, Einweisung für Schichten, etc. Damit du hier eingeteilt werden kannst, solltest du den Wiesenwahn schon mindestens einmal besucht haben.",
+      "title": "Willkommen am Einlass",
+      "description": "Empfang neuer Gäste, Bändchenvergabe, Einweisung für Schichten etc. Damit du hier eingeteilt werden kannst, solltest du den Wiesenwahn schon mindestens einmal besucht haben.",
       "time_slots": [
         {
           "title": "Donnerstag",
@@ -267,31 +267,19 @@
       ]
     },
     {
-      "title": "Already Employed",
-      "description": "Bitte nur auswählen, wenn das Orga-Team bereits eine Absprache mit dir getroffen hat.",
+      "title": "Care-Team",
+      "description": "Beschreibung ausarbeiten. Kurzer Aufgabensbeschreibung, wie die Einteilung erfolgt und, dass man nüchtern sein muss",
       "time_slots": [
         {
           "title": "",
           "start_time": "00:00",
           "end_time": "12:00",
-          "num_needed": 10
-        },
-        {
-          "title": "",
-          "start_time": "00:00",
-          "end_time": "12:00",
-          "num_needed": 10
-        },
-        {
-          "title": "",
-          "start_time": "00:00",
-          "end_time": "12:00",
-          "num_needed": 10
+          "num_needed": 30
         }
       ]
     },
     {
-      "title": "Astronaut:innen Kost pressen",
+      "title": "Foodstation unterstützen",
       "description": "Vorbereitung und Ausgabe der Festival-Mahlzeiten in der Food-Station.",
       "time_slots": [
         {

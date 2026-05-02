@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -10,6 +11,8 @@ from src.models.datatypes import ArtistBooking, Booking
 from src.services.app_settings_service import get_payment_link
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 def _require_mail_credentials() -> tuple[str, str]:
@@ -135,21 +138,21 @@ def send_confirmation_mail(
     )
     food_title = food_option["title"] if food_option else "Essensoption nicht gefunden"
 
-    subject = "Weiher Wald & Weltall-Wahn - Deine Mission ist bestätigt!"
+    subject = "Zirkus Wiesenwahn - Deine Buchung ist bestätigt!"
 
     # Profile link section
     if profile_uuid:
         profile_url = f"{base_url}/profile/{profile_uuid}"
         profile_section = f"""
           <div class="details">
-            <h3>🚀 Dein persönliches Profil</h3>
+            <h3>🎪 Dein persönliches Profil</h3>
             <p>Zugriff auf dein Profil für Neuigkeiten, Schichteneinteilung und mehr:</p>
             <a href="{profile_url}" class="btn">ZUM PROFIL</a>
             <p style="font-size: 0.9em; color: #999; margin-top: 10px;">
               💡 Speichere diesen Link! Du brauchst ihn später für Updates zu deinen Schichten und Festival-Neuigkeiten.
             </p>
-            <p style="font-size: 0.85em; color: #666; margin-top: 5px;">
-              Link verloren? Fordere ihn erneut an unter: <a href="{base_url}/profile/recover" style="color: #C0C0C0;">Profile wiederherstellen</a>
+            <p style="font-size: 0.85em; color: #d1b67b; margin-top: 5px;">
+              Link verloren? Fordere ihn erneut an unter: <a href="{base_url}/profile/recover" style="color: #f0c55f;">Profile wiederherstellen</a>
             </p>
           </div>
         """
@@ -160,75 +163,53 @@ def send_confirmation_mail(
     <html>
     <head>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Rye&display=swap');
 
       body {{
-        font-family: 'Helvetica', sans-serif;
+        font-family: 'Merriweather', Georgia, serif;
         margin: 0;
         padding: 0;
-        color: #C0C0C0;
-        background-color: #0d0d0d;
-        background-image: 
-          radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
-          radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
-          radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px);
-        background-size: 550px 550px, 350px 350px, 250px 250px;
-        background-position: 0 0, 40px 60px, 130px 270px;
+        color: #f4ead6;
+        background: #170a10;
       }}
 
       h1, h2, h3 {{
-        font-family: 'Orbitron', sans-serif;
-        color: white;
+        font-family: 'Rye', serif;
+        color: #f7e9cf;
       }}
 
       .container {{
         max-width: 600px;
         margin: 20px auto;
-        border: 1px solid #333;
+        border: 1px solid #9a6c36;
       }}
 
       .header {{
-        background-color: #1a1a1a;
-        background-image: linear-gradient(145deg, #222222, #1a1a1a);
-        color: #ffffff;
+        background-color: #2a111b;
+        background-image: linear-gradient(145deg, #3f1b29, #251019);
+        color: #f7e9cf;
         padding: 20px;
         text-align: center;
-        border-bottom: 2px solid #C0C0C0;
-        position: relative;
-        overflow: hidden;
-      }}
-
-      .header::before {{
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: 
-          radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px);
-        background-size: 15px 15px;
-        z-index: 0;
+        border-bottom: 2px solid #d8b87a;
       }}
 
       .header h1 {{
-        position: relative;
         margin: 0;
-        text-shadow: 0 0 10px rgba(192, 192, 192, 0.8);
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
         letter-spacing: 2px;
       }}
 
       .content {{
         margin-top: 0;
-        background-color: rgba(26, 26, 26, 0.9);
+        background-color: rgba(35, 16, 25, 0.95);
         padding: 20px;
         border-radius: 5px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.45);
       }}
 
       .details {{
-        background-color: rgba(0, 0, 0, 0.3);
-        border: 1px solid #333;
+        background-color: rgba(216, 184, 122, 0.08);
+        border: 1px solid rgba(216, 184, 122, 0.5);
         padding: 15px;
         border-radius: 5px;
         margin: 15px 0;
@@ -236,33 +217,33 @@ def send_confirmation_mail(
 
       .btn {{
         display: inline-block;
-        background: linear-gradient(145deg, #222222, #1a1a1a);
-        color: #C0C0C0;
+        background: linear-gradient(180deg, #d6963a 0%, #ac6724 100%);
+        color: #2b140e;
         padding: 10px 20px;
         text-decoration: none;
         border-radius: 3px;
-        border: 1px solid #C0C0C0;
+        border: 1px solid rgba(243, 215, 159, 0.75);
         margin: 15px 0;
         text-align: center;
-        box-shadow: 0 0 6px #C0C0C0;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
       }}
 
       .btn:hover {{
-        box-shadow: 0 0 12px #FFFFFF;
-        color: #FFFFFF;
+        background: linear-gradient(180deg, #e5a648 0%, #b67128 100%);
+        color: #2b140e;
       }}
 
       .footer {{
         margin-top: 20px;
         text-align: center;
         font-size: 0.9em;
-        color: #777;
+        color: #d1b67b;
       }}
 
       .mission-data {{
         padding: 10px;
-        background-color: rgba(50, 50, 50, 0.3);
+        background-color: rgba(216, 184, 122, 0.08);
         border-radius: 5px;
       }}
 
@@ -271,38 +252,38 @@ def send_confirmation_mail(
     <body>
       <div class="container">
         <div class="header">
-          <h1>WEIHER WALD & WELTALL-WAHN</h1>
+          <h1>ZIRKUS WIESENWAHN</h1>
           <p>DO, 28.08.2025 - SO, 31.08.2025</p>
         </div>
 
         <div class="content">
-          <h2>Mission bestätigt, Astronaut {booking.first_name}!</h2>
+          <h2>Buchung bestätigt, {booking.first_name}!</h2>
 
-          <p>Willkommen an Bord! Die Flugleitung hat deine Teilnahme an der interstellaren Mission "Weiher Wald & Weltall-Wahn" registriert.</p>
+          <p>Willkommen in der Manege! Wir haben deine Teilnahme am Zirkus Wiesenwahn erfolgreich registriert.</p>
 
           <div class="details mission-data">
-            <h3>Missionsdaten:</h3>
+            <h3>Deine Buchungsdaten:</h3>
             {booking_details_html}
           </div>
 
-          <p>Für den Start deiner Mission ist noch ein Treibstofftransfer erforderlich:</p>
+          <p>Für deine Teilnahme fehlt nur noch dein Beitrag:</p>
 
-          <a href="{payment_link}" class="btn">TREIBSTOFFTRANSFER STARTEN</a>
+          <a href="{payment_link}" class="btn">BEITRAG JETZT ZAHLEN</a>
 
-          <p>Betreff für den Transfer:<br>
+          <p>Betreff für die Zahlung:<br>
           <strong>WW26 - {booking.first_name}, {booking.last_name} - {ticket_title} - {beverage_title} - {food_title}</strong></p>
 
-          <p>Weitere Missionsdaten werden über den Kommunikationskanal "WhatsApp" übermittelt.</p>
+          <p>Weitere Informationen teilen wir dir rechtzeitig über deine <b>Profilseite</b> mit.</p>
 
           {profile_section}
 
-          <p>Countdown läuft! Wir sehen uns im Orbit über Poppenwind!</p>
+          <p>Bis bald in Poppenwind!</p>
 
-          <p>&#128640; Dein Weltall-Wahn Missionskontrollteam &#x1F680;</p>
+          <p>&#127914; Dein Zirkus Wiesenwahn Team &#127914;</p>
         </div>
 
         <div class="footer">
-          Dies ist eine automatisch generierte Nachricht. Bei Fragen kontaktiere die Missionszentrale.
+          Dies ist eine automatisch generierte Nachricht. Bei Fragen kontaktiere das Orga-Team.
         </div>
       </div>
     </body>
@@ -322,9 +303,9 @@ def send_confirmation_mail(
         server.login(gmail_user, gmail_password)
         server.sendmail(gmail_user, booking.email, msg.as_string())
         server.close()
-        print("Email erfolgreich gesendet!")
+        logger.info("Email erfolgreich versendet!")
     except Exception as e:
-        print(f"Fehler beim Senden der E-Mail: {e}")
+        logger.error(f"Fehler beim Senden der E-Mail: {e}")
 
 
 def send_artist_confirmation_mail(
@@ -364,21 +345,21 @@ def send_artist_confirmation_mail(
     )
     food_title = food_option["title"] if food_option else "Essensoption nicht gefunden"
 
-    subject = "Weiher Wald & Weltall-Wahn - Schön, dass du zu uns kommst!"
+    subject = "Zirkus Wiesenwahn - Schön, dass du zu uns kommst!"
 
     # Profile link section
     if profile_uuid:
         profile_url = f"{base_url}/profile/{profile_uuid}"
         profile_section = f"""
           <div class="details">
-            <h3>🚀 Dein persönliches Profil</h3>
+            <h3>🎪 Dein persönliches Profil</h3>
             <p>Zugriff auf dein Profil für Neuigkeiten und Festival-Updates:</p>
             <a href="{profile_url}" class="btn">ZUM PROFIL</a>
             <p style="font-size: 0.9em; color: #999; margin-top: 10px;">
               💡 Speichere diesen Link! Du brauchst ihn später für Festival-Neuigkeiten und Updates.
             </p>
-            <p style="font-size: 0.85em; color: #666; margin-top: 5px;">
-              Link verloren? Fordere ihn erneut an unter: <a href="{base_url}/profile/recover" style="color: #C0C0C0;">Profile wiederherstellen</a>
+            <p style="font-size: 0.85em; color: #d1b67b; margin-top: 5px;">
+              Link verloren? Fordere ihn erneut an unter: <a href="{base_url}/profile/recover" style="color: #f0c55f;">Profile wiederherstellen</a>
             </p>
           </div>
         """
@@ -389,75 +370,53 @@ def send_artist_confirmation_mail(
     <html>
     <head>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Rye&display=swap');
 
       body {{
-        font-family: 'Helvetica', sans-serif;
+        font-family: 'Merriweather', Georgia, serif;
         margin: 0;
         padding: 0;
-        color: #C0C0C0;
-        background-color: #0d0d0d;
-        background-image: 
-          radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
-          radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
-          radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px);
-        background-size: 550px 550px, 350px 350px, 250px 250px;
-        background-position: 0 0, 40px 60px, 130px 270px;
+        color: #f4ead6;
+        background: #170a10;
       }}
 
       h1, h2, h3 {{
-        font-family: 'Orbitron', sans-serif;
-        color: white;
+        font-family: 'Rye', serif;
+        color: #f7e9cf;
       }}
 
       .container {{
         max-width: 600px;
         margin: 20px auto;
-        border: 1px solid #333;
+        border: 1px solid #9a6c36;
       }}
 
       .header {{
-        background-color: #1a1a1a;
-        background-image: linear-gradient(145deg, #222222, #1a1a1a);
-        color: #ffffff;
+        background-color: #2a111b;
+        background-image: linear-gradient(145deg, #3f1b29, #251019);
+        color: #f7e9cf;
         padding: 20px;
         text-align: center;
-        border-bottom: 2px solid #C0C0C0;
-        position: relative;
-        overflow: hidden;
-      }}
-
-      .header::before {{
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: 
-          radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px);
-        background-size: 15px 15px;
-        z-index: 0;
+        border-bottom: 2px solid #d8b87a;
       }}
 
       .header h1 {{
-        position: relative;
         margin: 0;
-        text-shadow: 0 0 10px rgba(192, 192, 192, 0.8);
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
         letter-spacing: 2px;
       }}
 
       .content {{
         margin-top: 0;
-        background-color: rgba(26, 26, 26, 0.9);
+        background-color: rgba(35, 16, 25, 0.95);
         padding: 20px;
         border-radius: 5px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.45);
       }}
 
       .details {{
-        background-color: rgba(0, 0, 0, 0.3);
-        border: 1px solid #333;
+        background-color: rgba(216, 184, 122, 0.08);
+        border: 1px solid rgba(216, 184, 122, 0.5);
         padding: 15px;
         border-radius: 5px;
         margin: 15px 0;
@@ -465,8 +424,9 @@ def send_artist_confirmation_mail(
 
       .artist-badge {{
         display: inline-block;
-        background-color: #1976d2;
-        color: white;
+        background-color: rgba(216, 184, 122, 0.2);
+        border: 1px solid rgba(216, 184, 122, 0.65);
+        color: #f4ead6;
         padding: 5px 10px;
         border-radius: 4px;
         font-weight: bold;
@@ -475,33 +435,33 @@ def send_artist_confirmation_mail(
 
       .btn {{
         display: inline-block;
-        background: linear-gradient(145deg, #222222, #1a1a1a);
-        color: #C0C0C0;
+        background: linear-gradient(180deg, #d6963a 0%, #ac6724 100%);
+        color: #2b140e;
         padding: 10px 20px;
         text-decoration: none;
         border-radius: 3px;
-        border: 1px solid #C0C0C0;
+        border: 1px solid rgba(243, 215, 159, 0.75);
         margin: 15px 0;
         text-align: center;
-        box-shadow: 0 0 6px #C0C0C0;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
       }}
 
       .btn:hover {{
-        box-shadow: 0 0 12px #FFFFFF;
-        color: #FFFFFF;
+        background: linear-gradient(180deg, #e5a648 0%, #b67128 100%);
+        color: #2b140e;
       }}
 
       .footer {{
         margin-top: 20px;
         text-align: center;
         font-size: 0.9em;
-        color: #777;
+        color: #d1b67b;
       }}
 
       .mission-data {{
         padding: 10px;
-        background-color: rgba(50, 50, 50, 0.3);
+        background-color: rgba(216, 184, 122, 0.08);
         border-radius: 5px;
       }}
 
@@ -510,7 +470,7 @@ def send_artist_confirmation_mail(
     <body>
       <div class="container">
         <div class="header">
-          <h1>WEIHER WALD & WELTALL-WAHN</h1>
+          <h1>ZIRKUS WIESENWAHN</h1>
           <p>DO, 28.08.2025 - SO, 31.08.2025</p>
         </div>
 
@@ -518,7 +478,7 @@ def send_artist_confirmation_mail(
           <div class="artist-badge">KÜNSTLER</div>
           <h2>Anmeldung bestätigt, {booking.first_name}!</h2>
 
-          <p>Willkommen! Wir freuen uns, dass du uns als Künstler*in beim Weiher Wald & Weltall-Wahn bereicherst!</p>
+          <p>Willkommen! Wir freuen uns, dass du uns als Künstler*in beim Zirkus Wiesenwahn bereicherst!</p>
 
           <div class="details mission-data">
             <h3>Deine Buchungsdaten:</h3>
@@ -538,7 +498,7 @@ def send_artist_confirmation_mail(
         or "<p>Für dich als Künstler*in fallen keine Kosten an.</p>"
     }
 
-          <p>Weitere Informationen zu deinem Auftritt besprechen wir rechtzeit vorm Festival. Dazu werden wir dich zu einer Whatsapp Gruppe hinzufügen.</p>
+          <p>Weitere Informationen zu deinem Auftritt besprechen wir rechtzeitig vor dem Festival. Dazu werden wir dich zu einer WhatsApp-Gruppe hinzufügen.</p>
 
           <p>Bei Fragen zu deinem Auftritt, Technik oder Ablauf kannst du uns jederzeit kontaktieren.</p>
 
@@ -546,7 +506,7 @@ def send_artist_confirmation_mail(
 
           <p>Wir freuen uns auf dich!</p>
 
-          <p>&#128640; Dein Weltall-Wahn Team &#x1F680;</p>
+          <p>&#127914; Dein Zirkus Wiesenwahn Team &#127914;</p>
         </div>
 
         <div class="footer">
@@ -570,9 +530,9 @@ def send_artist_confirmation_mail(
         server.login(gmail_user, gmail_password)
         server.sendmail(gmail_user, booking.email, msg.as_string())
         server.close()
-        print("Artist email sent successfully!")
+        logger.info("Artist email sent successfully!")
     except Exception as e:
-        print(f"Error sending artist email: {e}")
+        logger.error(f"Error sending artist email: {e}")
 
 
 def get_artist_booking_details(booking: ArtistBooking, form_content: dict) -> str:
@@ -681,63 +641,57 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
           </div>
         """
 
-    subject = "Weiher Wald & Weltall-Wahn - Deine Profil-Links"
+    subject = "Zirkus Wiesenwahn - Deine Profil-Links"
 
     html = f"""
     <html>
     <head>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Rye&display=swap');
 
       body {{
-        font-family: 'Helvetica', sans-serif;
+        font-family: 'Merriweather', Georgia, serif;
         margin: 0;
         padding: 0;
-        color: #C0C0C0;
-        background-color: #0d0d0d;
-        background-image:
-          radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
-          radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
-          radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px);
-        background-size: 550px 550px, 350px 350px, 250px 250px;
-        background-position: 0 0, 40px 60px, 130px 270px;
+        color: #f4ead6;
+        background: #170a10;
       }}
 
       h1, h2, h3, h4 {{
-        font-family: 'Orbitron', sans-serif;
-        color: white;
+        font-family: 'Rye', serif;
+        color: #f7e9cf;
       }}
 
       .container {{
         max-width: 600px;
         margin: 20px auto;
-        border: 1px solid #333;
+        border: 1px solid #9a6c36;
       }}
 
       .header {{
-        background-color: #1a1a1a;
-        background-image: linear-gradient(145deg, #222222, #1a1a1a);
-        color: #ffffff;
+        background-color: #2a111b;
+        background-image: linear-gradient(145deg, #3f1b29, #251019);
+        color: #f7e9cf;
         padding: 20px;
         text-align: center;
-        border-bottom: 2px solid #C0C0C0;
+        border-bottom: 2px solid #d8b87a;
       }}
 
       .header h1 {{
         margin: 0;
-        text-shadow: 0 0 10px rgba(192, 192, 192, 0.8);
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
         letter-spacing: 2px;
       }}
 
       .content {{
-        background-color: rgba(26, 26, 26, 0.9);
+        background-color: rgba(35, 16, 25, 0.95);
         padding: 20px;
         border-radius: 5px;
       }}
 
       .profile-item {{
-        background-color: rgba(0, 0, 0, 0.3);
-        border: 1px solid #333;
+        background-color: rgba(216, 184, 122, 0.08);
+        border: 1px solid rgba(216, 184, 122, 0.5);
         padding: 15px;
         border-radius: 5px;
         margin: 15px 0;
@@ -745,33 +699,33 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
 
       .profile-item h4 {{
         margin-top: 0;
-        color: #64b5f6;
+        color: #e5cf9f;
       }}
 
       .btn {{
         display: inline-block;
-        background: linear-gradient(145deg, #222222, #1a1a1a);
-        color: #C0C0C0;
+        background: linear-gradient(180deg, #d6963a 0%, #ac6724 100%);
+        color: #2b140e;
         padding: 10px 20px;
         text-decoration: none;
         border-radius: 3px;
-        border: 1px solid #C0C0C0;
+        border: 1px solid rgba(243, 215, 159, 0.75);
         margin: 10px 0;
         text-align: center;
-        box-shadow: 0 0 6px #C0C0C0;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
       }}
 
       .btn:hover {{
-        box-shadow: 0 0 12px #FFFFFF;
-        color: #FFFFFF;
+        background: linear-gradient(180deg, #e5a648 0%, #b67128 100%);
+        color: #2b140e;
       }}
 
       .footer {{
         margin-top: 20px;
         text-align: center;
         font-size: 0.9em;
-        color: #777;
+        color: #d1b67b;
         padding: 15px;
       }}
     </style>
@@ -779,7 +733,7 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
     <body>
       <div class="container">
         <div class="header">
-          <h1>WEIHER WALD & WELTALL-WAHN</h1>
+          <h1>ZIRKUS WIESENWAHN</h1>
           <p>DO, 28.08.2025 - SO, 31.08.2025</p>
         </div>
 
@@ -790,17 +744,17 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
 
           {profile_links_html}
 
-          <p style="margin-top: 20px; padding: 15px; background-color: rgba(100, 181, 246, 0.1); border-left: 3px solid #64b5f6; border-radius: 3px;">
+          <p style="margin-top: 20px; padding: 15px; background-color: rgba(216, 184, 122, 0.12); border-left: 3px solid #d8b87a; border-radius: 3px;">
             💡 <strong>Tipp:</strong> Speichere diese Links, um später auf dein Profil, Schichteinteilungen und Festival-Neuigkeiten zuzugreifen.
           </p>
 
           <p>Bei Fragen kontaktiere uns jederzeit.</p>
 
-          <p>&#128640; Dein Weltall-Wahn Team &#x1F680;</p>
+          <p>&#127914; Dein Zirkus Wiesenwahn Team &#127914;</p>
         </div>
 
         <div class="footer">
-          Dies ist eine automatisch generierte Nachricht. Bei Fragen kontaktiere die Missionszentrale.
+          Dies ist eine automatisch generierte Nachricht. Bei Fragen kontaktiere das Orga-Team.
         </div>
       </div>
     </body>
@@ -820,6 +774,6 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
         server.login(gmail_user, gmail_password)
         server.sendmail(gmail_user, email, msg.as_string())
         server.close()
-        print(f"Profile recovery email sent successfully to {email}!")
+        logger.info(f"Profile recovery email sent successfully to {email}!")
     except Exception as e:
-        print(f"Error sending profile recovery email: {e}")
+        logger.error(f"Error sending profile recovery email: {e}")
