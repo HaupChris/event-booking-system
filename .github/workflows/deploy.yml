@@ -64,8 +64,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             mkdir -p /opt/wiesenwahn/data
-            mkdir -p /opt/wiesenwahn/data/signatures
-            mkdir -p /opt/wiesenwahn/data/artist_signatures
             mkdir -p /opt/wiesenwahn/logs
 
             # Create .env file with secrets
@@ -77,15 +75,17 @@ jobs:
             GMAIL_USER=${{ secrets.GMAIL_USER }}
             GMAIL_PASS=${{ secrets.GMAIL_PASS }}
             EOL
+            chmod 600 /opt/wiesenwahn/.env
 
             # Backup database before updating
             bash /opt/wiesenwahn/backup.sh deploy-backup || true
 
-            # Pull latest images and restart
+            # Pull latest images and restart services sequentially (RAM-friendly)
             cd /opt/wiesenwahn
-            docker compose pull
-            docker compose down
-            docker compose up -d
+            docker compose pull backend
+            docker compose up -d --no-deps --force-recreate backend
+            docker compose pull frontend
+            docker compose up -d --no-deps --force-recreate frontend
 
-            # Clean up old images
-            docker image prune -af
+            # Clean up stale images older than 7 days
+            docker image prune -af --filter "until=168h"
