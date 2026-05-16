@@ -4,7 +4,7 @@
  * Display news feed with read/unread status
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   alpha,
   Alert,
@@ -15,7 +15,12 @@ import {
   CardHeader,
   Chip,
   Collapse,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -87,6 +92,8 @@ const getCategoryLabel = (category: string | null) => {
 
 const resolveCategoryLabel = (item: NewsItem) =>
   item.category_label || getCategoryLabel(item.category);
+
+const resolveCategoryKey = (item: NewsItem) => item.category || 'general';
 
 const getCardSx = (isCircusMode: boolean, isNew: boolean) => {
   const cardSx = {
@@ -227,6 +234,36 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ news, isOnline, onMarkAsRead }) => 
   const brandingPack = useBrandingPack();
   const isCircusMode = mode === 'circus';
   const [expandedNews, setExpandedNews] = useState<Set<number>>(new Set());
+  const [categoryFilter, setCategoryFilter] = useState('all');
+
+  const categoryOptions = useMemo(() => {
+    const labelsByKey = new Map<string, string>();
+
+    news.forEach((item) => {
+      labelsByKey.set(resolveCategoryKey(item), resolveCategoryLabel(item));
+    });
+
+    return Array.from(labelsByKey.entries()).sort((a, b) => a[1].localeCompare(b[1], 'de'));
+  }, [news]);
+
+  const filteredNews = useMemo(() => {
+    if (categoryFilter === 'all') {
+      return news;
+    }
+
+    return news.filter((item) => resolveCategoryKey(item) === categoryFilter);
+  }, [categoryFilter, news]);
+
+  useEffect(() => {
+    if (categoryFilter === 'all') {
+      return;
+    }
+
+    const categoryStillExists = categoryOptions.some(([key]) => key === categoryFilter);
+    if (!categoryStillExists) {
+      setCategoryFilter('all');
+    }
+  }, [categoryFilter, categoryOptions]);
 
   const handleExpandClick = async (newsId: number, isRead: boolean) => {
     const newExpanded = new Set(expandedNews);
@@ -261,10 +298,29 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ news, isOnline, onMarkAsRead }) => 
         </Alert>
       )}
 
-      {news.length === 0 ? (
+      <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ mb: 2 }}>
+        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 260 } }}>
+          <InputLabel id="news-category-filter-label">Kategorie</InputLabel>
+          <Select
+            labelId="news-category-filter-label"
+            label="Kategorie"
+            value={categoryFilter}
+            onChange={(event) => setCategoryFilter(String(event.target.value))}
+          >
+            <MenuItem value="all">Alle Kategorien</MenuItem>
+            {categoryOptions.map(([key, label]) => (
+              <MenuItem key={key} value={key}>
+                {label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Stack>
+
+      {filteredNews.length === 0 ? (
         <Alert severity="info">Noch keine Neuigkeiten verfügbar. Schau später wieder vorbei!</Alert>
       ) : (
-        news.map((item) => (
+        filteredNews.map((item) => (
           <NewsFeedCard
             key={item.id}
             item={item}

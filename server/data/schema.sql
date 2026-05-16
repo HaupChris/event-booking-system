@@ -213,7 +213,8 @@ CREATE TABLE IF NOT EXISTS News (
     category TEXT,
     published_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     author TEXT,
-    is_active INTEGER DEFAULT 1
+    is_active INTEGER DEFAULT 1,
+    display_order INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS NewsReadStatus (

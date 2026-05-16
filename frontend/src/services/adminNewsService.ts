@@ -19,7 +19,10 @@ export interface NewsItem {
   author: string | null;
   published_date: string;
   is_active: boolean;
+  display_order?: number | null;
 }
+
+export type NewsMoveDirection = 'up' | 'down';
 
 export interface NewsCategory {
   id: number;
@@ -148,6 +151,31 @@ export const deleteNews = async (
     });
   } catch (error) {
     console.error('Error deleting news:', error);
+    throw error;
+  }
+};
+
+/**
+ * Move a news item in display order
+ */
+export const moveNews = async (
+  token: string,
+  newsId: number,
+  direction: NewsMoveDirection
+): Promise<void> => {
+  try {
+    await axios.post(
+      `${API_BASE_URL}/api/admin/news/${newsId}/move`,
+      { direction },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  } catch (error) {
+    console.error('Error moving news item:', error);
     throw error;
   }
 };

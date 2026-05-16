@@ -16,7 +16,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import type { NewsCategory, NewsItem } from '../../../../services/adminNewsService';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import type {
+  NewsCategory,
+  NewsItem,
+  NewsMoveDirection,
+} from '../../../../services/adminNewsService';
 import { formatDate, getCategoryLabel, getSnippet } from './newsManagement.utils';
 import { getNewsCategoryIconFromKey } from '../../../../utils/newsCategoryIcons';
 
@@ -31,6 +37,9 @@ interface NewsHistoryCardProps {
   onChangeCategoryFilter: (value: string) => void;
   onChangeStatusFilter: (value: 'all' | 'active' | 'inactive') => void;
   onEdit: (item: NewsItem) => void;
+  onMove: (item: NewsItem, direction: NewsMoveDirection) => void;
+  canMoveUp: (item: NewsItem) => boolean;
+  canMoveDown: (item: NewsItem) => boolean;
   onToggleActive: (item: NewsItem) => void;
   onDeletePermanent: (item: NewsItem) => void;
 }
@@ -46,6 +55,9 @@ function NewsHistoryCard({
   onChangeCategoryFilter,
   onChangeStatusFilter,
   onEdit,
+  onMove,
+  canMoveUp,
+  canMoveDown,
   onToggleActive,
   onDeletePermanent,
 }: NewsHistoryCardProps) {
@@ -143,6 +155,24 @@ function NewsHistoryCard({
                       disabled={saving}
                     >
                       Bearbeiten
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<ArrowUpwardIcon fontSize="small" />}
+                      onClick={() => onMove(item, 'up')}
+                      disabled={saving || !canMoveUp(item)}
+                    >
+                      Nach oben
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<ArrowDownwardIcon fontSize="small" />}
+                      onClick={() => onMove(item, 'down')}
+                      disabled={saving || !canMoveDown(item)}
+                    >
+                      Nach unten
                     </Button>
                     <Button
                       size="small"

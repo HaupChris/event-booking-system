@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Alert, Box, Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import type { CreateNewsRequest, NewsCategory, NewsItem } from '../../services/adminNewsService';
 import {
   createNews,
@@ -8,15 +8,20 @@ import {
   deleteNews,
   getAllNews,
   getAllNewsCategories,
+  moveNews,
   updateNews,
 } from '../../services/adminNewsService';
 import { TokenContext } from '../../contexts/AuthContext';
 import NewsComposerCard from './components/news/NewsComposerCard';
 import NewsPreviewCard from './components/news/NewsPreviewCard';
 import NewsHistoryCard from './components/news/NewsHistoryCard';
-import { getActiveCount } from './components/news/newsManagement.utils';
-import NewsCategoryManagerDialog from './components/news/NewsCategoryManagerDialog';
-import NewsActionDialogs from './components/news/NewsActionDialogs';
+import {
+  canMoveNewsDown,
+  canMoveNewsUp,
+  filterNewsItems,
+  getActiveCount,
+} from './components/news/newsManagement.utils';
+import NewsManagementOverlays from './components/news/NewsManagementOverlays';
 import { DEFAULT_NEWS_ICON_KEY } from '../../utils/newsCategoryIcons';
 
 const emptyForm: CreateNewsRequest = {
@@ -26,22 +31,7 @@ const emptyForm: CreateNewsRequest = {
   is_active: true,
 };
 
-const filterNewsItems = (
-  newsItems: NewsItem[],
-  categoryFilter: string,
-  statusFilter: 'all' | 'active' | 'inactive'
-) =>
-  newsItems.filter((item) => {
-    const categoryMatches =
-      categoryFilter === 'all' || (item.category || 'general') === categoryFilter;
-    const statusMatches =
-      statusFilter === 'all' ||
-      (statusFilter === 'active' && item.is_active) ||
-      (statusFilter === 'inactive' && !item.is_active);
-
-    return categoryMatches && statusMatches;
-  });
-
+// eslint-disable-next-line max-lines-per-function
 function NewsManagementPage() {
   const { token } = useContext(TokenContext);
 
@@ -213,6 +203,31 @@ function NewsManagementPage() {
     }
   };
 
+  const canMoveUp = useCallback(
+    (item: NewsItem) => canMoveNewsUp(news, item.id),
+    [news]
+  );
+
+  const canMoveDown = useCallback(
+    (item: NewsItem) => canMoveNewsDown(news, item.id),
+    [news]
+  );
+
+  const handleMove = async (item: NewsItem, direction: 'up' | 'down') => {
+    try {
+      setSaving(true);
+      setError(null);
+      setSuccess(null);
+      await moveNews(token, item.id, direction);
+      await loadNews();
+    } catch (moveError) {
+      console.error('Error moving news item:', moveError);
+      setError('Reihenfolge konnte nicht aktualisiert werden.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleDeletePermanent = async () => {
     if (!newsToDelete) {
       return;
@@ -328,43 +343,35 @@ function NewsManagementPage() {
             onChangeCategoryFilter={setCategoryFilter}
             onChangeStatusFilter={setStatusFilter}
             onEdit={handleEdit}
+            onMove={handleMove}
+            canMoveUp={canMoveUp}
+            canMoveDown={canMoveDown}
             onToggleActive={openStatusDialog}
             onDeletePermanent={openDeleteDialog}
           />
         </Stack>
       </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
-      {success && (
-        <Alert severity="success" sx={{ mt: 2 }} onClose={() => setSuccess(null)}>
-          {success}
-        </Alert>
-      )}
-
-      <NewsActionDialogs
+      <NewsManagementOverlays
+        error={error}
+        success={success}
         saving={saving}
         statusDialogOpen={statusDialogOpen}
         newsToToggleStatus={newsToToggleStatus}
         deleteDialogOpen={deleteDialogOpen}
         newsToDelete={newsToDelete}
+        categoryDialogOpen={categoryDialogOpen}
+        categories={categories}
+        newCategoryKey={newCategoryKey}
+        newCategoryLabel={newCategoryLabel}
+        newCategoryIcon={newCategoryIcon}
+        onCloseError={() => setError(null)}
+        onCloseSuccess={() => setSuccess(null)}
         onCloseStatus={closeStatusDialog}
         onConfirmToggleActive={handleToggleActive}
         onCloseDelete={closeDeleteDialog}
         onConfirmDeletePermanent={handleDeletePermanent}
-      />
-
-      <NewsCategoryManagerDialog
-        open={categoryDialogOpen}
-        categories={categories}
-        loading={saving}
-        newCategoryKey={newCategoryKey}
-        newCategoryLabel={newCategoryLabel}
-        newCategoryIcon={newCategoryIcon}
-        onClose={() => setCategoryDialogOpen(false)}
+        onCloseCategoryDialog={() => setCategoryDialogOpen(false)}
         onChangeKey={setNewCategoryKey}
         onChangeLabel={setNewCategoryLabel}
         onChangeIcon={setNewCategoryIcon}

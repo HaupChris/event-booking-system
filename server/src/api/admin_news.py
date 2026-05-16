@@ -21,6 +21,7 @@ from src.services.news_service import (
     get_all_news,
     get_news_by_id,
     get_news_categories,
+    move_news,
     update_news,
     update_news_category,
 )
@@ -382,4 +383,38 @@ def delete_news_item(news_id: int):
     except Exception as e:
         elapsed_time = time.time() - start_time
         logger.error(f"News deletion failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@admin_news_bp.route("/news/<int:news_id>/move", methods=["POST"])
+@limiter_admin_news.limit("120/minute")
+@jwt_required()
+def move_news_item(news_id: int):
+    """
+    Move a news item up or down in display order.
+
+    Request body:
+        {
+            "direction": "up" | "down"
+        }
+    """
+    try:
+        unauthorized_response = _ensure_admin_identity()
+        if unauthorized_response:
+            return unauthorized_response
+
+        payload = request.json or {}
+        direction = str(payload.get("direction", "")).strip().lower()
+        if direction not in {"up", "down"}:
+            return jsonify({"error": "direction must be 'up' or 'down'"}), 400
+
+        was_moved = move_news(news_id, direction)
+        response = (
+            (jsonify({"message": "News item moved successfully"}), 200)
+            if was_moved
+            else (jsonify({"error": "News item not found or cannot be moved further"}), 404)
+        )
+        return response
+    except Exception as e:
+        logger.error(f"News move failed for item {news_id}: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500

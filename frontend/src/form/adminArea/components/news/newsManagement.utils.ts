@@ -1,5 +1,7 @@
 import type { NewsItem } from '../../../../services/adminNewsService';
 
+export type NewsStatusFilter = 'all' | 'active' | 'inactive';
+
 export const NEWS_CATEGORIES = [
   { value: 'announcement', label: 'Ankuendigung' },
   { value: 'timetable', label: 'Zeitplan' },
@@ -43,3 +45,27 @@ export const getSnippet = (content: string) => {
 
 export const getActiveCount = (newsItems: NewsItem[]) =>
   newsItems.filter((item) => item.is_active).length;
+
+export const filterNewsItems = (
+  newsItems: NewsItem[],
+  categoryFilter: string,
+  statusFilter: NewsStatusFilter
+) =>
+  newsItems.filter((item) => {
+    const categoryMatches =
+      categoryFilter === 'all' || (item.category || 'general') === categoryFilter;
+    const statusMatches =
+      statusFilter === 'all' ||
+      (statusFilter === 'active' && item.is_active) ||
+      (statusFilter === 'inactive' && !item.is_active);
+
+    return categoryMatches && statusMatches;
+  });
+
+export const canMoveNewsUp = (newsItems: NewsItem[], newsId: number) =>
+  newsItems.findIndex((newsItem) => newsItem.id === newsId) > 0;
+
+export const canMoveNewsDown = (newsItems: NewsItem[], newsId: number) => {
+  const index = newsItems.findIndex((newsItem) => newsItem.id === newsId);
+  return index !== -1 && index < newsItems.length - 1;
+};
