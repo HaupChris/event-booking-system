@@ -256,7 +256,7 @@ def send_confirmation_mail(
       <div class="container">
         <div class="header">
           <h1>ZIRKUS WIESENWAHN</h1>
-          <p>DO, 28.08.2025 - SO, 31.08.2025</p>
+          <p>DO, 13.08.2026 - SO, 16.08.2026</p>
         </div>
 
         <div class="content">
@@ -477,7 +477,7 @@ def send_artist_confirmation_mail(
       <div class="container">
         <div class="header">
           <h1>ZIRKUS WIESENWAHN</h1>
-          <p>DO, 28.08.2025 - SO, 31.08.2025</p>
+          <p>DO, 13.08.2026 - SO, 16.08.2026</p>
         </div>
 
         <div class="content">
@@ -743,7 +743,7 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
       <div class="container">
         <div class="header">
           <h1>ZIRKUS WIESENWAHN</h1>
-          <p>DO, 28.08.2025 - SO, 31.08.2025</p>
+          <p>DO, 13.08.2026 - SO, 16.08.2026</p>
         </div>
 
         <div class="content">
