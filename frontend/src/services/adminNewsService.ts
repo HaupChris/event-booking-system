@@ -34,6 +34,7 @@ export interface CreateNewsRequest {
   content: string;
   category?: string;
   author?: string;
+  is_active?: boolean;
 }
 
 export interface UpdateNewsRequest {
@@ -41,6 +42,7 @@ export interface UpdateNewsRequest {
   content?: string;
   category?: string;
   author?: string;
+  is_active?: boolean;
 }
 
 export interface CreateNewsCategoryRequest {

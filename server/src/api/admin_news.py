@@ -222,7 +222,8 @@ def create_news_item():
             "title": string (required),
             "content": string (required),
             "category": string (optional),
-            "author": string (optional)
+            "author": string (optional),
+            "is_active": bool (optional, default: true)
         }
     """
     start_time = time.time()
@@ -246,6 +247,10 @@ def create_news_item():
         content = data.get("content")
         category = data.get("category")
         author = data.get("author", admin_user)
+        is_active = data.get("is_active")
+
+        if is_active is not None and not isinstance(is_active, bool):
+            return jsonify({"error": "is_active must be a boolean"}), 400
 
         # Validate required fields
         if not title or not content:
@@ -253,7 +258,13 @@ def create_news_item():
             return jsonify({"error": "Title and content are required"}), 400
 
         # Create news item
-        news_id = create_news(title, content, category, author)
+        news_id = create_news(
+            title=title,
+            content=content,
+            category=category,
+            author=author,
+            is_active=True if is_active is None else is_active,
+        )
 
         elapsed_time = time.time() - start_time
         logger.info(
@@ -280,7 +291,8 @@ def update_news_item(news_id: int):
             "title": string,
             "content": string,
             "category": string,
-            "author": string
+            "author": string,
+            "is_active": bool
         }
     """
     start_time = time.time()
@@ -306,9 +318,13 @@ def update_news_item(news_id: int):
         content = data.get("content")
         category = data.get("category")
         author = data.get("author")
+        is_active = data.get("is_active")
+
+        if is_active is not None and not isinstance(is_active, bool):
+            return jsonify({"error": "is_active must be a boolean"}), 400
 
         # Update news item
-        success = update_news(news_id, title, content, category, author)
+        success = update_news(news_id, title, content, category, author, is_active)
 
         if success:
             elapsed_time = time.time() - start_time

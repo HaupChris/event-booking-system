@@ -36,6 +36,14 @@ function NewsComposerCard({
   onReset,
   onOpenCategoryManager,
 }: NewsComposerCardProps) {
+  const submitLabel = (() => {
+    if (isEditing) {
+      return formData.is_active === false ? 'Entwurf speichern' : 'Aenderungen speichern';
+    }
+
+    return formData.is_active === false ? 'Als Entwurf speichern' : 'News veroeffentlichen';
+  })();
+
   return (
     <Card variant="outlined">
       <CardContent sx={{ p: 3 }}>
@@ -71,6 +79,22 @@ function NewsComposerCard({
             ))}
           </TextField>
 
+          <TextField
+            select
+            label="Status"
+            value={formData.is_active === false ? 'inactive' : 'active'}
+            onChange={(event) =>
+              onChangeForm({
+                ...formData,
+                is_active: String(event.target.value) === 'active',
+              })
+            }
+            fullWidth
+          >
+            <MenuItem value="active">Sofort veroeffentlichen</MenuItem>
+            <MenuItem value="inactive">Als Entwurf speichern</MenuItem>
+          </TextField>
+
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               variant="outlined"
@@ -103,7 +127,7 @@ function NewsComposerCard({
               disabled={saving || !formData.title?.trim() || !formData.content?.trim()}
               fullWidth
             >
-              {isEditing ? 'Aenderungen speichern' : 'News veroeffentlichen'}
+              {submitLabel}
             </Button>
             <Button
               variant="outlined"

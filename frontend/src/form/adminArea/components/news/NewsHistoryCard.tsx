@@ -14,6 +14,8 @@ import {
 import CampaignIcon from '@mui/icons-material/Campaign';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import type { NewsCategory, NewsItem } from '../../../../services/adminNewsService';
 import { formatDate, getCategoryLabel, getSnippet } from './newsManagement.utils';
 import { getNewsCategoryIconFromKey } from '../../../../utils/newsCategoryIcons';
@@ -29,7 +31,8 @@ interface NewsHistoryCardProps {
   onChangeCategoryFilter: (value: string) => void;
   onChangeStatusFilter: (value: 'all' | 'active' | 'inactive') => void;
   onEdit: (item: NewsItem) => void;
-  onDeactivate: (item: NewsItem) => void;
+  onToggleActive: (item: NewsItem) => void;
+  onDeletePermanent: (item: NewsItem) => void;
 }
 
 function NewsHistoryCard({
@@ -43,7 +46,8 @@ function NewsHistoryCard({
   onChangeCategoryFilter,
   onChangeStatusFilter,
   onEdit,
-  onDeactivate,
+  onToggleActive,
+  onDeletePermanent,
 }: NewsHistoryCardProps) {
   return (
     <Card variant="outlined">
@@ -143,12 +147,28 @@ function NewsHistoryCard({
                     <Button
                       size="small"
                       variant="outlined"
-                      color="error"
-                      startIcon={<DeleteIcon fontSize="small" />}
-                      onClick={() => onDeactivate(item)}
-                      disabled={saving || !item.is_active}
+                      color={item.is_active ? 'error' : 'success'}
+                      startIcon={
+                        item.is_active ? (
+                          <DeleteIcon fontSize="small" />
+                        ) : (
+                          <PublishedWithChangesIcon fontSize="small" />
+                        )
+                      }
+                      onClick={() => onToggleActive(item)}
+                      disabled={saving}
                     >
-                      Deaktivieren
+                      {item.is_active ? 'Deaktivieren' : 'Aktivieren'}
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="error"
+                      startIcon={<DeleteForeverIcon fontSize="small" />}
+                      onClick={() => onDeletePermanent(item)}
+                      disabled={saving}
+                    >
+                      Endgueltig loeschen
                     </Button>
                   </Stack>
                 </Box>

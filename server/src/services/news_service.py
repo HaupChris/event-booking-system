@@ -198,6 +198,7 @@ def create_news(
     content: str,
     category: str | None = None,
     author: str | None = None,
+    is_active: bool = True,
 ) -> int:
     """Create a new news item."""
     try:
@@ -210,9 +211,9 @@ def create_news(
             cursor.execute(
                 """
                 INSERT INTO News (title, content, category, author, published_date, is_active)
-                VALUES (?, ?, ?, ?, ?, 1)
+                VALUES (?, ?, ?, ?, ?, ?)
             """,
-                (title, content, category, author, _now_iso()),
+                (title, content, category, author, _now_iso(), 1 if is_active else 0),
             )
 
             conn.commit()
@@ -235,6 +236,7 @@ def update_news(
     content: str | None = None,
     category: str | None = None,
     author: str | None = None,
+    is_active: bool | None = None,
 ) -> bool:
     """Update an existing news item."""
     try:
@@ -260,6 +262,9 @@ def update_news(
             if author is not None:
                 updates.append("author = ?")
                 params.append(author)
+            if is_active is not None:
+                updates.append("is_active = ?")
+                params.append(1 if is_active else 0)
 
             if not updates:
                 logger.warning(f"No fields to update for news {news_id}")
