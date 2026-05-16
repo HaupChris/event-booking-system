@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Alert, Box, CircularProgress, Container } from '@mui/material';
 import {
@@ -85,13 +85,16 @@ const ProfilePage: React.FC = () => {
     isLoading,
     error,
     isOnline,
+    refreshProfile,
     refreshShifts,
+    refreshNews,
     acceptShift,
     declineShift,
     markNewsAsRead,
   } = useProfile({ profileUuid: profileUuid || '', enableOffline: true });
 
   const isArtistProfile = Boolean(profile?.user?.is_artist);
+  const previousActiveViewRef = useRef<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -155,6 +158,38 @@ const ProfilePage: React.FC = () => {
       setActiveView('rideshare_overview');
     }
   }, [activeView, isRideShareEnabled]);
+
+  useEffect(() => {
+    if (!isOnline) {
+      previousActiveViewRef.current = activeView;
+      return;
+    }
+
+    const hasViewChanged = previousActiveViewRef.current !== activeView;
+    previousActiveViewRef.current = activeView;
+
+    if (!hasViewChanged) {
+      return;
+    }
+
+    if (activeView === 'news') {
+      refreshNews().then();
+      return;
+    }
+
+    if (activeView === 'profile') {
+      refreshProfile().then();
+      return;
+    }
+
+    if (activeView === 'shifts') {
+      if (isArtistProfile) {
+        refreshNews().then();
+      } else {
+        refreshShifts().then();
+      }
+    }
+  }, [activeView, isArtistProfile, isOnline, refreshNews, refreshProfile, refreshShifts]);
 
   const pageTitle = useMemo(() => {
     for (const item of menuItems) {

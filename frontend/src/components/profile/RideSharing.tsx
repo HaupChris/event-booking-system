@@ -87,7 +87,7 @@ const RideSharing: React.FC<RideSharingProps> = ({ viewMode }) => {
 
   useEffect(() => {
     loadBoard().then();
-  }, [loadBoard]);
+  }, [loadBoard, viewMode]);
 
   const parsedSeats = Number.parseInt(seatsTotalInput, 10);
   const seatsValid = Number.isInteger(parsedSeats) && parsedSeats >= 1 && parsedSeats <= 20;

@@ -188,15 +188,6 @@ const NewsFeedCard: React.FC<NewsFeedCardProps> = ({
                 minute: '2-digit',
               })}
             </Typography>
-            {item.author && (
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ ml: 1, fontFamily: isCircusMode ? bodyFont : undefined }}
-              >
-                • von {item.author}
-              </Typography>
-            )}
           </Box>
         }
       />
