@@ -41,7 +41,9 @@ def _connect_db() -> sqlite3.Connection:
 def get_all_faqs(include_inactive: bool = False, category_id: int = None) -> list[dict[str, Any]]:
     """Get all FAQ items."""
     try:
-        logger.debug(f"Fetching all FAQs (include_inactive={include_inactive}, category_id={category_id})")
+        logger.debug(
+            f"Fetching all FAQs (include_inactive={include_inactive}, category_id={category_id})"
+        )
 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
@@ -162,6 +164,7 @@ def update_faq(
     answer: str = None,
     category_id: int = None,
     display_order: int = None,
+    is_active: bool = None,
 ) -> bool:
     """Update an existing FAQ item."""
     try:
@@ -186,6 +189,9 @@ def update_faq(
             if display_order is not None:
                 updates.append("display_order = ?")
                 params.append(display_order)
+            if is_active is not None:
+                updates.append("is_active = ?")
+                params.append(1 if is_active else 0)
 
             if not updates:
                 logger.warning(f"No fields to update for FAQ {faq_id}")
@@ -339,7 +345,12 @@ def create_faq_category(name: str, display_order: int = 0) -> int:
         raise
 
 
-def update_faq_category(category_id: int, name: str = None, display_order: int = None) -> bool:
+def update_faq_category(
+    category_id: int,
+    name: str = None,
+    display_order: int = None,
+    is_active: bool = None,
+) -> bool:
     """Update an existing FAQ category."""
     try:
         logger.debug(f"Updating FAQ category {category_id}")
@@ -357,6 +368,9 @@ def update_faq_category(category_id: int, name: str = None, display_order: int =
             if display_order is not None:
                 updates.append("display_order = ?")
                 params.append(display_order)
+            if is_active is not None:
+                updates.append("is_active = ?")
+                params.append(1 if is_active else 0)
 
             if not updates:
                 logger.warning(f"No fields to update for FAQ category {category_id}")
@@ -395,7 +409,9 @@ def delete_faq_category(category_id: int, soft_delete: bool = True) -> bool:
             cursor = conn.cursor()
 
             if soft_delete:
-                cursor.execute("UPDATE FAQCategories SET is_active = 0 WHERE id = ?", (category_id,))
+                cursor.execute(
+                    "UPDATE FAQCategories SET is_active = 0 WHERE id = ?", (category_id,)
+                )
             else:
                 cursor.execute("DELETE FROM FAQCategories WHERE id = ?", (category_id,))
 

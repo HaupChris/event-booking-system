@@ -175,7 +175,8 @@ def update_faq_item(faq_id: int):
             "question": string,
             "answer": string,
             "category_id": int,
-            "display_order": int
+            "display_order": int,
+            "is_active": bool
         }
     """
     start_time = time.time()
@@ -188,9 +189,7 @@ def update_faq_item(faq_id: int):
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
-        logger.info(
-            f"FAQ update request for item {faq_id} from admin {admin_user} at {client_ip}"
-        )
+        logger.info(f"FAQ update request for item {faq_id} from admin {admin_user} at {client_ip}")
 
         # Validate request
         if not request.json:
@@ -202,9 +201,13 @@ def update_faq_item(faq_id: int):
         answer = data.get("answer")
         category_id = data.get("category_id")
         display_order = data.get("display_order")
+        is_active = data.get("is_active")
+
+        if is_active is not None and not isinstance(is_active, bool):
+            return jsonify({"error": "is_active must be a boolean"}), 400
 
         # Update FAQ item
-        success = update_faq(faq_id, question, answer, category_id, display_order)
+        success = update_faq(faq_id, question, answer, category_id, display_order, is_active)
 
         if success:
             elapsed_time = time.time() - start_time
@@ -281,7 +284,9 @@ def get_categories_list():
 
     # Admin identity check
     if admin_user != "admin":
-        logger.warning(f"Unauthorized category list access attempt from {admin_user} at {client_ip}")
+        logger.warning(
+            f"Unauthorized category list access attempt from {admin_user} at {client_ip}"
+        )
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
@@ -396,7 +401,8 @@ def update_category_item(category_id: int):
     Request body (all fields optional):
         {
             "name": string,
-            "display_order": int
+            "display_order": int,
+            "is_active": bool
         }
     """
     start_time = time.time()
@@ -421,9 +427,13 @@ def update_category_item(category_id: int):
         data = request.json
         name = data.get("name")
         display_order = data.get("display_order")
+        is_active = data.get("is_active")
+
+        if is_active is not None and not isinstance(is_active, bool):
+            return jsonify({"error": "is_active must be a boolean"}), 400
 
         # Update category
-        success = update_faq_category(category_id, name, display_order)
+        success = update_faq_category(category_id, name, display_order, is_active)
 
         if success:
             elapsed_time = time.time() - start_time

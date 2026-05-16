@@ -134,7 +134,7 @@ def migrate():
             },
             {
                 'question': 'Wo finde ich Informationen zur Anreise?',
-                'answer': 'Informationen zur Anreise findest du in den Neuigkeiten unter der Kategorie "Anreise". Außerdem kannst du die Mitfahrbörse nutzen, um Fahrgemeinschaften zu bilden.',
+                'answer': 'Informationen zur Anreise findest du in den Neuigkeiten unter der Kategorie "Anreise", rechtzeitig vor Festivalbeginn. Außerdem kannst du die Mitfahrbörse nutzen, um Fahrgemeinschaften zu bilden.',
                 'category_id': 5,  # Anreise & Mitfahren
                 'display_order': 1
             },

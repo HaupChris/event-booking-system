@@ -1,5 +1,22 @@
 import React, { useContext, useMemo, useState } from 'react';
-import { Alert, Box, CircularProgress, Snackbar, Tab, Tabs, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  Snackbar,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from '@mui/material';
+import {
+  ArrowDownward as ArrowDownwardIcon,
+  ArrowUpward as ArrowUpwardIcon,
+  DeleteForever as DeleteForeverIcon,
+  Edit as EditIcon,
+  PauseCircleOutline as PauseCircleOutlineIcon,
+  PublishedWithChanges as PublishedWithChangesIcon,
+} from '@mui/icons-material';
 import { TokenContext } from '../../contexts/AuthContext';
 import type { FAQ, FAQCategory } from '../../services/adminFaqService';
 import CategoryDialog from './components/CategoryDialog';
@@ -18,13 +35,16 @@ const getFAQCount = (categoryId: number, faqs: FAQ[]) =>
 const truncate = (text: string, max: number) =>
   text.length > max ? `${text.substring(0, max)}...` : text;
 
+type FAQActionType = 'deactivate' | 'reactivate' | 'delete_permanent';
+type CategoryActionType = 'deactivate' | 'reactivate' | 'delete_permanent';
+
 const FAQManagementPage: React.FC = () => {
   const { token } = useContext(TokenContext);
   const [activeTab, setActiveTab] = useState(0);
   const [faqDialogOpen, setFaqDialogOpen] = useState(false);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
-  const [faqDeleteDialogOpen, setFaqDeleteDialogOpen] = useState(false);
-  const [categoryDeleteDialogOpen, setCategoryDeleteDialogOpen] = useState(false);
+  const [faqActionType, setFaqActionType] = useState<FAQActionType | null>(null);
+  const [categoryActionType, setCategoryActionType] = useState<CategoryActionType | null>(null);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<number | 'all'>('all');
 
   const {
@@ -42,8 +62,10 @@ const FAQManagementPage: React.FC = () => {
     snackbar,
     setSnackbar,
     handleSaveFAQ,
+    handleSetFAQActive,
     handleDeleteFAQ,
     handleSaveCategory,
+    handleSetCategoryActive,
     handleDeleteCategory,
     handleMoveCategory,
   } = useFAQManagement(token);
@@ -95,14 +117,34 @@ const FAQManagementPage: React.FC = () => {
     setCategoryDialogOpen(true);
   };
 
+  const handleOpenToggleFAQStatusDialog = (faq: FAQ) => {
+    setSelectedFAQ(faq);
+    setFaqActionType(faq.is_active ? 'deactivate' : 'reactivate');
+  };
+
   const handleOpenDeleteFAQDialog = (faq: FAQ) => {
     setSelectedFAQ(faq);
-    setFaqDeleteDialogOpen(true);
+    setFaqActionType('delete_permanent');
+  };
+
+  const closeFAQActionDialog = () => {
+    setFaqActionType(null);
+    setSelectedFAQ(null);
+  };
+
+  const handleOpenToggleCategoryStatusDialog = (category: FAQCategory) => {
+    setSelectedCategory(category);
+    setCategoryActionType(category.is_active ? 'deactivate' : 'reactivate');
   };
 
   const handleOpenDeleteCategoryDialog = (category: FAQCategory) => {
     setSelectedCategory(category);
-    setCategoryDeleteDialogOpen(true);
+    setCategoryActionType('delete_permanent');
+  };
+
+  const closeCategoryActionDialog = () => {
+    setCategoryActionType(null);
+    setSelectedCategory(null);
   };
 
   const onSaveFAQ = async () => {
@@ -112,13 +154,22 @@ const FAQManagementPage: React.FC = () => {
     }
   };
 
-  const onDeleteFAQ = async () => {
-    if (!selectedFAQ) {
+  const onConfirmFAQAction = async () => {
+    if (!selectedFAQ || !faqActionType) {
       return;
     }
-    const success = await handleDeleteFAQ(selectedFAQ.id);
+
+    let success = false;
+    if (faqActionType === 'deactivate') {
+      success = await handleSetFAQActive(selectedFAQ.id, false);
+    } else if (faqActionType === 'reactivate') {
+      success = await handleSetFAQActive(selectedFAQ.id, true);
+    } else {
+      success = await handleDeleteFAQ(selectedFAQ.id, true);
+    }
+
     if (success) {
-      setFaqDeleteDialogOpen(false);
+      closeFAQActionDialog();
     }
   };
 
@@ -129,13 +180,22 @@ const FAQManagementPage: React.FC = () => {
     }
   };
 
-  const onDeleteCategory = async () => {
-    if (!selectedCategory) {
+  const onConfirmCategoryAction = async () => {
+    if (!selectedCategory || !categoryActionType) {
       return;
     }
-    const success = await handleDeleteCategory(selectedCategory.id);
+
+    let success = false;
+    if (categoryActionType === 'deactivate') {
+      success = await handleSetCategoryActive(selectedCategory.id, false);
+    } else if (categoryActionType === 'reactivate') {
+      success = await handleSetCategoryActive(selectedCategory.id, true);
+    } else {
+      success = await handleDeleteCategory(selectedCategory.id, true);
+    }
+
     if (success) {
-      setCategoryDeleteDialogOpen(false);
+      closeCategoryActionDialog();
     }
   };
 
@@ -154,6 +214,35 @@ const FAQManagementPage: React.FC = () => {
       <Typography variant="h4" sx={{ mb: 3 }}>
         FAQ Management
       </Typography>
+
+      <Alert severity="info" sx={{ mb: 3 }}>
+        <Typography variant="subtitle2" sx={{ mb: 1 }}>
+          Icon-Legende
+        </Typography>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 1, md: 2 }}>
+          <Stack direction="row" spacing={0.75} alignItems="center">
+            <EditIcon fontSize="small" />
+            <Typography variant="body2">Bearbeiten</Typography>
+          </Stack>
+          <Stack direction="row" spacing={0.75} alignItems="center">
+            <PauseCircleOutlineIcon fontSize="small" />
+            <Typography variant="body2">Deaktivieren</Typography>
+          </Stack>
+          <Stack direction="row" spacing={0.75} alignItems="center">
+            <PublishedWithChangesIcon fontSize="small" />
+            <Typography variant="body2">Reaktivieren</Typography>
+          </Stack>
+          <Stack direction="row" spacing={0.75} alignItems="center">
+            <DeleteForeverIcon fontSize="small" />
+            <Typography variant="body2">Dauerhaft loeschen</Typography>
+          </Stack>
+          <Stack direction="row" spacing={0.75} alignItems="center">
+            <ArrowUpwardIcon fontSize="small" />
+            <ArrowDownwardIcon fontSize="small" />
+            <Typography variant="body2">Reihenfolge aendern</Typography>
+          </Stack>
+        </Stack>
+      </Alert>
 
       <Tabs
         value={activeTab}
@@ -174,7 +263,8 @@ const FAQManagementPage: React.FC = () => {
           truncate={truncate}
           onCreateFAQ={handleOpenCreateFAQDialog}
           onEditFAQ={handleOpenEditFAQDialog}
-          onDeleteFAQ={handleOpenDeleteFAQDialog}
+          onToggleFAQActive={handleOpenToggleFAQStatusDialog}
+          onDeleteFAQPermanent={handleOpenDeleteFAQDialog}
         />
       )}
 
@@ -184,7 +274,8 @@ const FAQManagementPage: React.FC = () => {
           getFAQCount={(id) => getFAQCount(id, faqs)}
           onCreateCategory={handleOpenCreateCategoryDialog}
           onEditCategory={handleOpenEditCategoryDialog}
-          onDeleteCategory={handleOpenDeleteCategoryDialog}
+          onToggleCategoryActive={handleOpenToggleCategoryStatusDialog}
+          onDeleteCategoryPermanent={handleOpenDeleteCategoryDialog}
           onMoveCategory={handleMoveCategory}
         />
       )}
@@ -209,25 +300,62 @@ const FAQManagementPage: React.FC = () => {
       />
 
       <DeleteConfirmDialog
-        open={faqDeleteDialogOpen}
-        title="Delete FAQ?"
-        message="Are you sure you want to delete this FAQ?"
+        open={Boolean(faqActionType)}
+        title={
+          faqActionType === 'reactivate'
+            ? 'FAQ reaktivieren?'
+            : faqActionType === 'delete_permanent'
+              ? 'FAQ dauerhaft loeschen?'
+              : 'FAQ deaktivieren?'
+        }
+        message={
+          faqActionType === 'reactivate'
+            ? 'Dieser FAQ-Eintrag wird wieder sichtbar gemacht.'
+            : faqActionType === 'delete_permanent'
+              ? 'Dieser FAQ-Eintrag wird dauerhaft entfernt und kann nicht wiederhergestellt werden.'
+              : 'Dieser FAQ-Eintrag wird ausgeblendet, kann spaeter aber wieder aktiviert werden.'
+        }
         itemName={selectedFAQ?.question}
-        onClose={() => setFaqDeleteDialogOpen(false)}
-        onConfirm={onDeleteFAQ}
+        onClose={closeFAQActionDialog}
+        onConfirm={onConfirmFAQAction}
+        confirmLabel={
+          faqActionType === 'reactivate'
+            ? 'Reaktivieren'
+            : faqActionType === 'delete_permanent'
+              ? 'Dauerhaft loeschen'
+              : 'Deaktivieren'
+        }
+        confirmColor={faqActionType === 'reactivate' ? 'success' : 'error'}
       />
 
       <DeleteConfirmDialog
-        open={categoryDeleteDialogOpen}
-        title="Delete Category?"
-        message={
-          selectedCategoryFaqCount > 0
-            ? `This category contains ${selectedCategoryFaqCount} FAQ(s). Please reassign or delete them first.`
-            : `Are you sure you want to deactivate "${selectedCategory?.name}"? It will no longer be visible to users.`
+        open={Boolean(categoryActionType)}
+        title={
+          categoryActionType === 'reactivate'
+            ? 'Kategorie reaktivieren?'
+            : categoryActionType === 'delete_permanent'
+              ? 'Kategorie dauerhaft loeschen?'
+              : 'Kategorie deaktivieren?'
         }
-        onClose={() => setCategoryDeleteDialogOpen(false)}
-        onConfirm={onDeleteCategory}
-        disabled={selectedCategoryFaqCount > 0}
+        message={
+          categoryActionType === 'reactivate'
+            ? 'Diese Kategorie wird wieder sichtbar gemacht.'
+            : categoryActionType === 'delete_permanent'
+              ? selectedCategoryFaqCount > 0
+                ? `Diese Kategorie enthaelt ${selectedCategoryFaqCount} FAQ(s). Beim dauerhaften Loeschen werden die FAQ-Eintraege ebenfalls entfernt.`
+                : 'Diese Kategorie wird dauerhaft entfernt und kann nicht wiederhergestellt werden.'
+              : `"${selectedCategory?.name}" wird ausgeblendet, kann spaeter aber wieder aktiviert werden.`
+        }
+        onClose={closeCategoryActionDialog}
+        onConfirm={onConfirmCategoryAction}
+        confirmLabel={
+          categoryActionType === 'reactivate'
+            ? 'Reaktivieren'
+            : categoryActionType === 'delete_permanent'
+              ? 'Dauerhaft loeschen'
+              : 'Deaktivieren'
+        }
+        confirmColor={categoryActionType === 'reactivate' ? 'success' : 'error'}
       />
 
       <Snackbar

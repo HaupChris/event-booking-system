@@ -81,15 +81,28 @@ export const useFAQManagement = (token: string) => {
     }
   };
 
-  const handleDeleteFAQ = async (faqId: number) => {
+  const handleSetFAQActive = async (faqId: number, isActive: boolean) => {
     try {
-      await deleteFAQ(token, faqId, false);
-      showSnackbar('FAQ deactivated successfully', 'success');
+      await updateFAQ(token, faqId, { is_active: isActive });
+      showSnackbar(isActive ? 'FAQ reactivated successfully' : 'FAQ deactivated successfully', 'success');
+      loadData();
+      return true;
+    } catch (error) {
+      console.error('Error updating FAQ status:', error);
+      showSnackbar('Failed to update FAQ status', 'error');
+      return false;
+    }
+  };
+
+  const handleDeleteFAQ = async (faqId: number, permanent = false) => {
+    try {
+      await deleteFAQ(token, faqId, permanent);
+      showSnackbar(permanent ? 'FAQ deleted permanently' : 'FAQ deactivated successfully', 'success');
       loadData();
       return true;
     } catch (error) {
       console.error('Error deleting FAQ:', error);
-      showSnackbar('Failed to delete FAQ', 'error');
+      showSnackbar(permanent ? 'Failed to delete FAQ permanently' : 'Failed to deactivate FAQ', 'error');
       return false;
     }
   };
@@ -112,15 +125,37 @@ export const useFAQManagement = (token: string) => {
     }
   };
 
-  const handleDeleteCategory = async (categoryId: number) => {
+  const handleSetCategoryActive = async (categoryId: number, isActive: boolean) => {
     try {
-      await deleteFAQCategory(token, categoryId, false);
-      showSnackbar('Category deactivated successfully', 'success');
+      await updateFAQCategory(token, categoryId, { is_active: isActive });
+      showSnackbar(
+        isActive ? 'Category reactivated successfully' : 'Category deactivated successfully',
+        'success'
+      );
+      loadData();
+      return true;
+    } catch (error) {
+      console.error('Error updating category status:', error);
+      showSnackbar('Failed to update category status', 'error');
+      return false;
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId: number, permanent = false) => {
+    try {
+      await deleteFAQCategory(token, categoryId, permanent);
+      showSnackbar(
+        permanent ? 'Category deleted permanently' : 'Category deactivated successfully',
+        'success'
+      );
       loadData();
       return true;
     } catch (error) {
       console.error('Error deleting category:', error);
-      showSnackbar('Failed to delete category', 'error');
+      showSnackbar(
+        permanent ? 'Failed to delete category permanently' : 'Failed to deactivate category',
+        'error'
+      );
       return false;
     }
   };
@@ -173,8 +208,10 @@ export const useFAQManagement = (token: string) => {
     snackbar,
     setSnackbar,
     handleSaveFAQ,
+    handleSetFAQActive,
     handleDeleteFAQ,
     handleSaveCategory,
+    handleSetCategoryActive,
     handleDeleteCategory,
     handleMoveCategory,
   };

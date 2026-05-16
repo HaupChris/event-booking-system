@@ -15,9 +15,16 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
-import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  DeleteForever as DeleteForeverIcon,
+  Edit as EditIcon,
+  PauseCircleOutline as PauseCircleOutlineIcon,
+  PublishedWithChanges as PublishedWithChangesIcon,
+} from '@mui/icons-material';
 import type { FAQ, FAQCategory } from '../../../services/adminFaqService';
 
 interface FAQListTabProps {
@@ -29,7 +36,8 @@ interface FAQListTabProps {
   truncate: (text: string, max: number) => string;
   onCreateFAQ: () => void;
   onEditFAQ: (faq: FAQ) => void;
-  onDeleteFAQ: (faq: FAQ) => void;
+  onToggleFAQActive: (faq: FAQ) => void;
+  onDeleteFAQPermanent: (faq: FAQ) => void;
 }
 
 const FAQListTab: React.FC<FAQListTabProps> = ({
@@ -41,7 +49,8 @@ const FAQListTab: React.FC<FAQListTabProps> = ({
   truncate,
   onCreateFAQ,
   onEditFAQ,
-  onDeleteFAQ,
+  onToggleFAQActive,
+  onDeleteFAQPermanent,
 }) => (
   <>
     <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -103,12 +112,33 @@ const FAQListTab: React.FC<FAQListTabProps> = ({
                 />
               </TableCell>
               <TableCell align="right">
-                <IconButton size="small" onClick={() => onEditFAQ(faq)}>
-                  <EditIcon fontSize="small" />
-                </IconButton>
-                <IconButton size="small" color="error" onClick={() => onDeleteFAQ(faq)}>
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
+                <Tooltip title="FAQ bearbeiten">
+                  <IconButton size="small" onClick={() => onEditFAQ(faq)}>
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={faq.is_active ? 'FAQ deaktivieren' : 'FAQ reaktivieren'}>
+                  <IconButton
+                    size="small"
+                    color={faq.is_active ? 'warning' : 'success'}
+                    onClick={() => onToggleFAQActive(faq)}
+                  >
+                    {faq.is_active ? (
+                      <PauseCircleOutlineIcon fontSize="small" />
+                    ) : (
+                      <PublishedWithChangesIcon fontSize="small" />
+                    )}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="FAQ dauerhaft loeschen">
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => onDeleteFAQPermanent(faq)}
+                  >
+                    <DeleteForeverIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </TableCell>
             </TableRow>
           ))}

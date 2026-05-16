@@ -41,6 +41,7 @@ export interface UpdateFAQRequest {
   answer?: string;
   category_id?: number;
   display_order?: number;
+  is_active?: boolean;
 }
 
 export interface CreateFAQCategoryRequest {
@@ -51,6 +52,7 @@ export interface CreateFAQCategoryRequest {
 export interface UpdateFAQCategoryRequest {
   name?: string;
   display_order?: number;
+  is_active?: boolean;
 }
 
 /**

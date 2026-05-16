@@ -3,8 +3,10 @@ import {
   ArrowDownward,
   ArrowUpward,
   Add as AddIcon,
-  Delete as DeleteIcon,
+  DeleteForever as DeleteForeverIcon,
   Edit as EditIcon,
+  PauseCircleOutline as PauseCircleOutlineIcon,
+  PublishedWithChanges as PublishedWithChangesIcon,
 } from '@mui/icons-material';
 import {
   Box,
@@ -18,6 +20,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import type { FAQCategory } from '../../../services/adminFaqService';
@@ -27,7 +30,8 @@ interface FAQCategoryTabProps {
   getFAQCount: (categoryId: number) => number;
   onCreateCategory: () => void;
   onEditCategory: (category: FAQCategory) => void;
-  onDeleteCategory: (category: FAQCategory) => void;
+  onToggleCategoryActive: (category: FAQCategory) => void;
+  onDeleteCategoryPermanent: (category: FAQCategory) => void;
   onMoveCategory: (category: FAQCategory, direction: 'up' | 'down') => void;
 }
 
@@ -36,7 +40,8 @@ const FAQCategoryTab: React.FC<FAQCategoryTabProps> = ({
   getFAQCount,
   onCreateCategory,
   onEditCategory,
-  onDeleteCategory,
+  onToggleCategoryActive,
+  onDeleteCategoryPermanent,
   onMoveCategory,
 }) => (
   <>
@@ -93,12 +98,35 @@ const FAQCategoryTab: React.FC<FAQCategoryTabProps> = ({
                 />
               </TableCell>
               <TableCell align="right">
-                <IconButton size="small" onClick={() => onEditCategory(category)}>
-                  <EditIcon fontSize="small" />
-                </IconButton>
-                <IconButton size="small" color="error" onClick={() => onDeleteCategory(category)}>
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
+                <Tooltip title="Kategorie bearbeiten">
+                  <IconButton size="small" onClick={() => onEditCategory(category)}>
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip
+                  title={category.is_active ? 'Kategorie deaktivieren' : 'Kategorie reaktivieren'}
+                >
+                  <IconButton
+                    size="small"
+                    color={category.is_active ? 'warning' : 'success'}
+                    onClick={() => onToggleCategoryActive(category)}
+                  >
+                    {category.is_active ? (
+                      <PauseCircleOutlineIcon fontSize="small" />
+                    ) : (
+                      <PublishedWithChangesIcon fontSize="small" />
+                    )}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Kategorie dauerhaft loeschen">
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => onDeleteCategoryPermanent(category)}
+                  >
+                    <DeleteForeverIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </TableCell>
             </TableRow>
           ))}

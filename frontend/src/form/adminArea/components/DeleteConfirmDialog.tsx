@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
 } from '@mui/material';
 
 interface DeleteConfirmDialogProps {
@@ -16,6 +16,8 @@ interface DeleteConfirmDialogProps {
   onClose: () => void;
   onConfirm: () => void;
   disabled?: boolean;
+  confirmLabel?: string;
+  confirmColor?: 'error' | 'success' | 'warning' | 'primary';
 }
 
 const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
@@ -26,6 +28,8 @@ const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
   onClose,
   onConfirm,
   disabled = false,
+  confirmLabel = 'Delete',
+  confirmColor = 'error',
 }) => {
   return (
     <Dialog open={open} onClose={onClose}>
@@ -40,8 +44,8 @@ const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={onConfirm} variant="contained" color="error" disabled={disabled}>
-          Delete
+        <Button onClick={onConfirm} variant="contained" color={confirmColor} disabled={disabled}>
+          {confirmLabel}
         </Button>
       </DialogActions>
     </Dialog>
