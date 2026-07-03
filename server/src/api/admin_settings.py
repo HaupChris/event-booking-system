@@ -14,9 +14,11 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from src.services.app_settings_service import (
     get_frontend_branding_pack,
     get_payment_link,
+    get_public_app_url,
     get_rideshare_enabled,
     set_frontend_branding_pack,
     set_payment_link,
+    set_public_app_url,
     set_rideshare_enabled,
 )
 from src.services.password_service import VALID_ROLES, update_password
@@ -82,6 +84,53 @@ def update_payment_link_setting():
 
     logger.info("Payment link updated via admin settings")
     return jsonify({"msg": "Payment link updated successfully", "payment_link": payment_link}), 200
+
+
+@admin_settings_bp.route("/settings/public-app-url", methods=["GET"])
+@jwt_required()
+def get_public_app_url_setting():
+    """Return currently configured public frontend URL."""
+    unauthorized_response = _ensure_admin_identity()
+    if unauthorized_response:
+        return unauthorized_response
+
+    return jsonify({"public_app_url": get_public_app_url()}), 200
+
+
+@admin_settings_bp.route("/settings/public-app-url", methods=["PUT"])
+@jwt_required()
+def update_public_app_url_setting():
+    """Update public frontend URL setting."""
+    unauthorized_response = _ensure_admin_identity()
+    if unauthorized_response:
+        return unauthorized_response
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"msg": "Missing JSON body"}), 400
+
+    public_app_url = data.get("public_app_url", "").strip()
+    if not public_app_url:
+        return jsonify({"msg": "Public app URL must not be empty"}), 400
+
+    if not _is_valid_http_url(public_app_url):
+        return jsonify({"msg": "Public app URL must start with http:// or https://"}), 400
+
+    normalized_public_app_url = public_app_url.rstrip("/")
+    success = set_public_app_url(normalized_public_app_url)
+    if not success:
+        return jsonify({"msg": "Failed to update public app URL"}), 500
+
+    logger.info("Public app URL updated via admin settings")
+    return (
+        jsonify(
+            {
+                "msg": "Public app URL updated successfully",
+                "public_app_url": normalized_public_app_url,
+            }
+        ),
+        200,
+    )
 
 
 @admin_settings_bp.route("/settings/branding-pack", methods=["GET"])

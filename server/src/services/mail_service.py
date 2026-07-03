@@ -4,11 +4,12 @@ import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from html import escape
 
 from dotenv import load_dotenv
 
 from src.models.datatypes import ArtistBooking, Booking
-from src.services.app_settings_service import get_payment_link
+from src.services.app_settings_service import get_payment_link, get_public_app_url
 
 load_dotenv()
 
@@ -23,6 +24,47 @@ def _require_mail_credentials() -> tuple[str, str]:
         raise RuntimeError("Missing mail credentials: GMAIL_USER and GMAIL_PASS must be set")
 
     return str(gmail_user), str(gmail_password)
+
+
+def _send_message(msg: MIMEMultipart, recipient: str) -> bool:
+    gmail_user, gmail_password = _require_mail_credentials()
+    msg["From"] = gmail_user
+    msg["To"] = recipient
+
+    try:
+        server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+        server.ehlo()
+        server.login(gmail_user, gmail_password)
+        server.sendmail(gmail_user, recipient, msg.as_string())
+        server.close()
+        return True
+    except Exception as e:
+        logger.error(f"Fehler beim Senden der E-Mail an {recipient}: {e}")
+        return False
+
+
+def _render_basic_html_email(body: str) -> str:
+    escaped_body = escape(body).replace("\n", "<br>")
+    return (
+        "<html><body>"
+        f'<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222;">{escaped_body}</div>'
+        "</body></html>"
+    )
+
+
+def send_email(recipient: str, subject: str, body: str, html_body: str | None = None) -> bool:
+    """Send a generic email with text and optional HTML body."""
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+
+    if body:
+        msg.attach(MIMEText(body, "plain", "utf-8"))
+
+    rendered_html = html_body if html_body is not None else _render_basic_html_email(body)
+    if rendered_html:
+        msg.attach(MIMEText(rendered_html, "html", "utf-8"))
+
+    return _send_message(msg, recipient)
 
 
 def get_booking_details(booking: Booking, form_content: dict) -> str:
@@ -113,10 +155,7 @@ def send_confirmation_mail(
         form_content: Form content dictionary
         profile_uuid: Unique profile UUID for accessing profile page
     """
-    gmail_user, gmail_password = _require_mail_credentials()
-
-    # Get base URL from environment or use default
-    base_url = os.environ.get("APP_BASE_URL", "http://localhost:3000")
+    base_url = get_public_app_url()
     payment_link = get_payment_link()
 
     booking_details_html = get_booking_details(booking, form_content).replace("\n", "<br>")
@@ -294,21 +333,12 @@ def send_confirmation_mail(
     """
 
     msg = MIMEMultipart("alternative")
-    msg["From"] = gmail_user
-    msg["To"] = booking.email
     msg["Subject"] = subject
 
     msg.attach(MIMEText(html, "html"))
 
-    try:
-        server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
-        server.ehlo()
-        server.login(gmail_user, gmail_password)
-        server.sendmail(gmail_user, booking.email, msg.as_string())
-        server.close()
+    if _send_message(msg, booking.email):
         logger.info("Email erfolgreich versendet!")
-    except Exception as e:
-        logger.error(f"Fehler beim Senden der E-Mail: {e}")
 
 
 def send_artist_confirmation_mail(
@@ -322,10 +352,7 @@ def send_artist_confirmation_mail(
         form_content: Form content dictionary
         profile_uuid: Unique profile UUID for accessing profile page
     """
-    gmail_user, gmail_password = _require_mail_credentials()
-
-    # Get base URL from environment or use default
-    base_url = os.environ.get("APP_BASE_URL", "http://localhost:3000")
+    base_url = get_public_app_url()
     payment_link = get_payment_link()
 
     # Get booking details in HTML format
@@ -524,21 +551,12 @@ def send_artist_confirmation_mail(
     """
 
     msg = MIMEMultipart("alternative")
-    msg["From"] = gmail_user
-    msg["To"] = booking.email
     msg["Subject"] = subject
 
     msg.attach(MIMEText(html, "html"))
 
-    try:
-        server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
-        server.ehlo()
-        server.login(gmail_user, gmail_password)
-        server.sendmail(gmail_user, booking.email, msg.as_string())
-        server.close()
+    if _send_message(msg, booking.email):
         logger.info("Artist email sent successfully!")
-    except Exception as e:
-        logger.error(f"Error sending artist email: {e}")
 
 
 def get_artist_booking_details(booking: ArtistBooking, form_content: dict) -> str:
@@ -588,7 +606,7 @@ def get_artist_booking_details(booking: ArtistBooking, form_content: dict) -> st
                 performance_info += f"Dauer: {details['duration']} Minuten\n"
             if details.get("genre"):
                 performance_info += f"Genre: {details['genre']}\n"
-        except:
+        except (TypeError, ValueError, json.JSONDecodeError):
             performance_info += "Auftrittsinformationen sind formatiert als JSON gespeichert und können hier nicht angezeigt werden.\n"
     else:
         performance_info += "Keine Auftrittsinformationen angegeben.\n"
@@ -629,10 +647,7 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
         email: The email address to send to
         profiles: List of dicts with 'profile_uuid', 'name', 'booking_type', 'timestamp'
     """
-    gmail_user, gmail_password = _require_mail_credentials()
-
-    # Get base URL from environment or use default
-    base_url = os.environ.get("APP_BASE_URL", "http://localhost:3000")
+    base_url = get_public_app_url()
 
     # Build profile links HTML
     profile_links_html = ""
@@ -771,18 +786,9 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
     """
 
     msg = MIMEMultipart("alternative")
-    msg["From"] = gmail_user
-    msg["To"] = email
     msg["Subject"] = subject
 
     msg.attach(MIMEText(html, "html"))
 
-    try:
-        server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
-        server.ehlo()
-        server.login(gmail_user, gmail_password)
-        server.sendmail(gmail_user, email, msg.as_string())
-        server.close()
+    if _send_message(msg, email):
         logger.info(f"Profile recovery email sent successfully to {email}!")
-    except Exception as e:
-        logger.error(f"Error sending profile recovery email: {e}")

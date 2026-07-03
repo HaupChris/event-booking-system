@@ -23,6 +23,11 @@ interface SettingsPaymentsBrandingSectionProps {
   savingPaymentLink: boolean;
   onPaymentLinkDraftChange: (value: string) => void;
   onPaymentLinkSave: () => void;
+  publicAppUrl: string;
+  publicAppUrlDraft: string;
+  savingPublicAppUrl: boolean;
+  onPublicAppUrlDraftChange: (value: string) => void;
+  onPublicAppUrlSave: () => void;
   brandingPack: string;
   brandingPackDraft: string;
   brandingPackOptions: BrandingPackOption[];
@@ -43,6 +48,11 @@ const SettingsPaymentsBrandingSection: React.FC<SettingsPaymentsBrandingSectionP
   savingPaymentLink,
   onPaymentLinkDraftChange,
   onPaymentLinkSave,
+  publicAppUrl,
+  publicAppUrlDraft,
+  savingPublicAppUrl,
+  onPublicAppUrlDraftChange,
+  onPublicAppUrlSave,
   brandingPack,
   brandingPackDraft,
   brandingPackOptions,
@@ -85,6 +95,37 @@ const SettingsPaymentsBrandingSection: React.FC<SettingsPaymentsBrandingSectionP
             }}
           >
             {savingPaymentLink ? 'Saving...' : 'Save'}
+          </Button>
+        </Stack>
+      </Box>
+
+      <Box>
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
+          Public App URL
+        </Typography>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems="flex-start">
+          <TextField
+            label="Frontend Base URL"
+            size="small"
+            fullWidth
+            value={publicAppUrlDraft}
+            onChange={(event) => onPublicAppUrlDraftChange(event.target.value)}
+            helperText="Used for profile links in confirmation, recovery and admin custom mails."
+          />
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<Save />}
+            disabled={savingPublicAppUrl || publicAppUrlDraft.trim() === publicAppUrl}
+            onClick={onPublicAppUrlSave}
+            sx={{
+              ...primaryButtonSx,
+              minWidth: { xs: '100%', md: 150 },
+              height: 40,
+              mt: { xs: 0, md: 0.5 },
+            }}
+          >
+            {savingPublicAppUrl ? 'Saving...' : 'Save'}
           </Button>
         </Stack>
       </Box>

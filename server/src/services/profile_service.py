@@ -14,6 +14,8 @@ from contextlib import closing
 from datetime import datetime
 from typing import Any
 
+from src.services.app_settings_service import get_public_app_url
+from src.services.mail_service import send_email
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -611,8 +613,7 @@ def get_profile_stats() -> list[dict[str, Any]]:
             profiles = []
 
             # Get regular bookings
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT
                     b.id as booking_id,
                     'regular' as booking_type,
@@ -627,8 +628,7 @@ def get_profile_stats() -> list[dict[str, Any]]:
                 JOIN Users u ON b.user_id = u.id
                 WHERE b.profile_uuid IS NOT NULL
                 ORDER BY u.last_name, u.first_name
-            """
-            )
+            """)
 
             for row in cursor.fetchall():
                 profiles.append(
@@ -646,8 +646,7 @@ def get_profile_stats() -> list[dict[str, Any]]:
                 )
 
             # Get artist bookings
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT
                     ab.id as booking_id,
                     'artist' as booking_type,
@@ -662,8 +661,7 @@ def get_profile_stats() -> list[dict[str, Any]]:
                 JOIN Artists a ON ab.artist_id = a.id
                 WHERE ab.profile_uuid IS NOT NULL
                 ORDER BY a.last_name, a.first_name
-            """
-            )
+            """)
 
             for row in cursor.fetchall():
                 profiles.append(
@@ -703,8 +701,7 @@ def send_profile_link_email(profile_uuid: str, email: str, first_name: str) -> b
     try:
         logger.debug(f"Sending profile link email to {email} for profile {profile_uuid}")
 
-        # Get the base URL from environment (default to localhost for development)
-        base_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+        base_url = get_public_app_url()
         profile_url = f"{base_url}/profile/{profile_uuid}"
 
         subject = "Dein Wiesenwahn Festival Profil-Link"

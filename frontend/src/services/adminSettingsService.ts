@@ -7,6 +7,10 @@ export interface PaymentLinkResponse {
   payment_link: string;
 }
 
+export interface PublicAppUrlResponse {
+  public_app_url: string;
+}
+
 export interface BrandingPackResponse {
   branding_pack: string;
 }
@@ -45,10 +49,36 @@ export const getPaymentLink = async (token: string): Promise<PaymentLinkResponse
   return response.data;
 };
 
+export const getPublicAppUrl = async (token: string): Promise<PublicAppUrlResponse> => {
+  const response = await axios.get<PublicAppUrlResponse>(
+    `${API_BASE_URL}/api/admin/settings/public-app-url`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
 export const updatePaymentLink = async (token: string, paymentLink: string): Promise<void> => {
   await axios.put(
     `${API_BASE_URL}/api/admin/settings/payment-link`,
     { payment_link: paymentLink },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+};
+
+export const updatePublicAppUrl = async (token: string, publicAppUrl: string): Promise<void> => {
+  await axios.put(
+    `${API_BASE_URL}/api/admin/settings/public-app-url`,
+    { public_app_url: publicAppUrl },
     {
       headers: {
         Authorization: `Bearer ${token}`,

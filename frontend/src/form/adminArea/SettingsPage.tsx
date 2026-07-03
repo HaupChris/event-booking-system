@@ -1,36 +1,22 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Divider,
-  IconButton,
-  InputAdornment,
-  Snackbar,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-} from '@mui/material';
-import { Save, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Alert, Box, Card, CardContent, CardHeader, Divider, Snackbar, Stack } from '@mui/material';
 import { TokenContext } from '../../contexts/AuthContext';
 import {
   getBrandingPack,
   getPaymentLink,
+  getPublicAppUrl,
   getRideShareEnabled,
   updatePassword,
   updateBrandingPack,
   updatePaymentLink,
+  updatePublicAppUrl,
   updateRideShareEnabled,
 } from '../../services/adminSettingsService';
 import { resolvePaymentLink } from '../../utils/paymentLink';
 import { getBrandingPackOptions } from '../../branding/packs';
 import { useThemeMode } from '../../components/styles/theme';
 import SettingsPaymentsBrandingSection from './components/SettingsPaymentsBrandingSection';
+import SettingsPasswordSection from './components/SettingsPasswordSection';
 
 interface RolePasswords {
   newPassword: string;
@@ -65,9 +51,12 @@ const SettingsPage: React.FC = () => {
   });
   const [paymentLink, setPaymentLink] = useState('');
   const [paymentLinkDraft, setPaymentLinkDraft] = useState('');
+  const [publicAppUrl, setPublicAppUrl] = useState('');
+  const [publicAppUrlDraft, setPublicAppUrlDraft] = useState('');
   const [activeRole, setActiveRole] = useState<RoleKey>('admin');
   const [saving, setSaving] = useState<RoleKey | null>(null);
   const [savingPaymentLink, setSavingPaymentLink] = useState(false);
+  const [savingPublicAppUrl, setSavingPublicAppUrl] = useState(false);
   const [brandingPack, setBrandingPack] = useState('');
   const [brandingPackDraft, setBrandingPackDraft] = useState('');
   const [savingBrandingPack, setSavingBrandingPack] = useState(false);
@@ -130,6 +119,15 @@ const SettingsPage: React.FC = () => {
       })
       .catch(() => {
         showSnackbar('Failed to load branding pack.', 'error');
+      });
+
+    getPublicAppUrl(token)
+      .then((response) => {
+        setPublicAppUrl(response.public_app_url);
+        setPublicAppUrlDraft(response.public_app_url);
+      })
+      .catch(() => {
+        showSnackbar('Failed to load public app URL.', 'error');
       });
 
     getRideShareEnabled(token)
@@ -213,6 +211,31 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const handlePublicAppUrlSave = async () => {
+    const trimmedValue = publicAppUrlDraft.trim().replace(/\/+$/, '');
+    if (!trimmedValue) {
+      showSnackbar('Public app URL must not be empty.', 'error');
+      return;
+    }
+
+    if (!trimmedValue.startsWith('http://') && !trimmedValue.startsWith('https://')) {
+      showSnackbar('Public app URL must start with http:// or https://', 'error');
+      return;
+    }
+
+    try {
+      setSavingPublicAppUrl(true);
+      await updatePublicAppUrl(token, trimmedValue);
+      setPublicAppUrl(trimmedValue);
+      setPublicAppUrlDraft(trimmedValue);
+      showSnackbar('Public app URL updated.', 'success');
+    } catch {
+      showSnackbar('Failed to update public app URL.', 'error');
+    } finally {
+      setSavingPublicAppUrl(false);
+    }
+  };
+
   const handleRideShareEnabledSave = async () => {
     try {
       setSavingRideShareEnabled(true);
@@ -258,6 +281,11 @@ const SettingsPage: React.FC = () => {
                 savingPaymentLink={savingPaymentLink}
                 onPaymentLinkDraftChange={setPaymentLinkDraft}
                 onPaymentLinkSave={handlePaymentLinkSave}
+                publicAppUrl={publicAppUrl}
+                publicAppUrlDraft={publicAppUrlDraft}
+                savingPublicAppUrl={savingPublicAppUrl}
+                onPublicAppUrlDraftChange={setPublicAppUrlDraft}
+                onPublicAppUrlSave={handlePublicAppUrlSave}
                 brandingPack={brandingPack}
                 brandingPackDraft={brandingPackDraft}
                 brandingPackOptions={brandingPackOptions}
@@ -275,83 +303,28 @@ const SettingsPage: React.FC = () => {
 
             <Divider />
 
-            <Box>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
-                Passwords
-              </Typography>
-              <Tabs
-                value={activeRole}
-                onChange={(_, value: RoleKey) => setActiveRole(value)}
-                variant="scrollable"
-                allowScrollButtonsMobile
-                sx={{ mb: 2, minHeight: 40, '& .MuiTab-root': { minHeight: 40, py: 0.5 } }}
-              >
-                {ROLES.map((role) => (
-                  <Tab key={role.key} value={role.key} label={role.label} />
-                ))}
-              </Tabs>
-
-              <Stack spacing={1.5} sx={{ maxWidth: 420 }}>
-                <TextField
-                  label={`${selectedRoleLabel} New Password`}
-                  type={selectedVisibility.newPassword ? 'text' : 'password'}
-                  size="small"
-                  value={selectedPasswords.newPassword}
-                  onChange={(event) => handleChange(activeRole, 'newPassword', event.target.value)}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          edge="end"
-                          onClick={() => togglePasswordVisibility(activeRole, 'newPassword')}
-                          aria-label="Toggle new password visibility"
-                        >
-                          {selectedVisibility.newPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <TextField
-                  label="Confirm Password"
-                  type={selectedVisibility.confirmPassword ? 'text' : 'password'}
-                  size="small"
-                  value={selectedPasswords.confirmPassword}
-                  onChange={(event) =>
-                    handleChange(activeRole, 'confirmPassword', event.target.value)
-                  }
-                  error={passwordMismatch}
-                  helperText={passwordMismatch ? 'Passwords do not match' : ''}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          edge="end"
-                          onClick={() => togglePasswordVisibility(activeRole, 'confirmPassword')}
-                          aria-label="Toggle confirm password visibility"
-                        >
-                          {selectedVisibility.confirmPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<Save />}
-                  disabled={
-                    saving === activeRole ||
-                    !selectedPasswords.newPassword ||
-                    selectedPasswords.newPassword !== selectedPasswords.confirmPassword
-                  }
-                  onClick={() => handleSubmit(activeRole)}
-                  sx={{ ...primaryButtonSx, alignSelf: 'flex-start', minWidth: 190, height: 36 }}
-                >
-                  {saving === activeRole ? 'Saving...' : `Save ${selectedRoleLabel} Password`}
-                </Button>
-              </Stack>
-            </Box>
+            <SettingsPasswordSection
+              roles={ROLES}
+              activeRole={activeRole}
+              selectedRoleLabel={selectedRoleLabel}
+              selectedPasswords={selectedPasswords}
+              selectedVisibility={selectedVisibility}
+              passwordMismatch={passwordMismatch}
+              saving={saving}
+              primaryButtonSx={primaryButtonSx}
+              onActiveRoleChange={(role) => setActiveRole(role as RoleKey)}
+              onNewPasswordChange={(value) => handleChange(activeRole, 'newPassword', value)}
+              onConfirmPasswordChange={(value) =>
+                handleChange(activeRole, 'confirmPassword', value)
+              }
+              onToggleNewPasswordVisibility={() =>
+                togglePasswordVisibility(activeRole, 'newPassword')
+              }
+              onToggleConfirmPasswordVisibility={() =>
+                togglePasswordVisibility(activeRole, 'confirmPassword')
+              }
+              onSubmit={() => handleSubmit(activeRole)}
+            />
           </Stack>
         </CardContent>
       </Card>

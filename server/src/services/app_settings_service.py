@@ -26,6 +26,13 @@ else:
 
 PAYMENT_LINK_KEY = "payment_link"
 DEFAULT_PAYMENT_LINK = "https://www.paypal.me/Wiesenwahn"
+PUBLIC_APP_URL_KEY = "public_app_url"
+DEFAULT_PUBLIC_APP_URL = (
+    os.environ.get("PUBLIC_APP_URL")
+    or os.environ.get("APP_BASE_URL")
+    or os.environ.get("FRONTEND_URL")
+    or "http://localhost:3000"
+).strip()
 BRANDING_PACK_KEY = "frontend_branding_pack"
 DEFAULT_BRANDING_PACK = os.environ.get("FRONTEND_BRANDING_PACK", "ww-2025-circus").strip()
 RIDESHARE_ENABLED_KEY = "rideshare_enabled"
@@ -52,6 +59,10 @@ def _ensure_table_exists(conn: sqlite3.Connection) -> None:
         )
         """)
     conn.commit()
+
+
+def _normalize_http_url(value: str) -> str:
+    return value.strip().rstrip("/")
 
 
 def _connect_db() -> sqlite3.Connection:
@@ -83,6 +94,24 @@ def get_payment_link() -> str:
     return DEFAULT_PAYMENT_LINK
 
 
+def get_public_app_url() -> str:
+    """Get configured public frontend URL, or default value when missing."""
+    try:
+        with closing(_connect_db()) as conn:
+            _ensure_table_exists(conn)
+            cursor = conn.cursor()
+            cursor.execute("SELECT value FROM AppSettings WHERE key = ?", (PUBLIC_APP_URL_KEY,))
+            row = cursor.fetchone()
+            if row:
+                value = _normalize_http_url(str(row["value"] or ""))
+                if value:
+                    return value
+    except sqlite3.Error as e:
+        logger.error(f"Failed to read public app URL from AppSettings: {e}", exc_info=True)
+
+    return _normalize_http_url(DEFAULT_PUBLIC_APP_URL)
+
+
 def set_payment_link(payment_link: str) -> bool:
     """Persist payment link setting."""
     now = _now_iso()
@@ -103,6 +132,30 @@ def set_payment_link(payment_link: str) -> bool:
             return True
     except sqlite3.Error as e:
         logger.error(f"Failed to update payment link in AppSettings: {e}", exc_info=True)
+        return False
+
+
+def set_public_app_url(public_app_url: str) -> bool:
+    """Persist public frontend URL setting."""
+    now = _now_iso()
+    normalized_url = _normalize_http_url(public_app_url)
+
+    try:
+        with closing(_connect_db()) as conn:
+            _ensure_table_exists(conn)
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO AppSettings (key, value, updated_at) "
+                "VALUES (?, ?, ?) "
+                "ON CONFLICT(key) DO UPDATE SET value = excluded.value, "
+                "updated_at = excluded.updated_at",
+                (PUBLIC_APP_URL_KEY, normalized_url, now),
+            )
+            conn.commit()
+            logger.info("Public app URL updated via app settings service")
+            return True
+    except sqlite3.Error as e:
+        logger.error(f"Failed to update public app URL in AppSettings: {e}", exc_info=True)
         return False
 
 
