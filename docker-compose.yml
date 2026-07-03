@@ -28,6 +28,7 @@ services:
       - ./logs:/app/logs:rw
     environment:
       - IN_DOCKER=true
+      - ENABLE_APP_RATE_LIMITING=false
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - PASSWORD=${USER_PASSWORD}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}

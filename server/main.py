@@ -1,15 +1,13 @@
 import os
 import sys
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from src.api.admin_faq import admin_faq_bp
 from src.api.admin_news import admin_news_bp
 from src.api.admin_options import admin_options_bp
@@ -34,6 +32,9 @@ from src.utils.logger import (
     log_security_event,
     setup_logging,
 )
+from src.utils.rate_limit import get_client_ip, limiter
+from werkzeug.exceptions import HTTPException
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(dotenv_path=BASE_DIR / ".env")
@@ -42,6 +43,9 @@ app = Flask(__name__)
 
 # Load config from environment
 load_config(app)
+
+# Respect forwarded client metadata from the nginx reverse proxy.
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
 # Setup CORS
 cors_origins_raw = os.environ.get(
@@ -63,7 +67,7 @@ ensure_password_hashes()
 rate_limit_violations = defaultdict(list)
 
 # Setup rate-limiter
-limiter = Limiter(get_remote_address, app=app, default_limits=["20000 per day", "5000 per hour"])
+limiter.init_app(app)
 
 logger = get_logger(__name__)
 
@@ -74,6 +78,14 @@ def header_whitelist():
     """Filter requests that should bypass rate limiting."""
     # Only bypass for health checks or similar
     return request.endpoint == "health.health_check"
+
+
+@app.errorhandler(HTTPException)
+def handle_http_exception(e):
+    logger.warning(
+        f"HTTP Exception {e.code}: {request.method} {request.path} from {get_client_ip()}"
+    )
+    return {"message": e.description}, e.code
 
 
 # Register blueprints
@@ -101,12 +113,12 @@ def handle_all_errors(e):
 
 
 @app.errorhandler(404)
-def handle_not_found(e):
-    logger.warning(f"404 Not Found: {request.method} {request.path} from {request.remote_addr}")
+def handle_not_found(_e):
+    logger.warning(f"404 Not Found: {request.method} {request.path} from {get_client_ip()}")
 
     # Track potential scanning attempts
-    client_ip = request.remote_addr
-    now = datetime.now()
+    client_ip = get_client_ip()
+    now = datetime.now(tz=UTC)
 
     # Use rate_limit_violations dict to track 404s too
     key = f"{client_ip}_404"
@@ -133,11 +145,11 @@ def handle_not_found(e):
 
 
 @app.errorhandler(429)
-def handle_rate_limit_exceeded(e):
+def handle_rate_limit_exceeded(_e):
     """Handle actual rate limit violations."""
-    client_ip = get_remote_address()
+    client_ip = get_client_ip()
     endpoint = request.endpoint
-    now = datetime.now()
+    now = datetime.now(tz=UTC)
 
     # Clean old violations (older than 1 hour)
     rate_limit_violations[client_ip] = [

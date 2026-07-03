@@ -10,8 +10,6 @@ import time
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from src.services.faq_service import (
     create_faq,
@@ -26,12 +24,13 @@ from src.services.faq_service import (
     update_faq_category,
 )
 from src.utils.logger import get_logger
+from src.utils.rate_limit import limiter
 
 # Initialize logger
 logger = get_logger(__name__)
 
 admin_faq_bp = Blueprint("admin_faq", __name__)
-limiter_admin_faq = Limiter(get_remote_address)
+limiter_admin_faq = limiter
 
 
 @admin_faq_bp.route("/faqs", methods=["GET"])

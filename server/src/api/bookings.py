@@ -2,8 +2,6 @@ import time
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from src.models.datatypes import Booking
 from src.services.booking_service import (
@@ -19,13 +17,14 @@ from src.services.option_service import ticket_requires_workshift
 from src.services.orga_team_service import is_valid_active_orga_team_member
 from src.services.workshift_service import validate_booking_timeslot_selection
 from src.utils.logger import get_logger, log_security_event
+from src.utils.rate_limit import limiter
 from src.utils.signature import decode_signature_to_blob
 
 # Initialize logger
 logger = get_logger(__name__)
 
 bookings_bp = Blueprint("bookings", __name__)
-limiter_bookings = Limiter(get_remote_address)
+limiter_bookings = limiter
 
 
 @bookings_bp.route("/submitForm", methods=["POST"])
@@ -102,7 +101,8 @@ def submit_form():
                 )
             except Exception as email_error:
                 logger.error(
-                    f"Booking successful but email failed for {booking.first_name} {booking.last_name}: {str(email_error)}",
+                    "Booking successful but email failed for "
+                    f"{booking.first_name} {booking.last_name}: {str(email_error)}",
                     exc_info=True,
                 )
                 # Still return success since booking was created

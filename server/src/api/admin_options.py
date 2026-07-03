@@ -4,8 +4,6 @@ from typing import Any, cast
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from src.services.option_service import (
     OptionScope,
@@ -15,9 +13,10 @@ from src.services.option_service import (
     get_options,
     update_option,
 )
+from src.utils.rate_limit import limiter
 
 admin_options_bp = Blueprint("admin_options", __name__)
-limiter_admin_options = Limiter(get_remote_address)
+limiter_admin_options = limiter
 
 VALID_SCOPES = {"regular", "artist"}
 VALID_OPTION_TYPES = {"ticket", "beverage", "food"}

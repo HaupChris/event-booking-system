@@ -2,16 +2,15 @@ import os
 import time
 
 from flask import Blueprint, jsonify
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from src.utils.logger import get_logger
+from src.utils.rate_limit import limiter
 
 # Initialize logger
 logger = get_logger(__name__)
 
 health_bp = Blueprint("health", __name__)
-limiter_health = Limiter(get_remote_address)
+limiter_health = limiter
 
 
 @health_bp.route("/health", methods=["GET"])

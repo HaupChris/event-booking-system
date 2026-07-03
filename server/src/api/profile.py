@@ -9,8 +9,6 @@ Authentication is handled via profile UUID in the URL path.
 import time
 
 from flask import Blueprint, jsonify, request
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from src.services.app_settings_service import get_payment_link, get_rideshare_enabled
 from src.services.faq_service import get_faqs_grouped_by_category
@@ -34,12 +32,13 @@ from src.services.rideshare_service import (
 )
 from src.services.shift_message_service import get_shift_messages_for_booking
 from src.utils.logger import get_logger, log_security_event
+from src.utils.rate_limit import limiter
 
 # Initialize logger
 logger = get_logger(__name__)
 
 profile_bp = Blueprint("profile", __name__)
-limiter_profile = Limiter(get_remote_address)
+limiter_profile = limiter
 
 
 def _ensure_rideshare_enabled():

@@ -2,14 +2,13 @@ import time
 
 from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from src.services.booking_service import get_up_to_date_form_content
 from src.utils.logger import get_logger
+from src.utils.rate_limit import limiter
 
 formcontent_bp = Blueprint("formcontent", __name__)
-limiter_formcontent = Limiter(get_remote_address)
+limiter_formcontent = limiter
 
 # Get logger for this module
 logger = get_logger(__name__)

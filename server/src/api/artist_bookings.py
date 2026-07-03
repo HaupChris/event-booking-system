@@ -3,8 +3,6 @@ import time
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from src.models.datatypes import ArtistBooking
 from src.services.artist_service import (
@@ -19,13 +17,14 @@ from src.services.artist_service import (
 from src.services.mail_service import send_artist_confirmation_mail
 from src.services.orga_team_service import is_valid_active_orga_team_member
 from src.utils.logger import get_logger, log_security_event
+from src.utils.rate_limit import limiter
 from src.utils.signature import decode_signature_to_blob
 
 # Initialize logger
 logger = get_logger(__name__)
 
 artist_bp = Blueprint("artist", __name__)
-limiter_artist = Limiter(get_remote_address)
+limiter_artist = limiter
 
 
 def _to_int(value, default: int = -1) -> int:

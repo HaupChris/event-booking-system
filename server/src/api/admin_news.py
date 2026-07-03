@@ -10,8 +10,6 @@ import time
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from src.services.news_service import (
     create_news,
@@ -26,12 +24,13 @@ from src.services.news_service import (
     update_news_category,
 )
 from src.utils.logger import get_logger
+from src.utils.rate_limit import limiter
 
 # Initialize logger
 logger = get_logger(__name__)
 
 admin_news_bp = Blueprint("admin_news", __name__)
-limiter_admin_news = Limiter(get_remote_address)
+limiter_admin_news = limiter
 
 
 def _ensure_admin_identity():

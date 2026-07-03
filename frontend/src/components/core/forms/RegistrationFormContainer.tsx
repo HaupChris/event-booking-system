@@ -12,6 +12,76 @@ import { useFormManagement } from '../../../hooks/useFormManagement';
 import taenzerinImage from '../../../img/taenzerin.png';
 import { useBrandingPack } from '../../../branding/useBrandingPack';
 
+const getErrorResponseDetail = (error: unknown): string | undefined => {
+  if (!axios.isAxiosError(error) || !error.response?.data || typeof error.response.data !== 'object') {
+    return undefined;
+  }
+
+  const data = error.response.data as { error?: unknown; message?: unknown; msg?: unknown };
+
+  if (typeof data.error === 'string') {
+    return data.error;
+  }
+
+  if (typeof data.message === 'string') {
+    return data.message;
+  }
+
+  if (typeof data.msg === 'string') {
+    return data.msg;
+  }
+
+  return undefined;
+};
+
+const getFormContentErrorMessage = (error: unknown): string => {
+  if (!axios.isAxiosError(error)) {
+    return 'Formulardaten konnten nicht geladen werden. Bitte versuche es erneut.';
+  }
+
+  const status = error.response?.status;
+  if (status === 429) {
+    return 'Zu viele Anfragen. Bitte warte kurz und lade die Seite dann erneut.';
+  }
+
+  if (typeof status === 'number' && status >= 500) {
+    return 'Serverfehler beim Laden der Formulardaten. Bitte versuche es spaeter erneut.';
+  }
+
+  if (error.request) {
+    return 'Server nicht erreichbar. Bitte pruefe, ob das Backend laeuft.';
+  }
+
+  return 'Formulardaten konnten nicht geladen werden. Bitte versuche es erneut.';
+};
+
+const getSubmitErrorMessage = (error: unknown): string => {
+  if (!axios.isAxiosError(error)) {
+    return 'Absenden fehlgeschlagen. Bitte versuche es erneut.';
+  }
+
+  const status = error.response?.status;
+  const detail = getErrorResponseDetail(error);
+
+  if (status === 429) {
+    return 'Zu viele Anfragen. Bitte warte kurz und versuche es dann erneut.';
+  }
+
+  if (detail === 'Duplicate booking') {
+    return 'Diese Anmeldung wurde bereits gespeichert. Bitte nutze deinen Profil-Link oder die Profil-Wiederherstellung.';
+  }
+
+  if (typeof status === 'number' && status >= 500) {
+    return 'Serverfehler beim Absenden. Bitte versuche es spaeter erneut.';
+  }
+
+  if (error.request) {
+    return 'Server nicht erreichbar. Bitte pruefe, ob das Backend laeuft.';
+  }
+
+  return 'Absenden fehlgeschlagen. Bitte pruefe deine Eingaben und versuche es erneut.';
+};
+
 /**
  * Configuration for the registration form container
  */
@@ -135,7 +205,7 @@ export function RegistrationFormContainer<
           return;
         }
 
-        setCurrentError('Server nicht erreichbar. Bitte pruefe, ob das Backend laeuft.');
+        setCurrentError(getFormContentErrorMessage(error));
       });
   }, [config.apiEndpoints.formContent, setAuth, setCurrentError, setToken, token]);
 
@@ -243,9 +313,7 @@ export function RegistrationFormContainer<
             isSubmitted: true,
             isSubmitting: false,
           });
-          setCurrentError(
-            'Absenden fehlgeschlagen. Bitte pruefe die Serververbindung und versuche es erneut.'
-          );
+          setCurrentError(getSubmitErrorMessage(error));
         }
       });
   };

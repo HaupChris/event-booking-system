@@ -1,7 +1,5 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from src.models.datatypes import ShiftAssignment
 from src.services.shift_assignment_service import (
@@ -23,9 +21,10 @@ from src.services.shift_message_service import (
     delete_shift_message,
     get_shift_messages_grouped,
 )
+from src.utils.rate_limit import limiter
 
 shift_assignments_bp = Blueprint("shift_assignments", __name__)
-limiter_assignments = Limiter(get_remote_address)
+limiter_assignments = limiter
 
 
 @shift_assignments_bp.route("/shifts/assignments", methods=["GET"])

@@ -70,6 +70,8 @@ const ProfileRecovery: React.FC = () => {
         setError('Zu viele Anfragen. Bitte versuche es in einer Stunde erneut.');
       } else if (typeof status === 'number' && status >= 500) {
         setError('Serverfehler. Bitte versuche es später erneut.');
+      } else if (status === undefined) {
+        setError('Server nicht erreichbar. Bitte pruefe die Verbindung und versuche es erneut.');
       } else {
         // Generic success message even on error (security)
         setSuccess(true);

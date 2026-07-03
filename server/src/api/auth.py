@@ -1,7 +1,5 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from src.services.password_service import verify_password
 from src.utils.logger import (
@@ -9,11 +7,12 @@ from src.utils.logger import (
     log_authentication_event,
     log_security_event,
 )
+from src.utils.rate_limit import limiter
 
 logger = get_logger(__name__)
 
 auth_bp = Blueprint("auth", __name__)
-limiter_auth = Limiter(get_remote_address)
+limiter_auth = limiter
 
 logger.info("Authentication module initialized (DB-backed passwords)")
 

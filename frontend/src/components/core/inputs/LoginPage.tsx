@@ -54,6 +54,22 @@ const LoginPage: React.FC<LoginPageProps> = ({
   const navigate = useNavigate();
   const brandingPack = useBrandingPack();
 
+  const getLoginErrorMessage = (status: number) => {
+    if (status === 401) {
+      return 'Falsches Passwort';
+    }
+
+    if (status === 429) {
+      return 'Zu viele Anmeldeversuche. Bitte warte kurz und versuche es erneut.';
+    }
+
+    if (status >= 500) {
+      return 'Serverfehler. Bitte versuche es in ein paar Minuten erneut.';
+    }
+
+    return 'Anmeldung fehlgeschlagen. Bitte versuche es erneut.';
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError('');
@@ -79,10 +95,10 @@ const LoginPage: React.FC<LoginPageProps> = ({
 
         navigate(redirectPath);
       } else {
-        setError('Falsches Passwort');
+        setError(getLoginErrorMessage(response.status));
       }
     } catch (error) {
-      setError('Ein Fehler ist aufgetreten, bitte versuche es erneut.');
+      setError('Server nicht erreichbar. Bitte pruefe, ob das Backend laeuft.');
     }
   };
 

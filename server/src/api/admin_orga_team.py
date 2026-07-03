@@ -2,8 +2,6 @@
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from src.services.orga_team_service import (
     create_orga_team_member,
@@ -12,11 +10,12 @@ from src.services.orga_team_service import (
     update_orga_team_member,
 )
 from src.utils.logger import get_logger
+from src.utils.rate_limit import limiter
 
 logger = get_logger(__name__)
 
 admin_orga_team_bp = Blueprint("admin_orga_team", __name__)
-limiter_admin_orga = Limiter(get_remote_address)
+limiter_admin_orga = limiter
 
 
 def _ensure_admin() -> tuple[dict, int] | None:
