@@ -141,12 +141,31 @@ const NewsFeedCard: React.FC<NewsFeedCardProps> = ({
   return (
     <Card key={item.id} variant="outlined" sx={getCardSx(isCircusMode, isNew)}>
       <CardHeader
-        sx={{ px: { xs: 2, sm: 2.5 }, pt: { xs: 2, sm: 2.5 }, pb: 1.25 }}
+        sx={{
+          px: { xs: 2, sm: 2.5 },
+          pt: { xs: 2, sm: 2.5 },
+          pb: 1.25,
+          alignItems: 'flex-start',
+          '& .MuiCardHeader-content': {
+            minWidth: 0,
+          },
+          '& .MuiCardHeader-action': {
+            flexShrink: 0,
+            alignSelf: 'flex-start',
+            mt: 0,
+            mr: 0,
+            ml: 1,
+          },
+          '& .MuiCardHeader-avatar': {
+            mr: { xs: 1.25, sm: 2 },
+          },
+        }}
         avatar={resolveCategoryIcon(item)}
         action={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {isNew && <Badge badgeContent={<FiberNewIcon fontSize="small" />} color="primary" />}
             <IconButton
+              size="small"
               onClick={() => onToggle(item.id, item.is_read)}
               sx={{
                 transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -161,11 +180,15 @@ const NewsFeedCard: React.FC<NewsFeedCardProps> = ({
           </Box>
         }
         title={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', minWidth: 0 }}>
             <Typography
               variant="h6"
               component="span"
-              sx={{ fontFamily: isCircusMode ? headingFont : undefined }}
+              sx={{
+                minWidth: 0,
+                overflowWrap: 'anywhere',
+                fontFamily: isCircusMode ? headingFont : undefined,
+              }}
             >
               {item.title}
             </Typography>

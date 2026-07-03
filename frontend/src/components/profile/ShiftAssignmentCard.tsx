@@ -65,15 +65,22 @@ const ShiftAssignmentCard: React.FC<ShiftAssignmentCardProps> = ({
         <Box
           sx={{
             display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
             justifyContent: 'space-between',
             alignItems: 'flex-start',
+            gap: 1,
             mb: 2,
           }}
         >
           <Typography
             variant="subtitle1"
             color="primary"
-            sx={{ flexGrow: 1, fontFamily: isCircusMode ? headingFont : undefined }}
+            sx={{
+              flexGrow: 1,
+              minWidth: 0,
+              overflowWrap: 'anywhere',
+              fontFamily: isCircusMode ? headingFont : undefined,
+            }}
           >
             {shift.workshift.title}
           </Typography>
@@ -92,12 +99,12 @@ const ShiftAssignmentCard: React.FC<ShiftAssignmentCardProps> = ({
 
         <Divider sx={{ my: 1.5 }} />
 
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1, minWidth: 0 }}>
           <AccessTimeIcon
-            sx={{ mr: 1, color: isCircusMode ? '#d8b87a' : 'text.secondary' }}
+            sx={{ mr: 1, mt: 0.2, flexShrink: 0, color: isCircusMode ? '#d8b87a' : 'text.secondary' }}
             fontSize="small"
           />
-          <Typography variant="body2">
+          <Typography variant="body2" sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
             <strong>{shift.timeslot.title}</strong>
           </Typography>
         </Box>
@@ -133,10 +140,13 @@ const ShiftAssignmentCard: React.FC<ShiftAssignmentCardProps> = ({
       {showActions && shift.status === 'pending' && (
         <CardActions
           sx={{
+            flexDirection: { xs: 'column-reverse', sm: 'row' },
+            alignItems: { xs: 'stretch', sm: 'center' },
             justifyContent: 'flex-end',
             px: { xs: 2, sm: 2.5 },
             pb: { xs: 2, sm: 2.5 },
             pt: 0,
+            gap: 1,
           }}
         >
           <Button
@@ -144,7 +154,7 @@ const ShiftAssignmentCard: React.FC<ShiftAssignmentCardProps> = ({
             color="error"
             onClick={() => onDecline(shift)}
             disabled={processing === shift.assignment_id}
-            sx={{ textTransform: 'none', fontFamily: bodyFont }}
+            sx={{ width: { xs: '100%', sm: 'auto' }, textTransform: 'none', fontFamily: bodyFont }}
           >
             Ablehnen
           </Button>
@@ -154,7 +164,7 @@ const ShiftAssignmentCard: React.FC<ShiftAssignmentCardProps> = ({
             onClick={() => onAccept(shift)}
             disabled={processing === shift.assignment_id}
             startIcon={<CheckCircleIcon />}
-            sx={{ textTransform: 'none', fontFamily: bodyFont }}
+            sx={{ width: { xs: '100%', sm: 'auto' }, textTransform: 'none', fontFamily: bodyFont }}
           >
             Annehmen
           </Button>

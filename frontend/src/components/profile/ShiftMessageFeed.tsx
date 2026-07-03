@@ -56,15 +56,20 @@ function ShiftMessageFeed({ shiftMessages }: ShiftMessageFeedProps) {
                 <Box
                   sx={{
                     display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
                     justifyContent: 'space-between',
                     alignItems: 'flex-start',
-                    gap: 2,
+                    gap: 1,
                     mb: 0.75,
                   }}
                 >
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontFamily: isCircusMode ? brandingPack.typography.heading : undefined }}
+                    sx={{
+                      minWidth: 0,
+                      overflowWrap: 'anywhere',
+                      fontFamily: isCircusMode ? brandingPack.typography.heading : undefined,
+                    }}
                   >
                     {message.title}
                   </Typography>
