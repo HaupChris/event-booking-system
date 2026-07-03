@@ -1,29 +1,19 @@
 import React, { useContext, useState } from 'react';
 import {
   Box,
-  Typography,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Tooltip,
-  IconButton,
   Button,
   TextField,
   Snackbar,
   Alert,
   useMediaQuery,
   useTheme,
-  FormControlLabel,
-  Checkbox,
-  Menu,
   InputAdornment,
-  Tab,
-  Tabs,
 } from '@mui/material';
 import {
-  ViewColumn as ViewColumnIcon,
-  FilterAlt as FilterAltIcon,
   ArrowUpward as ArrowUpwardIcon,
   ArrowDownward as ArrowDownwardIcon,
   Search as SearchIcon,
@@ -31,9 +21,11 @@ import {
 import { TokenContext } from '../../contexts/AuthContext';
 import { useFetchData } from './useFetchData';
 import type { CombinedBooking } from './interface';
-import AdminCard from './components/AdminCard';
 import BookingTable from './components/BookingTable';
 import BookingDetailModal from './components/BookingDetailModal';
+import BookingCustomMailDialog from './components/BookingCustomMailDialog';
+import BookingBulkActionsBar from './components/BookingBulkActionsBar';
+import BookingsDisplayControls from './components/BookingsDisplayControls';
 import { filterBookings, getInviterFilterData, sortBookings } from './utils/bookingUtils';
 import { useColumnVisibility } from '../../hooks/useColumnVisibility';
 import { useSnackbar } from '../../hooks/useSnackbar';
@@ -41,6 +33,8 @@ import { useBookingActions } from '../../hooks/useBookingActions';
 import { useModal } from '../../hooks/useModal';
 import { useSort } from '../../hooks/useSort';
 import { useAdminPageFilters } from '../../hooks/useAdminPageFilters';
+import type { AdminBookingMailSendResponse } from '../../services/adminBookingMailService';
+import { useBookingSelection } from './hooks/useBookingSelection';
 
 interface ColumnVisibility {
   [key: string]: boolean;
@@ -63,6 +57,7 @@ const BookingsPage: React.FC = () => {
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
   const [invitedByFilter, setInvitedByFilter] = useState('all');
+  const [customMailDialogOpen, setCustomMailDialogOpen] = useState(false);
 
   // Custom hooks for state management
   const {
@@ -118,6 +113,16 @@ const BookingsPage: React.FC = () => {
     sortCriterion,
     sortOrder
   );
+  const {
+    selectedBookingKeys,
+    selectedRecipients,
+    allVisibleSelected,
+    someVisibleSelected,
+    toggleSelectBooking,
+    toggleSelectAllVisible,
+    clearSelection,
+    setSelectedBookingKeys,
+  } = useBookingSelection(bookings, processedBookings);
 
   // Handlers for view type menu
   const handleViewTypeMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -135,6 +140,17 @@ const BookingsPage: React.FC = () => {
 
   const handleViewChange = (_: React.SyntheticEvent, newValue: 'all' | 'regular' | 'artist') => {
     setViewType(newValue);
+  };
+
+  const handleCustomMailSent = (result: AdminBookingMailSendResponse) => {
+    if (result.failed > 0) {
+      showError(`Sent ${result.sent} emails, ${result.failed} failed.`);
+    } else {
+      showSuccess(`Sent ${result.sent} email${result.sent === 1 ? '' : 's'}.`);
+    }
+
+    setCustomMailDialogOpen(false);
+    setSelectedBookingKeys(new Set());
   };
 
   // Handlers for modal actions
@@ -161,89 +177,22 @@ const BookingsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 2 }}>
-      {/* Control panel */}
-      <AdminCard title="Bookings Management" sx={{ mb: 3 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 1,
-            p: 1,
-          }}
-        >
-          {/* View Type Selection - Either Tabs or Dropdown based on screen size */}
-          {isMobile ? (
-            <Box>
-              <Button
-                variant="outlined"
-                onClick={handleViewTypeMenuOpen}
-                endIcon={<FilterAltIcon />}
-                size="small"
-              >
-                {viewType === 'all'
-                  ? 'All Bookings'
-                  : viewType === 'regular'
-                    ? 'Regular'
-                    : 'Artists'}
-              </Button>
-              <Menu
-                anchorEl={viewTypeAnchorEl}
-                open={Boolean(viewTypeAnchorEl)}
-                onClose={handleViewTypeMenuClose}
-              >
-                <MenuItem onClick={() => handleViewTypeSelect('all')}>All Bookings</MenuItem>
-                <MenuItem onClick={() => handleViewTypeSelect('regular')}>
-                  Regular Participants
-                </MenuItem>
-                <MenuItem onClick={() => handleViewTypeSelect('artist')}>Artists</MenuItem>
-              </Menu>
-            </Box>
-          ) : (
-            <Tabs value={viewType} onChange={handleViewChange} sx={{ minWidth: '300px' }}>
-              <Tab label="All Bookings" value="all" />
-              <Tab label="Regular Participants" value="regular" />
-              <Tab label="Artists" value="artist" />
-            </Tabs>
-          )}
-
-          {/* Column Visibility Button */}
-          <Box>
-            <Tooltip title="Select visible columns">
-              <IconButton onClick={handleColumnFilterOpen} color="primary" size="small">
-                <ViewColumnIcon />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              anchorEl={columnFilterAnchorEl}
-              open={Boolean(columnFilterAnchorEl)}
-              onClose={handleColumnFilterClose}
-            >
-              <MenuItem disabled>
-                <Typography variant="subtitle2">Show Columns</Typography>
-              </MenuItem>
-              {Object.keys(columnVisibility).map((column) => (
-                <MenuItem key={column}>
-                  <FormControlLabel
-                    control={
-                      // src/form/adminArea/BookingsPage.tsx (continued)
-                      <Checkbox
-                        checked={columnVisibility[column as keyof ColumnVisibility]}
-                        onChange={() =>
-                          handleColumnVisibilityChange(column as keyof ColumnVisibility)
-                        }
-                      />
-                    }
-                    label={column.charAt(0).toUpperCase() + column.slice(1)}
-                  />
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-        </Box>
-      </AdminCard>
+      <BookingsDisplayControls
+        isMobile={isMobile}
+        viewType={viewType}
+        viewTypeAnchorEl={viewTypeAnchorEl}
+        columnFilterAnchorEl={columnFilterAnchorEl}
+        columnVisibility={columnVisibility}
+        onViewTypeMenuOpen={handleViewTypeMenuOpen}
+        onViewTypeMenuClose={handleViewTypeMenuClose}
+        onViewTypeSelect={handleViewTypeSelect}
+        onViewChange={handleViewChange}
+        onColumnFilterOpen={handleColumnFilterOpen}
+        onColumnFilterClose={handleColumnFilterClose}
+        onColumnVisibilityChange={(column) =>
+          handleColumnVisibilityChange(column as keyof ColumnVisibility)
+        }
+      />
 
       {/* Search and Sort Controls */}
       <Box
@@ -328,6 +277,13 @@ const BookingsPage: React.FC = () => {
         </Box>
       </Box>
 
+      <BookingBulkActionsBar
+        isMobile={isMobile}
+        selectedCount={selectedRecipients.length}
+        onClearSelection={clearSelection}
+        onOpenCustomMail={() => setCustomMailDialogOpen(true)}
+      />
+
       {/* Bookings Table */}
       <BookingTable
         bookings={processedBookings}
@@ -335,6 +291,11 @@ const BookingsPage: React.FC = () => {
         formContent={formContent}
         artistFormContent={artistFormContent}
         onOpenDetails={handleOpenModal}
+        selectedBookingKeys={selectedBookingKeys}
+        allVisibleSelected={allVisibleSelected}
+        someVisibleSelected={someVisibleSelected}
+        onToggleSelectAllVisible={toggleSelectAllVisible}
+        onToggleSelectBooking={toggleSelectBooking}
       />
 
       {/* Detail/Edit Modal */}
@@ -349,6 +310,14 @@ const BookingsPage: React.FC = () => {
         onError={handleModalError}
         isMobile={isMobile}
         onDelete={handleDeleteBooking}
+      />
+
+      <BookingCustomMailDialog
+        open={customMailDialogOpen}
+        token={token}
+        selectedRecipients={selectedRecipients}
+        onClose={() => setCustomMailDialogOpen(false)}
+        onSent={handleCustomMailSent}
       />
 
       {/* Notification Snackbar */}

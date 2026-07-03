@@ -13,6 +13,7 @@ import {
   Tooltip,
   Typography,
   Box,
+  Checkbox,
 } from '@mui/material';
 import {
   MoreHoriz as MoreHorizIcon,
@@ -42,6 +43,11 @@ interface BookingTableProps {
   formContent: FormContent;
   artistFormContent: ArtistFormContent;
   onOpenDetails: (booking: CombinedBooking) => void;
+  selectedBookingKeys: Set<string>;
+  allVisibleSelected: boolean;
+  someVisibleSelected: boolean;
+  onToggleSelectAllVisible: () => void;
+  onToggleSelectBooking: (booking: CombinedBooking) => void;
 }
 
 const BookingTable: React.FC<BookingTableProps> = ({
@@ -50,7 +56,14 @@ const BookingTable: React.FC<BookingTableProps> = ({
   formContent,
   artistFormContent,
   onOpenDetails,
+  selectedBookingKeys,
+  allVisibleSelected,
+  someVisibleSelected,
+  onToggleSelectAllVisible,
+  onToggleSelectBooking,
 }) => {
+  const getBookingKey = (booking: CombinedBooking) => `${booking.bookingType}:${booking.id}`;
+
   const handleCopyLink = (profileUuid: string) => {
     const url = `${window.location.origin}/profile/${profileUuid}`;
     navigator.clipboard.writeText(url);
@@ -65,6 +78,14 @@ const BookingTable: React.FC<BookingTableProps> = ({
       <Table size="medium">
         <TableHead>
           <TableRow sx={{ bgcolor: alpha(adminPalette.primary.main, 0.1) }}>
+            <TableCell padding="checkbox">
+              <Checkbox
+                checked={allVisibleSelected}
+                indeterminate={someVisibleSelected}
+                onChange={onToggleSelectAllVisible}
+                inputProps={{ 'aria-label': 'Select all visible bookings' }}
+              />
+            </TableCell>
             {columnVisibility.type && <TableCell>Type</TableCell>}
             {columnVisibility.name && <TableCell>Name</TableCell>}
             {columnVisibility.email && <TableCell>Email</TableCell>}
@@ -89,6 +110,15 @@ const BookingTable: React.FC<BookingTableProps> = ({
                 },
               }}
             >
+              <TableCell padding="checkbox">
+                <Checkbox
+                  checked={selectedBookingKeys.has(getBookingKey(booking))}
+                  onChange={() => onToggleSelectBooking(booking)}
+                  inputProps={{
+                    'aria-label': `Select ${booking.first_name} ${booking.last_name}`,
+                  }}
+                />
+              </TableCell>
               {columnVisibility.type && (
                 <TableCell>
                   {booking.bookingType === 'artist' ? (
@@ -165,6 +195,15 @@ const BookingTable: React.FC<BookingTableProps> = ({
               </TableCell>
             </TableRow>
           ))}
+          {bookings.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={9}>
+                <Typography variant="body2" color="text.secondary" align="center">
+                  No bookings found.
+                </Typography>
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>
