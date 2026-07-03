@@ -44,6 +44,15 @@ jobs:
         run: |
           sed -i 's/${REPO_OWNER}/${{ env.REPO_OWNER_LOWERCASE }}/g' docker-compose.yml
 
+      - name: Read nginx config
+        id: nginx_config
+        run: |
+          {
+            echo 'content<<__NGINX_CONF__'
+            cat deployment/nginx/wiesenwahn.conf
+            echo '__NGINX_CONF__'
+          } >> "$GITHUB_OUTPUT"
+
       - name: Copy docker-compose.yml to server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -65,6 +74,18 @@ jobs:
           script: |
             mkdir -p /opt/wiesenwahn/data
             mkdir -p /opt/wiesenwahn/logs
+
+            cat > /tmp/wiesenwahn.conf.new <<'EOF'
+            ${{ steps.nginx_config.outputs.content }}
+            EOF
+
+            if ! cmp -s /tmp/wiesenwahn.conf.new /etc/nginx/sites-available/wiesenwahn.conf; then
+              cp /etc/nginx/sites-available/wiesenwahn.conf /etc/nginx/sites-available/wiesenwahn.conf.bak-$(date +%F-%H%M%S) || true
+              install -D -m 644 /tmp/wiesenwahn.conf.new /etc/nginx/sites-available/wiesenwahn.conf
+              ln -sf /etc/nginx/sites-available/wiesenwahn.conf /etc/nginx/sites-enabled/wiesenwahn.conf
+              nginx -t
+              systemctl reload nginx
+            fi
 
             # Create .env file with secrets
             cat > /opt/wiesenwahn/.env << EOL
