@@ -11,7 +11,9 @@ from src.services.option_service import (
     create_option,
     delete_option,
     get_options,
+    get_step_description,
     update_option,
+    update_step_description,
 )
 from src.utils.rate_limit import limiter
 
@@ -19,7 +21,7 @@ admin_options_bp = Blueprint("admin_options", __name__)
 limiter_admin_options = limiter
 
 VALID_SCOPES = {"regular", "artist"}
-VALID_OPTION_TYPES = {"ticket", "beverage", "food"}
+VALID_OPTION_TYPES = {"ticket", "beverage", "food", "material"}
 
 
 def _ensure_admin() -> tuple[dict, int] | None:
@@ -80,13 +82,21 @@ def get_options_endpoint(scope: str, option_type: str):
     normalized_scope = cast(OptionScope, scope)
     normalized_option_type = cast(OptionType, option_type)
 
-    return jsonify({"options": get_options(normalized_scope, normalized_option_type)}), 200
+    return (
+        jsonify(
+            {
+                "options": get_options(normalized_scope, normalized_option_type),
+                "step_description": get_step_description(normalized_scope, normalized_option_type),
+            }
+        ),
+        200,
+    )
 
 
 @admin_options_bp.route("/options/<string:scope>/<string:option_type>", methods=["POST"])
 @limiter_admin_options.limit("60/minute")
 @jwt_required()
-def create_option_endpoint(scope: str, option_type: str):
+def create_option_endpoint(scope: str, option_type: str):  # noqa: PLR0911
     unauthorized = _ensure_admin()
     if unauthorized:
         return jsonify(unauthorized[0]), unauthorized[1]
@@ -109,8 +119,15 @@ def create_option_endpoint(scope: str, option_type: str):
         amount = _to_int(data.get("amount", 0), default=-1)
         if amount < 0:
             return jsonify({"error": "Amount must be a non-negative integer"}), 400
+        num_needed = 1
+    elif option_type == "material":
+        amount = 0
+        num_needed = _to_int(data.get("num_needed", 1), default=0)
+        if num_needed < 1:
+            return jsonify({"error": "num_needed must be a positive integer"}), 400
     else:
         amount = 0
+        num_needed = 1
 
     option_id = create_option(
         scope=normalized_scope,
@@ -119,6 +136,7 @@ def create_option_endpoint(scope: str, option_type: str):
         working_title=str(data.get("working_title") or "").strip() or None,
         price=_to_float(data.get("price", 0.0)),
         amount=amount,
+        num_needed=num_needed,
         requires_workshift=_to_bool(data.get("requires_workshift", True), default=True),
         description=str(data.get("description") or "").strip(),
     )
@@ -131,7 +149,7 @@ def create_option_endpoint(scope: str, option_type: str):
 )
 @limiter_admin_options.limit("60/minute")
 @jwt_required()
-def update_option_endpoint(scope: str, option_type: str, option_id: int):  # noqa: PLR0911
+def update_option_endpoint(scope: str, option_type: str, option_id: int):  # noqa: PLR0911, PLR0912
     unauthorized = _ensure_admin()
     if unauthorized:
         return jsonify(unauthorized[0]), unauthorized[1]
@@ -160,6 +178,12 @@ def update_option_endpoint(scope: str, option_type: str, option_id: int):  # noq
         if amount < 0:
             return jsonify({"error": "Amount must be a non-negative integer"}), 400
 
+    num_needed: int | None = None
+    if "num_needed" in data:
+        num_needed = _to_int(data.get("num_needed"), default=0)
+        if num_needed < 1:
+            return jsonify({"error": "num_needed must be a positive integer"}), 400
+
     price: float | None = None
     if "price" in data:
         price = _to_float(data.get("price"), default=-1)
@@ -178,6 +202,7 @@ def update_option_endpoint(scope: str, option_type: str, option_id: int):  # noq
         working_title=str(working_title).strip() if working_title is not None else None,
         price=price,
         amount=amount,
+        num_needed=num_needed,
         requires_workshift=requires_workshift,
         description=str(data.get("description") or "").strip() if "description" in data else None,
     )
@@ -210,3 +235,31 @@ def delete_option_endpoint(scope: str, option_type: str, option_id: int):
         return jsonify({"error": message}), status_code
 
     return jsonify({"message": message}), 200
+
+
+@admin_options_bp.route(
+    "/options/<string:scope>/<string:option_type>/step-description", methods=["PUT"]
+)
+@limiter_admin_options.limit("60/minute")
+@jwt_required()
+def update_step_description_endpoint(scope: str, option_type: str):
+    unauthorized = _ensure_admin()
+    if unauthorized:
+        return jsonify(unauthorized[0]), unauthorized[1]
+
+    if not _is_valid_scope(scope) or not _is_valid_option_type(option_type):
+        return jsonify({"error": "Invalid option scope or type"}), 400
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing JSON body"}), 400
+
+    description = str(data.get("step_description") or "").strip()
+    normalized_scope = cast(OptionScope, scope)
+    normalized_option_type = cast(OptionType, option_type)
+
+    success = update_step_description(normalized_scope, normalized_option_type, description)
+    if not success:
+        return jsonify({"error": "Failed to update step description"}), 500
+
+    return jsonify({"message": "Step description updated", "step_description": description}), 200

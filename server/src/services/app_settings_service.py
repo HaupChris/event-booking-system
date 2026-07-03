@@ -10,6 +10,7 @@ import sqlite3
 from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Literal
 
 from src.utils.logger import get_logger
 
@@ -33,6 +34,9 @@ DEFAULT_RIDESHARE_ENABLED = os.environ.get("RIDESHARE_ENABLED", "true").strip().
     "false",
     "no",
 }
+FormStepScope = Literal["regular", "artist"]
+FormStepType = Literal["ticket", "beverage", "food", "material"]
+FORM_STEP_TYPES: tuple[FormStepType, ...] = ("ticket", "beverage", "food", "material")
 
 
 def _now_iso() -> str:
@@ -181,4 +185,63 @@ def set_rideshare_enabled(is_enabled: bool) -> bool:
             return True
     except sqlite3.Error as e:
         logger.error(f"Failed to update rideshare toggle in AppSettings: {e}", exc_info=True)
+        return False
+
+
+def _get_form_step_description_key(scope: FormStepScope, step_type: FormStepType) -> str:
+    return f"form_step_description:{scope}:{step_type}"
+
+
+def get_form_step_description(scope: FormStepScope, step_type: FormStepType) -> str:
+    """Return persisted description override for a configurable form step."""
+    try:
+        with closing(_connect_db()) as conn:
+            _ensure_table_exists(conn)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT value FROM AppSettings WHERE key = ?",
+                (_get_form_step_description_key(scope, step_type),),
+            )
+            row = cursor.fetchone()
+            if row:
+                return str(row["value"] or "").strip()
+    except sqlite3.Error as e:
+        logger.error(
+            f"Failed to read form step description for {scope}/{step_type}: {e}",
+            exc_info=True,
+        )
+
+    return ""
+
+
+def get_form_step_descriptions(scope: FormStepScope) -> dict[FormStepType, str]:
+    """Return persisted description overrides for all configurable form steps."""
+    return {step_type: get_form_step_description(scope, step_type) for step_type in FORM_STEP_TYPES}
+
+
+def set_form_step_description(
+    scope: FormStepScope, step_type: FormStepType, description: str
+) -> bool:
+    """Persist description override for a configurable form step."""
+    now = _now_iso()
+
+    try:
+        with closing(_connect_db()) as conn:
+            _ensure_table_exists(conn)
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO AppSettings (key, value, updated_at) "
+                "VALUES (?, ?, ?) "
+                "ON CONFLICT(key) DO UPDATE SET value = excluded.value, "
+                "updated_at = excluded.updated_at",
+                (_get_form_step_description_key(scope, step_type), description.strip(), now),
+            )
+            conn.commit()
+            logger.info(f"Updated form step description for {scope}/{step_type}")
+            return True
+    except sqlite3.Error as e:
+        logger.error(
+            f"Failed to update form step description for {scope}/{step_type}: {e}",
+            exc_info=True,
+        )
         return False

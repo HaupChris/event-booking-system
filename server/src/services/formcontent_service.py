@@ -446,6 +446,54 @@ def _load_artist_options_from_db(
     return ticket_options, beverage_options, food_options
 
 
+def _load_regular_materials_from_db(cursor: sqlite3.Cursor) -> list[Material]:
+    cursor.execute(
+        """
+        SELECT
+            id,
+            title,
+            COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title,
+            num_needed
+        FROM Materials
+        ORDER BY id ASC
+        """
+    )
+    material_rows = cursor.fetchall()
+    return [
+        Material(
+            id=int(row[0]),
+            title=row[1],
+            working_title=row[2],
+            num_needed=_normalize_positive_int(row[3]),
+        )
+        for row in material_rows
+    ]
+
+
+def _load_artist_materials_from_db(cursor: sqlite3.Cursor) -> list[ArtistMaterial]:
+    cursor.execute(
+        """
+        SELECT
+            id,
+            title,
+            COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title,
+            num_needed
+        FROM ArtistMaterials
+        ORDER BY id ASC
+        """
+    )
+    material_rows = cursor.fetchall()
+    return [
+        ArtistMaterial(
+            id=int(row[0]),
+            title=row[1],
+            working_title=row[2],
+            num_needed=_normalize_positive_int(row[3]),
+        )
+        for row in material_rows
+    ]
+
+
 def update_form_content_with_db_counts(
     form_content_obj: FormContent, db_connect_func: Callable[[], sqlite3.Connection]
 ) -> dict:
@@ -478,6 +526,18 @@ def update_form_content_with_db_counts(
             form_content_obj.work_shifts = db_work_shifts
         except sqlite3.OperationalError:
             logger.warning("Workshift columns missing in DB, using JSON fallback for this request")
+
+        try:
+            form_content_obj.materials = _load_regular_materials_from_db(cursor)
+        except sqlite3.OperationalError:
+            logger.warning("Material columns missing in DB, using JSON fallback for this request")
+
+        try:
+            form_content_obj.artist_materials = _load_artist_materials_from_db(cursor)
+        except sqlite3.OperationalError:
+            logger.warning(
+                "Artist material columns missing in DB, using JSON fallback for this request"
+            )
 
         # timeslot ids in database may differ from ids in the formcontent json file. we need to use the db ones.
         # _update_timeslot_ids_from_db(form_content_obj, cursor)
@@ -711,6 +771,13 @@ def update_artist_form_content_with_db_counts(
         except sqlite3.OperationalError:
             logger.warning(
                 "Artist option columns/tables missing in DB, using JSON fallback for this request"
+            )
+
+        try:
+            form_content_obj.artist_materials = _load_artist_materials_from_db(cursor)
+        except sqlite3.OperationalError:
+            logger.warning(
+                "Artist material columns/tables missing in DB, using JSON fallback for this request"
             )
 
         # TICKETS

@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import type { ArtistFormProps } from './ArtistRegistrationFormContainer';
 import { artistAreaTexts } from '../constants/texts';
+import { getStepDescription } from '../utils/stepDescription';
 import BeverageSelectionFormBase from '../../components/core/forms/BeverageSelectionFormBase';
 import ThemedFormLayout from '../../components/core/layouts/ThemedFormLayout';
 import FormCard from '../../components/core/display/FormCard';
@@ -22,6 +23,11 @@ const formatPrice = (price: number): string => {
 
 function ArtistBandBeverageSelectionForm(props: ArtistFormProps) {
   const bandMembers = props.currentBooking.band_members ?? [];
+  const missionBriefing = getStepDescription(
+    props.formContent.step_descriptions,
+    'beverage',
+    artistAreaTexts.beverageSelectionForm.missionBriefing
+  );
   const beverageOptions = [
     { value: -1, label: artistAreaTexts.beverageSelectionForm.noBeverage },
     ...props.formContent.beverage_options.map((option) => ({
@@ -41,7 +47,7 @@ function ArtistBandBeverageSelectionForm(props: ArtistFormProps) {
 
   return (
     <ThemedFormLayout
-      missionBriefing={artistAreaTexts.beverageSelectionForm.missionBriefing}
+      missionBriefing={missionBriefing}
       footerId={artistAreaTexts.beverageSelectionForm.footerId}
     >
       <FormCard>
@@ -99,6 +105,15 @@ function ArtistBeverageSelectionForm(props: ArtistFormProps) {
     return <ArtistBandBeverageSelectionForm {...props} />;
   }
 
+  const texts = {
+    ...artistAreaTexts.beverageSelectionForm,
+    missionBriefing: getStepDescription(
+      props.formContent.step_descriptions,
+      'beverage',
+      artistAreaTexts.beverageSelectionForm.missionBriefing
+    ),
+  };
+
   const getImageSource = (beverage_id: number) => {
     if (beverage_id === 0) return beverages_0;
     if (beverage_id === 1) return beverages_1;
@@ -111,7 +126,7 @@ function ArtistBeverageSelectionForm(props: ArtistFormProps) {
       currentBooking={props.currentBooking}
       updateBooking={props.updateBooking}
       formContent={props.formContent}
-      texts={artistAreaTexts.beverageSelectionForm}
+      texts={texts}
       getImageSource={getImageSource}
     />
   );

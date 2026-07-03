@@ -44,6 +44,8 @@ const OptionCrudDialogs: React.FC<OptionCrudDialogsProps> = ({
 }) => {
   const showDescription = optionType === 'beverage' || optionType === 'food';
   const showAmount = optionType === 'ticket';
+  const showPrice = optionType !== 'material';
+  const showNumNeeded = optionType === 'material';
 
   return (
     <>
@@ -78,13 +80,15 @@ const OptionCrudDialogs: React.FC<OptionCrudDialogsProps> = ({
                 minRows={2}
               />
             )}
-            <TextField
-              label="Price"
-              value={optionForm.price}
-              onChange={(event) => onOptionChange({ ...optionForm, price: event.target.value })}
-              size="small"
-              type="number"
-            />
+            {showPrice && (
+              <TextField
+                label="Price"
+                value={optionForm.price}
+                onChange={(event) => onOptionChange({ ...optionForm, price: event.target.value })}
+                size="small"
+                type="number"
+              />
+            )}
             {showAmount && (
               <>
                 <TextField
@@ -111,6 +115,17 @@ const OptionCrudDialogs: React.FC<OptionCrudDialogsProps> = ({
                   label="Arbeitsdienst erforderlich"
                 />
               </>
+            )}
+            {showNumNeeded && (
+              <TextField
+                label="Needed amount"
+                value={optionForm.num_needed}
+                onChange={(event) =>
+                  onOptionChange({ ...optionForm, num_needed: event.target.value })
+                }
+                size="small"
+                type="number"
+              />
             )}
           </Box>
         </DialogContent>

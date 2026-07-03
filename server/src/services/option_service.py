@@ -7,8 +7,15 @@ from contextlib import closing
 from pathlib import Path
 from typing import Any, Literal
 
+from src.services.app_settings_service import (
+    FormStepScope,
+    FormStepType,
+    get_form_step_description,
+    set_form_step_description,
+)
+
 OptionScope = Literal["regular", "artist"]
-OptionType = Literal["ticket", "beverage", "food"]
+OptionType = Literal["ticket", "beverage", "food", "material"]
 
 IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 
@@ -27,9 +34,11 @@ TABLE_NAME_MAP: dict[tuple[OptionScope, OptionType], str] = {
     ("regular", "ticket"): "TicketOptions",
     ("regular", "beverage"): "BeverageOptions",
     ("regular", "food"): "FoodOptions",
+    ("regular", "material"): "Materials",
     ("artist", "ticket"): "ArtistTicketOptions",
     ("artist", "beverage"): "ArtistBeverageOptions",
     ("artist", "food"): "ArtistFoodOptions",
+    ("artist", "material"): "ArtistMaterials",
 }
 
 BOOKING_TABLE_MAP: dict[OptionScope, str] = {
@@ -41,9 +50,24 @@ BOOKING_COLUMN_MAP: dict[OptionType, str] = {
     "ticket": "ticket_option_id",
     "beverage": "beverage_option_id",
     "food": "food_option_id",
+    "material": "",
 }
 
-ALLOWED_TABLE_NAMES = set(TABLE_NAME_MAP.values()) | set(BOOKING_TABLE_MAP.values())
+MATERIAL_USAGE_TABLE_MAP: dict[OptionScope, str] = {
+    "regular": "BookingMaterials",
+    "artist": "ArtistBookingMaterials",
+}
+
+MATERIAL_USAGE_COLUMN_MAP: dict[OptionScope, str] = {
+    "regular": "material_id",
+    "artist": "artist_material_id",
+}
+
+ALLOWED_TABLE_NAMES = (
+    set(TABLE_NAME_MAP.values())
+    | set(BOOKING_TABLE_MAP.values())
+    | set(MATERIAL_USAGE_TABLE_MAP.values())
+)
 
 
 def _assert_allowed_table_name(table_name: str) -> str:
@@ -70,6 +94,14 @@ def _normalize_non_negative_int(value: Any, default: int = 0) -> int:
     except (TypeError, ValueError):
         return default
     return parsed if parsed >= 0 else default
+
+
+def _normalize_positive_int(value: Any, default: int = 1) -> int:
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return default
+    return parsed if parsed >= 1 else default
 
 
 def _normalize_non_negative_float(value: Any, default: float = 0.0) -> float:
@@ -162,6 +194,33 @@ def _seed_described_option_table_if_empty(
         )
 
 
+def _seed_material_table_if_empty(
+    cursor: sqlite3.Cursor, table_name: str, materials: list[dict[str, Any]]
+) -> None:
+    table_name = _assert_allowed_table_name(table_name)
+    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+    if int(cursor.fetchone()[0]) > 0:
+        return
+
+    for idx, material in enumerate(materials):
+        title = str(material.get("title", "")).strip()
+        if not title:
+            continue
+        working_title = str(material.get("working_title", "")).strip() or title
+        cursor.execute(
+            f"""
+            INSERT INTO {table_name} (id, title, working_title, num_needed)
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                idx,
+                title,
+                working_title,
+                _normalize_positive_int(material.get("num_needed", 1)),
+            ),
+        )
+
+
 def _ensure_schema(conn: sqlite3.Connection) -> None:
     cursor = conn.cursor()
 
@@ -233,6 +292,26 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
         )
         """
     )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS Materials (
+            id INTEGER PRIMARY KEY NOT NULL,
+            title TEXT NOT NULL,
+            working_title TEXT,
+            num_needed INTEGER NOT NULL
+        )
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS ArtistMaterials (
+            id INTEGER PRIMARY KEY NOT NULL,
+            title TEXT NOT NULL,
+            working_title TEXT,
+            num_needed INTEGER NOT NULL
+        )
+        """
+    )
 
     option_tables = [
         "TicketOptions",
@@ -241,6 +320,8 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
         "ArtistTicketOptions",
         "ArtistBeverageOptions",
         "ArtistFoodOptions",
+        "Materials",
+        "ArtistMaterials",
     ]
 
     for table_name in option_tables:
@@ -275,14 +356,18 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
     artist_ticket_seed = _load_option_seed(ARTIST_FORM_CONTENT_PATH, "ticket_options")
     artist_beverage_seed = _load_option_seed(ARTIST_FORM_CONTENT_PATH, "beverage_options")
     artist_food_seed = _load_option_seed(ARTIST_FORM_CONTENT_PATH, "food_options")
+    regular_material_seed = _load_option_seed(REGULAR_FORM_CONTENT_PATH, "materials")
+    artist_material_seed = _load_option_seed(ARTIST_FORM_CONTENT_PATH, "artist_materials")
 
     _seed_ticket_table_if_empty(cursor, "TicketOptions", regular_ticket_seed)
     _seed_described_option_table_if_empty(cursor, "BeverageOptions", regular_beverage_seed)
     _seed_described_option_table_if_empty(cursor, "FoodOptions", regular_food_seed)
+    _seed_material_table_if_empty(cursor, "Materials", regular_material_seed)
 
     _seed_ticket_table_if_empty(cursor, "ArtistTicketOptions", artist_ticket_seed)
     _seed_described_option_table_if_empty(cursor, "ArtistBeverageOptions", artist_beverage_seed)
     _seed_described_option_table_if_empty(cursor, "ArtistFoodOptions", artist_food_seed)
+    _seed_material_table_if_empty(cursor, "ArtistMaterials", artist_material_seed)
 
     conn.commit()
 
@@ -329,6 +414,29 @@ def get_options(scope: OptionScope, option_type: OptionType) -> list[dict[str, A
                 for row in rows
             ]
 
+        if option_type == "material":
+            cursor.execute(
+                f"""
+                SELECT
+                    id,
+                    title,
+                    COALESCE(NULLIF(TRIM(working_title), ''), title) as working_title,
+                    num_needed
+                FROM {table_name}
+                ORDER BY id ASC
+                """
+            )
+            rows = cursor.fetchall()
+            return [
+                {
+                    "id": int(row["id"]),
+                    "title": row["title"],
+                    "working_title": row["working_title"],
+                    "num_needed": _normalize_positive_int(row["num_needed"], default=1),
+                }
+                for row in rows
+            ]
+
         cursor.execute(
             f"""
             SELECT
@@ -361,6 +469,7 @@ def create_option(  # noqa: PLR0913
     working_title: str | None = None,
     price: float = 0.0,
     amount: int = 0,
+    num_needed: int = 1,
     description: str = "",
     requires_workshift: bool = True,
 ) -> int:
@@ -384,6 +493,18 @@ def create_option(  # noqa: PLR0913
                     _normalize_non_negative_float(price),
                     _normalize_non_negative_int(amount),
                     1 if _normalize_bool(requires_workshift, default=True) else 0,
+                ),
+            )
+        elif option_type == "material":
+            cursor.execute(
+                f"""
+                INSERT INTO {table_name} (title, working_title, num_needed)
+                VALUES (?, ?, ?)
+                """,
+                (
+                    clean_title,
+                    clean_working_title,
+                    _normalize_positive_int(num_needed),
                 ),
             )
         else:
@@ -413,6 +534,7 @@ def update_option(  # noqa: PLR0913
     working_title: str | None = None,
     price: float | None = None,
     amount: int | None = None,
+    num_needed: int | None = None,
     description: str | None = None,
     requires_workshift: bool | None = None,
 ) -> bool:
@@ -441,6 +563,10 @@ def update_option(  # noqa: PLR0913
             updates.append("amount = ?")
             values.append(_normalize_non_negative_int(amount))
 
+        if option_type == "material" and num_needed is not None:
+            updates.append("num_needed = ?")
+            values.append(_normalize_positive_int(num_needed))
+
         if option_type == "ticket" and requires_workshift is not None:
             updates.append("requires_workshift = ?")
             values.append(1 if _normalize_bool(requires_workshift, default=True) else 0)
@@ -463,8 +589,6 @@ def update_option(  # noqa: PLR0913
 
 def delete_option(scope: OptionScope, option_type: OptionType, option_id: int) -> tuple[bool, str]:
     table_name = _resolve_table_name(scope, option_type)
-    usage_table = _assert_allowed_table_name(BOOKING_TABLE_MAP[scope])
-    usage_column = BOOKING_COLUMN_MAP[option_type]
 
     with closing(_connect_db()) as conn:
         _ensure_schema(conn)
@@ -474,6 +598,23 @@ def delete_option(scope: OptionScope, option_type: OptionType, option_id: int) -
         if not cursor.fetchone():
             return False, "Option not found"
 
+        if option_type == "material":
+            usage_table = _assert_allowed_table_name(MATERIAL_USAGE_TABLE_MAP[scope])
+            usage_column = MATERIAL_USAGE_COLUMN_MAP[scope]
+            cursor.execute(
+                f"SELECT COUNT(*) FROM {usage_table} WHERE {usage_column} = ?",
+                (option_id,),
+            )
+            usage_count = int(cursor.fetchone()[0])
+            if usage_count > 0:
+                return False, "Option is in use and cannot be deleted"
+
+            cursor.execute(f"DELETE FROM {table_name} WHERE id = ?", (option_id,))
+            conn.commit()
+            return True, "Option deleted"
+
+        usage_table = _assert_allowed_table_name(BOOKING_TABLE_MAP[scope])
+        usage_column = BOOKING_COLUMN_MAP[option_type]
         cursor.execute(
             f"SELECT COUNT(*) FROM {usage_table} WHERE {usage_column} = ?",
             (option_id,),
@@ -507,6 +648,18 @@ def ticket_requires_workshift(ticket_id: int, scope: OptionScope = "regular") ->
             return True
 
         return bool(row["requires_workshift"])
+
+
+def get_step_description(scope: OptionScope, option_type: OptionType) -> str:
+    step_scope: FormStepScope = scope
+    step_type: FormStepType = option_type
+    return get_form_step_description(step_scope, step_type)
+
+
+def update_step_description(scope: OptionScope, option_type: OptionType, description: str) -> bool:
+    step_scope: FormStepScope = scope
+    step_type: FormStepType = option_type
+    return set_form_step_description(step_scope, step_type, description)
 
 
 ensure_option_schema()

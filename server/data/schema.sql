@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS TimeSlots  (
 CREATE TABLE IF NOT EXISTS Materials  (
     id INTEGER PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
+    working_title TEXT,
     num_needed INTEGER NOT NULL
 );
 
@@ -194,6 +195,7 @@ CREATE TABLE IF NOT EXISTS BookingArtistMaterials  (
 CREATE TABLE IF NOT EXISTS ArtistMaterials (
     id INTEGER PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
+    working_title TEXT,
     num_needed INTEGER NOT NULL
 );
 

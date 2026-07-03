@@ -1,4 +1,5 @@
 import type {
+  FormStepDescriptions,
   TicketOption,
   BeverageOption,
   FoodOption,
@@ -9,6 +10,7 @@ import type {
 export interface ArtistMaterial {
   id: number;
   title: string;
+  working_title?: string;
   num_needed: number;
   num_booked: number;
 }
@@ -65,5 +67,6 @@ export interface ArtistFormContent {
   artist_materials: Array<ArtistMaterial>;
   professions: Array<Profession>;
   payment_link?: string;
+  step_descriptions?: FormStepDescriptions;
   orga_inviters: Array<OrgaInviter>;
 }

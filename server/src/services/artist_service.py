@@ -4,7 +4,7 @@ from contextlib import closing
 from typing import Any, cast
 
 from src.models.datatypes import ArtistBooking, ArtistBookingWithTimestamp
-from src.services.app_settings_service import get_payment_link
+from src.services.app_settings_service import get_form_step_descriptions, get_payment_link
 from src.services.booking_service import DB_FILE_PATH
 from src.services.formcontent_service import (
     get_artist_form_content_obj,
@@ -419,6 +419,7 @@ def get_up_to_date_artist_form_content() -> dict:
     result = update_artist_form_content_with_db_counts(cast(Any, form_content_obj), _connect_db)  # type: ignore
     result["payment_link"] = get_payment_link()
     result["orga_inviters"] = get_active_orga_team_members()
+    result["step_descriptions"] = get_form_step_descriptions("artist")
     return result
 
 

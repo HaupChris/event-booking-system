@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import type { ArtistFormProps } from './ArtistRegistrationFormContainer';
 import { artistAreaTexts } from '../constants/texts';
+import { getStepDescription } from '../utils/stepDescription';
 import TicketSelectionFormBase from '../../components/core/forms/TicketSelectionFormBase';
 import ThemedFormLayout from '../../components/core/layouts/ThemedFormLayout';
 import FormCard from '../../components/core/display/FormCard';
@@ -18,6 +19,11 @@ const formatPrice = (price: number): string => {
 
 function ArtistBandTicketSelectionForm(props: ArtistFormProps) {
   const bandMembers = props.currentBooking.band_members ?? [];
+  const missionBriefing = getStepDescription(
+    props.formContent.step_descriptions,
+    'ticket',
+    artistAreaTexts.ticketSelectionForm.missionBriefing
+  );
   const ticketOptions = props.formContent.ticket_options.map((option) => ({
     value: option.id,
     label: `${option.title} - ${formatPrice(option.price)}${option.amount > 0 ? ` - max ${option.amount}` : ''}`,
@@ -34,7 +40,7 @@ function ArtistBandTicketSelectionForm(props: ArtistFormProps) {
 
   return (
     <ThemedFormLayout
-      missionBriefing={artistAreaTexts.ticketSelectionForm.missionBriefing}
+      missionBriefing={missionBriefing}
       footerId={artistAreaTexts.ticketSelectionForm.footerId}
     >
       <FormCard>
@@ -92,13 +98,22 @@ function ArtistTicketSelectionForm(props: ArtistFormProps) {
     return <ArtistBandTicketSelectionForm {...props} />;
   }
 
+  const texts = {
+    ...artistAreaTexts.ticketSelectionForm,
+    missionBriefing: getStepDescription(
+      props.formContent.step_descriptions,
+      'ticket',
+      artistAreaTexts.ticketSelectionForm.missionBriefing
+    ),
+  };
+
   return (
     <TicketSelectionFormBase
       currentBooking={props.currentBooking}
       updateBooking={props.updateBooking}
       formContent={props.formContent}
       formValidation={props.formValidation}
-      texts={artistAreaTexts.ticketSelectionForm}
+      texts={texts}
     />
   );
 }

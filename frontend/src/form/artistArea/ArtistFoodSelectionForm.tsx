@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import type { ArtistFormProps } from './ArtistRegistrationFormContainer';
 import { artistAreaTexts } from '../constants/texts';
+import { getStepDescription } from '../utils/stepDescription';
 import FoodSelectionFormBase from '../../components/core/forms/FoodSelectionFormBase';
 import { foodImages } from '../../constants/foodImages';
 import ThemedFormLayout from '../../components/core/layouts/ThemedFormLayout';
@@ -51,6 +52,11 @@ const parseFoodDescription = (description: string): { text: string; dietType: st
 
 function ArtistBandFoodSelectionForm(props: ArtistFormProps) {
   const bandMembers = props.currentBooking.band_members ?? [];
+  const missionBriefing = getStepDescription(
+    props.formContent.step_descriptions,
+    'food',
+    artistAreaTexts.foodSelectionForm.missionBriefing
+  );
   const foodOptions = [
     { value: -1, label: artistAreaTexts.foodSelectionForm.noFood },
     ...props.formContent.food_options.map((option) => {
@@ -73,7 +79,7 @@ function ArtistBandFoodSelectionForm(props: ArtistFormProps) {
 
   return (
     <ThemedFormLayout
-      missionBriefing={artistAreaTexts.foodSelectionForm.missionBriefing}
+      missionBriefing={missionBriefing}
       footerId={artistAreaTexts.foodSelectionForm.footerId}
     >
       <FormCard>
@@ -131,12 +137,21 @@ function ArtistFoodSelectionForm(props: ArtistFormProps) {
     return <ArtistBandFoodSelectionForm {...props} />;
   }
 
+  const texts = {
+    ...artistAreaTexts.foodSelectionForm,
+    missionBriefing: getStepDescription(
+      props.formContent.step_descriptions,
+      'food',
+      artistAreaTexts.foodSelectionForm.missionBriefing
+    ),
+  };
+
   return (
     <FoodSelectionFormBase
       currentBooking={props.currentBooking}
       updateBooking={props.updateBooking}
       formContent={props.formContent}
-      texts={artistAreaTexts.foodSelectionForm}
+      texts={texts}
       images={foodImages}
     />
   );

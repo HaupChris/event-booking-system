@@ -93,8 +93,31 @@ def _init_db_data(connection: Connection, form_content: FormContent):
         # Insert Materials
         for idx, material in enumerate(form_content.materials):
             cursor.execute(
-                "INSERT OR IGNORE INTO Materials (id, title, num_needed) VALUES (?, ?, ?)",
-                (idx, material.title, material.num_needed),
+                """
+                INSERT OR IGNORE INTO Materials (id, title, working_title, num_needed)
+                VALUES (?, ?, ?, ?)
+                """,
+                (
+                    idx,
+                    material.title,
+                    material.working_title or material.title,
+                    material.num_needed,
+                ),
+            )
+
+        # Insert Artist Materials
+        for idx, artist_material in enumerate(form_content.artist_materials):
+            cursor.execute(
+                """
+                INSERT OR IGNORE INTO ArtistMaterials (id, title, working_title, num_needed)
+                VALUES (?, ?, ?, ?)
+                """,
+                (
+                    idx,
+                    artist_material.title,
+                    artist_material.working_title or artist_material.title,
+                    artist_material.num_needed,
+                ),
             )
 
         # Insert WorkShifts and TimeSlots

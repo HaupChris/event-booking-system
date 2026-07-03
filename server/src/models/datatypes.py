@@ -29,6 +29,7 @@ class Material(Interface):
     id: int
     title: str
     num_needed: int
+    working_title: str = ""
     num_booked: int = 0
 
 
@@ -37,6 +38,7 @@ class ArtistMaterial(Interface):
     id: int
     title: str
     num_needed: int
+    working_title: str = ""
     num_booked: int = 0
 
 

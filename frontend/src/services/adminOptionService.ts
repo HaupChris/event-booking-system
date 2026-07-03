@@ -4,16 +4,22 @@ import { API_URL } from '../config/env';
 const API_BASE_URL = API_URL || '';
 
 export type AdminOptionScope = 'regular' | 'artist';
-export type AdminOptionType = 'ticket' | 'beverage' | 'food';
+export type AdminOptionType = 'ticket' | 'beverage' | 'food' | 'material';
 
 export interface AdminOptionItem {
   id: number;
   title: string;
   working_title: string;
-  price: number;
+  price?: number;
   amount?: number;
+  num_needed?: number;
   requires_workshift?: boolean;
   description?: string;
+}
+
+export interface AdminOptionConfig {
+  options: AdminOptionItem[];
+  step_description: string;
 }
 
 const authHeaders = (token: string) => ({
@@ -25,14 +31,14 @@ export const getAdminOptions = async (
   token: string,
   scope: AdminOptionScope,
   optionType: AdminOptionType
-): Promise<AdminOptionItem[]> => {
-  const response = await axios.get<{ options: AdminOptionItem[] }>(
+): Promise<AdminOptionConfig> => {
+  const response = await axios.get<AdminOptionConfig>(
     `${API_BASE_URL}/api/admin/options/${scope}/${optionType}`,
     {
       headers: authHeaders(token),
     }
   );
-  return response.data.options;
+  return response.data;
 };
 
 export const createAdminOption = async (
@@ -44,6 +50,7 @@ export const createAdminOption = async (
     working_title?: string;
     price?: number;
     amount?: number;
+    num_needed?: number;
     requires_workshift?: boolean;
     description?: string;
   }
@@ -63,6 +70,7 @@ export const updateAdminOption = async (
     working_title?: string;
     price?: number;
     amount?: number;
+    num_needed?: number;
     requires_workshift?: boolean;
     description?: string;
   }
@@ -81,4 +89,19 @@ export const deleteAdminOption = async (
   await axios.delete(`${API_BASE_URL}/api/admin/options/${scope}/${optionType}/${optionId}`, {
     headers: authHeaders(token),
   });
+};
+
+export const updateAdminStepDescription = async (
+  token: string,
+  scope: AdminOptionScope,
+  optionType: AdminOptionType,
+  stepDescription: string
+): Promise<void> => {
+  await axios.put(
+    `${API_BASE_URL}/api/admin/options/${scope}/${optionType}/step-description`,
+    { step_description: stepDescription },
+    {
+      headers: authHeaders(token),
+    }
+  );
 };

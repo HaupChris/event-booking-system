@@ -20,9 +20,15 @@ import ThemedFormLayout from '../../components/core/layouts/ThemedFormLayout';
 import FormCard from '../../components/core/display/FormCard';
 import SelectionOptionWithImage from '../../components/core/display/SelectionOptionWithImage';
 import { userAreaTexts } from '../constants/texts';
+import { getStepDescription } from '../utils/stepDescription';
 
 function BeverageSelectionForm(props: FormProps) {
   const theme = useTheme();
+  const missionBriefing = getStepDescription(
+    props.formContent.step_descriptions,
+    'beverage',
+    userAreaTexts.beverageSelectionForm.missionBriefing
+  );
 
   // Function to handle beverage selection
   const handleBeverageSelect = (id: number) => () => {
@@ -44,7 +50,7 @@ function BeverageSelectionForm(props: FormProps) {
 
   return (
     <ThemedFormLayout
-      missionBriefing={userAreaTexts.beverageSelectionForm.missionBriefing}
+      missionBriefing={missionBriefing}
       footerId={userAreaTexts.beverageSelectionForm.footerId}
     >
       <List sx={{ p: { xs: 1, sm: 2 } }}>

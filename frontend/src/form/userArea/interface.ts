@@ -20,8 +20,18 @@ export interface WorkShift {
 export interface Material {
   id: number;
   title: string;
+  working_title?: string;
   num_needed: number;
   num_booked: number;
+}
+
+export type ConfigurableFormStep = 'ticket' | 'beverage' | 'food' | 'material';
+
+export interface FormStepDescriptions {
+  ticket?: string;
+  beverage?: string;
+  food?: string;
+  material?: string;
 }
 
 export interface BeverageOption {
@@ -70,6 +80,7 @@ export interface FormContent {
   materials: Array<Material>;
   professions: Array<Profession>;
   payment_link?: string;
+  step_descriptions?: FormStepDescriptions;
   orga_inviters: Array<OrgaInviter>;
 }
 

@@ -8,6 +8,7 @@ import {
   type AdminOptionScope,
   type AdminOptionType,
   updateAdminOption,
+  updateAdminStepDescription,
 } from '../../../services/adminOptionService';
 import { getAdminTitle } from '../utils/titleUtils';
 import DeleteConfirmDialog from './DeleteConfirmDialog';
@@ -31,6 +32,17 @@ const OptionCrudTab: React.FC<OptionCrudTabProps> = ({ optionType, onDataChanged
   const [optionDialogOpen, setOptionDialogOpen] = useState(false);
   const [editingOption, setEditingOption] = useState<AdminOptionItem | null>(null);
   const [optionForm, setOptionForm] = useState<OptionFormState>(DEFAULT_OPTION_FORM);
+  const [stepDescriptionMap, setStepDescriptionMap] = useState<Record<AdminOptionScope, string>>({
+    regular: '',
+    artist: '',
+  });
+  const [stepDescriptionDraftMap, setStepDescriptionDraftMap] = useState<
+    Record<AdminOptionScope, string>
+  >({
+    regular: '',
+    artist: '',
+  });
+  const [savingStepDescription, setSavingStepDescription] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -38,24 +50,32 @@ const OptionCrudTab: React.FC<OptionCrudTabProps> = ({ optionType, onDataChanged
   }>({ open: false, message: '', severity: 'success' });
   const [deleteTarget, setDeleteTarget] = useState<AdminOptionItem | null>(null);
 
-  const showSnackbar = (message: string, severity: 'success' | 'error') => {
+  const showSnackbar = useCallback((message: string, severity: 'success' | 'error') => {
     setSnackbar({ open: true, message, severity });
-  };
+  }, []);
 
   const fetchOptions = useCallback(async () => {
     try {
       setLoading(true);
-      const [regularOptions, artistOptions] = await Promise.all([
+      const [regularConfig, artistConfig] = await Promise.all([
         getAdminOptions(token, 'regular', optionType),
         getAdminOptions(token, 'artist', optionType),
       ]);
-      setOptionMap({ regular: regularOptions, artist: artistOptions });
+      setOptionMap({ regular: regularConfig.options, artist: artistConfig.options });
+      setStepDescriptionMap({
+        regular: regularConfig.step_description || '',
+        artist: artistConfig.step_description || '',
+      });
+      setStepDescriptionDraftMap({
+        regular: regularConfig.step_description || '',
+        artist: artistConfig.step_description || '',
+      });
     } catch {
       showSnackbar('Failed to load options.', 'error');
     } finally {
       setLoading(false);
     }
-  }, [optionType, token]);
+  }, [optionType, showSnackbar, token]);
 
   useEffect(() => {
     fetchOptions().then();
@@ -85,6 +105,7 @@ const OptionCrudTab: React.FC<OptionCrudTabProps> = ({ optionType, onDataChanged
       working_title: option.working_title,
       price: String(option.price ?? 0),
       amount: String(option.amount ?? 0),
+      num_needed: String(option.num_needed ?? 1),
       requires_workshift: option.requires_workshift !== false,
       description: option.description || '',
     });
@@ -101,27 +122,34 @@ const OptionCrudTab: React.FC<OptionCrudTabProps> = ({ optionType, onDataChanged
     const workingTitle = optionForm.working_title.trim() || title;
     const price = Number(optionForm.price);
     const amount = Number(optionForm.amount);
+    const numNeeded = Number(optionForm.num_needed);
 
     if (!title) {
       showSnackbar('Display title is required.', 'error');
       return;
     }
 
-    if (Number.isNaN(price) || price < 0) {
+    if (optionType !== 'material' && (Number.isNaN(price) || price < 0)) {
       showSnackbar('Price must be a non-negative number.', 'error');
       return;
     }
 
-    if (optionType === 'ticket' && (Number.isNaN(amount) || amount < 0)) {
+    if (optionType === 'ticket' && (!Number.isInteger(amount) || amount < 0)) {
       showSnackbar('Amount must be a non-negative integer.', 'error');
+      return;
+    }
+
+    if (optionType === 'material' && (!Number.isInteger(numNeeded) || numNeeded < 1)) {
+      showSnackbar('Needed amount must be a positive integer.', 'error');
       return;
     }
 
     const payload = {
       title,
       working_title: workingTitle,
-      price,
+      price: optionType !== 'material' ? price : undefined,
       amount: optionType === 'ticket' ? Math.floor(amount) : undefined,
+      num_needed: optionType === 'material' ? Math.floor(numNeeded) : undefined,
       requires_workshift: optionType === 'ticket' ? optionForm.requires_workshift : undefined,
       description:
         optionType === 'beverage' || optionType === 'food' ? optionForm.description : undefined,
@@ -138,6 +166,23 @@ const OptionCrudTab: React.FC<OptionCrudTabProps> = ({ optionType, onDataChanged
       showSnackbar('Option saved.', 'success');
     } catch {
       showSnackbar('Failed to save option.', 'error');
+    }
+  };
+
+  const handleSaveStepDescription = async () => {
+    const nextDescription = stepDescriptionDraftMap[scope].trim();
+
+    try {
+      setSavingStepDescription(true);
+      await updateAdminStepDescription(token, scope, optionType, nextDescription);
+      setStepDescriptionMap((prev) => ({ ...prev, [scope]: nextDescription }));
+      setStepDescriptionDraftMap((prev) => ({ ...prev, [scope]: nextDescription }));
+      await onDataChanged();
+      showSnackbar('Step description saved.', 'success');
+    } catch {
+      showSnackbar('Failed to save step description.', 'error');
+    } finally {
+      setSavingStepDescription(false);
     }
   };
 
@@ -169,7 +214,14 @@ const OptionCrudTab: React.FC<OptionCrudTabProps> = ({ optionType, onDataChanged
         scope={scope}
         options={sortedOptions}
         loading={loading}
+        stepDescription={stepDescriptionMap[scope]}
+        stepDescriptionDraft={stepDescriptionDraftMap[scope]}
+        savingStepDescription={savingStepDescription}
         onScopeChange={setScope}
+        onStepDescriptionChange={(value) =>
+          setStepDescriptionDraftMap((prev) => ({ ...prev, [scope]: value }))
+        }
+        onSaveStepDescription={handleSaveStepDescription}
         onAddOption={openCreateOptionDialog}
         onEditOption={openEditOptionDialog}
         onDeleteOption={requestDeleteOption}

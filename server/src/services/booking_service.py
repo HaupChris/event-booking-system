@@ -6,7 +6,7 @@ from contextlib import closing
 
 from src.models.datatypes import Booking, BookingWithTimestamp
 from src.models.schema import init_db
-from src.services.app_settings_service import get_payment_link
+from src.services.app_settings_service import get_form_step_descriptions, get_payment_link
 from src.services.formcontent_service import (
     get_form_content_obj,
     update_form_content_with_db_counts,
@@ -473,6 +473,7 @@ def get_up_to_date_form_content() -> dict:
         result = update_form_content_with_db_counts(form_content_obj, _connect_db)
         result["payment_link"] = get_payment_link()
         result["orga_inviters"] = get_active_orga_team_members()
+        result["step_descriptions"] = get_form_step_descriptions("regular")
 
         duration = time.time() - start_time
         logger.debug(f"Form content generated in {duration:.3f}s")

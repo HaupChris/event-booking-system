@@ -18,8 +18,10 @@ import {
   Close as CloseIcon,
   People,
   Mic,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useFetchData } from './useFetchData';
+import OptionCrudTab from './components/OptionCrudTab';
 import TabSwitcher from './components/TabSwitcher';
 import ProgressList from './components/ProgressList';
 import PeopleList from './components/PeopleList';
@@ -33,6 +35,7 @@ import {
   transformBookingsToPeopleItems,
 } from './transformers/materialTransformers';
 import { getUsersForMaterial } from './utils/materialUtils';
+import { getAdminTitle } from './utils/titleUtils';
 import type { Material } from '../userArea/interface';
 import type { ArtistMaterial } from '../artistArea/interface';
 
@@ -42,10 +45,12 @@ interface MaterialModalData {
 }
 
 const MaterialsPage: React.FC = () => {
-  const { regularBookings, artistBookings, formContent, artistFormContent } = useFetchData();
+  const { regularBookings, artistBookings, formContent, artistFormContent, refetch } =
+    useFetchData();
 
   // Tab state
-  const [activeTab, setActiveTab] = useState('materials');
+  const [activeTab, setActiveTab] = useState<'overview' | 'setup'>('overview');
+  const [overviewTab, setOverviewTab] = useState<'materials' | 'people'>('materials');
   const [viewType, setViewType] = useState<ViewFilterType>('all');
 
   // Custom hooks for state management
@@ -118,75 +123,86 @@ const MaterialsPage: React.FC = () => {
         Materials Overview
       </Typography>
 
-      {/* Main tabs (Materials vs People view) */}
       <TabSwitcher
         tabs={[
-          { value: 'materials', label: 'Material Overview', icon: <HandymanIcon /> },
-          { value: 'people', label: 'People Overview', icon: <People /> },
+          { value: 'overview', label: 'Overview', icon: <HandymanIcon /> },
+          { value: 'setup', label: 'Setup', icon: <SettingsIcon /> },
         ]}
         currentTab={activeTab}
-        onChange={setActiveTab}
+        onChange={(value) => setActiveTab(value as 'overview' | 'setup')}
       />
 
-      {/* View Type Controls */}
-      <AdminCard sx={{ mb: 3 }}>
-        <Box sx={{ p: 1 }}>
+      {activeTab === 'overview' && (
+        <>
           <TabSwitcher
             tabs={[
-              { value: 'all', label: 'All', icon: <People /> },
-              { value: 'regular', label: 'Regular', icon: <PersonIcon /> },
-              { value: 'artist', label: 'Artist', icon: <Mic /> },
+              { value: 'materials', label: 'Material Overview', icon: <HandymanIcon /> },
+              { value: 'people', label: 'People Overview', icon: <People /> },
             ]}
-            currentTab={viewType}
-            onChange={(value) => setViewType(value as ViewFilterType)}
+            currentTab={overviewTab}
+            onChange={(value) => setOverviewTab(value as 'materials' | 'people')}
           />
-        </Box>
-      </AdminCard>
 
-      {/* Material Overview Tab */}
-      {activeTab === 'materials' && (
-        <>
-          <FilterSortBar
-            sortOptions={[
-              { value: 'progress', label: 'Progress' },
-              { value: 'name', label: 'Name' },
-            ]}
-            sortBy={materialSortBy}
-            sortOrder={materialSortOrder}
-            onSortByChange={handleMaterialSortByChange}
-            onSortOrderToggle={handleToggleMaterialSort}
-          >
-            <Typography variant="body2">
-              Showing {materialsToProgressItems().length} materials sorted by {materialSortBy}
-            </Typography>
-          </FilterSortBar>
+          <AdminCard sx={{ mb: 3 }}>
+            <Box sx={{ p: 1 }}>
+              <TabSwitcher
+                tabs={[
+                  { value: 'all', label: 'All', icon: <People /> },
+                  { value: 'regular', label: 'Regular', icon: <PersonIcon /> },
+                  { value: 'artist', label: 'Artist', icon: <Mic /> },
+                ]}
+                currentTab={viewType}
+                onChange={(value) => setViewType(value as ViewFilterType)}
+              />
+            </Box>
+          </AdminCard>
 
-          <ProgressList items={materialsToProgressItems()} />
+          {overviewTab === 'materials' && (
+            <>
+              <FilterSortBar
+                sortOptions={[
+                  { value: 'progress', label: 'Progress' },
+                  { value: 'name', label: 'Name' },
+                ]}
+                sortBy={materialSortBy}
+                sortOrder={materialSortOrder}
+                onSortByChange={handleMaterialSortByChange}
+                onSortOrderToggle={handleToggleMaterialSort}
+              >
+                <Typography variant="body2">
+                  Showing {materialsToProgressItems().length} materials sorted by {materialSortBy}
+                </Typography>
+              </FilterSortBar>
+
+              <ProgressList items={materialsToProgressItems()} />
+            </>
+          )}
+
+          {overviewTab === 'people' && (
+            <>
+              <FilterSortBar
+                sortOptions={[
+                  { value: 'name', label: 'Name' },
+                  { value: 'materials', label: 'Materials Count' },
+                ]}
+                sortBy={peopleSortBy}
+                sortOrder={peopleSortOrder}
+                onSortByChange={handlePeopleSortByChange}
+                onSortOrderToggle={handleTogglePeopleSort}
+              >
+                <Typography variant="body2">
+                  Showing {bookingsToPeopleItems().length} people bringing materials sorted by{' '}
+                  {peopleSortBy}
+                </Typography>
+              </FilterSortBar>
+
+              <PeopleList people={bookingsToPeopleItems()} />
+            </>
+          )}
         </>
       )}
 
-      {/* People Overview Tab */}
-      {activeTab === 'people' && (
-        <>
-          <FilterSortBar
-            sortOptions={[
-              { value: 'name', label: 'Name' },
-              { value: 'materials', label: 'Materials Count' },
-            ]}
-            sortBy={peopleSortBy}
-            sortOrder={peopleSortOrder}
-            onSortByChange={handlePeopleSortByChange}
-            onSortOrderToggle={handleTogglePeopleSort}
-          >
-            <Typography variant="body2">
-              Showing {bookingsToPeopleItems().length} people bringing materials sorted by{' '}
-              {peopleSortBy}
-            </Typography>
-          </FilterSortBar>
-
-          <PeopleList people={bookingsToPeopleItems()} />
-        </>
-      )}
+      {activeTab === 'setup' && <OptionCrudTab optionType="material" onDataChanged={refetch} />}
 
       {/* Material Details Modal */}
       <Modal open={openMaterialModal} onClose={handleCloseMaterialModal}>
@@ -218,7 +234,7 @@ const MaterialsPage: React.FC = () => {
               <Box sx={{ mb: 3, pr: 4 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                   <Typography variant="h6" color="text.primary">
-                    {selectedMaterialData.material.title}
+                    {getAdminTitle(selectedMaterialData.material)}
                   </Typography>
                   {selectedMaterialData.materialType === 'artist' && (
                     <Chip label="Artist Material" color="primary" size="small" sx={{ ml: 1 }} />

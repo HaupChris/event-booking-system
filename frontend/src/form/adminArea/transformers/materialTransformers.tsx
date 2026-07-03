@@ -9,6 +9,7 @@ import { Person as PersonIcon, Handyman as HandymanIcon } from '@mui/icons-mater
 import type { ProgressItem } from '../components/ProgressList';
 import type { Person } from '../components/PeopleList';
 import type { ViewFilterType } from '../utils/optionsUtils';
+import { getAdminTitle } from '../utils/titleUtils';
 import { getMaterialCount, getUsersForMaterial } from '../utils/materialUtils';
 import type { FormContent, Material } from '../../userArea/interface';
 import type { ArtistFormContent, ArtistMaterial } from '../../artistArea/interface';
@@ -51,7 +52,7 @@ export const transformMaterialsToProgressItems = ({
     viewType === 'all' || viewType === 'regular'
       ? formContent.materials.map((material) => ({
           id: `regular-${material.id}`,
-          title: material.title,
+          title: getAdminTitle(material),
           currentCount: getMaterialCount(material.id, 'regular', regularBookings, artistBookings),
           totalNeeded: material.num_needed,
           badgeContent: getUsersForMaterial(material.id, 'regular', regularBookings, artistBookings)
@@ -66,7 +67,7 @@ export const transformMaterialsToProgressItems = ({
     viewType === 'all' || viewType === 'artist'
       ? artistFormContent.artist_materials.map((material) => ({
           id: `artist-${material.id}`,
-          title: material.title,
+          title: getAdminTitle(material),
           currentCount: getMaterialCount(material.id, 'artist', regularBookings, artistBookings),
           totalNeeded: material.num_needed,
           badgeContent: getUsersForMaterial(material.id, 'artist', regularBookings, artistBookings)
@@ -155,7 +156,7 @@ export const transformBookingsToPeopleItems = ({
                     return material ? (
                       <Chip
                         key={materialId}
-                        label={material.title}
+                        label={getAdminTitle(material)}
                         variant="outlined"
                         size="small"
                       />
@@ -192,7 +193,7 @@ export const transformBookingsToPeopleItems = ({
                     return material ? (
                       <Chip
                         key={materialId}
-                        label={material.title}
+                        label={getAdminTitle(material)}
                         color="primary"
                         variant="outlined"
                         size="small"
