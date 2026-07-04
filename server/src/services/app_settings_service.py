@@ -11,6 +11,9 @@ from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
+from urllib.parse import urlsplit
+
+from flask import has_request_context, request
 
 from src.utils.logger import get_logger
 
@@ -65,6 +68,18 @@ def _normalize_http_url(value: str) -> str:
     return value.strip().rstrip("/")
 
 
+def _is_local_development_url(value: str) -> bool:
+    hostname = urlsplit(value).hostname
+    return hostname in {"localhost", "127.0.0.1", "frontend", "backend"}
+
+
+def _get_request_public_app_url() -> str:
+    if not has_request_context():
+        return ""
+
+    return _normalize_http_url(request.url_root)
+
+
 def _connect_db() -> sqlite3.Connection:
     """Returns a new SQLite connection."""
     try:
@@ -96,6 +111,8 @@ def get_payment_link() -> str:
 
 def get_public_app_url() -> str:
     """Get configured public frontend URL, or default value when missing."""
+    request_public_app_url = _get_request_public_app_url()
+
     try:
         with closing(_connect_db()) as conn:
             _ensure_table_exists(conn)
@@ -105,9 +122,24 @@ def get_public_app_url() -> str:
             if row:
                 value = _normalize_http_url(str(row["value"] or ""))
                 if value:
+                    if (
+                        request_public_app_url
+                        and _is_local_development_url(value)
+                        and not _is_local_development_url(request_public_app_url)
+                    ):
+                        logger.warning(
+                            "Ignoring local development public app URL '%s' in favor of request origin '%s'",
+                            value,
+                            request_public_app_url,
+                        )
+                        return request_public_app_url
+
                     return value
     except sqlite3.Error as e:
         logger.error(f"Failed to read public app URL from AppSettings: {e}", exc_info=True)
+
+    if request_public_app_url:
+        return request_public_app_url
 
     return _normalize_http_url(DEFAULT_PUBLIC_APP_URL)
 
