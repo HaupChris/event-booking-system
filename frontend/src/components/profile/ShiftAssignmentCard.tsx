@@ -101,7 +101,12 @@ const ShiftAssignmentCard: React.FC<ShiftAssignmentCardProps> = ({
 
         <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1, minWidth: 0 }}>
           <AccessTimeIcon
-            sx={{ mr: 1, mt: 0.2, flexShrink: 0, color: isCircusMode ? '#d8b87a' : 'text.secondary' }}
+            sx={{
+              mr: 1,
+              mt: 0.2,
+              flexShrink: 0,
+              color: isCircusMode ? '#d8b87a' : 'text.secondary',
+            }}
             fontSize="small"
           />
           <Typography variant="body2" sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>

@@ -35,8 +35,7 @@ export const userAreaTexts = {
   },
 
   foodSelectionForm: {
-    missionBriefing:
-      'Bestell dein Abendessen bei uns vor. Wähle aus unseren Festival-Gerichten!',
+    missionBriefing: 'Bestell dein Abendessen bei uns vor. Wähle aus unseren Festival-Gerichten!',
     footerId: 'WWWW-FOOD-STATION // ID-2026',
     title: 'Wähle dein Abendessen',
     noFood: 'Kein Essen für mich',
@@ -111,8 +110,7 @@ export const userAreaTexts = {
   },
 
   summaryForm: {
-    missionBriefing:
-      'Überprüfe deine Angaben und Einsatzdetails vor dem Abschluss deiner Buchung.',
+    missionBriefing: 'Überprüfe deine Angaben und Einsatzdetails vor dem Abschluss deiner Buchung.',
     footerId: 'WWWW-MISSION-SUMMARY // ID-2026',
     title: 'Zusammenfassung',
     missionContribution: 'Festivalbeitrag',

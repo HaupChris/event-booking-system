@@ -203,15 +203,9 @@ function NewsManagementPage() {
     }
   };
 
-  const canMoveUp = useCallback(
-    (item: NewsItem) => canMoveNewsUp(news, item.id),
-    [news]
-  );
+  const canMoveUp = useCallback((item: NewsItem) => canMoveNewsUp(news, item.id), [news]);
 
-  const canMoveDown = useCallback(
-    (item: NewsItem) => canMoveNewsDown(news, item.id),
-    [news]
-  );
+  const canMoveDown = useCallback((item: NewsItem) => canMoveNewsDown(news, item.id), [news]);
 
   const handleMove = async (item: NewsItem, direction: 'up' | 'down') => {
     try {

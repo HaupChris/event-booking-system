@@ -180,7 +180,9 @@ const NewsFeedCard: React.FC<NewsFeedCardProps> = ({
           </Box>
         }
         title={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', minWidth: 0 }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', minWidth: 0 }}
+          >
             <Typography
               variant="h6"
               component="span"

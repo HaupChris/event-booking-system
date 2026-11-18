@@ -131,11 +131,7 @@ const FAQListTab: React.FC<FAQListTabProps> = ({
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="FAQ dauerhaft loeschen">
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => onDeleteFAQPermanent(faq)}
-                  >
+                  <IconButton size="small" color="error" onClick={() => onDeleteFAQPermanent(faq)}>
                     <DeleteForeverIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>

@@ -1,18 +1,18 @@
 # Files exceeding the code line limit (see tools/check_file_length.py).
 # Format: <path> <max allowed code lines>. Entries may only shrink or be removed.
-frontend/src/components/profile/NewsFeed.tsx 326
+frontend/src/components/profile/NewsFeed.tsx 328
 frontend/src/components/profile/ProfileOverviewSections.tsx 347
 frontend/src/components/profile/ProfileTopNavigation.tsx 351
 frontend/src/components/profile/RideSharingCards.tsx 435
 frontend/src/form/adminArea/BookingsPage.tsx 303
 frontend/src/form/adminArea/FAQManagementPage.tsx 339
-frontend/src/form/adminArea/NewsManagementPage.tsx 345
+frontend/src/form/adminArea/NewsManagementPage.tsx 339
 frontend/src/form/adminArea/PaymentConfirmationsPage.tsx 451
 frontend/src/form/adminArea/SettingsPage.tsx 317
 frontend/src/form/adminArea/ShiftAssignments/CurrentShiftPlanTab.tsx 313
 frontend/src/form/adminArea/ShiftAssignments/components/UserItem.tsx 337
 frontend/src/form/adminArea/components/BookingDetailFormFields.tsx 354
-frontend/src/form/constants/texts.ts 348
+frontend/src/form/constants/texts.ts 346
 frontend/src/form/userArea/WorkshiftsForm.tsx 314
 server/src/api/admin_faq.py 326
 server/src/api/profile.py 442

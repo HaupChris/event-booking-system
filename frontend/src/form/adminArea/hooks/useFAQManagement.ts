@@ -84,7 +84,10 @@ export const useFAQManagement = (token: string) => {
   const handleSetFAQActive = async (faqId: number, isActive: boolean) => {
     try {
       await updateFAQ(token, faqId, { is_active: isActive });
-      showSnackbar(isActive ? 'FAQ reactivated successfully' : 'FAQ deactivated successfully', 'success');
+      showSnackbar(
+        isActive ? 'FAQ reactivated successfully' : 'FAQ deactivated successfully',
+        'success'
+      );
       loadData();
       return true;
     } catch (error) {
@@ -97,12 +100,18 @@ export const useFAQManagement = (token: string) => {
   const handleDeleteFAQ = async (faqId: number, permanent = false) => {
     try {
       await deleteFAQ(token, faqId, permanent);
-      showSnackbar(permanent ? 'FAQ deleted permanently' : 'FAQ deactivated successfully', 'success');
+      showSnackbar(
+        permanent ? 'FAQ deleted permanently' : 'FAQ deactivated successfully',
+        'success'
+      );
       loadData();
       return true;
     } catch (error) {
       console.error('Error deleting FAQ:', error);
-      showSnackbar(permanent ? 'Failed to delete FAQ permanently' : 'Failed to deactivate FAQ', 'error');
+      showSnackbar(
+        permanent ? 'Failed to delete FAQ permanently' : 'Failed to deactivate FAQ',
+        'error'
+      );
       return false;
     }
   };

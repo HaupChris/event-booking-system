@@ -185,7 +185,8 @@ const FAQs: React.FC = () => {
           color="text.secondary"
           sx={{ mt: 1, fontFamily: isCircusMode ? brandingPack.typography.body : undefined }}
         >
-          Wenn deine Frage hier nicht beantwortet wurde, wende dich gerne an das Orga-Team per Whatsapp.
+          Wenn deine Frage hier nicht beantwortet wurde, wende dich gerne an das Orga-Team per
+          Whatsapp.
         </Typography>
       </Box>
     </FormCard>

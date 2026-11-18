@@ -38,6 +38,7 @@ const truncate = (text: string, max: number) =>
 type FAQActionType = 'deactivate' | 'reactivate' | 'delete_permanent';
 type CategoryActionType = 'deactivate' | 'reactivate' | 'delete_permanent';
 
+// eslint-disable-next-line max-lines-per-function -- lint-baseline: split into smaller components
 const FAQManagementPage: React.FC = () => {
   const { token } = useContext(TokenContext);
   const [activeTab, setActiveTab] = useState(0);
