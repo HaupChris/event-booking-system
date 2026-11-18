@@ -14,6 +14,7 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from src.services.app_settings_service import get_payment_link, get_rideshare_enabled
+from src.services.booking_events_service import record_profile_event
 from src.services.faq_service import get_faqs_grouped_by_category
 from src.services.mail_service import send_profile_recovery_mail
 from src.services.news_service import get_news_for_profile, get_unread_count, mark_news_as_read
@@ -514,7 +515,6 @@ def recover_profile():
         if not profiles:
             # Don't reveal whether email exists in system (security best practice)
             logger.info(f"No profiles found for email {email}, but returning success")
-            elapsed_time = time.time() - start_time
             return (
                 jsonify(
                     {
@@ -524,17 +524,16 @@ def recover_profile():
                 200,
             )
 
+        for profile in profiles:
+            record_profile_event(profile["profile_uuid"], "profile_link_requested")
+
         # Send recovery email
         try:
             send_profile_recovery_mail(email, profiles)
-            logger.info(f"Profile recovery email sent to {email} with {len(profiles)} profile(s)")
         except Exception as e:
             logger.exception(f"Failed to send recovery email to {email}: {str(e)}")
             # Don't expose email sending errors to user
             pass
-
-        elapsed_time = time.time() - start_time
-        logger.info(f"Profile recovery completed in {elapsed_time:.2f}s")
 
         return (
             jsonify(

@@ -14,6 +14,7 @@ from datetime import datetime
 from typing import Any
 
 from src.services.app_settings_service import get_public_app_url
+from src.services.booking_events_service import record_profile_event
 from src.services.mail_service import send_email
 from src.utils.logger import get_logger
 from src.utils.paths import get_db_file_path
@@ -419,8 +420,6 @@ def get_assigned_shifts(booking_id: int) -> list[dict[str, Any]]:
 def accept_shift(profile_uuid: str, assignment_id: int) -> bool:
     """Mark a shift assignment as accepted."""
     try:
-        logger.debug(f"Accepting shift assignment {assignment_id} for profile {profile_uuid}")
-
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
 
@@ -454,7 +453,7 @@ def accept_shift(profile_uuid: str, assignment_id: int) -> bool:
 
             conn.commit()
 
-            logger.info(f"Shift assignment {assignment_id} accepted by profile {profile_uuid}")
+            record_profile_event(profile_uuid, "shift_accepted", {"assignment_id": assignment_id})
             return True
 
     except sqlite3.Error as e:
@@ -470,8 +469,6 @@ def decline_shift(
 ) -> bool:
     """Mark a shift assignment as declined with optional reason and alternatives."""
     try:
-        logger.debug(f"Declining shift assignment {assignment_id} for profile {profile_uuid}")
-
         # Validate rejection reason (required, minimum 20 characters)
         MIN_REASON_LENGTH = 20  # noqa: N806  # lint-baseline
         if not rejection_reason or len(rejection_reason.strip()) < MIN_REASON_LENGTH:
@@ -520,7 +517,9 @@ def decline_shift(
 
             conn.commit()
 
-            logger.info(f"Shift assignment {assignment_id} declined by profile {profile_uuid}")
+            has_alternatives = bool(alternative_preferences)
+            details = {"assignment_id": assignment_id, "has_alternatives": has_alternatives}
+            record_profile_event(profile_uuid, "shift_declined", details)
             return True
 
     except sqlite3.Error as e:
@@ -693,8 +692,6 @@ def send_profile_link_email(profile_uuid: str, email: str, first_name: str) -> b
         True if email was sent successfully, False otherwise
     """
     try:
-        logger.debug(f"Sending profile link email to {email} for profile {profile_uuid}")
-
         base_url = get_public_app_url()
         profile_url = f"{base_url}/profile/{profile_uuid}"
 
@@ -725,11 +722,9 @@ Dein Wiesenwahn-Team
 
         success = send_email(recipient=email, subject=subject, body=body)
 
-        if success:
-            logger.info(f"Profile link email sent successfully to {email}")
-        else:
-            logger.error(f"Failed to send profile link email to {email}")
-
+        record_profile_event(
+            profile_uuid, "profile_link_sent" if success else "profile_link_send_failed"
+        )
         return success
 
     except Exception as e:

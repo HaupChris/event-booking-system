@@ -194,6 +194,11 @@ Client-Error-Endpunkt; (4) Klardaten entfernen und Log-Aufrufe auf Attribute ums
   Python rotiert (logrotate-Regel entfernt, Deploy löscht sie auf dem Server), Docker-Logs auf
   3 × 10 MB begrenzt, ungenutzter Security-Monitoring-Code entfernt, Ruff `G` aktiv
   (`G004`-Baseline: 21 Dateien), `logger.exception` statt `error(exc_info=True)`, lnav-Format
+- [x] **PR 2:** Pseudonyme `R-<id>`/`A-<id>` und `email_ref` (HMAC); Tabelle `BookingEvents` mit
+  Ereignis-Verlauf pro Buchung (wird mit der Buchung gelöscht), Admin-Endpunkt und Anzeige
+  „History“ in der Buchungsdetailansicht; Bestätigungsmails melden jetzt, ob der Versand klappte.
+  Dabei entfernt: doppelte Log-Zeilen, ungenutzte Artist-Hilfsfunktionen (alter, nicht
+  transaktionaler Einfügeweg) und `check_email_exists`
   - [ ] Alte Log-Dateien auf dem Server (`access.log*`, `errors.log*`, `debug.log*`) einmalig löschen
   - [ ] lnav-Format auf dem Server ausprobieren und ggf. korrigieren
 

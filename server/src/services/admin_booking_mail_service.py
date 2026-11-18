@@ -3,6 +3,7 @@ from typing import Literal, TypedDict
 
 from src.services.app_settings_service import get_payment_link, get_public_app_url
 from src.services.artist_service import get_all_artist_bookings, get_up_to_date_artist_form_content
+from src.services.booking_events_service import record_booking_event
 from src.services.booking_service import get_all_bookings, get_up_to_date_form_content
 from src.services.mail_service import send_email
 from src.utils.logger import get_logger
@@ -241,7 +242,13 @@ def send_custom_booking_mails(
         subject = render_custom_mail_template(subject_template, context)
         body = render_custom_mail_template(body_template, context)
 
-        if send_email(context["email"], subject, body):
+        sent = send_email(context["email"], subject, body)
+        record_booking_event(
+            selected_booking["booking_type"],
+            selected_booking["booking_id"],
+            "custom_mail_sent" if sent else "custom_mail_failed",
+        )
+        if sent:
             sent_count += 1
             continue
 

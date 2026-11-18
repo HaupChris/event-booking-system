@@ -35,7 +35,7 @@ dann hier ergänzen.
 |---|---|---|
 | `request_id` | Kennung des Requests, wird automatisch gesetzt und den Nutzern als Fehlercode angezeigt | `a1b2c3d4` |
 | `booking_ref` | Pseudonym einer Buchung: `R-<id>` regulär, `A-<id>` Artist | `R-123` |
-| `email_ref` | kurzer HMAC einer E-Mail, nur wenn es (noch) keine Buchung gibt, z. B. bei Recovery | `e:9f2c41` |
+| `email_ref` | kurzer HMAC einer E-Mail, nur wenn es (noch) keine Buchung gibt, z. B. bei Recovery | `e:9f2c41ab` |
 | `role` | Rolle aus dem JWT | `admin` |
 | `route`, `method`, `status`, `duration_ms` | Request-Daten, automatisch in `request_finished` | `bookings.submit_form` |
 | `reason` | maschinenlesbarer Grund für eine Ablehnung | `duplicate_booking` |
@@ -88,6 +88,29 @@ except SMTPException:
 - in `except`-Blöcken `logger.exception(...)` verwenden (Level `error` mit Stacktrace, Ruff `G201`),
   nicht `str(e)` in den Text kopieren
 - jede Exception nur einmal loggen: dort, wo sie behandelt wird
+
+## Ereignis-Verlauf pro Buchung
+
+Fachliche Ereignisse werden zusätzlich zur Log-Zeile in der Tabelle `BookingEvents` gespeichert
+und in der Admin-Buchungsansicht als „History“ angezeigt, zusammen mit dem Pseudonym (`R-123`),
+nach dem in den Logs gesucht werden kann. Der Verlauf wird mit der Buchung gelöscht.
+
+```python
+from src.services.booking_events_service import record_booking_event, record_profile_event
+
+record_booking_event("regular", booking_id, "payment_updated", {"is_paid": True, "paid_amount": 40})
+record_profile_event(profile_uuid, "shift_accepted", {"assignment_id": 17})  # nur UUID bekannt
+```
+
+- erlaubte Ereignisnamen stehen in `BOOKING_EVENTS` (`booking_events_service.py`); neue Namen
+  dort und im Frontend (`BookingEventHistory.tsx`, `EVENT_LABELS`) ergänzen
+- `details` folgen denselben Regeln wie Log-Attribute: keine personenbezogenen Daten, kein Freitext
+- in einer laufenden Transaktion `cursor=...` übergeben, damit Buchung und Ereignis gemeinsam
+  gespeichert oder verworfen werden
+
+Heute erfasst: Buchung angelegt, Bestätigungsmail versendet/fehlgeschlagen, von Admin bearbeitet,
+Zahlung aktualisiert, Schicht angenommen/abgelehnt, Profil-Link angefordert/versendet/fehlgeschlagen,
+Custom-Mail versendet/fehlgeschlagen.
 
 ## Durchsetzung
 

@@ -5,6 +5,11 @@ from typing import Any, cast
 
 from src.models.datatypes import ArtistBooking, ArtistBookingWithTimestamp
 from src.services.app_settings_service import get_form_step_descriptions, get_payment_link
+from src.services.booking_events_service import (
+    delete_booking_events,
+    payment_details,
+    record_booking_event,
+)
 from src.services.booking_service import DB_FILE_PATH
 from src.services.formcontent_service import (
     get_artist_form_content_obj,
@@ -267,7 +272,7 @@ def update_artist_booking(booking_id: int, booking_data: dict) -> bool:
                         (booking_id, material_id),
                     )
 
-            # Commit transaction
+            record_booking_event("artist", booking_id, "booking_updated_by_admin", cursor=cursor)
             conn.commit()
             return True
 
@@ -311,6 +316,8 @@ def update_artist_payment(booking_id: int, payment_data: dict) -> bool:
                 ),
             )
 
+            details = payment_details(payment_data)
+            record_booking_event("artist", booking_id, "payment_updated", details, cursor=cursor)
             conn.commit()
             return True
 
@@ -380,6 +387,10 @@ def insert_artist_bookings(bookings: list[ArtistBooking]) -> tuple[bool, list[st
                     ),
                 )
                 booking_id = cast(int, cursor.lastrowid)
+                details = {"ticket_id": booking.ticket_id}
+                record_booking_event(
+                    "artist", booking_id, "booking_created", details, cursor=cursor
+                )
 
                 for material_id in booking.artist_material_ids:
                     cursor.execute(
@@ -445,7 +456,8 @@ def delete_artist_booking(booking_id: int) -> bool:
 
             artist_id = result[0]
 
-            # Delete the booking
+            # Delete the booking and its event history
+            delete_booking_events(cursor, "artist", booking_id)
             cursor.execute("DELETE FROM ArtistBookings WHERE id = ?", (booking_id,))
 
             # Check if artist has other bookings, if not, delete the artist
@@ -484,26 +496,6 @@ def _to_signature_blob(signature: str | bytes) -> bytes:
     return decode_signature_to_blob(signature)
 
 
-def _artist_booking_exists(booking: ArtistBooking) -> bool:
-    """
-    Checks if an artist booking already exists with the same name and email.
-    """
-    with closing(_connect_db()) as conn:
-        cursor = conn.cursor()
-        cursor.execute(
-            """
-            SELECT COUNT(*)
-            FROM Artists a
-            JOIN ArtistBookings b ON a.id = b.artist_id
-            WHERE a.first_name = ?
-            AND a.last_name = ?
-            AND a.email = ?
-            """,
-            (booking.first_name, booking.last_name, booking.email),
-        )
-        return cursor.fetchone()[0] > 0
-
-
 def _artist_booking_exists_with_cursor(cursor: sqlite3.Cursor, booking: ArtistBooking) -> bool:
     """
     Checks if an artist booking already exists with the same name and email.
@@ -520,105 +512,3 @@ def _artist_booking_exists_with_cursor(cursor: sqlite3.Cursor, booking: ArtistBo
         (booking.first_name, booking.last_name, booking.email),
     )
     return cursor.fetchone()[0] > 0
-
-
-def _create_artist(booking: ArtistBooking) -> int:
-    """
-    Creates an artist in the Artists table and returns the artist_id.
-    """
-    with closing(_connect_db()) as conn:
-        cursor = conn.cursor()
-        cursor.execute(
-            """
-            INSERT INTO Artists (last_name, first_name, email, phone_number)
-            VALUES (?, ?, ?, ?)
-            """,
-            (booking.last_name, booking.first_name, booking.email, booking.phone),
-        )
-        conn.commit()
-        artist_id = cursor.lastrowid
-        if artist_id is None:
-            raise RuntimeError("Failed to create artist record")
-        return artist_id
-
-
-def _create_artist_booking(artist_id: int, booking: ArtistBooking) -> tuple[int, str | None]:
-    """
-    Creates an artist booking in the ArtistBookings table and returns (booking_id, profile_uuid).
-    """
-    # Generate unique profile UUID
-    profile_uuid = str(uuid.uuid4())
-    signature_blob = _to_signature_blob(booking.signature)
-
-    with closing(_connect_db()) as conn:
-        cursor = conn.cursor()
-        cursor.execute(
-            """
-            INSERT INTO ArtistBookings (
-                artist_id, ticket_option_id, beverage_option_id, food_option_id,
-                signature, total_price, is_paid, paid_amount, payment_notes, payment_date,
-                invited_by_id, equipment, special_requests, performance_details, profile_uuid
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                artist_id,
-                booking.ticket_id,
-                booking.beverage_id,
-                booking.food_id,
-                sqlite3.Binary(signature_blob),
-                booking.total_price,
-                booking.is_paid,
-                booking.paid_amount,
-                booking.payment_notes,
-                booking.payment_date,
-                booking.invited_by_id,
-                booking.equipment,
-                booking.special_requests,
-                booking.performance_details,
-                profile_uuid,
-            ),
-        )
-        conn.commit()
-        booking_id = cursor.lastrowid
-        if booking_id is None:
-            raise RuntimeError("Failed to create artist booking record")
-        return booking_id, profile_uuid
-
-
-def _assign_artist_materials(booking_id: int, material_ids: list[int]) -> None:
-    """
-    Inserts the chosen artist materials into ArtistBookingMaterials.
-    """
-    if not material_ids:
-        return
-    with closing(_connect_db()) as conn:
-        cursor = conn.cursor()
-        for material_id in material_ids:
-            cursor.execute(
-                """
-                INSERT INTO ArtistBookingMaterials (booking_id, artist_material_id)
-                VALUES (?, ?)
-                """,
-                (booking_id, material_id),
-            )
-        conn.commit()
-
-
-def _assign_artist_professions(booking_id: int, profession_ids: list[int]) -> None:
-    """
-    Inserts the chosen professions into ArtistBookingProfessions.
-    """
-    if not profession_ids:
-        return
-    with closing(_connect_db()) as conn:
-        cursor = conn.cursor()
-        for profession_id in profession_ids:
-            cursor.execute(
-                """
-                INSERT INTO ArtistBookingProfessions (booking_id, profession_id)
-                VALUES (?, ?)
-                """,
-                (booking_id, profession_id),
-            )
-        conn.commit()

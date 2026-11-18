@@ -15,7 +15,7 @@ from src.services.artist_service import (
     update_artist_booking,
     update_artist_payment,
 )
-from src.services.mail_service import send_artist_confirmation_mail
+from src.services.confirmation_mail_service import send_confirmation
 from src.services.orga_team_service import is_valid_active_orga_team_member
 from src.services.pricing_service import SERVER_OWNED_PAYMENT_DEFAULTS, calculate_option_total
 from src.utils.logger import get_logger
@@ -159,16 +159,8 @@ def submit_artist_form():  # noqa: C901, PLR0911, PLR0912, PLR0915  # lint-basel
         success, profile_uuids = insert_artist_bookings(bookings_to_insert)
 
         if success:
-            try:
-                for booked_artist, profile_uuid in zip(
-                    bookings_to_insert, profile_uuids, strict=False
-                ):
-                    send_artist_confirmation_mail(booked_artist, form_content_dict, profile_uuid)
-                logger.info(f"Artist booking and confirmation email successful for {artist_name}")
-            except Exception as email_error:
-                logger.exception(
-                    f"Artist booking successful but email failed for {artist_name}: {str(email_error)}",
-                )
+            for booked_artist, profile_uuid in zip(bookings_to_insert, profile_uuids, strict=False):
+                send_confirmation(booked_artist, form_content_dict, profile_uuid)
 
             duration = time.time() - start_time
             logger.info(f"Artist booking process completed in {duration:.3f}s for {artist_name}")

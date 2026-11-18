@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from flask import Flask, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from src.api.admin_booking_events import admin_booking_events_bp
 from src.api.admin_booking_mails import admin_booking_mails_bp
 from src.api.admin_faq import admin_faq_bp
 from src.api.admin_news import admin_news_bp
@@ -97,6 +98,7 @@ app.register_blueprint(settings_bp, url_prefix="/api")
 app.register_blueprint(profile_bp, url_prefix="/api/profile")
 app.register_blueprint(admin_faq_bp, url_prefix="/api/admin")
 app.register_blueprint(admin_booking_mails_bp, url_prefix="/api/admin")
+app.register_blueprint(admin_booking_events_bp, url_prefix="/api/admin")
 app.register_blueprint(admin_news_bp, url_prefix="/api/admin")
 app.register_blueprint(admin_profiles_bp, url_prefix="/api/admin")
 app.register_blueprint(admin_settings_bp, url_prefix="/api/admin")
