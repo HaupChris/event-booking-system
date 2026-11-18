@@ -88,9 +88,9 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
   Maßnahme: `Content-Security-Policy` setzen, veralteten `X-XSS-Protection`-Header entfernen,
   Unterschrift nicht im Entwurf persistieren.
 
-- [ ] **S7 – Personendaten in Logs.**
-  E-Mail, Namen und volle UUIDs werden auf INFO geloggt (`bookings.py`, `profile.py`, …).
-  Maßnahme: zentrale Maskierungs-Hilfe im Logger.
+- [ ] **S7 – Personendaten in Logs.** Bewusste Entscheidung für den Support (Nutzerprobleme
+  nachvollziehen). Wird nicht einfach entfernt, sondern durch das Logging- und Support-Konzept
+  (Phase L) ersetzt. Erst wenn das steht, werden Namen/E-Mails/UUIDs aus den Logs entfernt.
 
 - [ ] **S8 – Buchung nicht atomar, Foreign Keys aus.**
   `create_user`, `create_booking`, `assign_materials`, `assign_professions` committen jeweils
@@ -106,7 +106,7 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
   - Links laufen nie ab und lassen sich nicht widerrufen; eine weitergeleitete Mail heißt Vollzugriff,
     inkl. schreibender Aktionen (Schichten annehmen/ablehnen, Mitfahr-Posts)
   - Keine eigene Rate-Limit-Zone für `/api/profile/` (siehe S4)
-  Maßnahmen: UUID in Logs maskieren, `no-store` für Profil-Antworten und kein SW-Caching,
+  Maßnahmen: UUID in Logs pseudonymisieren (Phase L), `no-store` für Profil-Antworten und kein SW-Caching,
   Antwort auf nötige Felder reduzieren, Link-Rotation (Admin + bei Recovery), optional Ablauf
   nach dem Festival; mittelfristig Link → kurzlebiges Session-Token statt UUID in jeder API-URL.
 
@@ -117,6 +117,39 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
 - [ ] Jeder Fix in Phase 0 bekommt zuerst einen Test, der die Lücke nachweist.
 - [ ] Vor Phase 1: Tests für Buchung (user + artist), Auth, Admin-Zugriffsschutz
   (parametrisiert über alle Routen), Profil-Endpunkte, Admin-CRUD.
+
+---
+
+## Phase L – Logging- und Support-Konzept
+
+**Zielkonflikt:** Datensparsam sein und trotzdem Nutzerprobleme schnell finden und reproduzieren.
+Heute werden dafür Namen, E-Mails und UUIDs geloggt; im Frontend gibt es gar kein Logging.
+
+**Grundidee:** Logs enthalten keine Klardaten, sind aber über Pseudonyme und Fehlercodes gezielt
+einer Buchung zuordenbar, und zwar nur für Admins, die die Buchung ohnehin sehen dürfen.
+
+- [ ] **Fehlercode für Nutzer.** Jede Antwort bekommt `X-Request-ID` (existiert schon als
+  `g.request_id`, wird aber nicht zurückgegeben). Das Frontend zeigt bei Fehlern
+  „Fehlercode: a1b2c3d4“. Nutzer schicken den Code mit → genau ein Log-Eintrag statt Suche nach Namen.
+- [ ] **Pseudonyme statt Klardaten.** Statt Name/E-Mail/UUID wird `booking_id` bzw. ein kurzer
+  HMAC der Profil-UUID (Server-Secret) geloggt. Im Admin-Bereich zeigt jede Buchung ihr Pseudonym
+  → `grep` in den Logs findet alle Einträge dieser Person. Ohne Admin-Zugang sind Logs nicht zuordenbar.
+- [ ] **Ereignis-Verlauf pro Buchung (Audit-Tabelle in der DB).** Fachliche Ereignisse wie
+  „Buchung angelegt“, „Bestätigungsmail versendet/fehlgeschlagen“, „Schicht abgelehnt“,
+  „Zahlung erfasst“, „Recovery-Mail angefordert“ landen in einer Tabelle und sind in der
+  Admin-Buchungsansicht sichtbar. Löst die meisten Support-Fälle ohne Logs. Wird mit der Buchung gelöscht.
+- [ ] **Frontend-Fehler erfassen.** Error-Boundary + `window.onerror`/`unhandledrejection` +
+  zentraler Axios-Fehler-Handler (F1) senden an `POST /api/client-errors`: Fehlertyp, Meldung,
+  Stacktrace, Route **ohne** UUID, App-Version, Request-ID, Browser grob. Keine Formulardaten.
+  Rate-limitiert, Größe begrenzt, ohne Auth nutzbar. Selbst gebaut statt Sentry/GlitchTip
+  (VPS mit 512 MB RAM; keine Daten an Dritte).
+- [ ] **Strukturierte Logs.** JSON-Zeilen mit festen Feldern (`request_id`, `route`, `status`,
+  `duration_ms`, `booking_ref`, `event`); erleichtert Suche und spätere Auswertung.
+- [ ] **Aufbewahrung festlegen.** Heute rotieren Python (30 Tage) und logrotate (7 Tage)
+  dieselben Dateien → auf einen Mechanismus reduzieren. Vorschlag: Anwendungs-Logs 14 Tage,
+  Security-Events (pseudonym) 90 Tage, Debug-Logs in Produktion aus.
+- [ ] **Danach:** Klardaten aus allen Log-Aufrufen entfernen (S7) und per Test absichern
+  (Log-Ausgabe einer Buchung darf weder E-Mail noch Namen enthalten).
 
 ---
 
