@@ -18,10 +18,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.8.0",
-    "mypy>=1.13.0",
+    "ruff==0.14.10",  # keep in sync with .pre-commit-config.yaml
+    "mypy==1.19.1",  # keep in sync with .pre-commit-config.yaml
     "pre-commit>=4.0.0",
-    "import-linter>=2.1",
+    "import-linter==2.17",  # keep in sync with .pre-commit-config.yaml
     "pytest-cov>=6.0.0",
     "types-requests>=2.32.0",
     "types-Flask>=1.1.6",
