@@ -108,9 +108,14 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
   - Links laufen nie ab und lassen sich nicht widerrufen; eine weitergeleitete Mail heißt Vollzugriff,
     inkl. schreibender Aktionen (Schichten annehmen/ablehnen, Mitfahr-Posts)
   - Keine eigene Rate-Limit-Zone für `/api/profile/` (siehe S4)
-  Maßnahmen: UUID in Logs pseudonymisieren (Phase L), `no-store` für Profil-Antworten und kein SW-Caching,
-  Antwort auf nötige Felder reduzieren, Link-Rotation (Admin + bei Recovery), optional Ablauf
-  nach dem Festival; mittelfristig Link → kurzlebiges Session-Token statt UUID in jeder API-URL.
+  - [x] `Cache-Control: no-store` für alle Profil-Antworten
+  - [x] Eigene nginx-Rate-Limit-Zone für `/api/profile/` (S4)
+  - [x] Admin-Hinweis: „Payment Notes“ sind für Teilnehmende im Profil sichtbar
+  - [ ] UUID in Logs pseudonymisieren (Phase L)
+  - [ ] Link-Rotation durch Admins (bei Verdacht auf Weitergabe), optional Ablauf nach dem Festival
+  - [ ] Mittelfristig: Link → kurzlebiges Session-Token statt UUID in jeder API-URL
+  - Bewusst beibehalten: Offline-Cache des Service Workers für Profildaten (schlechter Empfang auf
+    dem Festival; Daten liegen nur auf dem Gerät der Person). Cache API ignoriert `no-store`.
 
 ### Voraussetzung: Charakterisierungstests
 

@@ -155,6 +155,7 @@ const PaymentManagementModal: React.FC<PaymentManagementModalProps> = ({
               value={editedBooking.payment_notes || ''}
               onChange={(event) => onInputChange('payment_notes', event.target.value)}
               placeholder="Enter any notes about the payment..."
+              helperText="Visible to the participant on their profile page. No internal notes."
             />
           </Grid>
         </Grid>
@@ -194,21 +195,16 @@ const PaymentConfirmationsPage: React.FC = () => {
   });
 
   // Sort bookings
+  const sortDirection = sortOrder === 'asc' ? 1 : -1;
   const sortedBookings = [...filteredBookings].sort((a, b) => {
     if (sortBy === 'name') {
       const nameA = `${a.last_name} ${a.first_name}`.toLowerCase();
-      const nameB = `${b.last_name} ${b.first_name}`.toLowerCase();
-      return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-    } else if (sortBy === 'date') {
-      const dateA = a.payment_date || '0';
-      const dateB = b.payment_date || '0';
-      return sortOrder === 'asc' ? dateA.localeCompare(dateB) : dateB.localeCompare(dateA);
-    } else {
-      // amount
-      const amountA = a.paid_amount || 0;
-      const amountB = b.paid_amount || 0;
-      return sortOrder === 'asc' ? amountA - amountB : amountB - amountA;
+      return sortDirection * nameA.localeCompare(`${b.last_name} ${b.first_name}`.toLowerCase());
     }
+    if (sortBy === 'date') {
+      return sortDirection * (a.payment_date || '0').localeCompare(b.payment_date || '0');
+    }
+    return sortDirection * ((a.paid_amount || 0) - (b.paid_amount || 0)); // amount
   });
 
   const handleOpenModal = (booking: CombinedBooking) => {

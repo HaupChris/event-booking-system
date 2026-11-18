@@ -7,8 +7,11 @@ Authentication is handled via profile UUID in the URL path.
 """
 
 import time
+from collections.abc import Callable
+from functools import wraps
+from typing import Any
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from src.services.app_settings_service import get_payment_link, get_rideshare_enabled
 from src.services.faq_service import get_faqs_grouped_by_category
@@ -41,6 +44,13 @@ profile_bp = Blueprint("profile", __name__)
 limiter_profile = limiter
 
 
+@profile_bp.after_request
+def _disable_caching(response: Response) -> Response:
+    """Profile responses contain personal data: keep them out of browser and proxy caches."""
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 def _ensure_rideshare_enabled():
     if get_rideshare_enabled():
         return None
@@ -52,6 +62,14 @@ def _ensure_rideshare_enabled():
         ),
         403,
     )
+
+
+def _rideshare_enabled_required(view: Callable) -> Callable:
+    @wraps(view)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        return _ensure_rideshare_enabled() or view(*args, **kwargs)
+
+    return wrapper
 
 
 @profile_bp.route("/<profile_uuid>", methods=["GET"])
@@ -142,15 +160,12 @@ def get_shift_messages_for_profile(profile_uuid: str):
 
 @profile_bp.route("/<profile_uuid>/rideshare", methods=["GET"])
 @limiter_profile.limit("100/minute")
+@_rideshare_enabled_required
 def get_rideshare(profile_uuid: str):
     """Get ride sharing board data for a profile."""
     client_ip = request.remote_addr
 
     try:
-        disabled_response = _ensure_rideshare_enabled()
-        if disabled_response:
-            return disabled_response
-
         logger.debug(f"Ride sharing board request for UUID {profile_uuid[:8]}... from {client_ip}")
 
         rideshare = get_rideshare_board(profile_uuid)
@@ -166,15 +181,12 @@ def get_rideshare(profile_uuid: str):
 
 @profile_bp.route("/<profile_uuid>/rideshare/posts", methods=["POST"])
 @limiter_profile.limit("30/minute")
+@_rideshare_enabled_required
 def create_rideshare(profile_uuid: str):
     """Create a ride sharing offer or request for a profile."""
     client_ip = request.remote_addr
 
     try:
-        disabled_response = _ensure_rideshare_enabled()
-        if disabled_response:
-            return disabled_response
-
         logger.info(f"Ride share post create for UUID {profile_uuid[:8]}... from {client_ip}")
 
         data = request.json or {}
@@ -202,15 +214,12 @@ def create_rideshare(profile_uuid: str):
 
 @profile_bp.route("/<profile_uuid>/rideshare/posts/<int:post_id>/react", methods=["POST"])
 @limiter_profile.limit("40/minute")
+@_rideshare_enabled_required
 def react_to_rideshare(profile_uuid: str, post_id: int):
     """React to a ride share post (offer or request)."""
     client_ip = request.remote_addr
 
     try:
-        disabled_response = _ensure_rideshare_enabled()
-        if disabled_response:
-            return disabled_response
-
         logger.info(
             f"Ride share reaction for UUID {profile_uuid[:8]}..., post {post_id} from {client_ip}"
         )
@@ -235,15 +244,12 @@ def react_to_rideshare(profile_uuid: str, post_id: int):
     "/<profile_uuid>/rideshare/join-requests/<int:request_id>/approve", methods=["PUT"]
 )
 @limiter_profile.limit("60/minute")
+@_rideshare_enabled_required
 def approve_rideshare_join(profile_uuid: str, request_id: int):
     """Approve a ride share response for an owned post."""
     client_ip = request.remote_addr
 
     try:
-        disabled_response = _ensure_rideshare_enabled()
-        if disabled_response:
-            return disabled_response
-
         logger.info(
             f"Ride share join approval for UUID {profile_uuid[:8]}..., request {request_id} from {client_ip}"
         )
@@ -267,15 +273,12 @@ def approve_rideshare_join(profile_uuid: str, request_id: int):
     "/<profile_uuid>/rideshare/join-requests/<int:request_id>/reject", methods=["PUT"]
 )
 @limiter_profile.limit("60/minute")
+@_rideshare_enabled_required
 def reject_rideshare_join(profile_uuid: str, request_id: int):
     """Reject a ride share response for an owned post."""
     client_ip = request.remote_addr
 
     try:
-        disabled_response = _ensure_rideshare_enabled()
-        if disabled_response:
-            return disabled_response
-
         logger.info(
             f"Ride share join rejection for UUID {profile_uuid[:8]}..., request {request_id} from {client_ip}"
         )
@@ -297,15 +300,12 @@ def reject_rideshare_join(profile_uuid: str, request_id: int):
 
 @profile_bp.route("/<profile_uuid>/rideshare/posts/<int:post_id>", methods=["DELETE"])
 @limiter_profile.limit("30/minute")
+@_rideshare_enabled_required
 def cancel_rideshare(profile_uuid: str, post_id: int):
     """Cancel an owned ride share post."""
     client_ip = request.remote_addr
 
     try:
-        disabled_response = _ensure_rideshare_enabled()
-        if disabled_response:
-            return disabled_response
-
         logger.info(
             f"Ride share post cancel for UUID {profile_uuid[:8]}..., post {post_id} from {client_ip}"
         )
@@ -327,15 +327,12 @@ def cancel_rideshare(profile_uuid: str, post_id: int):
 
 @profile_bp.route("/<profile_uuid>/rideshare/posts/<int:post_id>/complete", methods=["PUT"])
 @limiter_profile.limit("30/minute")
+@_rideshare_enabled_required
 def complete_rideshare(profile_uuid: str, post_id: int):
     """Mark an owned ride share post as completed."""
     client_ip = request.remote_addr
 
     try:
-        disabled_response = _ensure_rideshare_enabled()
-        if disabled_response:
-            return disabled_response
-
         logger.info(
             f"Ride share post complete for UUID {profile_uuid[:8]}..., post {post_id} from {client_ip}"
         )
