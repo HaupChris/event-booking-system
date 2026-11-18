@@ -43,8 +43,31 @@ def _send_message(msg: MIMEMultipart, recipient: str) -> bool:
         return False
 
 
+def _text_to_html(text: str) -> str:
+    """Escape plain text for HTML and keep its line breaks."""
+    return escape(text).replace("\n", "<br>")
+
+
+def _option_title(options: list[dict], option_id: int, fallback: str) -> str:
+    option = next((option for option in options if option["id"] == option_id), None)
+    return escape(option["title"]) if option else fallback
+
+
+def _escaped_option_titles(
+    booking: Booking | ArtistBooking, form_content: dict
+) -> tuple[str, str, str]:
+    """HTML-escaped ticket, beverage and food titles of a booking."""
+    return (
+        _option_title(form_content["ticket_options"], booking.ticket_id, "Ticket nicht gefunden"),
+        _option_title(
+            form_content["beverage_options"], booking.beverage_id, "Getränkeoption nicht gefunden"
+        ),
+        _option_title(form_content["food_options"], booking.food_id, "Essensoption nicht gefunden"),
+    )
+
+
 def _render_basic_html_email(body: str) -> str:
-    escaped_body = escape(body).replace("\n", "<br>")
+    escaped_body = _text_to_html(body)
     return (
         "<html><body>"
         f'<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222;">{escaped_body}</div>'
@@ -158,24 +181,10 @@ def send_confirmation_mail(
     base_url = get_public_app_url()
     payment_link = get_payment_link()
 
-    booking_details_html = get_booking_details(booking, form_content).replace("\n", "<br>")
+    booking_details_html = _text_to_html(get_booking_details(booking, form_content))
 
-    # Ticket, beverage, and food title (for PayPal subject)
-    ticket_option = next(
-        (to for to in form_content["ticket_options"] if to["id"] == booking.ticket_id), None
-    )
-    beverage_option = next(
-        (bo for bo in form_content["beverage_options"] if bo["id"] == booking.beverage_id), None
-    )
-    food_option = next(
-        (fo for fo in form_content["food_options"] if fo["id"] == booking.food_id), None
-    )
-
-    ticket_title = ticket_option["title"] if ticket_option else "Ticket nicht gefunden"
-    beverage_title = (
-        beverage_option["title"] if beverage_option else "Getränkeoption nicht gefunden"
-    )
-    food_title = food_option["title"] if food_option else "Essensoption nicht gefunden"
+    # Ticket, beverage, and food title (for the payment reference)
+    ticket_title, beverage_title, food_title = _escaped_option_titles(booking, form_content)
 
     subject = "Zirkus Wiesenwahn - Deine Buchung ist bestätigt!"
 
@@ -186,12 +195,12 @@ def send_confirmation_mail(
           <div class="details">
             <h3>🎪 Dein persönliches Profil</h3>
             <p>Zugriff auf dein Profil für Neuigkeiten, Schichteneinteilung und mehr:</p>
-            <a href="{profile_url}" class="btn">ZUM PROFIL</a>
+            <a href="{escape(profile_url)}" class="btn">ZUM PROFIL</a>
             <p style="font-size: 0.9em; color: #999; margin-top: 10px;">
               💡 Speichere diesen Link! Du brauchst ihn später für Updates zu deinen Schichten und Festival-Neuigkeiten.
             </p>
             <p style="font-size: 0.85em; color: #d1b67b; margin-top: 5px;">
-              Link verloren? Fordere ihn erneut an unter: <a href="{base_url}/profile/recover" style="color: #f0c55f;">Profile wiederherstellen</a>
+              Link verloren? Fordere ihn erneut an unter: <a href="{escape(base_url)}/profile/recover" style="color: #f0c55f;">Profile wiederherstellen</a>
             </p>
           </div>
         """
@@ -299,7 +308,7 @@ def send_confirmation_mail(
         </div>
 
         <div class="content">
-          <h2>Buchung bestätigt, {booking.first_name}!</h2>
+          <h2>Buchung bestätigt, {escape(booking.first_name)}!</h2>
 
           <p>Willkommen in der Manege! Wir haben deine Teilnahme am Zirkus Wiesenwahn erfolgreich registriert.</p>
 
@@ -310,10 +319,10 @@ def send_confirmation_mail(
 
           <p>Für deine Teilnahme fehlt nur noch dein Beitrag:</p>
 
-          <a href="{payment_link}" class="btn">BEITRAG JETZT ZAHLEN</a>
+          <a href="{escape(payment_link)}" class="btn">BEITRAG JETZT ZAHLEN</a>
 
           <p>Betreff für die Zahlung:<br>
-          <strong>WW26 - {booking.first_name}, {booking.last_name} - {ticket_title} - {beverage_title} - {food_title}</strong></p>
+          <strong>WW26 - {escape(booking.first_name)}, {escape(booking.last_name)} - {ticket_title} - {beverage_title} - {food_title}</strong></p>
 
           <p>Weitere Informationen teilen wir dir rechtzeitig über deine <b>Profilseite</b> mit.</p>
 
@@ -356,24 +365,10 @@ def send_artist_confirmation_mail(
     payment_link = get_payment_link()
 
     # Get booking details in HTML format
-    booking_details_html = get_artist_booking_details(booking, form_content).replace("\n", "<br>")
+    booking_details_html = _text_to_html(get_artist_booking_details(booking, form_content))
 
-    # Get ticket, beverage, and food titles for PayPal subject
-    ticket_option = next(
-        (to for to in form_content["ticket_options"] if to["id"] == booking.ticket_id), None
-    )
-    beverage_option = next(
-        (bo for bo in form_content["beverage_options"] if bo["id"] == booking.beverage_id), None
-    )
-    food_option = next(
-        (fo for fo in form_content["food_options"] if fo["id"] == booking.food_id), None
-    )
-
-    ticket_title = ticket_option["title"] if ticket_option else "Ticket nicht gefunden"
-    beverage_title = (
-        beverage_option["title"] if beverage_option else "Getränkeoption nicht gefunden"
-    )
-    food_title = food_option["title"] if food_option else "Essensoption nicht gefunden"
+    # Ticket, beverage, and food title (for the payment reference)
+    ticket_title, beverage_title, food_title = _escaped_option_titles(booking, form_content)
 
     subject = "Zirkus Wiesenwahn - Schön, dass du zu uns kommst!"
 
@@ -384,12 +379,12 @@ def send_artist_confirmation_mail(
           <div class="details">
             <h3>🎪 Dein persönliches Profil</h3>
             <p>Zugriff auf dein Profil für Neuigkeiten und Festival-Updates:</p>
-            <a href="{profile_url}" class="btn">ZUM PROFIL</a>
+            <a href="{escape(profile_url)}" class="btn">ZUM PROFIL</a>
             <p style="font-size: 0.9em; color: #999; margin-top: 10px;">
               💡 Speichere diesen Link! Du brauchst ihn später für Festival-Neuigkeiten und Updates.
             </p>
             <p style="font-size: 0.85em; color: #d1b67b; margin-top: 5px;">
-              Link verloren? Fordere ihn erneut an unter: <a href="{base_url}/profile/recover" style="color: #f0c55f;">Profile wiederherstellen</a>
+              Link verloren? Fordere ihn erneut an unter: <a href="{escape(base_url)}/profile/recover" style="color: #f0c55f;">Profile wiederherstellen</a>
             </p>
           </div>
         """
@@ -509,7 +504,7 @@ def send_artist_confirmation_mail(
 
         <div class="content">
           <div class="artist-badge">KÜNSTLER</div>
-          <h2>Anmeldung bestätigt, {booking.first_name}!</h2>
+          <h2>Anmeldung bestätigt, {escape(booking.first_name)}!</h2>
 
           <p>Willkommen! Wir freuen uns, dass du uns als Künstler*in beim Zirkus Wiesenwahn bereicherst!</p>
 
@@ -523,10 +518,10 @@ def send_artist_confirmation_mail(
         and f'''
           <p>Für deine Buchung ist noch ein Beitrag erforderlich:</p>
 
-          <a href="{payment_link}" class="btn">BEITRAG JETZT ÜBERWEISEN</a>
+          <a href="{escape(payment_link)}" class="btn">BEITRAG JETZT ÜBERWEISEN</a>
 
           <p>Betreff für die Überweisung:<br>
-          <strong>WWWW ARTIST - {booking.first_name}, {booking.last_name} - {ticket_title} - {beverage_title} - {food_title}</strong></p>
+          <strong>WWWW ARTIST - {escape(booking.first_name)}, {escape(booking.last_name)} - {ticket_title} - {beverage_title} - {food_title}</strong></p>
           '''
         or "<p>Für dich als Künstler*in fallen keine Kosten an.</p>"
     }
@@ -656,9 +651,9 @@ def send_profile_recovery_mail(email: str, profiles: list) -> None:
         booking_type_label = "Künstler" if profile["booking_type"] == "artist" else "Regular"
         profile_links_html += f"""
           <div class="profile-item">
-            <h4>{profile["name"]} ({booking_type_label})</h4>
-            <p style="font-size: 0.9em; color: #999;">Buchung vom: {profile["timestamp"][:10]}</p>
-            <a href="{profile_url}" class="btn">PROFIL ÖFFNEN</a>
+            <h4>{escape(str(profile["name"]))} ({booking_type_label})</h4>
+            <p style="font-size: 0.9em; color: #999;">Buchung vom: {escape(str(profile["timestamp"])[:10])}</p>
+            <a href="{escape(profile_url)}" class="btn">PROFIL ÖFFNEN</a>
           </div>
         """
 
