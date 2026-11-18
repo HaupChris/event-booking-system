@@ -77,7 +77,7 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
   `request.remote_addr` nach `ProxyFix`.
 
 - [ ] **S5 – Sensible Dateien im Git.**
-  `data/bookings.db`, `frontend/build/`, `.github/artifacts/vulverability-report.csv` sind eingecheckt.
+  ~~`data/bookings.db`~~ (war in der gesamten History leer; aus dem Index entfernt, `*.db` ignoriert), `frontend/build/`, `.github/artifacts/vulverability-report.csv` sind eingecheckt.
   Außerdem stand in `test/test_api.py` ein Klartext-Passwort (Datei inzwischen entfernt, in der
   History aber noch vorhanden).
   Maßnahme: prüfen, ob echte Personendaten enthalten sind und ob das Passwort noch irgendwo

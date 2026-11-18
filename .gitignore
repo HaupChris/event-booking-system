@@ -33,3 +33,6 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 .import_linter_cache/
+
+# Local databases (may contain personal data)
+*.db
