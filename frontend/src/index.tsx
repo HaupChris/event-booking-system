@@ -1,7 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import axios from 'axios';
 import App from './App';
+import ErrorBoundary from './components/core/feedback/ErrorBoundary';
+import apiClient from './services/apiClient';
+import { installApiErrorReporting, installGlobalErrorHandlers } from './utils/errorReporting';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import type { BeforeInstallPromptEvent } from './serviceWorkerRegistration';
@@ -23,10 +27,16 @@ if (import.meta.env.DEV) {
   );
 }
 
+installGlobalErrorHandlers();
+installApiErrorReporting(axios);
+installApiErrorReporting(apiClient);
+
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </React.StrictMode>
 );
 

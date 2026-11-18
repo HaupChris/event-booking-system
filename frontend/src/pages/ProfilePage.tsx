@@ -24,6 +24,7 @@ import RideSharing from '../components/profile/RideSharing';
 import FAQs from '../components/profile/FAQs';
 import { getFrontendSettings } from '../services/frontendSettingsService';
 import MissionHeading from '../components/core/display/MissionHeading';
+import { withErrorCode } from '../utils/errorReporting';
 
 const RideShareNotice: React.FC = () => (
   <Box sx={{ pb: 1 }}>
@@ -256,7 +257,10 @@ const ProfilePage: React.FC = () => {
     return (
       <Container sx={{ mt: 4 }}>
         <Alert severity="error">
-          Fehler beim Laden des Profils. Bitte ueberpruefe den Link oder versuche es spaeter erneut.
+          {withErrorCode(
+            'Fehler beim Laden des Profils. Bitte ueberpruefe den Link oder versuche es spaeter erneut.',
+            error
+          )}
         </Alert>
       </Container>
     );

@@ -11,6 +11,7 @@ import StepNavigation from '../navigation/StepNavigation';
 import { useFormManagement } from '../../../hooks/useFormManagement';
 import taenzerinImage from '../../../img/taenzerin.png';
 import { useBrandingPack } from '../../../branding/useBrandingPack';
+import { withErrorCode } from '../../../utils/errorReporting';
 
 const getErrorResponseDetail = (error: unknown): string | undefined => {
   if (
@@ -202,7 +203,7 @@ export function RegistrationFormContainer<
           return;
         }
 
-        setCurrentError(getFormContentErrorMessage(error));
+        setCurrentError(withErrorCode(getFormContentErrorMessage(error), error));
       });
   }, [config.apiEndpoints.formContent, setAuth, setCurrentError, setToken, token]);
 
@@ -311,7 +312,7 @@ export function RegistrationFormContainer<
             isSubmitted: true,
             isSubmitting: false,
           });
-          setCurrentError(getSubmitErrorMessage(error));
+          setCurrentError(withErrorCode(getSubmitErrorMessage(error), error));
         }
       });
   };

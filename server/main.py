@@ -19,6 +19,7 @@ from src.api.admin_workshifts import admin_workshifts_bp
 from src.api.artist_bookings import artist_bp
 from src.api.auth import auth_bp
 from src.api.bookings import bookings_bp
+from src.api.client_errors import client_errors_bp
 from src.api.formcontent import formcontent_bp
 from src.api.health import health_bp
 from src.api.profile import profile_bp
@@ -92,6 +93,7 @@ app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(bookings_bp, url_prefix="/api")
 app.register_blueprint(formcontent_bp, url_prefix="/api")
 app.register_blueprint(health_bp, url_prefix="/api")
+app.register_blueprint(client_errors_bp, url_prefix="/api")
 app.register_blueprint(artist_bp, url_prefix="/api")
 app.register_blueprint(shift_assignments_bp, url_prefix="/api")
 app.register_blueprint(settings_bp, url_prefix="/api")

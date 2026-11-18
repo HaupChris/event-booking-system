@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { withErrorCode } from '../../utils/errorReporting';
 import type { Dayjs } from 'dayjs';
 import { Alert, Box, CircularProgress } from '@mui/material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
@@ -32,13 +33,8 @@ interface RideSharingProps {
 }
 
 const getErrorMessage = (error: unknown, fallback: string) => {
-  if (axios.isAxiosError(error)) {
-    const message = error.response?.data?.error;
-    if (typeof message === 'string' && message.trim()) {
-      return message;
-    }
-  }
-  return fallback;
+  const message: unknown = axios.isAxiosError(error) ? error.response?.data?.error : undefined;
+  return typeof message === 'string' && message.trim() ? message : withErrorCode(fallback, error);
 };
 
 const RideSharing: React.FC<RideSharingProps> = ({ viewMode }) => {

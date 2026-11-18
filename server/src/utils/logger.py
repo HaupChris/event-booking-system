@@ -27,6 +27,7 @@ SECURITY_LOGGER_NAME = "security"
 MAX_VALUE_LENGTH = 200
 MAX_EVENT_LENGTH = 500
 MAX_EXCEPTION_LENGTH = 8000
+MAX_STACK_LENGTH = 2000
 MAX_COLLECTION_ITEMS = 20
 TRUNCATED = "…[truncated]"
 REDACTED = "[redacted]"
@@ -73,6 +74,8 @@ def sanitize_event(_logger: Any, _method: str, event_dict: dict[str, Any]) -> di
             event_dict[key] = _limit(str(value), MAX_EVENT_LENGTH)
         elif key == "exception":
             event_dict[key] = _limit(str(value), MAX_EXCEPTION_LENGTH)
+        elif key == "stack":  # browser stack traces from /api/client-errors
+            event_dict[key] = _limit(str(value), MAX_STACK_LENGTH)
         elif _is_sensitive(key):
             event_dict[key] = REDACTED
         else:
