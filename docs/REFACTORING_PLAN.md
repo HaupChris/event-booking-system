@@ -98,6 +98,18 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
   Maßnahme: eine Transaktion pro Buchung, Foreign Keys aktivieren.
   *Noch zu prüfen:* ob Ticket-Kontingente (`amount`) beim Buchen durchgesetzt werden.
 
+- [ ] **S9 – Profil-Links (UUID als einziges Geheimnis).**
+  Die UUID (v4, 122 Bit Zufall) ist nicht erratbar. Das Risiko ist, dass der Link nach außen gelangt:
+  - Volle UUID im App-Request-Log (`log_request` loggt `request.path`) und im nginx-Access-Log
+  - Profil-Antworten (E-Mail, Telefon, Zahlungsstatus) cacht der Service Worker
+    (`frontend/public/service-worker.js`); kein `Cache-Control: no-store`
+  - Links laufen nie ab und lassen sich nicht widerrufen; eine weitergeleitete Mail heißt Vollzugriff,
+    inkl. schreibender Aktionen (Schichten annehmen/ablehnen, Mitfahr-Posts)
+  - Keine eigene Rate-Limit-Zone für `/api/profile/` (siehe S4)
+  Maßnahmen: UUID in Logs maskieren, `no-store` für Profil-Antworten und kein SW-Caching,
+  Antwort auf nötige Felder reduzieren, Link-Rotation (Admin + bei Recovery), optional Ablauf
+  nach dem Festival; mittelfristig Link → kurzlebiges Session-Token statt UUID in jeder API-URL.
+
 ### Voraussetzung: Charakterisierungstests
 
 - [x] Testinfrastruktur (`server/test/conftest.py`): Flask-Test-Client, isolierte DB pro Test
@@ -194,6 +206,40 @@ Erfordert Datenmigration mit Backup → erst nach Phase 0/1 und mit Testabdeckun
 - [ ] **Rollback-fähige Images.** Zusätzlich zum `:latest` mit Commit-SHA taggen.
 - [ ] **nginx entdoppeln.** `frontend/nginx/default.conf` dupliziert Rate-Limit-Zonen und Auth-Routen des
   Host-nginx → Rate-Limiting nur im Host-nginx, Container-nginx liefert nur statische Dateien.
+- [ ] **Schwachstellen-Scans in CI** (Trivy):
+  - `uv.lock` einführen (ohne Lockfile sieht Trivy die Python-Abhängigkeiten nicht; zudem reproduzierbare Builds)
+  - `trivy fs` auf Abhängigkeiten (Python + npm) und `trivy config` auf Dockerfiles/Compose
+  - `trivy image` auf die gebauten Images vor dem Push in `deploy.yml`
+  - Blockierend bei CRITICAL/HIGH mit verfügbarem Fix (`--ignore-unfixed`), Ergebnisse als SARIF ins
+    GitHub-Security-Tab, zusätzlich wöchentlicher Scan (neue CVEs in unveränderten Abhängigkeiten)
+  - Actions (insb. Security-Tools) per Commit-SHA pinnen, Dependabot für Actions/pip/npm aktivieren
 - [x] **Doku aufräumen.** Veraltete Plan-/Session-Dokumente entfernt, `AGENTS.md`/`CLAUDE.md`/README aktualisiert.
 - [ ] `ROADMAP.md`: offene Feature-Ideen in GitHub-Issues überführen, dann löschen.
 - [ ] `VPS_SECURITY_HARDENING_CHECKLIST.md` (untracked) nach `deployment/` verschieben und einchecken.
+
+---
+
+## Phase 5 – Server und Deployment absichern
+
+Vorhanden: `deployment/setup.sh` (ufw, unattended-upgrades, fail2ban, SSH nur per Key),
+Container nur auf localhost, `no-new-privileges`, `cap_drop: ALL` (Backend). Offen:
+
+- [ ] **Kein Root-Deploy.** CI deployt per SSH als `root` (`SERVER_USERNAME: root`), Root-Login ist
+  erlaubt (`PermitRootLogin prohibit-password`). → eigener Deploy-User mit eng begrenztem `sudo`
+  (nur Deploy-Skript, nginx-Reload), `PermitRootLogin no`, Deploy-Key mit `command=`-Restriktion.
+  Hinweis: Mitgliedschaft in der `docker`-Gruppe entspricht faktisch Root.
+- [ ] **nginx-Config nicht aus CI als Root schreiben.** Heute schreibt der Deploy-Job
+  `/etc/nginx/...` und lädt nginx neu. → Config-Änderungen per Skript mit `nginx -t` und Rollback,
+  ausgeführt vom eingeschränkten Deploy-User.
+- [ ] **Container härten:** Backend-Dockerfile ohne `USER` (läuft als root) → eigener User;
+  `read_only: true` + tmpfs; Frontend `cap_drop`; Base-Images pinnen (`node:20` ist veraltet → 22/24 LTS).
+- [ ] **Images nachvollziehbar deployen:** Tag mit Commit-SHA (siehe Phase 4), optional per Digest
+  deployen; GHCR-Pakete privat halten.
+- [ ] **Secrets:** `.env` wird bei jedem Deploy aus GitHub-Secrets neu geschrieben (ok, `chmod 600`);
+  Secrets rotieren (JWT-Secret, Rollen-Passwörter, Gmail-App-Passwort); GitHub-Environment
+  `production` mit Required Reviewer für den Deploy.
+- [ ] **Backups:** verschlüsselt und offsite, regelmäßiger Restore-Test.
+- [ ] **Logs:** Aufbewahrung begrenzen (personenbezogene Daten), UUIDs/E-Mails maskieren (S7/S9).
+- [ ] **Monitoring:** Uptime-Check, Alarm bei Deploy-Fehlern, fail2ban-Jail für 401/429 der API.
+- [ ] `VPS_SECURITY_HARDENING_CHECKLIST.md` (44 offene Punkte) mit diesem Abschnitt abgleichen,
+  nach `deployment/` verschieben und einchecken.
