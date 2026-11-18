@@ -1,6 +1,7 @@
 // @ts-ignore
 import { download, generateCsv, mkConfig } from 'export-to-csv';
 import type { ShiftAssignment } from '../types';
+import { neutralizeCsvRows } from '../../../../utils/csvSafety';
 
 export const exportShiftAssignments = (assignments: ShiftAssignment[]) => {
   // First export - by name (sorted by lastname, lastname first)
@@ -19,7 +20,7 @@ export const exportShiftAssignments = (assignments: ShiftAssignment[]) => {
       Ende: assignment.timeslot_end,
     }));
 
-  const csv1 = generateCsv(csvConfig1)(data1);
+  const csv1 = generateCsv(csvConfig1)(neutralizeCsvRows(data1));
   download(csvConfig1)(csv1);
 
   // Second export - by shift (sorted by Dienst, then Schicht, then Start)
@@ -46,6 +47,6 @@ export const exportShiftAssignments = (assignments: ShiftAssignment[]) => {
       Phone: assignment.phone,
     }));
 
-  const csv2 = generateCsv(csvConfig2)(data2);
+  const csv2 = generateCsv(csvConfig2)(neutralizeCsvRows(data2));
   download(csvConfig2)(csv2);
 };

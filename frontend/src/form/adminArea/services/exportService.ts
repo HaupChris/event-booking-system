@@ -6,6 +6,7 @@
 import type { BookingWithTimestamp, FormContent } from '../../userArea/interface';
 import type { ArtistBookingWithTimestamp, ArtistFormContent } from '../../artistArea/interface';
 import { getAdminTitle } from '../utils/titleUtils';
+import { neutralizeCsvRows } from '../../../utils/csvSafety';
 
 type ExportData = Record<string, unknown>;
 
@@ -290,9 +291,21 @@ export const exportFinancialsData = (
 };
 
 /**
- * Main export function that routes to the appropriate transformer based on active tab
+ * Main export function that routes to the appropriate transformer based on active tab.
+ * All cells are protected against CSV formula injection.
  */
 export const getExportDataByTab = (
+  activeTab: string,
+  regularBookings: BookingWithTimestamp[],
+  artistBookings: ArtistBookingWithTimestamp[],
+  formContent: FormContent,
+  artistFormContent: ArtistFormContent
+): ExportData[] =>
+  neutralizeCsvRows(
+    selectExportData(activeTab, regularBookings, artistBookings, formContent, artistFormContent)
+  );
+
+const selectExportData = (
   activeTab: string,
   regularBookings: BookingWithTimestamp[],
   artistBookings: ArtistBookingWithTimestamp[],

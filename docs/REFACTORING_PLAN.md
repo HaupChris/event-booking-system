@@ -132,7 +132,8 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
   - Bewusst beibehalten: Offline-Cache des Service Workers für Profildaten (schlechter Empfang auf
     dem Festival; Daten liegen nur auf dem Gerät der Person). Cache API ignoriert `no-store`.
 
-- [ ] **S10 – Formel-Injection im CSV-Export (zielt auf das Orga-Team).**
+- [x] **S10 – Formel-Injection im CSV-Export (zielt auf das Orga-Team).** Behoben über
+  `frontend/src/utils/csvSafety.ts` für beide Exportwege (Dashboard und Schichtzuteilungen), mit Tests.
   Der Admin-Export (`react-csv` in `frontend/src/form/adminArea/Dashboard.tsx`,
   `frontend/src/form/adminArea/ShiftAssignments/utils/exportUtils.ts`) schreibt Eingaben der
   Teilnehmenden ungefiltert in CSV-Dateien (Name, E-Mail, Supporter-Buddy, Equipment, Sonderwünsche).
