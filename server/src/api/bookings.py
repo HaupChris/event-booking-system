@@ -15,7 +15,14 @@ from src.services.booking_service import (
 from src.services.mail_service import send_confirmation_mail
 from src.services.option_service import ticket_requires_workshift
 from src.services.orga_team_service import is_valid_active_orga_team_member
-from src.services.workshift_service import validate_booking_timeslot_selection
+from src.services.pricing_service import (
+    SERVER_OWNED_PAYMENT_DEFAULTS,
+    calculate_regular_total_price,
+)
+from src.services.workshift_service import (
+    MAX_SHIFTS_PER_BOOKING,
+    validate_booking_timeslot_selection,
+)
 from src.utils.logger import get_logger, log_security_event
 from src.utils.rate_limit import limiter
 from src.utils.signature import decode_signature_to_blob
@@ -25,6 +32,46 @@ logger = get_logger(__name__)
 
 bookings_bp = Blueprint("bookings", __name__)
 limiter_bookings = limiter
+
+
+def _apply_workshift_rules(booking: Booking) -> str | None:
+    """Validate or reset shift-related fields depending on the ticket. Returns an error message."""
+    booking.requires_workshift = ticket_requires_workshift(booking.ticket_id, scope="regular")
+
+    if not booking.requires_workshift:
+        booking.timeslot_priority_1 = -1
+        booking.timeslot_priority_2 = -1
+        booking.timeslot_priority_3 = -1
+        booking.amount_shifts = 0
+        booking.supporter_buddy = ""
+        return None
+
+    try:
+        booking.amount_shifts = int(booking.amount_shifts)
+    except (TypeError, ValueError):
+        return "Invalid number of shifts"
+    if not 1 <= booking.amount_shifts <= MAX_SHIFTS_PER_BOOKING:
+        return f"Number of shifts must be between 1 and {MAX_SHIFTS_PER_BOOKING}"
+
+    selection_valid, selection_error = validate_booking_timeslot_selection(
+        [booking.timeslot_priority_1, booking.timeslot_priority_2, booking.timeslot_priority_3]
+    )
+    return None if selection_valid else selection_error
+
+
+def _apply_server_price(booking: Booking, form_content: dict) -> str | None:
+    """Set the total price from the server-side option prices. Returns an error message."""
+    try:
+        booking.total_price = calculate_regular_total_price(
+            form_content,
+            int(booking.ticket_id),
+            int(booking.beverage_id),
+            int(booking.food_id),
+            booking.amount_shifts,
+        )
+    except (TypeError, ValueError):
+        return "Invalid option selection"
+    return None
 
 
 @bookings_bp.route("/submitForm", methods=["POST"])
@@ -43,9 +90,8 @@ def submit_form():
             logger.warning(f"Booking submission failed: missing JSON body from {client_ip}")
             return jsonify({"error": "Missing JSON body"}), 400
 
-        booking_data = request.json
-        if "id" in booking_data:
-            del booking_data["id"]
+        booking_data = {**request.json, **SERVER_OWNED_PAYMENT_DEFAULTS}
+        booking_data.pop("id", None)
 
         try:
             decode_signature_to_blob(str(booking_data.get("signature", "")))
@@ -64,28 +110,13 @@ def submit_form():
             )
             return jsonify({"error": "Invalid inviter selection"}), 400
 
-        requires_workshift = ticket_requires_workshift(booking.ticket_id, scope="regular")
-        booking.requires_workshift = requires_workshift
-
-        if requires_workshift:
-            selection_valid, selection_error = validate_booking_timeslot_selection(
-                [
-                    booking.timeslot_priority_1,
-                    booking.timeslot_priority_2,
-                    booking.timeslot_priority_3,
-                ]
-            )
-            if not selection_valid:
-                logger.warning(
-                    f"Booking submission failed: invalid timeslot selection for {booking.email}: {selection_error}"
-                )
-                return jsonify({"error": selection_error}), 400
-        else:
-            booking.timeslot_priority_1 = -1
-            booking.timeslot_priority_2 = -1
-            booking.timeslot_priority_3 = -1
-            booking.amount_shifts = 0
-            booking.supporter_buddy = ""
+        form_content_dict = get_up_to_date_form_content()
+        validation_error = _apply_workshift_rules(booking) or _apply_server_price(
+            booking, form_content_dict
+        )
+        if validation_error:
+            logger.warning(f"Booking submission failed: {validation_error}")
+            return jsonify({"error": validation_error}), 400
 
         # Attempt to insert booking
         success, profile_uuid = insert_booking(booking)
@@ -94,7 +125,6 @@ def submit_form():
             resolved_profile_uuid = profile_uuid or ""
             # Send email
             try:
-                form_content_dict = get_up_to_date_form_content()
                 send_confirmation_mail(booking, form_content_dict, resolved_profile_uuid)
                 logger.info(
                     f"Booking and confirmation email successful for {booking.first_name} {booking.last_name}"

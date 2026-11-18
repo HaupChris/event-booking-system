@@ -13,6 +13,9 @@ DB_FILE_PATH = get_db_file_path()
 
 ALLOWED_SCHEMA_TABLES = {"WorkShifts", "TimeSlots", "Bookings", "ShiftAssignments", "ShiftMessages"}
 
+# Matches the choices in frontend/src/form/userArea/WorkshiftsForm.tsx.
+MAX_SHIFTS_PER_BOOKING = 3
+
 
 def _assert_allowed_schema_table(table_name: str) -> str:
     if table_name not in ALLOWED_SCHEMA_TABLES:

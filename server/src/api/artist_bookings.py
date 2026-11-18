@@ -16,6 +16,7 @@ from src.services.artist_service import (
 )
 from src.services.mail_service import send_artist_confirmation_mail
 from src.services.orga_team_service import is_valid_active_orga_team_member
+from src.services.pricing_service import SERVER_OWNED_PAYMENT_DEFAULTS, calculate_option_total
 from src.utils.logger import get_logger, log_security_event
 from src.utils.rate_limit import limiter
 from src.utils.signature import decode_signature_to_blob
@@ -38,22 +39,6 @@ def _is_valid_email(value: str) -> bool:
     return bool(re.fullmatch(r"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$", value, re.I))
 
 
-def _get_option_price(options: list[dict], option_id: int) -> float:
-    for option in options:
-        if _to_int(option.get("id"), -1) == option_id:
-            return float(option.get("price", 0) or 0)
-    return 0.0
-
-
-def _calculate_artist_total_price(
-    form_content_dict: dict, ticket_id: int, beverage_id: int, food_id: int
-) -> float:
-    ticket_price = _get_option_price(form_content_dict.get("ticket_options", []), ticket_id)
-    beverage_price = _get_option_price(form_content_dict.get("beverage_options", []), beverage_id)
-    food_price = _get_option_price(form_content_dict.get("food_options", []), food_id)
-    return ticket_price + beverage_price + food_price
-
-
 def _create_artist_booking_payload(source: dict, total_price: float) -> dict:
     return {
         "last_name": str(source.get("last_name", "")).strip(),
@@ -67,10 +52,7 @@ def _create_artist_booking_payload(source: dict, total_price: float) -> dict:
         "artist_material_ids": source.get("artist_material_ids", []),
         "total_price": total_price,
         "signature": str(source.get("signature", "")),
-        "is_paid": bool(source.get("is_paid", False)),
-        "paid_amount": float(source.get("paid_amount", 0) or 0),
-        "payment_notes": str(source.get("payment_notes", "")),
-        "payment_date": str(source.get("payment_date", "")),
+        **SERVER_OWNED_PAYMENT_DEFAULTS,
         "equipment": str(source.get("equipment", "")),
         "special_requests": str(source.get("special_requests", "")),
         "performance_details": str(source.get("performance_details", "")),
@@ -107,7 +89,7 @@ def submit_artist_form():  # noqa: C901, PLR0911, PLR0912, PLR0915  # lint-basel
 
         form_content_dict = get_up_to_date_artist_form_content()
 
-        lead_total_price = _calculate_artist_total_price(
+        lead_total_price = calculate_option_total(
             form_content_dict,
             _to_int(booking_data.get("ticket_id"), -1),
             _to_int(booking_data.get("beverage_id"), -1),
@@ -158,7 +140,7 @@ def submit_artist_form():  # noqa: C901, PLR0911, PLR0912, PLR0915  # lint-basel
                     "artist_material_ids": [],
                     "profession_ids": [],
                 }
-                member_total_price = _calculate_artist_total_price(
+                member_total_price = calculate_option_total(
                     form_content_dict, ticket_id, beverage_id, food_id
                 )
                 bookings_to_insert.append(
@@ -203,6 +185,11 @@ def submit_artist_form():  # noqa: C901, PLR0911, PLR0912, PLR0915  # lint-basel
         else:
             logger.warning(f"Duplicate artist booking attempt for {artist_name}")
             return jsonify({"error": "Duplicate booking"}), 400
+
+    except ValueError as e:
+        # Raised by the price calculation for unknown options or missing form content.
+        logger.warning(f"Artist booking submission rejected: {e}")
+        return jsonify({"error": "Invalid option selection"}), 400
 
     except Exception as e:
         duration = time.time() - start_time

@@ -9,7 +9,7 @@ import os
 import shutil
 import sqlite3
 import tempfile
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
 from contextlib import closing
 from pathlib import Path
 from typing import Any
@@ -58,7 +58,7 @@ SIGNATURE_DATA_URL = "data:image/png;base64," + base64.b64encode(
 
 
 @pytest.fixture(autouse=True)
-def fresh_database() -> Iterator[Path]:
+def fresh_database() -> Path:
     """Every test starts from the same freshly initialized database."""
     shutil.copyfile(_TEMPLATE_DB_PATH, _DB_PATH)
     return _DB_PATH
