@@ -166,9 +166,8 @@ def submit_artist_form():  # noqa: C901, PLR0911, PLR0912, PLR0915  # lint-basel
                     send_artist_confirmation_mail(booked_artist, form_content_dict, profile_uuid)
                 logger.info(f"Artist booking and confirmation email successful for {artist_name}")
             except Exception as email_error:
-                logger.error(
+                logger.exception(
                     f"Artist booking successful but email failed for {artist_name}: {str(email_error)}",
-                    exc_info=True,
                 )
 
             duration = time.time() - start_time
@@ -194,9 +193,7 @@ def submit_artist_form():  # noqa: C901, PLR0911, PLR0912, PLR0915  # lint-basel
 
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(
-            f"Artist booking submission failed after {duration:.3f}s: {str(e)}", exc_info=True
-        )
+        logger.exception(f"Artist booking submission failed after {duration:.3f}s: {str(e)}")
         return jsonify({"error": "Artist booking submission failed"}), 500
 
 
@@ -222,9 +219,7 @@ def get_artist_formcontent():
 
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(
-            f"Error generating artist form content after {duration:.3f}s: {str(e)}", exc_info=True
-        )
+        logger.exception(f"Error generating artist form content after {duration:.3f}s: {str(e)}")
         return jsonify({"error": "Failed to generate artist form content"}), 500
 
 
@@ -258,9 +253,7 @@ def get_artist_bookings():
 
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(
-            f"Failed to retrieve artist booking data after {duration:.3f}s: {str(e)}", exc_info=True
-        )
+        logger.exception(f"Failed to retrieve artist booking data after {duration:.3f}s: {str(e)}")
         return jsonify({"error": "Failed to retrieve artist booking data"}), 500
 
 
@@ -284,7 +277,7 @@ def get_artist_booking(booking_id):
             return jsonify({"error": "Booking not found"}), 404
 
     except Exception as e:
-        logger.error(f"Failed to retrieve artist booking {booking_id}: {str(e)}", exc_info=True)
+        logger.exception(f"Failed to retrieve artist booking {booking_id}: {str(e)}")
         return jsonify({"error": "Failed to retrieve artist booking"}), 500
 
 
@@ -316,7 +309,7 @@ def update_artist(booking_id):
             return jsonify({"error": "Booking not found"}), 404
 
     except Exception as e:
-        logger.error(f"Failed to update artist booking {booking_id}: {str(e)}", exc_info=True)
+        logger.exception(f"Failed to update artist booking {booking_id}: {str(e)}")
         return jsonify({"error": "Failed to update artist booking"}), 500
 
 
@@ -350,9 +343,7 @@ def update_artist_payment_route(booking_id):
             return jsonify({"error": "Booking not found"}), 404
 
     except Exception as e:
-        logger.error(
-            f"Failed to update artist payment for booking {booking_id}: {str(e)}", exc_info=True
-        )
+        logger.exception(f"Failed to update artist payment for booking {booking_id}: {str(e)}")
         return jsonify({"error": "Failed to update artist payment"}), 500
 
 
@@ -379,5 +370,5 @@ def delete_artist_booking_endpoint(booking_id):
             return jsonify({"error": "Booking not found"}), 404
 
     except Exception as e:
-        logger.error(f"Failed to delete artist booking {booking_id}: {str(e)}", exc_info=True)
+        logger.exception(f"Failed to delete artist booking {booking_id}: {str(e)}")
         return jsonify({"error": "Failed to delete artist booking"}), 500

@@ -105,7 +105,17 @@ only be reduced, never extended:
 - CI blocks on CRITICAL/HIGH vulnerabilities with an available fix (Trivy: dependencies,
   Dockerfiles, secrets and built images). Accepted findings go into `.trivyignore` with a reason.
 
-## Testing
+## Logging
+
+Rules in `docs/LOGGING.md`. In short:
+- structlog via `get_logger(__name__)`; first argument is a stable `snake_case` event name,
+  context goes into attributes: `logger.info("booking_created", booking_ref="R-123")`.
+  No f-strings (ruff `G004`).
+- Use the attribute names listed in `docs/LOGGING.md` (`booking_ref`, `reason`, `error_type`, …).
+- Only values with bounded size: never request bodies, headers, free text from users or signatures.
+- No personal data or secrets: use `booking_ref`/`email_ref` pseudonyms; IPs only in the security log.
+- Unexpected errors in `except` blocks: `logger.exception("…_failed", …)` (ruff `G201`), logged once where handled.
+
 
 - Backend: pytest in `server/test/` (`test_*.py`), using the Flask test client and a
   temporary database; mock mail sending.

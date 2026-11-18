@@ -60,7 +60,7 @@ def get_profiles_stats():
         return jsonify({"profiles": stats}), 200
 
     except Exception as e:
-        logger.error(f"Profile stats retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"Profile stats retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -115,7 +115,7 @@ def send_profile_link():
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"Send profile link failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"Send profile link failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -191,5 +191,5 @@ def bulk_send_profile_links():
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"Bulk send failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"Bulk send failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500

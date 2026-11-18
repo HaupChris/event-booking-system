@@ -42,7 +42,7 @@ def preview_booking_custom_mail():
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
     except Exception as exc:
-        logger.error(f"Failed to preview custom booking mail: {exc}", exc_info=True)
+        logger.exception(f"Failed to preview custom booking mail: {exc}")
         return jsonify({"error": "Failed to render custom mail preview"}), 500
 
 
@@ -58,5 +58,5 @@ def send_booking_custom_mail():
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
     except Exception as exc:
-        logger.error(f"Failed to send custom booking mail: {exc}", exc_info=True)
+        logger.exception(f"Failed to send custom booking mail: {exc}")
         return jsonify({"error": "Failed to send custom booking mail"}), 500

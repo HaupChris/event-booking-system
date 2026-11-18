@@ -66,7 +66,7 @@ def get_faqs_list():
         return jsonify({"faqs": faqs}), 200
 
     except Exception as e:
-        logger.error(f"FAQ list retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"FAQ list retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -89,7 +89,7 @@ def get_faq_item(faq_id: int):
         return jsonify(faq), 200
 
     except Exception as e:
-        logger.error(f"FAQ item retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"FAQ item retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -142,7 +142,7 @@ def create_faq_item():
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"FAQ creation failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"FAQ creation failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -198,7 +198,7 @@ def update_faq_item(faq_id: int):
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"FAQ update failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"FAQ update failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -236,7 +236,7 @@ def delete_faq_item(faq_id: int):
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"FAQ deletion failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"FAQ deletion failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -266,7 +266,7 @@ def get_categories_list():
         return jsonify({"categories": categories}), 200
 
     except Exception as e:
-        logger.error(f"FAQ category list retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"FAQ category list retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -289,7 +289,7 @@ def get_category_item(category_id: int):
         return jsonify(category), 200
 
     except Exception as e:
-        logger.error(f"FAQ category retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"FAQ category retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -338,7 +338,7 @@ def create_category_item():
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"Category creation failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"Category creation failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -392,7 +392,7 @@ def update_category_item(category_id: int):
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"Category update failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"Category update failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -432,5 +432,5 @@ def delete_category_item(category_id: int):
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"Category deletion failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"Category deletion failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500

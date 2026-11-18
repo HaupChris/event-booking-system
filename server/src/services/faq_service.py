@@ -28,7 +28,7 @@ def _connect_db() -> sqlite3.Connection:
         conn.row_factory = sqlite3.Row
         return conn
     except sqlite3.Error as e:
-        logger.error(f"Failed to connect to database: {e}", exc_info=True)
+        logger.exception(f"Failed to connect to database: {e}")
         raise
 
 
@@ -79,7 +79,7 @@ def get_all_faqs(include_inactive: bool = False, category_id: int = None) -> lis
             return faqs
 
     except sqlite3.Error as e:
-        logger.error(f"Database error fetching FAQs: {e}", exc_info=True)
+        logger.exception(f"Database error fetching FAQs: {e}")
         raise
 
 
@@ -119,7 +119,7 @@ def get_faq_by_id(faq_id: int) -> dict[str, Any] | None:
                 return None
 
     except sqlite3.Error as e:
-        logger.error(f"Database error fetching FAQ {faq_id}: {e}", exc_info=True)
+        logger.exception(f"Database error fetching FAQ {faq_id}: {e}")
         raise
 
 
@@ -148,7 +148,7 @@ def create_faq(question: str, answer: str, category_id: int, display_order: int 
             return faq_id
 
     except sqlite3.Error as e:
-        logger.error(f"Database error creating FAQ: {e}", exc_info=True)
+        logger.exception(f"Database error creating FAQ: {e}")
         raise
 
 
@@ -209,7 +209,7 @@ def update_faq(  # noqa: PLR0913  # lint-baseline
                 return False
 
     except sqlite3.Error as e:
-        logger.error(f"Database error updating FAQ {faq_id}: {e}", exc_info=True)
+        logger.exception(f"Database error updating FAQ {faq_id}: {e}")
         raise
 
 
@@ -242,7 +242,7 @@ def delete_faq(faq_id: int, soft_delete: bool = True) -> bool:
                 return False
 
     except sqlite3.Error as e:
-        logger.error(f"Database error deleting FAQ {faq_id}: {e}", exc_info=True)
+        logger.exception(f"Database error deleting FAQ {faq_id}: {e}")
         raise
 
 
@@ -278,7 +278,7 @@ def get_all_faq_categories(include_inactive: bool = False) -> list[dict[str, Any
             return categories
 
     except sqlite3.Error as e:
-        logger.error(f"Database error fetching FAQ categories: {e}", exc_info=True)
+        logger.exception(f"Database error fetching FAQ categories: {e}")
         raise
 
 
@@ -308,7 +308,7 @@ def get_faq_category_by_id(category_id: int) -> dict[str, Any] | None:
                 return None
 
     except sqlite3.Error as e:
-        logger.error(f"Database error fetching FAQ category {category_id}: {e}", exc_info=True)
+        logger.exception(f"Database error fetching FAQ category {category_id}: {e}")
         raise
 
 
@@ -335,7 +335,7 @@ def create_faq_category(name: str, display_order: int = 0) -> int:
             return category_id
 
     except sqlite3.Error as e:
-        logger.error(f"Database error creating FAQ category: {e}", exc_info=True)
+        logger.exception(f"Database error creating FAQ category: {e}")
         raise
 
 
@@ -384,7 +384,7 @@ def update_faq_category(
                 return False
 
     except sqlite3.Error as e:
-        logger.error(f"Database error updating FAQ category {category_id}: {e}", exc_info=True)
+        logger.exception(f"Database error updating FAQ category {category_id}: {e}")
         raise
 
 
@@ -419,7 +419,7 @@ def delete_faq_category(category_id: int, soft_delete: bool = True) -> bool:
                 return False
 
     except sqlite3.Error as e:
-        logger.error(f"Database error deleting FAQ category {category_id}: {e}", exc_info=True)
+        logger.exception(f"Database error deleting FAQ category {category_id}: {e}")
         raise
 
 
@@ -485,5 +485,5 @@ def get_faqs_grouped_by_category() -> dict[str, Any]:
             return result
 
     except sqlite3.Error as e:
-        logger.error(f"Database error fetching grouped FAQs: {e}", exc_info=True)
+        logger.exception(f"Database error fetching grouped FAQs: {e}")
         raise

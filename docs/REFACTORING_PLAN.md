@@ -180,6 +180,29 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
 **Zielkonflikt:** Datensparsam sein und trotzdem Nutzerprobleme schnell finden und reproduzieren.
 Heute werden dafür Namen, E-Mails und UUIDs geloggt; im Frontend gibt es gar kein Logging.
 
+**Entscheidungen (2026-11-18):** structlog (JSON in Produktion, lesbare Konsole lokal);
+Aufbewahrung 30 Tage Anwendungs-Logs, 90 Tage Security-Log; Regeln in `docs/LOGGING.md`
+(Ereignisse mit Attributen statt f-Strings, nur Werte begrenzter Größe, keine Klardaten).
+Umsetzung in vier PRs: (1) structlog, JSON-Logs, Request-ID im Header, eine Rotation, Altcode raus;
+(2) Pseudonyme, Ereignis-Verlauf pro Buchung, Admin-Anzeige; (3) Fehlercode im Frontend und
+Client-Error-Endpunkt; (4) Klardaten entfernen und Log-Aufrufe auf Attribute umstellen
+(S7, Ruff-`G004`-Baseline auf null).
+
+- [x] **PR 1:** structlog mit JSON-Ausgabe und Sicherheitsnetz-Processor (Kürzen, Schwärzen),
+  `X-Request-ID` in jeder Antwort, eine `request_finished`-Zeile pro Request (UUIDs maskiert),
+  echte Herkunft (`where`), Security-Log separat (inkl. IP, 90 Tage), App-Log 30 Tage, nur
+  Python rotiert (logrotate-Regel entfernt, Deploy löscht sie auf dem Server), Docker-Logs auf
+  3 × 10 MB begrenzt, ungenutzter Security-Monitoring-Code entfernt, Ruff `G` aktiv
+  (`G004`-Baseline: 21 Dateien), `logger.exception` statt `error(exc_info=True)`, lnav-Format
+  - [ ] Alte Log-Dateien auf dem Server (`access.log*`, `errors.log*`, `debug.log*`) einmalig löschen
+  - [ ] lnav-Format auf dem Server ausprobieren und ggf. korrigieren
+
+Gefundene Mängel im Ist-Zustand: Herkunftsangabe zeigt den Logger-Wrapper statt der aufrufenden
+Stelle; Request-ID wird nicht an Clients zurückgegeben; doppelte Einträge (Zugriffszeilen in
+`access.log` und `app.log`); drei konkurrierende Rotationsmechanismen (Python, Aufräumskript,
+Host-logrotate – logrotate benennt Dateien um, während Python weiterschreibt); Docker-Logs ohne
+Größenbegrenzung; ~100 Zeilen ungenutzter „Security-Monitoring“-Code.
+
 **Grundidee:** Logs enthalten keine Klardaten, sind aber über Pseudonyme und Fehlercodes gezielt
 einer Buchung zuordenbar, und zwar nur für Admins, die die Buchung ohnehin sehen dürfen.
 

@@ -81,7 +81,7 @@ def _connect_db() -> sqlite3.Connection:
         conn.row_factory = sqlite3.Row
         return conn
     except sqlite3.Error as e:
-        logger.error(f"Failed to connect to database: {e}", exc_info=True)
+        logger.exception(f"Failed to connect to database: {e}")
         raise
 
 
@@ -98,7 +98,7 @@ def get_payment_link() -> str:
                 if value:
                     return value
     except sqlite3.Error as e:
-        logger.error(f"Failed to read payment link from AppSettings: {e}", exc_info=True)
+        logger.exception(f"Failed to read payment link from AppSettings: {e}")
 
     return DEFAULT_PAYMENT_LINK
 
@@ -130,7 +130,7 @@ def get_public_app_url() -> str:
 
                     return value
     except sqlite3.Error as e:
-        logger.error(f"Failed to read public app URL from AppSettings: {e}", exc_info=True)
+        logger.exception(f"Failed to read public app URL from AppSettings: {e}")
 
     if request_public_app_url:
         return request_public_app_url
@@ -157,7 +157,7 @@ def set_payment_link(payment_link: str) -> bool:
             logger.info("Payment link updated via app settings service")
             return True
     except sqlite3.Error as e:
-        logger.error(f"Failed to update payment link in AppSettings: {e}", exc_info=True)
+        logger.exception(f"Failed to update payment link in AppSettings: {e}")
         return False
 
 
@@ -181,7 +181,7 @@ def set_public_app_url(public_app_url: str) -> bool:
             logger.info("Public app URL updated via app settings service")
             return True
     except sqlite3.Error as e:
-        logger.error(f"Failed to update public app URL in AppSettings: {e}", exc_info=True)
+        logger.exception(f"Failed to update public app URL in AppSettings: {e}")
         return False
 
 
@@ -198,7 +198,7 @@ def get_frontend_branding_pack() -> str:
                 if value:
                     return value
     except sqlite3.Error as e:
-        logger.error(f"Failed to read frontend branding pack from AppSettings: {e}", exc_info=True)
+        logger.exception(f"Failed to read frontend branding pack from AppSettings: {e}")
 
     return DEFAULT_BRANDING_PACK
 
@@ -222,7 +222,7 @@ def set_frontend_branding_pack(branding_pack: str) -> bool:
             logger.info("Frontend branding pack updated via app settings service")
             return True
     except sqlite3.Error as e:
-        logger.error(f"Failed to update frontend branding pack in AppSettings: {e}", exc_info=True)
+        logger.exception(f"Failed to update frontend branding pack in AppSettings: {e}")
         return False
 
 
@@ -238,7 +238,7 @@ def get_rideshare_enabled() -> bool:
                 normalized = row["value"].strip().lower()
                 return normalized in {"1", "true", "yes", "on"}
     except sqlite3.Error as e:
-        logger.error(f"Failed to read rideshare toggle from AppSettings: {e}", exc_info=True)
+        logger.exception(f"Failed to read rideshare toggle from AppSettings: {e}")
 
     return DEFAULT_RIDESHARE_ENABLED
 
@@ -263,7 +263,7 @@ def set_rideshare_enabled(is_enabled: bool) -> bool:
             logger.info("Rideshare toggle updated via app settings service")
             return True
     except sqlite3.Error as e:
-        logger.error(f"Failed to update rideshare toggle in AppSettings: {e}", exc_info=True)
+        logger.exception(f"Failed to update rideshare toggle in AppSettings: {e}")
         return False
 
 
@@ -285,9 +285,8 @@ def get_form_step_description(scope: FormStepScope, step_type: FormStepType) -> 
             if row:
                 return str(row["value"] or "").strip()
     except sqlite3.Error as e:
-        logger.error(
+        logger.exception(
             f"Failed to read form step description for {scope}/{step_type}: {e}",
-            exc_info=True,
         )
 
     return ""
@@ -319,8 +318,7 @@ def set_form_step_description(
             logger.info(f"Updated form step description for {scope}/{step_type}")
             return True
     except sqlite3.Error as e:
-        logger.error(
+        logger.exception(
             f"Failed to update form step description for {scope}/{step_type}: {e}",
-            exc_info=True,
         )
         return False

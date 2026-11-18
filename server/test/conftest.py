@@ -29,7 +29,8 @@ TEST_PASSWORDS = {
 os.environ.update(
     {
         "DB_FILE_PATH": str(_DB_PATH),
-        "JWT_SECRET_KEY": "test-secret-key-that-is-long-enough-for-jwt",
+        "LOG_DIR": str(_TEST_DIR / "logs"),
+        "JWT_SECRET_KEY": "test-secret-key-that-is-long-enough-for-jwt",  # pragma: allowlist secret
         "PASSWORD": TEST_PASSWORDS["user"],
         "ADMIN_PASSWORD": TEST_PASSWORDS["admin"],
         "ARTIST_PASSWORD": TEST_PASSWORDS["artist"],
@@ -49,12 +50,15 @@ from src.services.orga_team_service import create_orga_team_member  # noqa: E402
 shutil.copyfile(_DB_PATH, _TEMPLATE_DB_PATH)
 
 # Smallest valid PNG (1x1 pixel) as data URL, accepted by the signature validation.
-SIGNATURE_DATA_URL = "data:image/png;base64," + base64.b64encode(
-    bytes.fromhex(
-        "89504e470d0a1a0a0000000d4948445200000001000000010806000000"
-        "1f15c4890000000d49444154789c6360000002000154a24f5d0000000049454e44ae426082"
-    )
-).decode("ascii")
+SIGNATURE_DATA_URL = (
+    "data:image/png;base64,"
+    + base64.b64encode(
+        bytes.fromhex(
+            "89504e470d0a1a0a0000000d4948445200000001000000010806000000"
+            "1f15c4890000000d49444154789c6360000002000154a24f5d0000000049454e44ae426082"  # pragma: allowlist secret (1x1 PNG)
+        )
+    ).decode("ascii")
+)
 
 
 @pytest.fixture(autouse=True)

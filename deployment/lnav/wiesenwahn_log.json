@@ -1,0 +1,52 @@
+{
+  "$schema": "https://lnav.org/schemas/format-v1.schema.json",
+  "wiesenwahn_log": {
+    "title": "Wiesenwahn backend log",
+    "description": "structlog JSON lines written by the backend (see docs/LOGGING.md).",
+    "json": true,
+    "file-pattern": "(app|security)\\.log.*",
+    "timestamp-field": "ts",
+    "level-field": "level",
+    "body-field": "event",
+    "opid-field": "request_id",
+    "hide-extra": false,
+    "level": {
+      "critical": "critical",
+      "error": "error",
+      "warning": "warning",
+      "info": "info",
+      "debug": "debug"
+    },
+    "value": {
+      "event": { "kind": "string", "identifier": true },
+      "request_id": { "kind": "string", "identifier": true },
+      "booking_ref": { "kind": "string", "identifier": true },
+      "email_ref": { "kind": "string", "identifier": true },
+      "logger": { "kind": "string", "identifier": true },
+      "route": { "kind": "string", "identifier": true },
+      "method": { "kind": "string" },
+      "path": { "kind": "string" },
+      "status": { "kind": "integer" },
+      "duration_ms": { "kind": "float" },
+      "reason": { "kind": "string", "identifier": true },
+      "error_type": { "kind": "string", "identifier": true },
+      "role": { "kind": "string", "identifier": true },
+      "client_ip": { "kind": "string", "identifier": true },
+      "where": { "kind": "string" },
+      "exception": { "kind": "string" }
+    },
+    "line-format": [
+      { "field": "__timestamp__" },
+      " ",
+      { "field": "__level__", "text-transform": "uppercase", "min-width": 7 },
+      " ",
+      { "field": "request_id", "default-value": "--------" },
+      " ",
+      { "field": "event" },
+      " ",
+      { "field": "route", "default-value": "" },
+      " ",
+      { "field": "status", "default-value": "" }
+    ]
+  }
+}

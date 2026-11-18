@@ -220,5 +220,5 @@ def change_password():  # noqa: PLR0911
         return jsonify({"msg": f"Password for '{role}' updated successfully"}), 200
 
     except Exception as e:
-        logger.error(f"Error updating password: {e}", exc_info=True)
+        logger.exception(f"Error updating password: {e}")
         return jsonify({"msg": "Internal server error"}), 500
