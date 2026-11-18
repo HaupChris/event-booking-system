@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity
 
+from src.api.auth_guards import protect_blueprint
 from src.models.datatypes import ShiftAssignment
 from src.services.shift_assignment_service import (
     create_assignment,
@@ -24,18 +25,13 @@ from src.services.shift_message_service import (
 from src.utils.rate_limit import limiter
 
 shift_assignments_bp = Blueprint("shift_assignments", __name__)
+protect_blueprint(shift_assignments_bp, "admin")
 limiter_assignments = limiter
 
 
 @shift_assignments_bp.route("/shifts/assignments", methods=["GET"])
 @limiter_assignments.limit("200/minute")
-@jwt_required()
 def get_assignments():
-    # Check if user has admin permissions
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-
     timeslot_id = request.args.get("timeslot_id")
     booking_id = request.args.get("booking_id")
 
@@ -54,13 +50,7 @@ def get_assignments():
 
 @shift_assignments_bp.route("/shifts/assignments", methods=["POST"])
 @limiter_assignments.limit("100/minute")
-@jwt_required()
 def create_shift_assignment():  # noqa: PLR0911  # lint-baseline
-    # Check if user has admin permissions
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-
     data = request.json
 
     # Validate required fields
@@ -120,13 +110,7 @@ def create_shift_assignment():  # noqa: PLR0911  # lint-baseline
 
 @shift_assignments_bp.route("/shifts/assignments/<int:assignment_id>", methods=["PUT"])
 @limiter_assignments.limit("100/minute")
-@jwt_required()
 def update_shift_assignment(assignment_id):
-    # Check if user has admin permissions
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-
     data = request.json
 
     # Create assignment object (only update is_confirmed and notes)
@@ -147,13 +131,7 @@ def update_shift_assignment(assignment_id):
 
 @shift_assignments_bp.route("/shifts/assignments/<int:assignment_id>", methods=["DELETE"])
 @limiter_assignments.limit("100/minute")
-@jwt_required()
 def delete_shift_assignment(assignment_id):
-    # Check if user has admin permissions
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-
     success = delete_assignment(assignment_id)
 
     if not success:
@@ -164,38 +142,22 @@ def delete_shift_assignment(assignment_id):
 
 @shift_assignments_bp.route("/shifts/summary/bookings", methods=["GET"])
 @limiter_assignments.limit("200/minute")
-@jwt_required()
 def get_bookings_summary():
-    # Check if user has admin permissions
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-
     summary = get_booking_assignments_summary()
     return jsonify(summary), 200
 
 
 @shift_assignments_bp.route("/shifts/summary/timeslots", methods=["GET"])
 @limiter_assignments.limit("200/minute")
-@jwt_required()
 def get_timeslots_summary():
-    # Check if user has admin permissions
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-
     summary = get_timeslot_summary()
     return jsonify(summary), 200
 
 
 @shift_assignments_bp.route("/shifts/bulk-assign", methods=["POST"])
 @limiter_assignments.limit("20/minute")
-@jwt_required()
 def bulk_assign_shifts():
     """Assign multiple users to multiple timeslots"""
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
 
     data = request.json
     user_ids = data.get("user_ids", [])
@@ -233,23 +195,15 @@ def bulk_assign_shifts():
 
 @shift_assignments_bp.route("/shifts/messages", methods=["GET"])
 @limiter_assignments.limit("200/minute")
-@jwt_required()
 def get_shift_messages():
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-
     messages = get_shift_messages_grouped()
     return jsonify({"groups": messages}), 200
 
 
 @shift_assignments_bp.route("/shifts/messages", methods=["POST"])
 @limiter_assignments.limit("60/minute")
-@jwt_required()
 def create_shift_message_item():
     identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
 
     data = request.json or {}
     timeslot_ids = data.get("timeslot_ids", [])
@@ -288,12 +242,7 @@ def create_shift_message_item():
 
 @shift_assignments_bp.route("/shifts/messages/<int:message_id>", methods=["DELETE"])
 @limiter_assignments.limit("60/minute")
-@jwt_required()
 def delete_shift_message_item(message_id: int):
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-
     success = delete_shift_message(message_id)
     if not success:
         return jsonify({"error": "Shift message not found"}), 404

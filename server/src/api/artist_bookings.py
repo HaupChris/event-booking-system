@@ -2,8 +2,9 @@ import re
 import time
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity
 
+from src.api.auth_guards import roles_required
 from src.models.datatypes import ArtistBooking
 from src.services.artist_service import (
     delete_artist_booking,
@@ -17,7 +18,7 @@ from src.services.artist_service import (
 from src.services.mail_service import send_artist_confirmation_mail
 from src.services.orga_team_service import is_valid_active_orga_team_member
 from src.services.pricing_service import SERVER_OWNED_PAYMENT_DEFAULTS, calculate_option_total
-from src.utils.logger import get_logger, log_security_event
+from src.utils.logger import get_logger
 from src.utils.rate_limit import limiter
 from src.utils.signature import decode_signature_to_blob
 
@@ -62,7 +63,7 @@ def _create_artist_booking_payload(source: dict, total_price: float) -> dict:
 
 @artist_bp.route("/artist/submitForm", methods=["POST"])
 @limiter_artist.limit("90/minute")
-@jwt_required()
+@roles_required("artist", "admin")
 def submit_artist_form():  # noqa: C901, PLR0911, PLR0912, PLR0915  # lint-baseline
     """Submit artist booking form with comprehensive logging."""
     start_time = time.time()
@@ -201,7 +202,7 @@ def submit_artist_form():  # noqa: C901, PLR0911, PLR0912, PLR0915  # lint-basel
 
 @artist_bp.route("/artist/formcontent", methods=["GET"])
 @limiter_artist.limit("200/minute")
-@jwt_required()
+@roles_required("artist", "admin")
 def get_artist_formcontent():
     """Get artist form content with performance monitoring."""
     start_time = time.time()
@@ -229,7 +230,7 @@ def get_artist_formcontent():
 
 @artist_bp.route("/artist/data", methods=["GET"])
 @limiter_artist.limit("200/minute")
-@jwt_required()
+@roles_required("admin")
 def get_artist_bookings():
     """Get all artist bookings with admin authorization."""
     start_time = time.time()
@@ -237,15 +238,6 @@ def get_artist_bookings():
     try:
         # Check if user has admin permissions
         identity = get_jwt_identity()
-        if identity not in ["admin"]:
-            logger.warning(
-                f"Unauthorized access attempt to artist data from user: {identity}, IP: {request.remote_addr}"
-            )
-            log_security_event(
-                "UNAUTHORIZED_ARTIST_DATA_ACCESS",
-                {"endpoint": "artist_data", "user_identity": identity},
-            )
-            return jsonify({"error": "Unauthorized"}), 403
 
         logger.info(f"Admin {identity} accessing artist booking data from {request.remote_addr}")
 
@@ -274,25 +266,12 @@ def get_artist_bookings():
 
 @artist_bp.route("/artist/booking/<int:booking_id>", methods=["GET"])
 @limiter_artist.limit("200/minute")
-@jwt_required()
+@roles_required("admin")
 def get_artist_booking(booking_id):
     """Get specific artist booking with admin authorization."""
     try:
         # Check if user has admin permissions
         identity = get_jwt_identity()
-        if identity not in ["admin"]:
-            logger.warning(
-                f"Unauthorized artist booking access attempt by {identity} for booking {booking_id}"
-            )
-            log_security_event(
-                "UNAUTHORIZED_ARTIST_BOOKING_ACCESS",
-                {
-                    "endpoint": "get_artist_booking",
-                    "user_identity": identity,
-                    "booking_id": booking_id,
-                },
-            )
-            return jsonify({"error": "Unauthorized"}), 403
 
         logger.info(f"Admin {identity} accessing artist booking {booking_id}")
 
@@ -311,25 +290,12 @@ def get_artist_booking(booking_id):
 
 @artist_bp.route("/artist/booking/<int:booking_id>", methods=["PUT"])
 @limiter_artist.limit("60/minute")
-@jwt_required()
+@roles_required("admin")
 def update_artist(booking_id):
     """Update artist booking with admin authorization."""
     try:
         # Check if user has admin permissions
         identity = get_jwt_identity()
-        if identity not in ["admin"]:
-            logger.warning(
-                f"Unauthorized artist booking update attempt by {identity} for booking {booking_id}"
-            )
-            log_security_event(
-                "UNAUTHORIZED_ARTIST_UPDATE_ATTEMPT",
-                {
-                    "endpoint": "update_artist_booking",
-                    "user_identity": identity,
-                    "booking_id": booking_id,
-                },
-            )
-            return jsonify({"error": "Unauthorized"}), 403
 
         logger.info(f"Admin {identity} updating artist booking {booking_id}")
 
@@ -356,25 +322,12 @@ def update_artist(booking_id):
 
 @artist_bp.route("/artist/booking/<int:booking_id>/payment", methods=["PUT"])
 @limiter_artist.limit("60/minute")
-@jwt_required()
+@roles_required("admin")
 def update_artist_payment_route(booking_id):
     """Update artist payment status with admin authorization."""
     try:
         # Check if user has admin permissions
         identity = get_jwt_identity()
-        if identity not in ["admin"]:
-            logger.warning(
-                f"Unauthorized artist payment update attempt by {identity} for booking {booking_id}"
-            )
-            log_security_event(
-                "UNAUTHORIZED_ARTIST_PAYMENT_UPDATE",
-                {
-                    "endpoint": "update_artist_payment",
-                    "user_identity": identity,
-                    "booking_id": booking_id,
-                },
-            )
-            return jsonify({"error": "Unauthorized"}), 403
 
         logger.info(f"Admin {identity} updating artist payment for booking {booking_id}")
 
@@ -405,25 +358,12 @@ def update_artist_payment_route(booking_id):
 
 @artist_bp.route("/artist/booking/<int:booking_id>", methods=["DELETE"])
 @limiter_artist.limit("30/minute")
-@jwt_required()
+@roles_required("admin")
 def delete_artist_booking_endpoint(booking_id):
     """Delete artist booking with admin authorization."""
     try:
         # Check if user has admin permissions
         identity = get_jwt_identity()
-        if identity not in ["admin"]:
-            logger.warning(
-                f"Unauthorized artist booking deletion attempt by {identity} for booking {booking_id}"
-            )
-            log_security_event(
-                "UNAUTHORIZED_ARTIST_DELETE_ATTEMPT",
-                {
-                    "endpoint": "delete_artist_booking",
-                    "user_identity": identity,
-                    "booking_id": booking_id,
-                },
-            )
-            return jsonify({"error": "Unauthorized"}), 403
 
         logger.warning(
             f"Admin {identity} deleting artist booking {booking_id}"

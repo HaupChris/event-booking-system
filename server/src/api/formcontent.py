@@ -1,8 +1,8 @@
 import time
 
 from flask import Blueprint, jsonify
-from flask_jwt_extended import jwt_required
 
+from src.api.auth_guards import roles_required
 from src.services.booking_service import get_up_to_date_form_content
 from src.utils.logger import get_logger
 from src.utils.rate_limit import limiter
@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 
 @formcontent_bp.route("/formcontent", methods=["GET"])
 @limiter_formcontent.limit("200/minute")
-@jwt_required()
+@roles_required("user", "admin")
 def get_formcontent():
     """Get form content with performance monitoring."""
     start_time = time.time()

@@ -1,8 +1,9 @@
 import time
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity
 
+from src.api.auth_guards import roles_required
 from src.models.datatypes import Booking
 from src.services.booking_service import (
     delete_booking,
@@ -23,7 +24,7 @@ from src.services.workshift_service import (
     MAX_SHIFTS_PER_BOOKING,
     validate_booking_timeslot_selection,
 )
-from src.utils.logger import get_logger, log_security_event
+from src.utils.logger import get_logger
 from src.utils.rate_limit import limiter
 from src.utils.signature import decode_signature_to_blob
 
@@ -76,7 +77,7 @@ def _apply_server_price(booking: Booking, form_content: dict) -> str | None:
 
 @bookings_bp.route("/submitForm", methods=["POST"])
 @limiter_bookings.limit("90/minute")
-@jwt_required()
+@roles_required("user", "admin")
 def submit_form():
     """Submit booking form with comprehensive logging."""
     start_time = time.time()
@@ -164,7 +165,7 @@ def submit_form():
 
 @bookings_bp.route("/data", methods=["GET"])
 @limiter_bookings.limit("200/minute")
-@jwt_required()
+@roles_required("admin")
 def get_bookings():
     """Get all bookings with admin authorization."""
     start_time = time.time()
@@ -172,14 +173,6 @@ def get_bookings():
     try:
         # Check if user has admin permissions
         identity = get_jwt_identity()
-        if identity not in ["admin"]:
-            logger.warning(
-                f"Unauthorized access attempt to booking data from user: {identity}, IP: {request.remote_addr}"
-            )
-            log_security_event(
-                "UNAUTHORIZED_DATA_ACCESS", {"endpoint": "bookings_data", "user_identity": identity}
-            )
-            return jsonify({"error": "Unauthorized"}), 403
 
         logger.info(f"Admin {identity} accessing booking data from {request.remote_addr}")
 
@@ -206,21 +199,12 @@ def get_bookings():
 
 @bookings_bp.route("/booking/<int:booking_id>", methods=["PUT"])
 @limiter_bookings.limit("60/minute")
-@jwt_required()
+@roles_required("admin")
 def update_booking(booking_id):
     """Update booking with admin authorization."""
     try:
         # Check if user has admin permissions
         identity = get_jwt_identity()
-        if identity not in ["admin"]:
-            logger.warning(
-                f"Unauthorized booking update attempt by {identity} for booking {booking_id}"
-            )
-            log_security_event(
-                "UNAUTHORIZED_UPDATE_ATTEMPT",
-                {"endpoint": "update_booking", "user_identity": identity, "booking_id": booking_id},
-            )
-            return jsonify({"error": "Unauthorized"}), 403
 
         logger.info(f"Admin {identity} updating booking {booking_id}")
 
@@ -245,21 +229,12 @@ def update_booking(booking_id):
 
 @bookings_bp.route("/booking/<int:booking_id>/payment", methods=["PUT"])
 @limiter_bookings.limit("60/minute")
-@jwt_required()
+@roles_required("admin")
 def update_payment(booking_id):
     """Update payment status with admin authorization."""
     try:
         # Check if user has admin permissions
         identity = get_jwt_identity()
-        if identity not in ["admin"]:
-            logger.warning(
-                f"Unauthorized payment update attempt by {identity} for booking {booking_id}"
-            )
-            log_security_event(
-                "UNAUTHORIZED_PAYMENT_UPDATE",
-                {"endpoint": "update_payment", "user_identity": identity, "booking_id": booking_id},
-            )
-            return jsonify({"error": "Unauthorized"}), 403
 
         logger.info(f"Admin {identity} updating payment for booking {booking_id}")
 
@@ -284,21 +259,12 @@ def update_payment(booking_id):
 
 @bookings_bp.route("/booking/<int:booking_id>", methods=["DELETE"])
 @limiter_bookings.limit("30/minute")
-@jwt_required()
+@roles_required("admin")
 def delete_booking_endpoint(booking_id):
     """Delete booking with admin authorization."""
     try:
         # Check if user has admin permissions
         identity = get_jwt_identity()
-        if identity not in ["admin"]:
-            logger.warning(
-                f"Unauthorized booking deletion attempt by {identity} for booking {booking_id}"
-            )
-            log_security_event(
-                "UNAUTHORIZED_DELETE_ATTEMPT",
-                {"endpoint": "delete_booking", "user_identity": identity, "booking_id": booking_id},
-            )
-            return jsonify({"error": "Unauthorized"}), 403
 
         logger.warning(
             f"Admin {identity} deleting booking {booking_id}"

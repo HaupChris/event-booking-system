@@ -9,8 +9,8 @@ Requires admin JWT authentication.
 import re
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
 
+from src.api.auth_guards import protect_blueprint
 from src.services.app_settings_service import (
     get_frontend_branding_pack,
     get_payment_link,
@@ -27,6 +27,7 @@ from src.utils.logger import get_logger
 logger = get_logger(__name__)
 
 admin_settings_bp = Blueprint("admin_settings", __name__)
+protect_blueprint(admin_settings_bp, "admin")
 
 MIN_PASSWORD_LENGTH = 12
 BRANDING_PACK_PATTERN = re.compile(r"^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$")
@@ -40,32 +41,17 @@ def _is_valid_branding_pack(value: str) -> bool:
     return bool(BRANDING_PACK_PATTERN.match(value))
 
 
-def _ensure_admin_identity():
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"msg": "Unauthorized"}), 403
-    return None
-
-
 @admin_settings_bp.route("/settings/payment-link", methods=["GET"])
-@jwt_required()
 def get_payment_link_setting():
     """Return currently configured payment link."""
-    unauthorized_response = _ensure_admin_identity()
-    if unauthorized_response:
-        return unauthorized_response
 
     payment_link = get_payment_link()
     return jsonify({"payment_link": payment_link}), 200
 
 
 @admin_settings_bp.route("/settings/payment-link", methods=["PUT"])
-@jwt_required()
 def update_payment_link_setting():
     """Update payment link setting."""
-    unauthorized_response = _ensure_admin_identity()
-    if unauthorized_response:
-        return unauthorized_response
 
     data = request.get_json()
     if not data:
@@ -87,23 +73,15 @@ def update_payment_link_setting():
 
 
 @admin_settings_bp.route("/settings/public-app-url", methods=["GET"])
-@jwt_required()
 def get_public_app_url_setting():
     """Return currently configured public frontend URL."""
-    unauthorized_response = _ensure_admin_identity()
-    if unauthorized_response:
-        return unauthorized_response
 
     return jsonify({"public_app_url": get_public_app_url()}), 200
 
 
 @admin_settings_bp.route("/settings/public-app-url", methods=["PUT"])
-@jwt_required()
 def update_public_app_url_setting():
     """Update public frontend URL setting."""
-    unauthorized_response = _ensure_admin_identity()
-    if unauthorized_response:
-        return unauthorized_response
 
     data = request.get_json()
     if not data:
@@ -134,24 +112,16 @@ def update_public_app_url_setting():
 
 
 @admin_settings_bp.route("/settings/branding-pack", methods=["GET"])
-@jwt_required()
 def get_branding_pack_setting():
     """Return currently configured frontend branding pack."""
-    unauthorized_response = _ensure_admin_identity()
-    if unauthorized_response:
-        return unauthorized_response
 
     branding_pack = get_frontend_branding_pack()
     return jsonify({"branding_pack": branding_pack}), 200
 
 
 @admin_settings_bp.route("/settings/branding-pack", methods=["PUT"])
-@jwt_required()
 def update_branding_pack_setting():
     """Update frontend branding pack setting."""
-    unauthorized_response = _ensure_admin_identity()
-    if unauthorized_response:
-        return unauthorized_response
 
     data = request.get_json()
     if not data:
@@ -183,23 +153,15 @@ def update_branding_pack_setting():
 
 
 @admin_settings_bp.route("/settings/rideshare-enabled", methods=["GET"])
-@jwt_required()
 def get_rideshare_enabled_setting():
     """Return whether rideshare is enabled for profile pages."""
-    unauthorized_response = _ensure_admin_identity()
-    if unauthorized_response:
-        return unauthorized_response
 
     return jsonify({"rideshare_enabled": get_rideshare_enabled()}), 200
 
 
 @admin_settings_bp.route("/settings/rideshare-enabled", methods=["PUT"])
-@jwt_required()
 def update_rideshare_enabled_setting():
     """Update rideshare enable/disable toggle."""
-    unauthorized_response = _ensure_admin_identity()
-    if unauthorized_response:
-        return unauthorized_response
 
     data = request.get_json()
     if not data:
@@ -226,14 +188,9 @@ def update_rideshare_enabled_setting():
 
 
 @admin_settings_bp.route("/settings/password", methods=["PUT"])
-@jwt_required()
 def change_password():  # noqa: PLR0911
     """Update the password for a given role."""
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         data = request.get_json()
         if not data:
             return jsonify({"msg": "Missing JSON body"}), 400

@@ -14,9 +14,7 @@ frontend/src/form/adminArea/ShiftAssignments/components/UserItem.tsx 337
 frontend/src/form/adminArea/components/BookingDetailFormFields.tsx 354
 frontend/src/form/constants/texts.ts 348
 frontend/src/form/userArea/WorkshiftsForm.tsx 314
-server/src/api/admin_faq.py 366
-server/src/api/admin_news.py 330
-server/src/api/artist_bookings.py 360
+server/src/api/admin_faq.py 326
 server/src/api/profile.py 443
 server/src/scripts/generate_mock_data.py 362
 server/src/services/artist_service.py 536

@@ -3,8 +3,8 @@
 from typing import Any
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
 
+from src.api.auth_guards import protect_blueprint
 from src.services.workshift_service import (
     create_timeslot,
     create_workshift,
@@ -20,13 +20,8 @@ from src.utils.rate_limit import limiter
 logger = get_logger(__name__)
 
 admin_workshifts_bp = Blueprint("admin_workshifts", __name__)
+protect_blueprint(admin_workshifts_bp, "admin")
 limiter_admin_workshifts = limiter
-
-
-def _ensure_admin() -> tuple[dict, int] | None:
-    if get_jwt_identity() != "admin":
-        return {"error": "Unauthorized"}, 403
-    return None
 
 
 def _parse_positive_int(value: Any, default: int = 1) -> int:
@@ -57,23 +52,13 @@ def _parse_positive_int(value: Any, default: int = 1) -> int:
 
 @admin_workshifts_bp.route("/workshifts", methods=["GET"])
 @limiter_admin_workshifts.limit("200/minute")
-@jwt_required()
 def get_workshifts():
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     return jsonify({"work_shifts": get_workshifts_with_timeslots()}), 200
 
 
 @admin_workshifts_bp.route("/workshifts", methods=["POST"])
 @limiter_admin_workshifts.limit("60/minute")
-@jwt_required()
 def create_workshift_endpoint():
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     data = request.get_json()
     if not data:
         return jsonify({"error": "Missing JSON body"}), 400
@@ -93,12 +78,7 @@ def create_workshift_endpoint():
 
 @admin_workshifts_bp.route("/workshifts/<int:workshift_id>", methods=["PUT"])
 @limiter_admin_workshifts.limit("60/minute")
-@jwt_required()
 def update_workshift_endpoint(workshift_id: int):
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     data = request.get_json()
     if not data:
         return jsonify({"error": "Missing JSON body"}), 400
@@ -131,12 +111,7 @@ def update_workshift_endpoint(workshift_id: int):
 
 @admin_workshifts_bp.route("/workshifts/<int:workshift_id>", methods=["DELETE"])
 @limiter_admin_workshifts.limit("30/minute")
-@jwt_required()
 def delete_workshift_endpoint(workshift_id: int):
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     success, message = delete_workshift(workshift_id)
     if not success:
         status_code = 404 if message == "Workshift not found" else 400
@@ -147,12 +122,7 @@ def delete_workshift_endpoint(workshift_id: int):
 
 @admin_workshifts_bp.route("/workshifts/<int:workshift_id>/timeslots", methods=["POST"])
 @limiter_admin_workshifts.limit("60/minute")
-@jwt_required()
 def create_timeslot_endpoint(workshift_id: int):
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     data = request.get_json()
     if not data:
         return jsonify({"error": "Missing JSON body"}), 400
@@ -178,12 +148,7 @@ def create_timeslot_endpoint(workshift_id: int):
 
 @admin_workshifts_bp.route("/timeslots/<int:timeslot_id>", methods=["PUT"])
 @limiter_admin_workshifts.limit("60/minute")
-@jwt_required()
 def update_timeslot_endpoint(timeslot_id: int):
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     data = request.get_json()
     if not data:
         return jsonify({"error": "Missing JSON body"}), 400
@@ -212,12 +177,7 @@ def update_timeslot_endpoint(timeslot_id: int):
 
 @admin_workshifts_bp.route("/timeslots/<int:timeslot_id>", methods=["DELETE"])
 @limiter_admin_workshifts.limit("30/minute")
-@jwt_required()
 def delete_timeslot_endpoint(timeslot_id: int):
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     success, message = delete_timeslot(timeslot_id)
     if not success:
         status_code = 404 if message == "Timeslot not found" else 400

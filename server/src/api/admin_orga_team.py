@@ -1,8 +1,8 @@
 """Admin API for managing Orga Team inviters."""
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
 
+from src.api.auth_guards import protect_blueprint
 from src.services.orga_team_service import (
     create_orga_team_member,
     deactivate_orga_team_member,
@@ -15,23 +15,13 @@ from src.utils.rate_limit import limiter
 logger = get_logger(__name__)
 
 admin_orga_team_bp = Blueprint("admin_orga_team", __name__)
+protect_blueprint(admin_orga_team_bp, "admin")
 limiter_admin_orga = limiter
-
-
-def _ensure_admin() -> tuple[dict, int] | None:
-    if get_jwt_identity() != "admin":
-        return {"error": "Unauthorized"}, 403
-    return None
 
 
 @admin_orga_team_bp.route("/orga-team", methods=["GET"])
 @limiter_admin_orga.limit("200/minute")
-@jwt_required()
 def get_orga_team_list():
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     include_inactive = request.args.get("include_inactive", "true").lower() == "true"
     inviters = get_orga_team_members(include_inactive=include_inactive)
     return jsonify({"inviters": inviters}), 200
@@ -39,12 +29,7 @@ def get_orga_team_list():
 
 @admin_orga_team_bp.route("/orga-team", methods=["POST"])
 @limiter_admin_orga.limit("60/minute")
-@jwt_required()
 def create_orga_team_item():
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     data = request.get_json()
     if not data:
         return jsonify({"error": "Missing JSON body"}), 400
@@ -65,12 +50,7 @@ def create_orga_team_item():
 
 @admin_orga_team_bp.route("/orga-team/<int:member_id>", methods=["PUT"])
 @limiter_admin_orga.limit("60/minute")
-@jwt_required()
 def update_orga_team_item(member_id: int):
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     data = request.get_json()
     if not data:
         return jsonify({"error": "Missing JSON body"}), 400
@@ -99,12 +79,7 @@ def update_orga_team_item(member_id: int):
 
 @admin_orga_team_bp.route("/orga-team/<int:member_id>", methods=["DELETE"])
 @limiter_admin_orga.limit("30/minute")
-@jwt_required()
 def delete_orga_team_item(member_id: int):
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     success = deactivate_orga_team_member(member_id)
     if not success:
         return jsonify({"error": "Inviter not found"}), 404

@@ -9,8 +9,9 @@ Requires admin JWT authentication.
 import time
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity
 
+from src.api.auth_guards import protect_blueprint
 from src.services.news_service import (
     create_news,
     create_news_category,
@@ -30,19 +31,12 @@ from src.utils.rate_limit import limiter
 logger = get_logger(__name__)
 
 admin_news_bp = Blueprint("admin_news", __name__)
+protect_blueprint(admin_news_bp, "admin")
 limiter_admin_news = limiter
-
-
-def _ensure_admin_identity():
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-    return None
 
 
 @admin_news_bp.route("/news", methods=["GET"])
 @limiter_admin_news.limit("200/minute")
-@jwt_required()
 def get_news_list():
     """
     Get all news items (admin only).
@@ -54,10 +48,6 @@ def get_news_list():
     admin_user = get_jwt_identity()
 
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         logger.info(f"News list request from admin {admin_user} at {client_ip}")
 
         include_inactive = request.args.get("include_inactive", "false").lower() == "true"
@@ -77,14 +67,9 @@ def get_news_list():
 
 @admin_news_bp.route("/news/categories", methods=["GET"])
 @limiter_admin_news.limit("200/minute")
-@jwt_required()
 def get_news_categories_list():
     """Get all available news categories (admin)."""
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         include_inactive = request.args.get("include_inactive", "false").lower() == "true"
         categories = get_news_categories(include_inactive=include_inactive)
         return jsonify({"categories": categories}), 200
@@ -95,14 +80,9 @@ def get_news_categories_list():
 
 @admin_news_bp.route("/news/categories", methods=["POST"])
 @limiter_admin_news.limit("60/minute")
-@jwt_required()
 def create_news_category_item():
     """Create a custom news category (admin)."""
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         if not request.json:
             return jsonify({"error": "Missing JSON body"}), 400
 
@@ -125,14 +105,9 @@ def create_news_category_item():
 
 @admin_news_bp.route("/news/categories/<int:category_id>", methods=["PUT"])
 @limiter_admin_news.limit("60/minute")
-@jwt_required()
 def update_news_category_item(category_id: int):
     """Update a custom news category (admin)."""
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         if not request.json:
             return jsonify({"error": "Missing JSON body"}), 400
 
@@ -165,14 +140,9 @@ def update_news_category_item(category_id: int):
 
 @admin_news_bp.route("/news/categories/<int:category_id>", methods=["DELETE"])
 @limiter_admin_news.limit("30/minute")
-@jwt_required()
 def deactivate_news_category_item(category_id: int):
     """Deactivate a news category (admin)."""
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         success = deactivate_news_category(category_id)
         if not success:
             return jsonify({"error": "Category not found"}), 404
@@ -184,17 +154,12 @@ def deactivate_news_category_item(category_id: int):
 
 @admin_news_bp.route("/news/<int:news_id>", methods=["GET"])
 @limiter_admin_news.limit("200/minute")
-@jwt_required()
 def get_news_item(news_id: int):
     """Get a specific news item by ID (admin only)."""
     client_ip = request.remote_addr
     admin_user = get_jwt_identity()
 
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         logger.debug(f"News item {news_id} request from admin {admin_user} at {client_ip}")
 
         news = get_news_by_id(news_id)
@@ -212,7 +177,6 @@ def get_news_item(news_id: int):
 
 @admin_news_bp.route("/news", methods=["POST"])
 @limiter_admin_news.limit("60/minute")
-@jwt_required()
 def create_news_item():
     """
     Create a new news item (admin only).
@@ -231,10 +195,6 @@ def create_news_item():
     admin_user = get_jwt_identity()
 
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         logger.info(f"News creation request from admin {admin_user} at {client_ip}")
 
         # Validate request
@@ -281,7 +241,6 @@ def create_news_item():
 
 @admin_news_bp.route("/news/<int:news_id>", methods=["PUT"])
 @limiter_admin_news.limit("60/minute")
-@jwt_required()
 def update_news_item(news_id: int):
     """
     Update an existing news item (admin only).
@@ -300,10 +259,6 @@ def update_news_item(news_id: int):
     admin_user = get_jwt_identity()
 
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         logger.info(
             f"News update request for item {news_id} from admin {admin_user} at {client_ip}"
         )
@@ -344,7 +299,6 @@ def update_news_item(news_id: int):
 
 @admin_news_bp.route("/news/<int:news_id>", methods=["DELETE"])
 @limiter_admin_news.limit("30/minute")
-@jwt_required()
 def delete_news_item(news_id: int):
     """
     Delete a news item (admin only).
@@ -357,10 +311,6 @@ def delete_news_item(news_id: int):
     admin_user = get_jwt_identity()
 
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         logger.info(
             f"News deletion request for item {news_id} from admin {admin_user} at {client_ip}"
         )
@@ -387,7 +337,6 @@ def delete_news_item(news_id: int):
 
 @admin_news_bp.route("/news/<int:news_id>/move", methods=["POST"])
 @limiter_admin_news.limit("120/minute")
-@jwt_required()
 def move_news_item(news_id: int):
     """
     Move a news item up or down in display order.
@@ -398,10 +347,6 @@ def move_news_item(news_id: int):
         }
     """
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         payload = request.json or {}
         direction = str(payload.get("direction", "")).strip().lower()
         if direction not in {"up", "down"}:

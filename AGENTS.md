@@ -93,7 +93,10 @@ only be reduced, never extended:
 
 - Never trust client-supplied prices, payment status or other server-owned fields:
   accept only whitelisted request fields and compute prices on the server.
-- Check roles on the server for every protected endpoint (JWT `role` claim).
+- Authorize every endpoint with `src/api/auth_guards.py`: `protect_blueprint(bp, "admin")` for
+  admin blueprints, `@roles_required(...)` for single routes (JWT `role` claim). No inline checks.
+  `server/test/test_route_authorization.py` enumerates all routes: a new public or non-admin
+  route must be added there explicitly, otherwise it is expected to be admin-only.
 - Escape all user input that ends up in HTML (including emails).
 - Do not log personal data (emails, names, full profile UUIDs) or secrets.
 - Secrets only via environment variables; `detect-secrets` runs in pre-commit.

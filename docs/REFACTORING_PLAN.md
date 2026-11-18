@@ -51,19 +51,19 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
 
 ## Phase 0 – Sicherheitslücken (sofort)
 
-- [ ] **S1 – Client bestimmt Preis und Zahlstatus.**
+- [x] **S1 – Client bestimmt Preis und Zahlstatus.**
   `/api/submitForm` übernimmt das Request-JSON 1:1 (`Booking(**booking_data)`), `total_price`,
   `is_paid`, `paid_amount`, `payment_*` landen ungeprüft in der DB.
   Orte: `server/src/api/bookings.py` (submit_form), `server/src/services/booking_service.py` (create_booking).
   Maßnahme: nur erlaubte Felder annehmen, Preis serverseitig berechnen (wie im Artist-Pfad,
   `server/src/api/artist_bookings.py` → `_calculate_artist_total_price`), Zahlungsfelder auf Defaults setzen.
 
-- [ ] **S2 – HTML-Injection in Mails.**
+- [x] **S2 – HTML-Injection in Mails.**
   `first_name`, `last_name`, `supporter_buddy` u. a. werden unescaped in HTML-f-Strings eingesetzt.
   Ort: `server/src/services/mail_service.py` (Bestätigungs-, Artist- und Recovery-Mails).
   Maßnahme: sofort `html.escape()`, mittelfristig Jinja2 mit Autoescape (B5).
 
-- [ ] **S3 – Rollenprüfung 30+ Mal kopiert, per Identity-String.**
+- [x] **S3 – Rollenprüfung 30+ Mal kopiert, per Identity-String.**
   `identity != "admin"` in fast jedem Admin-Endpunkt (`admin_faq.py` 10×, `shift_assignments.py` 10×, …).
   `/submitForm` akzeptiert jedes gültige Token, auch Artist-Tokens.
   Maßnahme: zentraler Decorator `@role_required(...)` auf Basis des `role`-Claims bzw.

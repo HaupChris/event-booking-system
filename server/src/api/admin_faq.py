@@ -9,8 +9,9 @@ Requires admin JWT authentication.
 import time
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity
 
+from src.api.auth_guards import protect_blueprint
 from src.services.faq_service import (
     create_faq,
     create_faq_category,
@@ -30,12 +31,12 @@ from src.utils.rate_limit import limiter
 logger = get_logger(__name__)
 
 admin_faq_bp = Blueprint("admin_faq", __name__)
+protect_blueprint(admin_faq_bp, "admin")
 limiter_admin_faq = limiter
 
 
 @admin_faq_bp.route("/faqs", methods=["GET"])
 @limiter_admin_faq.limit("200/minute")
-@jwt_required()
 def get_faqs_list():
     """
     Get all FAQ items (admin only).
@@ -46,11 +47,6 @@ def get_faqs_list():
     """
     client_ip = request.remote_addr
     admin_user = get_jwt_identity()
-
-    # Admin identity check
-    if admin_user != "admin":
-        logger.warning(f"Unauthorized FAQ list access attempt from {admin_user} at {client_ip}")
-        return jsonify({"error": "Unauthorized"}), 403
 
     try:
         logger.info(f"FAQ list request from admin {admin_user} at {client_ip}")
@@ -76,16 +72,10 @@ def get_faqs_list():
 
 @admin_faq_bp.route("/faqs/<int:faq_id>", methods=["GET"])
 @limiter_admin_faq.limit("200/minute")
-@jwt_required()
 def get_faq_item(faq_id: int):
     """Get a specific FAQ item by ID (admin only)."""
     client_ip = request.remote_addr
     admin_user = get_jwt_identity()
-
-    # Admin identity check
-    if admin_user != "admin":
-        logger.warning(f"Unauthorized FAQ access attempt from {admin_user} at {client_ip}")
-        return jsonify({"error": "Unauthorized"}), 403
 
     try:
         logger.debug(f"FAQ item {faq_id} request from admin {admin_user} at {client_ip}")
@@ -105,7 +95,6 @@ def get_faq_item(faq_id: int):
 
 @admin_faq_bp.route("/faqs", methods=["POST"])
 @limiter_admin_faq.limit("60/minute")
-@jwt_required()
 def create_faq_item():
     """
     Create a new FAQ item (admin only).
@@ -121,11 +110,6 @@ def create_faq_item():
     start_time = time.time()
     client_ip = request.remote_addr
     admin_user = get_jwt_identity()
-
-    # Admin identity check
-    if admin_user != "admin":
-        logger.warning(f"Unauthorized FAQ creation attempt from {admin_user} at {client_ip}")
-        return jsonify({"error": "Unauthorized"}), 403
 
     try:
         logger.info(f"FAQ creation request from admin {admin_user} at {client_ip}")
@@ -164,7 +148,6 @@ def create_faq_item():
 
 @admin_faq_bp.route("/faqs/<int:faq_id>", methods=["PUT"])
 @limiter_admin_faq.limit("60/minute")
-@jwt_required()
 def update_faq_item(faq_id: int):
     """
     Update an existing FAQ item (admin only).
@@ -181,11 +164,6 @@ def update_faq_item(faq_id: int):
     start_time = time.time()
     client_ip = request.remote_addr
     admin_user = get_jwt_identity()
-
-    # Admin identity check
-    if admin_user != "admin":
-        logger.warning(f"Unauthorized FAQ update attempt from {admin_user} at {client_ip}")
-        return jsonify({"error": "Unauthorized"}), 403
 
     try:
         logger.info(f"FAQ update request for item {faq_id} from admin {admin_user} at {client_ip}")
@@ -226,7 +204,6 @@ def update_faq_item(faq_id: int):
 
 @admin_faq_bp.route("/faqs/<int:faq_id>", methods=["DELETE"])
 @limiter_admin_faq.limit("30/minute")
-@jwt_required()
 def delete_faq_item(faq_id: int):
     """
     Delete a FAQ item (admin only).
@@ -237,11 +214,6 @@ def delete_faq_item(faq_id: int):
     start_time = time.time()
     client_ip = request.remote_addr
     admin_user = get_jwt_identity()
-
-    # Admin identity check
-    if admin_user != "admin":
-        logger.warning(f"Unauthorized FAQ deletion attempt from {admin_user} at {client_ip}")
-        return jsonify({"error": "Unauthorized"}), 403
 
     try:
         logger.info(
@@ -270,7 +242,6 @@ def delete_faq_item(faq_id: int):
 
 @admin_faq_bp.route("/faq-categories", methods=["GET"])
 @limiter_admin_faq.limit("200/minute")
-@jwt_required()
 def get_categories_list():
     """
     Get all FAQ categories (admin only).
@@ -280,13 +251,6 @@ def get_categories_list():
     """
     client_ip = request.remote_addr
     admin_user = get_jwt_identity()
-
-    # Admin identity check
-    if admin_user != "admin":
-        logger.warning(
-            f"Unauthorized category list access attempt from {admin_user} at {client_ip}"
-        )
-        return jsonify({"error": "Unauthorized"}), 403
 
     try:
         logger.info(f"FAQ category list request from admin {admin_user} at {client_ip}")
@@ -308,16 +272,10 @@ def get_categories_list():
 
 @admin_faq_bp.route("/faq-categories/<int:category_id>", methods=["GET"])
 @limiter_admin_faq.limit("200/minute")
-@jwt_required()
 def get_category_item(category_id: int):
     """Get a specific FAQ category by ID (admin only)."""
     client_ip = request.remote_addr
     admin_user = get_jwt_identity()
-
-    # Admin identity check
-    if admin_user != "admin":
-        logger.warning(f"Unauthorized category access attempt from {admin_user} at {client_ip}")
-        return jsonify({"error": "Unauthorized"}), 403
 
     try:
         logger.debug(f"FAQ category {category_id} request from admin {admin_user} at {client_ip}")
@@ -337,7 +295,6 @@ def get_category_item(category_id: int):
 
 @admin_faq_bp.route("/faq-categories", methods=["POST"])
 @limiter_admin_faq.limit("60/minute")
-@jwt_required()
 def create_category_item():
     """
     Create a new FAQ category (admin only).
@@ -351,11 +308,6 @@ def create_category_item():
     start_time = time.time()
     client_ip = request.remote_addr
     admin_user = get_jwt_identity()
-
-    # Admin identity check
-    if admin_user != "admin":
-        logger.warning(f"Unauthorized category creation attempt from {admin_user} at {client_ip}")
-        return jsonify({"error": "Unauthorized"}), 403
 
     try:
         logger.info(f"FAQ category creation request from admin {admin_user} at {client_ip}")
@@ -392,7 +344,6 @@ def create_category_item():
 
 @admin_faq_bp.route("/faq-categories/<int:category_id>", methods=["PUT"])
 @limiter_admin_faq.limit("60/minute")
-@jwt_required()
 def update_category_item(category_id: int):
     """
     Update an existing FAQ category (admin only).
@@ -407,11 +358,6 @@ def update_category_item(category_id: int):
     start_time = time.time()
     client_ip = request.remote_addr
     admin_user = get_jwt_identity()
-
-    # Admin identity check
-    if admin_user != "admin":
-        logger.warning(f"Unauthorized category update attempt from {admin_user} at {client_ip}")
-        return jsonify({"error": "Unauthorized"}), 403
 
     try:
         logger.info(
@@ -452,7 +398,6 @@ def update_category_item(category_id: int):
 
 @admin_faq_bp.route("/faq-categories/<int:category_id>", methods=["DELETE"])
 @limiter_admin_faq.limit("30/minute")
-@jwt_required()
 def delete_category_item(category_id: int):
     """
     Delete a FAQ category (admin only).
@@ -463,11 +408,6 @@ def delete_category_item(category_id: int):
     start_time = time.time()
     client_ip = request.remote_addr
     admin_user = get_jwt_identity()
-
-    # Admin identity check
-    if admin_user != "admin":
-        logger.warning(f"Unauthorized category deletion attempt from {admin_user} at {client_ip}")
-        return jsonify({"error": "Unauthorized"}), 403
 
     try:
         logger.info(

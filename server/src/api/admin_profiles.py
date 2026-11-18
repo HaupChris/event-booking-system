@@ -9,8 +9,9 @@ Requires admin JWT authentication.
 import time
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity
 
+from src.api.auth_guards import protect_blueprint
 from src.services.profile_service import get_profile_stats, send_profile_link_email
 from src.utils.logger import get_logger
 from src.utils.rate_limit import limiter
@@ -19,19 +20,12 @@ from src.utils.rate_limit import limiter
 logger = get_logger(__name__)
 
 admin_profiles_bp = Blueprint("admin_profiles", __name__)
+protect_blueprint(admin_profiles_bp, "admin")
 limiter_admin_profiles = limiter
-
-
-def _ensure_admin_identity():
-    identity = get_jwt_identity()
-    if identity != "admin":
-        return jsonify({"error": "Unauthorized"}), 403
-    return None
 
 
 @admin_profiles_bp.route("/profiles/stats", methods=["GET"])
 @limiter_admin_profiles.limit("200/minute")
-@jwt_required()
 def get_profiles_stats():
     """
     Get profile access statistics for all users (admin only).
@@ -57,10 +51,6 @@ def get_profiles_stats():
     admin_user = get_jwt_identity()
 
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         logger.info(f"Profile stats request from admin {admin_user} at {client_ip}")
 
         stats = get_profile_stats()
@@ -76,7 +66,6 @@ def get_profiles_stats():
 
 @admin_profiles_bp.route("/profiles/send-link", methods=["POST"])
 @limiter_admin_profiles.limit("60/minute")
-@jwt_required()
 def send_profile_link():
     """
     Send profile link to a user via email (admin only).
@@ -94,10 +83,6 @@ def send_profile_link():
     admin_user = get_jwt_identity()
 
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         logger.info(f"Send profile link request from admin {admin_user} at {client_ip}")
 
         # Validate request
@@ -136,7 +121,6 @@ def send_profile_link():
 
 @admin_profiles_bp.route("/profiles/bulk-send", methods=["POST"])
 @limiter_admin_profiles.limit("10/hour")
-@jwt_required()
 def bulk_send_profile_links():
     """
     Send profile links to multiple users via email (admin only).
@@ -152,10 +136,6 @@ def bulk_send_profile_links():
     admin_user = get_jwt_identity()
 
     try:
-        unauthorized_response = _ensure_admin_identity()
-        if unauthorized_response:
-            return unauthorized_response
-
         logger.info(f"Bulk send profile links request from admin {admin_user} at {client_ip}")
 
         # Validate request

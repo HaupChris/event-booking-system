@@ -3,8 +3,8 @@
 from typing import Any, cast
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
 
+from src.api.auth_guards import protect_blueprint
 from src.services.option_service import (
     OptionScope,
     OptionType,
@@ -18,16 +18,11 @@ from src.services.option_service import (
 from src.utils.rate_limit import limiter
 
 admin_options_bp = Blueprint("admin_options", __name__)
+protect_blueprint(admin_options_bp, "admin")
 limiter_admin_options = limiter
 
 VALID_SCOPES = {"regular", "artist"}
 VALID_OPTION_TYPES = {"ticket", "beverage", "food", "material"}
-
-
-def _ensure_admin() -> tuple[dict, int] | None:
-    if get_jwt_identity() != "admin":
-        return {"error": "Unauthorized"}, 403
-    return None
 
 
 def _is_valid_scope(scope: str) -> bool:
@@ -70,12 +65,7 @@ def _to_bool(value: Any, default: bool = True) -> bool:
 
 @admin_options_bp.route("/options/<string:scope>/<string:option_type>", methods=["GET"])
 @limiter_admin_options.limit("200/minute")
-@jwt_required()
 def get_options_endpoint(scope: str, option_type: str):
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     if not _is_valid_scope(scope) or not _is_valid_option_type(option_type):
         return jsonify({"error": "Invalid option scope or type"}), 400
 
@@ -95,12 +85,7 @@ def get_options_endpoint(scope: str, option_type: str):
 
 @admin_options_bp.route("/options/<string:scope>/<string:option_type>", methods=["POST"])
 @limiter_admin_options.limit("60/minute")
-@jwt_required()
 def create_option_endpoint(scope: str, option_type: str):  # noqa: PLR0911
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     if not _is_valid_scope(scope) or not _is_valid_option_type(option_type):
         return jsonify({"error": "Invalid option scope or type"}), 400
 
@@ -148,12 +133,7 @@ def create_option_endpoint(scope: str, option_type: str):  # noqa: PLR0911
     "/options/<string:scope>/<string:option_type>/<int:option_id>", methods=["PUT"]
 )
 @limiter_admin_options.limit("60/minute")
-@jwt_required()
 def update_option_endpoint(scope: str, option_type: str, option_id: int):  # noqa: C901, PLR0911, PLR0912  # lint-baseline
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     if not _is_valid_scope(scope) or not _is_valid_option_type(option_type):
         return jsonify({"error": "Invalid option scope or type"}), 400
 
@@ -217,12 +197,7 @@ def update_option_endpoint(scope: str, option_type: str, option_id: int):  # noq
     "/options/<string:scope>/<string:option_type>/<int:option_id>", methods=["DELETE"]
 )
 @limiter_admin_options.limit("30/minute")
-@jwt_required()
 def delete_option_endpoint(scope: str, option_type: str, option_id: int):
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     if not _is_valid_scope(scope) or not _is_valid_option_type(option_type):
         return jsonify({"error": "Invalid option scope or type"}), 400
 
@@ -241,12 +216,7 @@ def delete_option_endpoint(scope: str, option_type: str, option_id: int):
     "/options/<string:scope>/<string:option_type>/step-description", methods=["PUT"]
 )
 @limiter_admin_options.limit("60/minute")
-@jwt_required()
 def update_step_description_endpoint(scope: str, option_type: str):
-    unauthorized = _ensure_admin()
-    if unauthorized:
-        return jsonify(unauthorized[0]), unauthorized[1]
-
     if not _is_valid_scope(scope) or not _is_valid_option_type(option_type):
         return jsonify({"error": "Invalid option scope or type"}), 400
 
