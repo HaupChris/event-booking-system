@@ -11,6 +11,7 @@ dependencies = [
     "Flask-JWT-Extended>=4.7.0",
     "python-dotenv>=1.0.0",
     "gunicorn>=23.0.0",
+    "structlog>=26.1.0",
 ]
 
 [project.optional-dependencies]
@@ -78,6 +79,8 @@ select = [
     "C90",
     # flake8-tidy-imports (banned APIs, relative imports)
     "TID",
+    # flake8-logging-format: no f-strings/format in log calls (docs/LOGGING.md)
+    "G",
 ]
 
 ignore = [
@@ -92,6 +95,30 @@ ignore = [
 "src/migrations/*.py" = ["ALL"]    # Legacy one-off migrations, replaced in B2
 "test/*.py" = ["S101", "ARG", "PLR2004", "PLR0913"]  # Asserts, magic values; pytest injects fixtures as arguments
 "src/scripts/generate_mock_data.py" = ["S311"]  # Mock data does not need cryptographic randomness
+
+# Logging baseline (2026-11-18): f-strings in log calls. Migrate each file to structured
+# events (docs/LOGGING.md, Phase L PR 4 / S7) and remove its entry. Never add entries.
+"src/api/admin_booking_mails.py" = ["G004"]
+"src/api/admin_faq.py" = ["G004"]
+"src/api/admin_news.py" = ["G004"]
+"src/api/admin_orga_team.py" = ["G004"]
+"src/api/admin_profiles.py" = ["G004"]
+"src/api/admin_settings.py" = ["G004"]
+"src/api/artist_bookings.py" = ["G004"]
+"src/api/auth.py" = ["G004"]
+"src/api/bookings.py" = ["G004"]
+"src/api/formcontent.py" = ["G004"]
+"src/api/health.py" = ["G004"]
+"src/api/profile.py" = ["G004"]
+"src/services/app_settings_service.py" = ["G004"]
+"src/services/artist_service.py" = ["G004"]
+"src/services/booking_service.py" = ["G004"]
+"src/services/faq_service.py" = ["G004"]
+"src/services/formcontent_service.py" = ["G004"]
+"src/services/mail_service.py" = ["G004"]
+"src/services/news_service.py" = ["G004"]
+"src/services/password_service.py" = ["G004"]
+"src/services/profile_service.py" = ["G004"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10

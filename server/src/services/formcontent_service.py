@@ -144,9 +144,7 @@ def get_form_content_obj() -> FormContent:  # noqa: PLR0915  # lint-baseline
         raise
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(
-            f"Unexpected error loading form content after {duration:.3f}s: {str(e)}", exc_info=True
-        )
+        logger.exception(f"Unexpected error loading form content after {duration:.3f}s: {str(e)}")
         raise
 
 
@@ -226,9 +224,8 @@ def get_artist_form_content_obj() -> ArtistFormContent:
         raise
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(
+        logger.exception(
             f"Unexpected error loading artist form content after {duration:.3f}s: {str(e)}",
-            exc_info=True,
         )
         raise
 
@@ -689,9 +686,8 @@ def update_form_content_with_db_counts(  # noqa: C901, PLR0912, PLR0915  # lint-
 
     except sqlite3.Error as e:
         duration = time.time() - start_time
-        logger.error(
+        logger.exception(
             f"Database error updating form content counts after {duration:.3f}s: {str(e)}",
-            exc_info=True,
         )
         # Return the form content without updated counts as fallback
         if conn is not None:
@@ -699,9 +695,8 @@ def update_form_content_with_db_counts(  # noqa: C901, PLR0912, PLR0915  # lint-
         return asdict(form_content_obj)
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(
+        logger.exception(
             f"Unexpected error updating form content counts after {duration:.3f}s: {str(e)}",
-            exc_info=True,
         )
         # Return the form content without updated counts as fallback
         if conn is not None:
@@ -878,9 +873,8 @@ def update_artist_form_content_with_db_counts(  # noqa: C901, PLR0912, PLR0915  
 
     except sqlite3.Error as e:
         duration = time.time() - start_time
-        logger.error(
+        logger.exception(
             f"Database error updating artist form content counts after {duration:.3f}s: {str(e)}",
-            exc_info=True,
         )
         # Return the form content without updated counts as fallback
         if conn is not None:
@@ -888,9 +882,8 @@ def update_artist_form_content_with_db_counts(  # noqa: C901, PLR0912, PLR0915  
         return asdict(form_content_obj)
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(
+        logger.exception(
             f"Unexpected error updating artist form content counts after {duration:.3f}s: {str(e)}",
-            exc_info=True,
         )
         # Return the form content without updated counts as fallback
         if conn is not None:

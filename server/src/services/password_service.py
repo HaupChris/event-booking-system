@@ -36,7 +36,7 @@ def _connect_db() -> sqlite3.Connection:
         conn.row_factory = sqlite3.Row
         return conn
     except sqlite3.Error as e:
-        logger.error(f"Failed to connect to database: {e}", exc_info=True)
+        logger.exception(f"Failed to connect to database: {e}")
         raise
 
 
@@ -49,7 +49,7 @@ def get_password_hash(role: str) -> str | None:
             row = cursor.fetchone()
             return row["password_hash"] if row else None
     except sqlite3.Error as e:
-        logger.error(f"Error fetching password hash for {role}: {e}", exc_info=True)
+        logger.exception(f"Error fetching password hash for {role}: {e}")
         return None
 
 
@@ -92,7 +92,7 @@ def update_password(role: str, new_password: str) -> bool:
             logger.info(f"Password updated for role '{role}'")
             return True
     except sqlite3.Error as e:
-        logger.error(f"Error updating password for {role}: {e}", exc_info=True)
+        logger.exception(f"Error updating password for {role}: {e}")
         return False
 
 

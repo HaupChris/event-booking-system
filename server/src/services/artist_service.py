@@ -398,7 +398,7 @@ def insert_artist_bookings(bookings: list[ArtistBooking]) -> tuple[bool, list[st
             conn.commit()
         except Exception:
             conn.rollback()
-            logger.error("Artist booking insertion rolled back", exc_info=True)
+            logger.exception("Artist booking insertion rolled back")
             raise
 
     return True, profile_uuids

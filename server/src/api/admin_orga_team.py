@@ -44,7 +44,7 @@ def create_orga_team_item():
         inviter_id = create_orga_team_member(name=name, display_order=display_order)
         return jsonify({"message": "Inviter created", "id": inviter_id}), 201
     except Exception as error:
-        logger.error(f"Failed to create inviter '{name}': {error}", exc_info=True)
+        logger.exception(f"Failed to create inviter '{name}': {error}")
         return jsonify({"error": "Failed to create inviter"}), 500
 
 

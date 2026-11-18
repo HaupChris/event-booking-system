@@ -36,7 +36,7 @@ def _connect_db() -> sqlite3.Connection:
         conn = sqlite3.connect(DB_FILE_PATH)
         return conn
     except sqlite3.Error as e:
-        logger.error(f"Failed to connect to database: {e}", exc_info=True)
+        logger.exception(f"Failed to connect to database: {e}")
         raise
 
 
@@ -202,9 +202,8 @@ def insert_booking(booking: Booking) -> tuple[bool, str | None]:
             conn.commit()
         except Exception:
             conn.rollback()
-            logger.error(
+            logger.exception(
                 f"Booking insertion rolled back for {booking.first_name} {booking.last_name}",
-                exc_info=True,
             )
             raise
 
@@ -320,9 +319,7 @@ def get_all_bookings() -> list[BookingWithTimestamp]:
             return bookings
     except sqlite3.Error as e:
         duration = time.time() - start_time
-        logger.error(
-            f"Database error retrieving bookings after {duration:.3f}s: {e}", exc_info=True
-        )
+        logger.exception(f"Database error retrieving bookings after {duration:.3f}s: {e}")
         return []
 
 
@@ -338,7 +335,7 @@ def check_email_exists(email: str) -> bool:
             return cursor.fetchone() is not None
 
     except sqlite3.Error as e:
-        logger.error(f"Database error checking email existence: {e}", exc_info=True)
+        logger.exception(f"Database error checking email existence: {e}")
         return True
 
 
@@ -362,9 +359,7 @@ def get_up_to_date_form_content() -> dict:
         return result
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(
-            f"Failed to generate form content after {duration:.3f}s: {str(e)}", exc_info=True
-        )
+        logger.exception(f"Failed to generate form content after {duration:.3f}s: {str(e)}")
         return {}
 
 
@@ -464,10 +459,10 @@ def update_booking_db(booking_id: int, booking_data: dict) -> bool:
                 print(f"Error updating booking: {e}")
                 return False
     except sqlite3.Error as e:
-        logger.error(f"Database error updating booking {booking_id}: {e}", exc_info=True)
+        logger.exception(f"Database error updating booking {booking_id}: {e}")
         return False
     except Exception as e:
-        logger.error(f"Unexpected error updating booking {booking_id}: {str(e)}", exc_info=True)
+        logger.exception(f"Unexpected error updating booking {booking_id}: {str(e)}")
         return False
 
 
@@ -513,7 +508,7 @@ def update_booking_payment(booking_id: int, payment_data: dict) -> bool:
                 print(f"Error updating payment: {e}")
                 return False
     except Exception as e:
-        logger.error(f"Failed to update payment for booking {booking_id}: {str(e)}", exc_info=True)
+        logger.exception(f"Failed to update payment for booking {booking_id}: {str(e)}")
         return False
 
 
@@ -565,5 +560,5 @@ def delete_booking(booking_id: int) -> bool:
                 print(f"Error deleting booking: {e}")
                 return False
     except Exception as e:
-        logger.error(f"Failed to delete booking {booking_id}: {str(e)}", exc_info=True)
+        logger.exception(f"Failed to delete booking {booking_id}: {str(e)}")
         return False

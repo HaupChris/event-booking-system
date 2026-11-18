@@ -1,5 +1,4 @@
 import os
-import sys
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -28,8 +27,7 @@ from src.services.password_service import ensure_password_hashes
 from src.utils.config import load_config
 from src.utils.logger import (
     get_logger,
-    log_request,
-    log_response,
+    init_request_logging,
     log_security_event,
     setup_logging,
 )
@@ -54,10 +52,11 @@ cors_origins_raw = os.environ.get(
     "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173",
 )
 allowed_origins = [origin.strip() for origin in cors_origins_raw.split(",") if origin.strip()]
-CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
+CORS(app, resources={r"/api/*": {"origins": allowed_origins}}, expose_headers=["X-Request-ID"])
 
 # Setup logging
 setup_logging(app)
+init_request_logging(app)
 
 # Setup JWT
 jwt = JWTManager(app)
@@ -83,9 +82,7 @@ def header_whitelist():
 
 @app.errorhandler(HTTPException)
 def handle_http_exception(e):
-    logger.warning(
-        f"HTTP Exception {e.code}: {request.method} {request.path} from {get_client_ip()}"
-    )
+    # Status and route are already part of request_finished.
     return {"message": e.description}, e.code
 
 
@@ -110,15 +107,13 @@ app.register_blueprint(admin_options_bp, url_prefix="/api/admin")
 
 @app.errorhandler(Exception)
 def handle_all_errors(e):
-    logger.error(f"Unhandled Exception: {str(e)}", exc_info=True)
+    logger.error("unhandled_exception", error_type=type(e).__name__, exc_info=True)
     return {"message": "Internal server error"}, 500
 
 
 @app.errorhandler(404)
 def handle_not_found(_e):
-    logger.warning(f"404 Not Found: {request.method} {request.path} from {get_client_ip()}")
-
-    # Track potential scanning attempts
+    # Track potential scanning attempts (the 404 itself is part of request_finished)
     client_ip = get_client_ip()
     now = datetime.now(tz=UTC)
 
@@ -138,7 +133,8 @@ def handle_not_found(_e):
             {
                 "path": request.path,
                 "method": request.method,
-                "attempts_in_10min": len(rate_limit_violations[key]),
+                "count": len(rate_limit_violations[key]),
+                "time_window": "10_minutes",
             },
             severity="ERROR",
         )
@@ -163,42 +159,13 @@ def handle_rate_limit_exceeded(_e):
     rate_limit_violations[client_ip].append(now)
     violation_count = len(rate_limit_violations[client_ip])
 
-    logger.warning(
-        f"Rate limit exceeded: {client_ip} on {endpoint} (violation #{violation_count} in last hour)"
+    log_security_event(
+        "RATE_LIMIT_EXCEEDED",
+        {"endpoint": endpoint, "count": violation_count, "time_window": "1_hour"},
+        severity="ERROR" if violation_count >= 5 else "WARNING",
     )
 
-    # Log as security event if excessive
-    if violation_count >= 5:
-        log_security_event(
-            "EXCESSIVE_RATE_LIMITING",
-            {"endpoint": endpoint, "violation_count": violation_count, "time_window": "1_hour"},
-            severity="ERROR",
-        )
-    elif violation_count >= 3:
-        log_security_event(
-            "REPEATED_RATE_LIMITING",
-            {"endpoint": endpoint, "violation_count": violation_count, "time_window": "1_hour"},
-        )
-
     return {"message": "Rate limit exceeded"}, 429
-
-
-@app.before_request
-def log_request_info():
-    log_request()
-
-
-@app.after_request
-def after_request(response):
-    """Log outgoing responses."""
-    return log_response(response)
-
-
-def handle_exception(exc_type, exc_value, exc_traceback):
-    if issubclass(exc_type, KeyboardInterrupt):
-        sys.__excepthook__(exc_type, exc_value, exc_traceback)
-        return
-    app.logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
 
 if __name__ == "__main__":

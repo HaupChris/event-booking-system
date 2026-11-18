@@ -61,7 +61,7 @@ def get_news_list():
         return jsonify({"news": news_items}), 200
 
     except Exception as e:
-        logger.error(f"News list retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"News list retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -74,7 +74,7 @@ def get_news_categories_list():
         categories = get_news_categories(include_inactive=include_inactive)
         return jsonify({"categories": categories}), 200
     except Exception as e:
-        logger.error(f"News category list retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"News category list retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -99,7 +99,7 @@ def create_news_category_item():
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        logger.error(f"News category creation failed: {str(e)}", exc_info=True)
+        logger.exception(f"News category creation failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -134,7 +134,7 @@ def update_news_category_item(category_id: int):
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        logger.error(f"News category update failed: {str(e)}", exc_info=True)
+        logger.exception(f"News category update failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -148,7 +148,7 @@ def deactivate_news_category_item(category_id: int):
             return jsonify({"error": "Category not found"}), 404
         return jsonify({"message": "Category deactivated"}), 200
     except Exception as e:
-        logger.error(f"News category deactivation failed: {str(e)}", exc_info=True)
+        logger.exception(f"News category deactivation failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -171,7 +171,7 @@ def get_news_item(news_id: int):
         return jsonify(news), 200
 
     except Exception as e:
-        logger.error(f"News item retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"News item retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -235,7 +235,7 @@ def create_news_item():
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"News creation failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"News creation failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -293,7 +293,7 @@ def update_news_item(news_id: int):
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"News update failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"News update failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -331,7 +331,7 @@ def delete_news_item(news_id: int):
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"News deletion failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"News deletion failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -360,5 +360,5 @@ def move_news_item(news_id: int):
         )
         return response
     except Exception as e:
-        logger.error(f"News move failed for item {news_id}: {str(e)}", exc_info=True)
+        logger.exception(f"News move failed for item {news_id}: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500

@@ -111,7 +111,7 @@ def health_check():  # noqa: PLR0915  # lint-baseline
 
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(f"Health check system failure after {duration:.3f}s: {str(e)}", exc_info=True)
+        logger.exception(f"Health check system failure after {duration:.3f}s: {str(e)}")
         return (
             jsonify(
                 {

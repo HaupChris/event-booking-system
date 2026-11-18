@@ -40,7 +40,7 @@ def _connect_db() -> sqlite3.Connection:
         conn.row_factory = sqlite3.Row
         return conn
     except sqlite3.Error as e:
-        logger.error(f"Failed to connect to database: {e}", exc_info=True)
+        logger.exception(f"Failed to connect to database: {e}")
         raise
 
 
@@ -174,7 +174,7 @@ def get_all_news(include_inactive: bool = False) -> list[dict[str, Any]]:
             return news_items
 
     except sqlite3.Error as e:
-        logger.error(f"Database error fetching news: {e}", exc_info=True)
+        logger.exception(f"Database error fetching news: {e}")
         raise
 
 
@@ -218,7 +218,7 @@ def get_news_by_id(news_id: int) -> dict[str, Any] | None:
                 return None
 
     except sqlite3.Error as e:
-        logger.error(f"Database error fetching news {news_id}: {e}", exc_info=True)
+        logger.exception(f"Database error fetching news {news_id}: {e}")
         raise
 
 
@@ -258,7 +258,7 @@ def create_news(
             return int(news_id)
 
     except sqlite3.Error as e:
-        logger.error(f"Database error creating news: {e}", exc_info=True)
+        logger.exception(f"Database error creating news: {e}")
         raise
 
 
@@ -316,7 +316,7 @@ def update_news(  # noqa: PLR0913  # lint-baseline
                 return False
 
     except sqlite3.Error as e:
-        logger.error(f"Database error updating news {news_id}: {e}", exc_info=True)
+        logger.exception(f"Database error updating news {news_id}: {e}")
         raise
 
 
@@ -350,7 +350,7 @@ def delete_news(news_id: int, soft_delete: bool = True) -> bool:
                 return False
 
     except sqlite3.Error as e:
-        logger.error(f"Database error deleting news {news_id}: {e}", exc_info=True)
+        logger.exception(f"Database error deleting news {news_id}: {e}")
         raise
 
 
@@ -581,7 +581,7 @@ def get_news_for_profile(profile_uuid: str) -> list[dict[str, Any]]:
             return news_items
 
     except sqlite3.Error as e:
-        logger.error(f"Database error fetching news for profile {profile_uuid}: {e}", exc_info=True)
+        logger.exception(f"Database error fetching news for profile {profile_uuid}: {e}")
         raise
 
 
@@ -631,7 +631,7 @@ def mark_news_as_read(profile_uuid: str, news_id: int) -> bool:
                 return True
 
     except sqlite3.Error as e:
-        logger.error(f"Database error marking news as read: {e}", exc_info=True)
+        logger.exception(f"Database error marking news as read: {e}")
         raise
 
 
@@ -679,5 +679,5 @@ def get_unread_count(profile_uuid: str) -> int:
             return count
 
     except sqlite3.Error as e:
-        logger.error(f"Database error getting unread count: {e}", exc_info=True)
+        logger.exception(f"Database error getting unread count: {e}")
         raise

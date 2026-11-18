@@ -39,7 +39,5 @@ def get_formcontent():
 
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(
-            f"Error generating form content after {duration:.3f}s: {str(e)}", exc_info=True
-        )
+        logger.exception(f"Error generating form content after {duration:.3f}s: {str(e)}")
         return jsonify({"error": "Failed to generate form content"}), 500

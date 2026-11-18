@@ -131,10 +131,9 @@ def submit_form():
                     f"Booking and confirmation email successful for {booking.first_name} {booking.last_name}"
                 )
             except Exception as email_error:
-                logger.error(
+                logger.exception(
                     "Booking successful but email failed for "
                     f"{booking.first_name} {booking.last_name}: {str(email_error)}",
-                    exc_info=True,
                 )
                 # Still return success since booking was created
 
@@ -159,7 +158,7 @@ def submit_form():
 
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(f"Booking submission failed after {duration:.3f}s: {str(e)}", exc_info=True)
+        logger.exception(f"Booking submission failed after {duration:.3f}s: {str(e)}")
         return jsonify({"error": "Booking submission failed"}), 500
 
 
@@ -191,9 +190,7 @@ def get_bookings():
 
     except Exception as e:
         duration = time.time() - start_time
-        logger.error(
-            f"Failed to retrieve booking data after {duration:.3f}s: {str(e)}", exc_info=True
-        )
+        logger.exception(f"Failed to retrieve booking data after {duration:.3f}s: {str(e)}")
         return jsonify({"error": "Failed to retrieve booking data"}), 500
 
 
@@ -223,7 +220,7 @@ def update_booking(booking_id):
             return jsonify({"error": "Booking not found"}), 404
 
     except Exception as e:
-        logger.error(f"Failed to update booking {booking_id}: {str(e)}", exc_info=True)
+        logger.exception(f"Failed to update booking {booking_id}: {str(e)}")
         return jsonify({"error": "Failed to update booking"}), 500
 
 
@@ -253,7 +250,7 @@ def update_payment(booking_id):
             return jsonify({"error": "Booking not found"}), 404
 
     except Exception as e:
-        logger.error(f"Failed to update payment for booking {booking_id}: {str(e)}", exc_info=True)
+        logger.exception(f"Failed to update payment for booking {booking_id}: {str(e)}")
         return jsonify({"error": "Failed to update payment"}), 500
 
 
@@ -280,5 +277,5 @@ def delete_booking_endpoint(booking_id):
             return jsonify({"error": "Booking not found"}), 404
 
     except Exception as e:
-        logger.error(f"Failed to delete booking {booking_id}: {str(e)}", exc_info=True)
+        logger.exception(f"Failed to delete booking {booking_id}: {str(e)}")
         return jsonify({"error": "Failed to delete booking"}), 500

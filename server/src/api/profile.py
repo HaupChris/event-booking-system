@@ -110,7 +110,7 @@ def get_profile(profile_uuid: str):
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"Profile retrieval failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"Profile retrieval failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -134,7 +134,7 @@ def get_shifts(profile_uuid: str):
         return jsonify({"shifts": shifts}), 200
 
     except Exception as e:
-        logger.error(f"Shift retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"Shift retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -154,7 +154,7 @@ def get_shift_messages_for_profile(profile_uuid: str):
         messages = get_shift_messages_for_booking(profile["booking"]["id"])
         return jsonify({"messages": messages}), 200
     except Exception as e:
-        logger.error(f"Shift message feed retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"Shift message feed retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -175,7 +175,7 @@ def get_rideshare(profile_uuid: str):
         logger.warning(f"Ride sharing board failed: {str(e)} for UUID {profile_uuid[:8]}...")
         return jsonify({"error": str(e)}), 404
     except Exception as e:
-        logger.error(f"Ride sharing board retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"Ride sharing board retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -208,7 +208,7 @@ def create_rideshare(profile_uuid: str):
         logger.warning(f"Ride share post create validation failed: {str(e)}")
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        logger.error(f"Ride share post create failed: {str(e)}", exc_info=True)
+        logger.exception(f"Ride share post create failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -236,7 +236,7 @@ def react_to_rideshare(profile_uuid: str, post_id: int):
         logger.warning(f"Ride share reaction validation failed: {str(e)}")
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        logger.error(f"Ride share reaction failed: {str(e)}", exc_info=True)
+        logger.exception(f"Ride share reaction failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -265,7 +265,7 @@ def approve_rideshare_join(profile_uuid: str, request_id: int):
         logger.warning(f"Ride share join approval validation failed: {str(e)}")
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        logger.error(f"Ride share join approval failed: {str(e)}", exc_info=True)
+        logger.exception(f"Ride share join approval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -294,7 +294,7 @@ def reject_rideshare_join(profile_uuid: str, request_id: int):
         logger.warning(f"Ride share join rejection validation failed: {str(e)}")
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        logger.error(f"Ride share join rejection failed: {str(e)}", exc_info=True)
+        logger.exception(f"Ride share join rejection failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -321,7 +321,7 @@ def cancel_rideshare(profile_uuid: str, post_id: int):
         logger.warning(f"Ride share post cancel validation failed: {str(e)}")
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        logger.error(f"Ride share post cancel failed: {str(e)}", exc_info=True)
+        logger.exception(f"Ride share post cancel failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -348,7 +348,7 @@ def complete_rideshare(profile_uuid: str, post_id: int):
         logger.warning(f"Ride share post complete validation failed: {str(e)}")
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        logger.error(f"Ride share post complete failed: {str(e)}", exc_info=True)
+        logger.exception(f"Ride share post complete failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -375,7 +375,7 @@ def accept_shift_assignment(profile_uuid: str, assignment_id: int):
             return jsonify({"error": "Shift assignment not found"}), 404
 
     except Exception as e:
-        logger.error(f"Shift acceptance failed: {str(e)}", exc_info=True)
+        logger.exception(f"Shift acceptance failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -412,7 +412,7 @@ def decline_shift_assignment(profile_uuid: str, assignment_id: int):
         logger.warning(f"Shift decline validation failed: {str(e)}")
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        logger.error(f"Shift decline failed: {str(e)}", exc_info=True)
+        logger.exception(f"Shift decline failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -431,7 +431,7 @@ def get_news_feed(profile_uuid: str):
         return jsonify({"news": news_items}), 200
 
     except Exception as e:
-        logger.error(f"News feed retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"News feed retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -452,7 +452,7 @@ def mark_news_read(profile_uuid: str, news_id: int):
             return jsonify({"error": "Failed to mark news as read"}), 400
 
     except Exception as e:
-        logger.error(f"Mark news as read failed: {str(e)}", exc_info=True)
+        logger.exception(f"Mark news as read failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -470,7 +470,7 @@ def get_unread_news_count(profile_uuid: str):
         return jsonify({"unread_count": count}), 200
 
     except Exception as e:
-        logger.error(f"Unread count retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"Unread count retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -529,7 +529,7 @@ def recover_profile():
             send_profile_recovery_mail(email, profiles)
             logger.info(f"Profile recovery email sent to {email} with {len(profiles)} profile(s)")
         except Exception as e:
-            logger.error(f"Failed to send recovery email to {email}: {str(e)}", exc_info=True)
+            logger.exception(f"Failed to send recovery email to {email}: {str(e)}")
             # Don't expose email sending errors to user
             pass
 
@@ -547,7 +547,7 @@ def recover_profile():
 
     except Exception as e:
         elapsed_time = time.time() - start_time
-        logger.error(f"Profile recovery failed after {elapsed_time:.2f}s: {str(e)}", exc_info=True)
+        logger.exception(f"Profile recovery failed after {elapsed_time:.2f}s: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -572,5 +572,5 @@ def get_faqs_public():
         return jsonify(faqs), 200
 
     except Exception as e:
-        logger.error(f"FAQ retrieval failed: {str(e)}", exc_info=True)
+        logger.exception(f"FAQ retrieval failed: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500

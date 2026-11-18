@@ -26,3 +26,10 @@ def get_db_file_path() -> str:
 
 def get_data_dir() -> Path:
     return Path("/app/data") if in_docker() else SERVER_DIR / "data"
+
+
+def get_log_dir() -> Path:
+    override = os.environ.get("LOG_DIR", "").strip()
+    if override:
+        return Path(override)
+    return Path("/app/logs") if in_docker() else SERVER_DIR / "logs"

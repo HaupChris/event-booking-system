@@ -30,7 +30,7 @@ def _connect_db() -> sqlite3.Connection:
         conn.row_factory = sqlite3.Row  # Return rows as dictionaries
         return conn
     except sqlite3.Error as e:
-        logger.error(f"Failed to connect to database: {e}", exc_info=True)
+        logger.exception(f"Failed to connect to database: {e}")
         raise
 
 
@@ -341,7 +341,7 @@ def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:  # noqa: C9
             }
 
     except sqlite3.Error as e:
-        logger.error(f"Database error fetching profile {profile_uuid}: {e}", exc_info=True)
+        logger.exception(f"Database error fetching profile {profile_uuid}: {e}")
         raise
 
 
@@ -412,7 +412,7 @@ def get_assigned_shifts(booking_id: int) -> list[dict[str, Any]]:
             return shifts
 
     except sqlite3.Error as e:
-        logger.error(f"Database error fetching shifts for booking {booking_id}: {e}", exc_info=True)
+        logger.exception(f"Database error fetching shifts for booking {booking_id}: {e}")
         raise
 
 
@@ -458,7 +458,7 @@ def accept_shift(profile_uuid: str, assignment_id: int) -> bool:
             return True
 
     except sqlite3.Error as e:
-        logger.error(f"Database error accepting shift {assignment_id}: {e}", exc_info=True)
+        logger.exception(f"Database error accepting shift {assignment_id}: {e}")
         raise
 
 
@@ -524,7 +524,7 @@ def decline_shift(
             return True
 
     except sqlite3.Error as e:
-        logger.error(f"Database error declining shift {assignment_id}: {e}", exc_info=True)
+        logger.exception(f"Database error declining shift {assignment_id}: {e}")
         raise
 
 
@@ -589,7 +589,7 @@ def get_profile_uuids_by_email(email: str) -> list[dict[str, str]]:
             return profiles
 
     except sqlite3.Error as e:
-        logger.error(f"Database error searching profiles for email {email}: {e}", exc_info=True)
+        logger.exception(f"Database error searching profiles for email {email}: {e}")
         raise
 
 
@@ -676,7 +676,7 @@ def get_profile_stats() -> list[dict[str, Any]]:
             return profiles
 
     except sqlite3.Error as e:
-        logger.error(f"Database error fetching profile stats: {e}", exc_info=True)
+        logger.exception(f"Database error fetching profile stats: {e}")
         raise
 
 
@@ -733,5 +733,5 @@ Dein Wiesenwahn-Team
         return success
 
     except Exception as e:
-        logger.error(f"Error sending profile link email to {email}: {e}", exc_info=True)
+        logger.exception(f"Error sending profile link email to {email}: {e}")
         return False

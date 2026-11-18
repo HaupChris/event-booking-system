@@ -103,9 +103,6 @@ cp "$(dirname "$0")/nginx/wiesenwahn.conf" /etc/nginx/sites-available/wiesenwahn
 ln -sf /etc/nginx/sites-available/wiesenwahn.conf /etc/nginx/sites-enabled/wiesenwahn.conf
 rm -f /etc/nginx/sites-enabled/default
 
-# Copy logrotate config
-cp "$(dirname "$0")/logrotate-wiesenwahn" /etc/logrotate.d/wiesenwahn
-
 echo "=== 8/8: Crontab + SSL ==="
 # Install crontab
 crontab "$(dirname "$0")/crontab"

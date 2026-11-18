@@ -79,5 +79,4 @@ Backups stored at `/opt/wiesenwahn/backups/`. Email notification on success/fail
 | `nginx/wiesenwahn.conf` | nginx reverse proxy + security config |
 | `backup.sh` | Database backup script (installed to `/opt/wiesenwahn/`) |
 | `crontab` | Backup schedule (install with `crontab crontab`) |
-| `logrotate-wiesenwahn` | Log rotation config |
 | `.env.example` | Required environment variables template |

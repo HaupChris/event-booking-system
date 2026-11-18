@@ -50,7 +50,7 @@ dann hier ergänzen.
 | `debug` | nur Entwicklung, in Produktion aus | Zwischenwerte |
 | `info` | fachliche Ereignisse und Requests | `booking_created`, `request_finished` |
 | `warning` | erwartbare Fehler durch Eingaben oder Clients | Validierung, falsches Passwort, Rate-Limit |
-| `error` | unerwartete Fehler, immer mit `exc_info=True` | DB-Fehler, Mailversand fehlgeschlagen |
+| `error` | unerwartete Fehler, mit Stacktrace (`logger.exception`) | DB-Fehler, Mailversand fehlgeschlagen |
 
 Fehler von Clients (4xx) sind nie `error`.
 
@@ -82,10 +82,11 @@ Kosten bei späterer Auswertung). Erlaubt sind nur Werte, deren Größe der Code
 try:
     send_confirmation_mail(...)
 except SMTPException:
-    logger.error("mail_send_failed", booking_ref=ref, mail_type="confirmation", exc_info=True)
+    logger.exception("mail_send_failed", booking_ref=ref, mail_type="confirmation")
 ```
 
-- Exception mit `exc_info=True` loggen, nicht `str(e)` in den Text kopieren
+- in `except`-Blöcken `logger.exception(...)` verwenden (Level `error` mit Stacktrace, Ruff `G201`),
+  nicht `str(e)` in den Text kopieren
 - jede Exception nur einmal loggen: dort, wo sie behandelt wird
 
 ## Durchsetzung
@@ -112,10 +113,46 @@ eigenes Aufräumskript.
 
 ## Auswertung mit lnav
 
-`lnav` erkennt JSON-Zeilen automatisch und erlaubt Filter und SQL direkt auf den Dateien.
-Die konkreten Abfragen werden mit der Umsetzung ergänzt, z. B.:
+[lnav](https://lnav.org) zeigt die JSON-Zeilen lesbar an, filtert und erlaubt SQL direkt auf den
+Dateien. Das Format liegt in `deployment/lnav/wiesenwahn_log.json`.
 
-- alles zu einem Fehlercode: Filter `request_id = 'a1b2c3d4'`
-- alles zu einer Buchung: Filter `booking_ref = 'R-123'`
-- alle Fehler der letzten Stunde, gruppiert nach Ereignis
-- langsamste Routen nach `duration_ms`
+> Hinweis: Das Format ist nach der lnav-Dokumentation geschrieben, aber noch nicht mit einer
+> echten lnav-Installation getestet. Beim ersten Einsatz prüfen und ggf. korrigieren.
+
+```bash
+sudo apt install lnav                                   # einmalig auf dem Server
+lnav -i deployment/lnav/wiesenwahn_log.json             # Format installieren (einmalig)
+lnav /opt/wiesenwahn/logs/                              # app.log + security.log, inkl. rotierter Dateien
+```
+
+Typische Abfragen (in lnav mit `;` beginnen):
+
+```sql
+-- alles zu einem Fehlercode, den eine Person gemeldet hat
+SELECT log_time, log_level, logger, event, route, status FROM wiesenwahn_log
+ WHERE request_id = 'a1b2c3d4';
+
+-- alles zu einer Buchung
+SELECT log_time, event, route, reason FROM wiesenwahn_log WHERE booking_ref = 'R-123';
+
+-- Fehler der letzten 24 Stunden, gruppiert
+SELECT event, error_type, count(*) AS n FROM wiesenwahn_log
+ WHERE log_level = 'error' AND log_time > datetime('now', '-1 day')
+ GROUP BY event, error_type ORDER BY n DESC;
+
+-- langsamste Routen
+SELECT route, count(*) AS n, round(avg(duration_ms), 1) AS avg_ms, max(duration_ms) AS max_ms
+  FROM wiesenwahn_log WHERE event = 'request_finished'
+ GROUP BY route ORDER BY avg_ms DESC LIMIT 10;
+
+-- fehlgeschlagene Logins pro IP (security.log)
+SELECT client_ip, role, count(*) AS n FROM wiesenwahn_log
+ WHERE event = 'auth_failed' GROUP BY client_ip, role ORDER BY n DESC;
+```
+
+Ohne lnav, nur mit `jq`:
+
+```bash
+jq -c 'select(.request_id == "a1b2c3d4")' /opt/wiesenwahn/logs/app.log
+jq -c 'select(.level == "error") | {ts, event, where, error_type}' /opt/wiesenwahn/logs/app.log
+```
