@@ -69,7 +69,7 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
   Maßnahme: zentraler Decorator `@role_required(...)` auf Basis des `role`-Claims bzw.
   `before_request` je Admin-Blueprint.
 
-- [ ] **S4 – Rate-Limiting in Produktion praktisch aus.**
+- [x] **S4 – Rate-Limiting in Produktion praktisch aus.**
   `ENABLE_APP_RATE_LIMITING=false`; die Profil-Endpunkte (UUID = einziges Geheimnis) hängen nur am
   allgemeinen nginx-Limit (10 r/s). `get_client_ip()` vertraut dem ersten `X-Forwarded-For`-Eintrag (fälschbar).
   Orte: `server/src/utils/rate_limit.py`, `docker-compose.yml`, `deployment/nginx/wiesenwahn.conf`.

@@ -5,13 +5,11 @@ from flask_limiter import Limiter
 
 
 def get_client_ip() -> str:
-    """Prefer the original client IP when the app is behind nginx."""
-    forwarded_for = request.headers.get("X-Forwarded-For", "")
-    if forwarded_for:
-        client_ip = forwarded_for.split(",", 1)[0].strip()
-        if client_ip:
-            return client_ip
+    """Client IP as reported by the trusted nginx proxy.
 
+    ProxyFix (main.py) already sets remote_addr from the proxy's X-Forwarded-For entry.
+    Never read X-Forwarded-For here: its leading entries are controlled by the client.
+    """
     return request.remote_addr or "unknown"
 
 

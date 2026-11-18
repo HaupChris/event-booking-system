@@ -28,7 +28,9 @@ services:
       - ./logs:/app/logs:rw
     environment:
       - IN_DOCKER=true
-      - ENABLE_APP_RATE_LIMITING=false
+      # Second layer behind nginx (e.g. 3 recovery mails/hour per IP). Memory storage is only
+      # consistent with a single gunicorn worker; use a shared storage before adding workers.
+      - ENABLE_APP_RATE_LIMITING=true
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - PASSWORD=${USER_PASSWORD}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
