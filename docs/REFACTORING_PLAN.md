@@ -18,7 +18,7 @@ Reihenfolge: Phase 0 → Charakterisierungstests → Phase 1 + 3 parallel → Ph
 Das Refactoring ergibt eine neue Version, die vor dem Produktiv-Deploy ausführlich getestet wird.
 `main` deployt bei jedem Push automatisch – dort landet nur ein getesteter Release.
 
-- [ ] `develop` als Integrations-Branch anlegen (Stand von `refactoring/security-fixes`)
+- [x] `develop` als Integrations-Branch angelegt (Stand von `refactoring/security-fixes`)
 - [ ] Arbeits-Branches (`refactoring/…`, `feat/…`, `fix/…`) per PR nach `develop`; CI muss grün sein
 - [ ] Branch-Schutz für `main` und `develop` (nur per PR, CI erforderlich, kein Force-Push)
 - [ ] **Release-Test vor dem Merge nach `main`:**
@@ -363,3 +363,50 @@ Container nur auf localhost, `no-new-privileges`, `cap_drop: ALL` (Backend). Off
 - [ ] **Monitoring:** Uptime-Check, Alarm bei Deploy-Fehlern, fail2ban-Jail für 401/429 der API.
 - [ ] `VPS_SECURITY_HARDENING_CHECKLIST.md` (44 offene Punkte) mit diesem Abschnitt abgleichen,
   nach `deployment/` verschieben und einchecken.
+
+---
+
+## Phase 6 – Serverumzug (IONOS → neuer Server)
+
+Anlass: mehr RAM (heute ~512 MB, App nutzt fast alles), bessere Werkzeuge (Firewall, Snapshots,
+API, stundengenaue Abrechnung) und ein sauberer Neuaufbau nach Phase 5. Der Server ist derzeit
+offline, es gibt also keinen Zeitdruck.
+
+**Idee:** Der neue Server dient zuerst als Staging für den Release-Test der neuen Version und wird
+nach erfolgreichem Test zur Produktion. Der alte Server wird erst danach gekündigt.
+
+### Entscheidung Anbieter
+- [ ] Aktuellen IONOS-Vertrag prüfen: Tarif, Preis, Kündigungsfrist/Mindestlaufzeit, ob die Domains
+  im Paket enthalten sind und ob weitere Dienste (z. B. Postfächer) daran hängen
+- [ ] Vergleich (Stand 2026-11-18, inkl. MwSt.): Hetzner CX23 (2 vCPU, 4 GB, 40 GB) 7,13 €/Monat;
+  IONOS VPS S+ (1 vCPU, 2 GB, 60 GB) ca. 5 € bzw. M+ (2 vCPU, 4 GB, 120 GB) ca. 12 € nach
+  Aktionszeitraum, plus 10 € Einrichtung. Hetzner-Cloud-Tarife sind laut Website zeitweise
+  „nicht bestellbar“ → Verfügbarkeit in der Console prüfen
+- [ ] Standort in Deutschland (Falkenstein/Nürnberg), mind. 2 GB RAM, besser 4 GB
+  (lässt Platz für Log-Auswertung aus Phase L)
+
+### Neuen Server aufbauen (setzt Phase 5 um)
+- [ ] Provisionierung reproduzierbar machen: `deployment/setup.sh` bzw. cloud-init überarbeiten,
+  einmal auf dem neuen Server durchlaufen lassen (statt Handarbeit)
+- [ ] Anbieter-Firewall (nur 22/80/443), SSH nur per Key, kein Root-Login, eigener Deploy-User
+- [ ] Docker, Host-nginx (Konfiguration aus dem Repo), fail2ban, unattended-upgrades, Log-Rotation
+- [ ] Backups: Snapshots beim Anbieter + verschlüsselte Offsite-Kopie der DB, Restore einmal testen
+- [ ] Container als Non-root mit passenden Volume-Rechten (entfernt `DS-0002` aus `.trivyignore`)
+
+### Daten und Umschaltung
+- [ ] Release-Test der neuen Version auf dem neuen Server (siehe „Branching und Release“)
+- [ ] DNS-TTL von `wiesenwahn.de` 24 h vorher auf 300 s senken
+- [ ] App auf dem alten Server stoppen, konsistente DB-Kopie (`sqlite3 .backup`), auf den neuen
+  Server übertragen, Migrationen ausführen, Stichproben prüfen
+- [ ] A/AAAA-Einträge umstellen, TLS-Zertifikat per certbot auf dem neuen Server
+- [ ] GitHub-Secrets für den Deploy aktualisieren (Host, Deploy-User, Key); Secrets bei der
+  Gelegenheit rotieren (siehe S5)
+- [ ] Rückfallplan: alter Server bleibt einige Tage startbereit, DNS kann zurückgestellt werden
+
+### Domains (`wiesenwahn.de`, `hauptmann.online`)
+- [ ] Für den Umzug reicht es, die DNS-Einträge bei IONOS auf die neue IP zu setzen –
+  ein Domain-Transfer ist nicht nötig
+- [ ] Optional später: Transfer zu einem eigenen Registrar (Auth-Code bei IONOS anfordern;
+  `.online` hat nach Registrierung/Transfer 60 Tage Transfersperre; vorher abhängige Dienste
+  wie Postfächer umziehen). Hetzner führt `.de`; `.online` dort nicht bestätigt
+- [ ] Danach: alten Server und ggf. IONOS-Paket kündigen
