@@ -3,19 +3,25 @@ FROM python:3.12-slim
 # Set workdir
 WORKDIR /app
 
-# Install system dependencies and uv
-RUN apt-get update && apt-get install -y gcc libpq-dev curl && rm -rf /var/lib/apt/lists/*
+# curl is only needed for the HEALTHCHECK; all Python dependencies ship as wheels
+# Security updates of the base image are applied at build time.
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir uv
 
-# Copy pyproject.toml and install dependencies
-COPY pyproject.toml .
-RUN uv pip install --system .
+# Install the exact, hash-verified runtime dependencies from uv.lock (no dev tools)
+COPY pyproject.toml uv.lock ./
+RUN uv export --frozen --no-dev --no-emit-project -o /tmp/requirements.txt \
+    && uv pip install --system --no-cache -r /tmp/requirements.txt \
+    && rm /tmp/requirements.txt
 
 # Copy backend source
 COPY . .
 
 # Create necessary directories
-RUN mkdir -p logs db
+RUN mkdir -p logs db user_data
 
 # Expose Flask port
 EXPOSE 5001

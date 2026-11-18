@@ -16,7 +16,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/react-signature-canvas": "^1.0.2",
-    "axios": "^1.4.0",
+    "axios": "^1.21.1",
     "bcrypt": "^6.0.0",
     "dayjs": "^1.11.20",
     "dseg": "^0.46.0",

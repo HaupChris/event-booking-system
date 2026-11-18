@@ -1,0 +1,24 @@
+# Never copy local secrets, personal data or environments into the image.
+# Patterns without **/ only match at the top level of the build context.
+**/.env
+**/.env.*
+**/*.db
+**/*.db-journal
+**/signatures/
+**/artist_signatures/
+user_data/
+db/
+logs/
+email.html
+.venv/
+venv/
+**/__pycache__/
+**/*.pyc
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.import_linter_cache/
+test/

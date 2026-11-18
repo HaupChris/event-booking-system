@@ -24,7 +24,6 @@ repos:
         files: ^server/
         args: [--config-file=server/pyproject.toml]
         additional_dependencies:
-          - types-requests
           - types-Flask
 
   - repo: local
