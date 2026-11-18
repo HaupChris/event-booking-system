@@ -17,8 +17,8 @@ frontend/src/form/userArea/WorkshiftsForm.tsx 314
 server/src/api/admin_faq.py 326
 server/src/api/profile.py 443
 server/src/scripts/generate_mock_data.py 362
-server/src/services/artist_service.py 536
-server/src/services/booking_service.py 572
+server/src/services/artist_service.py 530
+server/src/services/booking_service.py 471
 server/src/services/faq_service.py 379
 server/src/services/formcontent_service.py 709
 server/src/services/mail_service.py 634

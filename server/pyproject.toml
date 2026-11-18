@@ -93,7 +93,7 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]  # Allow unused imports
 "src/migrations/*.py" = ["ALL"]    # Legacy one-off migrations, replaced in B2
-"test/*.py" = ["S101", "ARG", "PLR2004"]  # Allow asserts and magic values in tests
+"test/*.py" = ["S101", "ARG", "PLR2004", "PLR0913"]  # Asserts, magic values; pytest injects fixtures as arguments
 "src/scripts/generate_mock_data.py" = ["S311"]  # Mock data does not need cryptographic randomness
 
 [tool.ruff.lint.mccabe]

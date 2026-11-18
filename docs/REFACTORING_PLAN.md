@@ -92,11 +92,13 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
   nachvollziehen). Wird nicht einfach entfernt, sondern durch das Logging- und Support-Konzept
   (Phase L) ersetzt. Erst wenn das steht, werden Namen/E-Mails/UUIDs aus den Logs entfernt.
 
-- [ ] **S8 – Buchung nicht atomar, Foreign Keys aus.**
-  `create_user`, `create_booking`, `assign_materials`, `assign_professions` committen jeweils
-  in eigener Verbindung → halbe Datensätze bei Fehlern. `PRAGMA foreign_keys` wird nirgends gesetzt.
-  Maßnahme: eine Transaktion pro Buchung, Foreign Keys aktivieren.
-  *Noch zu prüfen:* ob Ticket-Kontingente (`amount`) beim Buchen durchgesetzt werden.
+- [x] **S8 – Buchung nicht atomar.** Reguläre Buchung jetzt in einer Transaktion
+  (`BEGIN IMMEDIATE`, Duplikat-Prüfung innerhalb des Locks); DB-Fehler führen zu 500 statt
+  „Duplicate booking“. Artist-Pfad: Duplikat-Prüfung in die Transaktion verschoben.
+  - [ ] `PRAGMA foreign_keys` ist nirgends aktiv → mit B1 einschalten (vorher Lösch-Reihenfolgen
+    und Altdaten auf verwaiste Verweise prüfen).
+  - [ ] **Produktfrage:** Ticket-Kontingente (`amount`) werden weder im Frontend noch im Backend
+    durchgesetzt (nur Anzeige „max N“ bei Artists). Gewollt? Falls ja: Prüfung in der Transaktion.
 
 - [ ] **S9 – Profil-Links (UUID als einziges Geheimnis).**
   Die UUID (v4, 122 Bit Zufall) ist nicht erratbar. Das Risiko ist, dass der Link nach außen gelangt:

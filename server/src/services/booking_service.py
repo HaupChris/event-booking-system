@@ -100,225 +100,116 @@ def _to_signature_blob(signature: str | bytes) -> bytes:
     return decode_signature_to_blob(signature)
 
 
-def booking_exists(booking: Booking) -> bool:
-    """
-    Checks if a booking already exists with the same first name, last name, and email.
-    """
-    try:
-        logger.debug(
-            f"Checking for existing booking: {booking.first_name} {booking.last_name} ({booking.email})"
-        )
-        with closing(_connect_db()) as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                """
-                           SELECT COUNT(*)
-                           FROM Users u
-                                    JOIN Bookings b ON u.id = b.user_id
-                           WHERE u.first_name = ?
-                             AND u.last_name = ?
-                             AND u.email = ?
-                           """,
-                (booking.first_name, booking.last_name, booking.email),
-            )
-            exists = cursor.fetchone()[0] > 0
-            if exists:
-                logger.debug(f"Existing booking found for {booking.first_name} {booking.last_name}")
-            return exists
-    except sqlite3.Error as e:
-        logger.error(f"Database error checking booking existence: {e}", exc_info=True)
-        return True
+def _booking_exists(cursor: sqlite3.Cursor, booking: Booking) -> bool:
+    """A booking with the same first name, last name and email already exists."""
+    cursor.execute(
+        """
+        SELECT COUNT(*)
+        FROM Users u
+                 JOIN Bookings b ON u.id = b.user_id
+        WHERE u.first_name = ?
+          AND u.last_name = ?
+          AND u.email = ?
+        """,
+        (booking.first_name, booking.last_name, booking.email),
+    )
+    return cursor.fetchone()[0] > 0
 
 
-def create_user(booking: Booking) -> int:
-    """Creates a user in the Users table and returns the user_id."""
-    try:
-        logger.debug(f"Creating user: {booking.first_name} {booking.last_name}")
-        with closing(_connect_db()) as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                """
-                           INSERT INTO Users (last_name, first_name, email, phone_number)
-                           VALUES (?, ?, ?, ?)
-                           """,
-                (booking.last_name, booking.first_name, booking.email, booking.phone),
-            )
-            conn.commit()
-            user_id = cursor.lastrowid
-            if user_id is None:
-                return -1
-            logger.info(
-                f"User created successfully with ID {user_id}: {booking.first_name} {booking.last_name}"
-            )
-            return int(user_id)
-    except sqlite3.Error as e:
-        logger.error(
-            f"Database error creating user {booking.first_name} {booking.last_name}: {e}",
-            exc_info=True,
-        )
-        return -1
+def _insert_user(cursor: sqlite3.Cursor, booking: Booking) -> int:
+    cursor.execute(
+        "INSERT INTO Users (last_name, first_name, email, phone_number) VALUES (?, ?, ?, ?)",
+        (booking.last_name, booking.first_name, booking.email, booking.phone),
+    )
+    return int(cursor.lastrowid or -1)
 
 
-def create_booking(user_id: int, booking: Booking) -> tuple[int, str | None]:
-    """
-    Creates a booking in the Bookings table and returns (booking_id, profile_uuid).
-    """
-    try:
-        logger.debug(f"Creating booking for user {user_id}")
-
-        # Generate unique profile UUID
-        profile_uuid = str(uuid.uuid4())
-
-        with closing(_connect_db()) as conn:
-            cursor = conn.cursor()
-            signature_blob = _to_signature_blob(booking.signature)
-            cursor.execute(
-                """
-                            INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, food_option_id,
-                                                  first_priority_timeslot_id, second_priority_timeslot_id,
-                                                  third_priority_timeslot_id,
-                                                  amount_shifts, supporter_buddy, invited_by_id,
-                                                  signature, total_price, is_paid,
-                                                  paid_amount, payment_notes, payment_date, profile_uuid)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                           """,
-                (
-                    user_id,
-                    booking.ticket_id,
-                    booking.beverage_id,
-                    booking.food_id,
-                    booking.timeslot_priority_1,
-                    booking.timeslot_priority_2,
-                    booking.timeslot_priority_3,
-                    booking.amount_shifts,
-                    booking.supporter_buddy,
-                    booking.invited_by_id,
-                    sqlite3.Binary(signature_blob),
-                    booking.total_price,
-                    booking.is_paid,
-                    booking.paid_amount,
-                    booking.payment_notes,
-                    booking.payment_date,
-                    profile_uuid,
-                ),
-            )
-            conn.commit()
-            booking_id = cursor.lastrowid
-            if booking_id is None:
-                return -1, None
-            logger.info(
-                f"Booking created successfully with ID {booking_id} (UUID: {profile_uuid[:8]}...) for user {user_id}"
-            )
-            return int(booking_id), profile_uuid
-    except sqlite3.Error as e:
-        logger.error(f"Database error creating booking for user {user_id}: {e}", exc_info=True)
-        return -1, None
+def _insert_booking_row(
+    cursor: sqlite3.Cursor, user_id: int, booking: Booking, profile_uuid: str
+) -> int:
+    cursor.execute(
+        """
+        INSERT INTO Bookings (user_id, ticket_option_id, beverage_option_id, food_option_id,
+                              first_priority_timeslot_id, second_priority_timeslot_id,
+                              third_priority_timeslot_id,
+                              amount_shifts, supporter_buddy, invited_by_id,
+                              signature, total_price, is_paid,
+                              paid_amount, payment_notes, payment_date, profile_uuid)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            user_id,
+            booking.ticket_id,
+            booking.beverage_id,
+            booking.food_id,
+            booking.timeslot_priority_1,
+            booking.timeslot_priority_2,
+            booking.timeslot_priority_3,
+            booking.amount_shifts,
+            booking.supporter_buddy,
+            booking.invited_by_id,
+            sqlite3.Binary(_to_signature_blob(booking.signature)),
+            booking.total_price,
+            booking.is_paid,
+            booking.paid_amount,
+            booking.payment_notes,
+            booking.payment_date,
+            profile_uuid,
+        ),
+    )
+    return int(cursor.lastrowid or -1)
 
 
-def assign_materials(booking_id: int, material_ids: list[int]) -> None:
-    """
-    Inserts the chosen materials into BookingMaterials.
-    """
-    try:
-        logger.info("Assigning materials.")
-        if not material_ids:
-            return
-        with closing(_connect_db()) as conn:
-            cursor = conn.cursor()
-            for material_id in material_ids:
-                cursor.execute(
-                    """
-                               INSERT INTO BookingMaterials (booking_id, material_id)
-                               VALUES (?, ?)
-                               """,
-                    (booking_id, material_id),
-                )
-            conn.commit()
-        logger.info(
-            f"Materials {material_ids} to booking_id assigned successfully to booking {booking_id}"
-        )
-    except Exception as e:
-        logger.error(
-            f"Unexpected error assigning materials {material_ids} to booking_id {booking_id}: {str(e)}",
-            exc_info=True,
-        )
+def _insert_materials(cursor: sqlite3.Cursor, booking_id: int, material_ids: list[int]) -> None:
+    cursor.executemany(
+        "INSERT INTO BookingMaterials (booking_id, material_id) VALUES (?, ?)",
+        [(booking_id, material_id) for material_id in material_ids],
+    )
 
 
-def assign_professions(booking_id: int, profession_ids: list[int]) -> None:
-    """
-    Inserts the chosen professions into BookingProfessions.
-    """
-    try:
-        if not profession_ids:
-            return
-        with closing(_connect_db()) as conn:
-            cursor = conn.cursor()
-            for profession_id in profession_ids:
-                cursor.execute(
-                    """
-                               INSERT INTO BookingProfessions (booking_id, profession_id)
-                               VALUES (?, ?)
-                               """,
-                    (booking_id, profession_id),
-                )
-            conn.commit()
-    except Exception as e:
-        logger.error(
-            f"Unexpected Error assingin profession ids: {profession_ids} to booking id {booking_id}: {e}",
-            exc_info=True,
-        )
+def _insert_professions(cursor: sqlite3.Cursor, booking_id: int, profession_ids: list[int]) -> None:
+    cursor.executemany(
+        "INSERT INTO BookingProfessions (booking_id, profession_id) VALUES (?, ?)",
+        [(booking_id, profession_id) for profession_id in profession_ids],
+    )
 
 
 def insert_booking(booking: Booking) -> tuple[bool, str | None]:
     """
-    Inserts a booking with comprehensive logging.
+    Store user, booking, materials and professions in one transaction.
 
-    Returns:
-        Tuple of (success: bool, profile_uuid: Optional[str])
+    Returns (True, profile_uuid) on success and (False, None) for a duplicate booking.
+    Database errors are raised after a rollback, so nothing is stored partially.
     """
-    start_time = time.time()
+    profile_uuid = str(uuid.uuid4())
 
-    try:
-        logger.info(f"Starting booking insertion for {booking.first_name} {booking.last_name}")
+    with closing(_connect_db()) as conn:
+        # IMMEDIATE takes the write lock up front, so concurrent duplicates are serialized.
+        conn.execute("BEGIN IMMEDIATE")
+        try:
+            cursor = conn.cursor()
+            if _booking_exists(cursor, booking):
+                conn.rollback()
+                logger.warning(
+                    f"Duplicate booking attempt for {booking.first_name} {booking.last_name} ({booking.email})"
+                )
+                return False, None
 
-        if booking_exists(booking):
-            logger.warning(
-                f"Duplicate booking attempt for {booking.first_name} {booking.last_name} ({booking.email})"
-            )
-            return False, None
-
-        user_id = create_user(booking)
-        if user_id == -1:
+            user_id = _insert_user(cursor, booking)
+            booking_id = _insert_booking_row(cursor, user_id, booking, profile_uuid)
+            _insert_materials(cursor, booking_id, booking.material_ids)
+            _insert_professions(cursor, booking_id, booking.profession_ids)
+            conn.commit()
+        except Exception:
+            conn.rollback()
             logger.error(
-                f"Failed to create user for booking: {booking.first_name} {booking.last_name}"
+                f"Booking insertion rolled back for {booking.first_name} {booking.last_name}",
+                exc_info=True,
             )
-            return False, None
+            raise
 
-        booking_id, profile_uuid = create_booking(user_id, booking)
-        if booking_id == -1:
-            logger.error(f"Failed to create booking for user {user_id}")
-            return False, None
-
-        assign_materials(booking_id, booking.material_ids)
-        assign_professions(booking_id, booking.profession_ids)
-
-        duration = time.time() - start_time
-        logger.info(
-            f"Booking insertion completed in {duration:.3f}s for {booking.first_name} {booking.last_name} (ID: {booking_id}, UUID: {profile_uuid[:8] if profile_uuid else 'None'}...)"
-        )
-
-        if duration > 1.0:
-            logger.warning(f"Slow booking insertion: {duration:.3f}s for booking {booking_id}")
-
-        return True, profile_uuid
-
-    except Exception as e:
-        duration = time.time() - start_time
-        logger.error(
-            f"Booking insertion failed after {duration:.3f}s for {booking.first_name} {booking.last_name}: {str(e)}",
-            exc_info=True,
-        )
-        return False, None
+    logger.info(f"Booking {booking_id} created (UUID: {profile_uuid[:8]}...) for user {user_id}")
+    return True, profile_uuid
 
 
 def get_all_bookings() -> list[BookingWithTimestamp]:

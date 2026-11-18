@@ -11,7 +11,10 @@ from src.services.formcontent_service import (
     update_artist_form_content_with_db_counts,
 )
 from src.services.orga_team_service import get_active_orga_team_members
+from src.utils.logger import get_logger
 from src.utils.signature import MAX_SIGNATURE_BYTES, decode_signature_to_blob
+
+logger = get_logger(__name__)
 
 
 def get_all_artist_bookings() -> list[ArtistBookingWithTimestamp]:
@@ -271,7 +274,7 @@ def update_artist_booking(booking_id: int, booking_data: dict) -> bool:
         except Exception as e:
             # Rollback in case of error
             conn.rollback()
-            print(f"Error updating artist booking: {e}")
+            logger.error(f"Error updating artist booking: {e}")
             return False
 
 
@@ -312,18 +315,8 @@ def update_artist_payment(booking_id: int, payment_data: dict) -> bool:
             return True
 
         except Exception as e:
-            print(f"Error updating artist payment: {e}")
+            logger.error(f"Error updating artist payment: {e}")
             return False
-
-
-def insert_artist_booking(booking: ArtistBooking) -> tuple[bool, str | None]:
-    """
-    Backward-compatible single-booking insert helper.
-    """
-    success, profile_uuids = insert_artist_bookings([booking])
-    if not success or not profile_uuids:
-        return False, None
-    return True, profile_uuids[0]
 
 
 def insert_artist_bookings(bookings: list[ArtistBooking]) -> tuple[bool, list[str]]:
@@ -338,15 +331,15 @@ def insert_artist_bookings(bookings: list[ArtistBooking]) -> tuple[bool, list[st
 
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
+        # IMMEDIATE takes the write lock before the duplicate check (no race between both).
+        conn.execute("BEGIN IMMEDIATE")
 
-        for booking in bookings:
-            if _artist_booking_exists_with_cursor(cursor, booking):
-                return False, []
+        if any(_artist_booking_exists_with_cursor(cursor, booking) for booking in bookings):
+            conn.rollback()
+            return False, []
 
         profile_uuids: list[str] = []
         try:
-            conn.execute("BEGIN TRANSACTION")
-
             for booking in bookings:
                 cursor.execute(
                     """
@@ -403,10 +396,10 @@ def insert_artist_bookings(bookings: list[ArtistBooking]) -> tuple[bool, list[st
                 profile_uuids.append(profile_uuid)
 
             conn.commit()
-        except Exception as e:
+        except Exception:
             conn.rollback()
-            print(f"Error inserting artist bookings: {e}")
-            return False, []
+            logger.error("Artist booking insertion rolled back", exc_info=True)
+            raise
 
     return True, profile_uuids
 
@@ -467,7 +460,7 @@ def delete_artist_booking(booking_id: int) -> bool:
         except Exception as e:
             # Rollback in case of error
             conn.rollback()
-            print(f"Error deleting artist booking: {e}")
+            logger.error(f"Error deleting artist booking: {e}")
             return False
 
 

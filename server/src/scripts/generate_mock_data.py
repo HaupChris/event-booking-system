@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from src.models.datatypes import ArtistBooking, Booking
-from src.services.artist_service import insert_artist_booking
+from src.services.artist_service import insert_artist_bookings
 from src.services.booking_service import _connect_db, insert_booking
 from src.services.formcontent_service import get_artist_form_content_obj, get_form_content_obj
 
@@ -430,13 +430,13 @@ def main():
     # Insert mock bookings
     successful_bookings = 0
     for booking in bookings:
-        if insert_booking(booking):
+        if insert_booking(booking)[0]:  # (success, profile_uuid)
             successful_bookings += 1
 
     # Insert mock artist bookings
     successful_artists = 0
     for artist in artists:
-        if insert_artist_booking(artist):
+        if insert_artist_bookings([artist])[0]:  # (success, profile_uuids)
             successful_artists += 1
 
     print(f"Successfully created {successful_bookings}/{args.participants} participant bookings")
