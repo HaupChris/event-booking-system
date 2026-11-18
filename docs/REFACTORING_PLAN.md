@@ -15,6 +15,40 @@ Reihenfolge: Phase 0 → Charakterisierungstests → Phase 1 + 3 parallel → Ph
 
 ---
 
+## Rahmenbedingungen (erledigt 2026-11-18)
+
+Regeln und Prüfungen sind in `AGENTS.md` beschrieben und laufen in pre-commit und CI
+(`.github/workflows/ci.yml`, Gate vor dem Deploy):
+
+- [x] `ruff format` als einziger Formatter, Ruff-Regeln verschärft (`C90`, `TID`, `S608` nicht
+  mehr global ignoriert, `max-args = 5`), Tool-Versionen gepinnt
+- [x] import-linter: Schichten `api → services → models → utils`, kein Flask in Services/Models
+- [x] Dateilängen-Check (`tools/check_file_length.py`) mit Ausnahmeliste
+- [x] pre-commit repariert (aktuelle Versionen, Secrets-Baseline, Frontend-Hooks über `node_modules`)
+- [x] `AGENTS.md` als einzige Quelle, `CLAUDE.md` importiert sie, `SETUP.md` in README aufgegangen
+
+### Altlasten-Baseline – muss schrittweise auf null
+
+Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle anfasst, behebt sie mit.
+
+| Baseline | Stand 2026-11-18 | Ort |
+|---|---|---|
+| Ruff-Verstöße | 107 Zeilen (`# noqa: …  # lint-baseline`) | `grep -rn lint-baseline server/` |
+| Dateien > 300 Zeilen | 30 (16 Backend, 14 Frontend) | `tools/file_length_allowlist.txt` |
+| import-linter-Ausnahmen | 1 (`app_settings_service → flask`) | `ignore_imports` in `server/pyproject.toml` |
+| mypy-Fehler | 50 in 15 Dateien (CI noch nicht blockierend) | `cd server && mypy .` |
+
+- [ ] **Priorität:** die 33 `S608`-Stellen (SQL mit f-Strings) prüfen; Tabellen-/Spaltennamen
+  müssen aus festen Allowlists kommen. Läuft mit B1 zusammen.
+- [ ] mypy-Fehler beheben, danach mypy in CI und pre-commit blockierend schalten.
+- [ ] Mit B1 `sqlite3` per Ruff `TID251` (banned-api) außerhalb von `src/db.py` verbieten.
+- [ ] Service-zu-Service-Imports reduzieren (z. B. `admin_booking_mail_service` hängt an vier
+  Services); ggf. später als import-linter-Vertrag absichern.
+- [ ] Frontend-Linting angleichen: aktuell 1 ESLint-Warnung und 8 nicht Prettier-formatierte
+  Dateien, ESLint 8 mit CRA-Konfiguration; danach `npm run quality` in CI aufnehmen.
+
+---
+
 ## Phase 0 – Sicherheitslücken (sofort)
 
 - [ ] **S1 – Client bestimmt Preis und Zahlstatus.**
@@ -44,8 +78,10 @@ Reihenfolge: Phase 0 → Charakterisierungstests → Phase 1 + 3 parallel → Ph
 
 - [ ] **S5 – Sensible Dateien im Git.**
   `data/bookings.db`, `frontend/build/`, `.github/artifacts/vulverability-report.csv` sind eingecheckt.
-  Maßnahme: prüfen, ob echte Personendaten enthalten sind → ggf. mit `git filter-repo` aus der
-  History entfernen; `.gitignore` ergänzen.
+  Außerdem stand in `test/test_api.py` ein Klartext-Passwort (Datei inzwischen entfernt, in der
+  History aber noch vorhanden).
+  Maßnahme: prüfen, ob echte Personendaten enthalten sind und ob das Passwort noch irgendwo
+  verwendet wird → ggf. mit `git filter-repo` aus der History entfernen; `.gitignore` ergänzen.
 
 - [ ] **S6 – Keine CSP; JWT und Formularentwürfe (inkl. Unterschrift) in `localStorage`.**
   Orte: `deployment/nginx/wiesenwahn.conf`, `frontend/src/App.tsx`, `frontend/src/hooks/useFormManagement.tsx`.
@@ -64,8 +100,11 @@ Reihenfolge: Phase 0 → Charakterisierungstests → Phase 1 + 3 parallel → Ph
 
 ### Voraussetzung: Charakterisierungstests
 
-- [ ] Aktuell nur ~245 Zeilen Tests. Vor Phase 1: pytest mit Flask-Test-Client und temporärer DB
-  für Buchung (user + artist), Auth, Admin-Zugriffsschutz, Profil-Endpunkte.
+- [ ] Testinfrastruktur: pytest-Fixtures mit Flask-Test-Client, temporärer DB aus `schema.sql`,
+  Tokens je Rolle, gemocktem Mailversand. Danach pytest als Job in `ci.yml` aufnehmen.
+- [ ] Jeder Fix in Phase 0 bekommt zuerst einen Test, der die Lücke nachweist.
+- [ ] Vor Phase 1: Tests für Buchung (user + artist), Auth, Admin-Zugriffsschutz
+  (parametrisiert über alle Routen), Profil-Endpunkte, Admin-CRUD.
 
 ---
 
@@ -148,9 +187,11 @@ Erfordert Datenmigration mit Backup → erst nach Phase 0/1 und mit Testabdeckun
 
 ## Phase 4 – Betrieb und CI
 
-- [ ] **Test-Gate vor Deploy.** `.github/workflows/deploy.yml` deployt bei jedem Push auf `main` ohne Lint/Tests.
+- [x] **Lint-Gate vor Deploy** (`ci.yml`, von `deploy.yml` aufgerufen).
+- [ ] **Test-Gate vor Deploy:** pytest-Job ergänzen, sobald die Testinfrastruktur steht.
 - [ ] **Rollback-fähige Images.** Zusätzlich zum `:latest` mit Commit-SHA taggen.
 - [ ] **nginx entdoppeln.** `frontend/nginx/default.conf` dupliziert Rate-Limit-Zonen und Auth-Routen des
   Host-nginx → Rate-Limiting nur im Host-nginx, Container-nginx liefert nur statische Dateien.
-- [ ] **Doku aufräumen.** Veraltete Plan-/Session-Dokumente entfernen, verbleibende Doku aktualisieren
-  (CLAUDE.md/README erwähnen noch `requirements.txt` bzw. „space-themed UI“).
+- [x] **Doku aufräumen.** Veraltete Plan-/Session-Dokumente entfernt, `AGENTS.md`/`CLAUDE.md`/README aktualisiert.
+- [ ] `ROADMAP.md`: offene Feature-Ideen in GitHub-Issues überführen, dann löschen.
+- [ ] `VPS_SECURITY_HARDENING_CHECKLIST.md` (untracked) nach `deployment/` verschieben und einchecken.

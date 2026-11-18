@@ -3,7 +3,7 @@
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 
 
-A full-stack booking and management system for a small, non-commercial music festival. This project features a React frontend with a space-themed UI and a Flask backend with RESTful APIs for handling user registrations, work shift assignments, and material contributions.
+A full-stack booking and management system for a small, non-commercial music festival. This project features a React frontend with yearly festival branding (e.g. circus, space) and a Flask backend with RESTful APIs for handling user registrations, work shift assignments, and material contributions.
 
 ## 🚀 Features
 
@@ -14,7 +14,7 @@ A full-stack booking and management system for a small, non-commercial music fes
 - **Admin Dashboard**: Organizers can view all bookings and manage participants
 - **Artist Portal**: Separate flow for artist registration with specific requirements
 - **Email Confirmations**: Automated confirmation emails with payment instructions
-- **Responsive UI**: Space-themed Material UI design that works on mobile and desktop
+- **Responsive UI**: Material UI with switchable festival branding packs, works on mobile and desktop
 
 ## 🛠️ Tech Stack
 
@@ -33,7 +33,7 @@ A full-stack booking and management system for a small, non-commercial music fes
 - **Flask-JWT-Extended** for authentication
 - **Flask-Limiter** for rate limiting
 - **Flask-CORS** for cross-origin resource sharing
-- **Python 3.11+**
+- **Python 3.12+**
 - **Docker** support for containerized deployment
 
 ## 📦 Project Structure
@@ -66,7 +66,8 @@ A full-stack booking and management system for a small, non-commercial music fes
 
 ### Prerequisites
 - Node.js 20+
-- Python 3.11+
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/) (`pip install uv`)
 - Docker (optional)
 
 ### Local Development Setup
@@ -107,22 +108,39 @@ npm run test
 
 ### Quality Checks
 
+Coding rules, lint baseline and architecture rules are described in [AGENTS.md](AGENTS.md).
+CI runs the same checks on every branch and before each deploy.
+
 ```bash
 # Backend
 cd server
 source .venv/bin/activate
-ruff check . && black --check . && mypy . && pytest
+ruff check . && ruff format --check . && lint-imports && pytest
 
 # Frontend
 cd frontend
 npm run quality
+
+# Repository-wide
+python tools/check_file_length.py
 ```
+
+### Pre-commit Hooks
+
+```bash
+pre-commit install          # once per clone (pre-commit is part of the backend dev deps)
+pre-commit run --all-files  # run manually
+```
+
+The ESLint and Prettier hooks use `frontend/node_modules`, so run `npm install` first.
 
 ### Docker Setup
 ```bash
-# Build and run with Docker Compose
-docker-compose up --build
+# Build and run locally with Docker Compose
+docker-compose -f docker-compose.local.yml up --build
 ```
+
+Production deployment (GitHub Actions → VPS) is described in [deployment/README.md](deployment/README.md).
 
 ## 📋 API Documentation
 
