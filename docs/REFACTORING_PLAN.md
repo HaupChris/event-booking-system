@@ -81,9 +81,11 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
   - [x] `data/bookings.db`: war in der gesamten History leer; aus dem Index entfernt, `*.db` ignoriert
   - [x] `frontend/build/` (CRA-Reste) und `.github/artifacts/vulverability-report.csv` aus dem Index
     entfernt, `.github/artifacts/` ignoriert
-  - [ ] Klartext-Passwort aus dem früheren `test/test_api.py` steht öffentlich in der History →
-    Rollen-Passwörter rotieren (auch wenn es kürzer als 12 Zeichen ist: ein vor der Mindestlänge
-    gesetzter Hash bleibt gültig); History-Bereinigung ist danach optional
+  - [ ] **Vor dem nächsten Go-live:** Klartext-Passwort aus dem früheren `test/test_api.py` steht
+    öffentlich in der History → alle drei Rollen-Passwörter rotieren (ein vor der Mindestlänge
+    gesetzter Hash bleibt gültig). Über *Admin → Settings → Password*: neue GitHub-Secrets allein
+    reichen nicht, Env-Werte werden nur übernommen, wenn für eine Rolle noch kein Hash existiert.
+    Dabei auch `JWT_SECRET_KEY` und das Gmail-App-Passwort erneuern. History-Bereinigung danach optional.
   - [ ] `dependabot-alert-export.yml` lädt die Alert-Liste als Workflow-Artefakt hoch; bei einem
     öffentlichen Repo für angemeldete GitHub-Nutzer abrufbar → Workflow entfernen oder Repo privat
 

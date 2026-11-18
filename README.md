@@ -3,7 +3,9 @@
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 
 
-A full-stack booking and management system for a small, non-commercial music festival. This project features a React frontend with yearly festival branding (e.g. circus, space) and a Flask backend with RESTful APIs for handling user registrations, work shift assignments, and material contributions.
+A full-stack booking and management system that runs the registration and organisation of our small, non-commercial music festival. Every year, participants and artists register through it, and the organising team uses it to manage bookings, payments, work shifts, materials and news.
+
+It consists of a React frontend with yearly festival branding (e.g. circus, space) and a Flask backend with a REST API on SQLite, deployed with Docker on a self-hosted server.
 
 ## 🚀 Features
 
@@ -183,7 +185,7 @@ The backend provides a RESTful API with the following main endpoints:
 
 ## 📝 License
 
-This project is proprietary and is not open for redistribution or use without explicit permission. All rights reserved. The source code is shared on GitHub for demonstration and educational purposes only. For inquiries about using this code in your own projects, please contact the repository owner.
+This project is proprietary. All rights reserved. The source code is publicly visible, but it may not be used, copied or redistributed without explicit permission. For inquiries, please contact the repository owner.
 
 ## 🙏 Acknowledgements
 
