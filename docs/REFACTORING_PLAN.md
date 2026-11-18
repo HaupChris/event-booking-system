@@ -37,6 +37,7 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
 | Dateien > 300 Zeilen | 30 (16 Backend, 14 Frontend) | `tools/file_length_allowlist.txt` |
 | import-linter-Ausnahmen | 1 (`app_settings_service → flask`) | `ignore_imports` in `server/pyproject.toml` |
 | mypy-Fehler | 50 in 15 Dateien (CI noch nicht blockierend) | `cd server && mypy .` |
+| Trivy-Ausnahmen | 1 (`DS-0002`: Container laufen als root → Phase 5) | `.trivyignore` |
 
 - [ ] **Priorität:** die 33 `S608`-Stellen (SQL mit f-Strings) prüfen; Tabellen-/Spaltennamen
   müssen aus festen Allowlists kommen. Läuft mit B1 zusammen.
@@ -246,13 +247,18 @@ Erfordert Datenmigration mit Backup → erst nach Phase 0/1 und mit Testabdeckun
 - [ ] **Rollback-fähige Images.** Zusätzlich zum `:latest` mit Commit-SHA taggen.
 - [ ] **nginx entdoppeln.** `frontend/nginx/default.conf` dupliziert Rate-Limit-Zonen und Auth-Routen des
   Host-nginx → Rate-Limiting nur im Host-nginx, Container-nginx liefert nur statische Dateien.
-- [ ] **Schwachstellen-Scans in CI** (Trivy):
-  - `uv.lock` einführen (ohne Lockfile sieht Trivy die Python-Abhängigkeiten nicht; zudem reproduzierbare Builds)
-  - `trivy fs` auf Abhängigkeiten (Python + npm) und `trivy config` auf Dockerfiles/Compose
-  - `trivy image` auf die gebauten Images vor dem Push in `deploy.yml`
-  - Blockierend bei CRITICAL/HIGH mit verfügbarem Fix (`--ignore-unfixed`), Ergebnisse als SARIF ins
-    GitHub-Security-Tab, zusätzlich wöchentlicher Scan (neue CVEs in unveränderten Abhängigkeiten)
-  - Actions (insb. Security-Tools) per Commit-SHA pinnen, Dependabot für Actions/pip/npm aktivieren
+- [x] **Schwachstellen-Scans in CI** (Trivy, `ci.yml`, blockierend bei CRITICAL/HIGH mit Fix):
+  - [x] `uv.lock` eingeführt; Images installieren exakt die gelockten, hash-geprüften Versionen
+  - [x] `trivy fs` (Abhängigkeiten, Dockerfiles, Secrets) und `trivy image` (frisch gebaute Images)
+  - [x] wöchentlicher Lauf; Trivy als Docker-Image per Digest gepinnt, Actions per SHA
+  - [x] Dependabot (Actions, uv, npm, Docker), gruppiert
+  - [x] Behoben: axios (12 CVEs), dompurify, form-data; OS-Updates beim Image-Build;
+    Build-Stage `node:20` (EOL) → `node:24-alpine`; ungenutzte Abhängigkeiten entfernt
+    (`flask-praetorian`, `requests`; `pytest` nur noch dev)
+  - [x] `.dockerignore` für `server/` und `frontend/`: lokale Builds kopierten `.env`, die
+    lokale DB und Unterschriften-PNGs ins Image
+  - [ ] SARIF-Upload ins GitHub-Security-Tab (für private Repos nur mit GitHub Advanced Security)
+
 - [x] **Doku aufräumen.** Veraltete Plan-/Session-Dokumente entfernt, `AGENTS.md`/`CLAUDE.md`/README aktualisiert.
 - [ ] `ROADMAP.md`: offene Feature-Ideen in GitHub-Issues überführen, dann löschen.
 - [ ] `VPS_SECURITY_HARDENING_CHECKLIST.md` (untracked) nach `deployment/` verschieben und einchecken.

@@ -1,0 +1,6 @@
+# Accepted Trivy findings. Every entry needs a reason and a plan to remove it.
+# Baseline 2026-11-18, see docs/REFACTORING_PLAN.md (Phase 5).
+
+# Containers run as root. Fixing this needs coordinated host volume ownership
+# (chown of /opt/wiesenwahn/data and logs during deploy) -> Phase 5 "Container härten".
+DS-0002

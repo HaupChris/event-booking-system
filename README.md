@@ -77,12 +77,11 @@ A full-stack booking and management system for a small, non-commercial music fes
 # Navigate to server directory
 cd server
 
-# Create and activate virtual environment
-uv venv
+# Create .venv with the exact locked dependencies (incl. dev tools)
+uv sync --extra dev
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# Install dependencies
-uv pip install -e ".[dev]"
+# Add or update a dependency: edit pyproject.toml, then `uv lock` and commit uv.lock
 
 # Run the server
 python main.py

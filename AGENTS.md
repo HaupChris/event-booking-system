@@ -30,7 +30,7 @@ Booking and management system for a small, non-commercial music festival.
 
 ```bash
 # Backend (Python 3.12, uv)
-cd server && uv venv && source .venv/bin/activate && uv pip install -e ".[dev]"
+cd server && uv sync --extra dev && source .venv/bin/activate   # exact versions from uv.lock
 python main.py                       # dev server on 127.0.0.1:5001
 ruff check . && ruff format --check . && lint-imports && pytest
 mypy .                               # not blocking yet, see "Lint baseline"
@@ -100,6 +100,10 @@ only be reduced, never extended:
 - Escape all user input that ends up in HTML (including emails).
 - Do not log personal data (emails, names, full profile UUIDs) or secrets.
 - Secrets only via environment variables; `detect-secrets` runs in pre-commit.
+- Dependencies are locked (`server/uv.lock`, `frontend/package-lock.json`). Change them via
+  `pyproject.toml` + `uv lock` or `npm install`, and commit the lockfile.
+- CI blocks on CRITICAL/HIGH vulnerabilities with an available fix (Trivy: dependencies,
+  Dockerfiles, secrets and built images). Accepted findings go into `.trivyignore` with a reason.
 
 ## Testing
 
