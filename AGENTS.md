@@ -117,6 +117,8 @@ only be reduced, never extended:
 
 - Commit style: `type(scope): imperative summary` (e.g. `feat(profile-page): ...`,
   `fix(mail): ...`, `refactor(api): ...`). Keep commits focused and small.
-- `main` deploys automatically to production; work on branches and merge via PR.
+- `main` deploys automatically to production. It only receives tested releases from `develop`.
+- `develop` is the integration branch: create `refactoring/…`, `feat/…` or `fix/…` branches from
+  it and merge back via PR with green CI. See "Branching und Release" in the refactoring plan.
 - PRs include: what changed and why, test evidence, and notes on config, env or
   migration impact.

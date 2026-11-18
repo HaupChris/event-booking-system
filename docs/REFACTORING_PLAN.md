@@ -13,6 +13,25 @@ git switch -c hotfix/<name> pre-refactoring-2026-11-18   # von dort aus weiterar
 
 Reihenfolge: Phase 0 → Charakterisierungstests → Phase 1 + 3 parallel → Phase 4 → Phase 2.
 
+## Branching und Release
+
+Das Refactoring ergibt eine neue Version, die vor dem Produktiv-Deploy ausführlich getestet wird.
+`main` deployt bei jedem Push automatisch – dort landet nur ein getesteter Release.
+
+- [ ] `develop` als Integrations-Branch anlegen (Stand von `refactoring/security-fixes`)
+- [ ] Arbeits-Branches (`refactoring/…`, `feat/…`, `fix/…`) per PR nach `develop`; CI muss grün sein
+- [ ] Branch-Schutz für `main` und `develop` (nur per PR, CI erforderlich, kein Force-Push)
+- [ ] **Release-Test vor dem Merge nach `main`:**
+  - Gesamt-Stack lokal mit Produktions-Images hinter der echten nginx-Konfiguration
+  - Automatisierter Browser-Durchlauf (heute ein Wegwerf-Skript, siehe S6) als
+    Playwright-Suite ins Repo übernehmen: User-/Artist-Anmeldung bis Absenden, Admin-Seiten,
+    Profilseite, CSP-Verletzungen = Fehler
+  - Datenmigration gegen eine Kopie der Produktions-DB testen (Phase 2 ändert das Schema)
+  - Manuelle Checkliste für das, was nicht automatisiert ist (Mails, Zahlungslink, PWA/Offline)
+  - Optional: Staging-Umgebung (zweiter Compose-Stack auf dem VPS oder lokal), wenn der Aufwand lohnt
+- [ ] Vor dem Go-live: Secrets rotieren (siehe S5), Backup der Produktions-DB, Rollback-Plan
+  (Image-Tags mit Commit-SHA, siehe Phase 4)
+
 ---
 
 ## Rahmenbedingungen (erledigt 2026-11-18)
@@ -187,6 +206,30 @@ einer Buchung zuordenbar, und zwar nur für Admins, die die Buchung ohnehin sehe
 - [ ] **Danach:** Klardaten aus allen Log-Aufrufen entfernen (S7) und per Test absichern
   (Log-Ausgabe einer Buchung darf weder E-Mail noch Namen enthalten).
 
+### Auswertung und Observability (zu entscheiden)
+
+Heute werden Log-Dateien von Hand durchgesehen. Neben dem *Was wird geloggt* ist zu klären,
+*wie* Logs ausgewertet werden und ob weitere Observability sinnvoll ist. Randbedingung: VPS mit
+ca. 512 MB RAM und 10 GB Disk; App nutzt davon bereits ~512 MB als Limit.
+
+Stufen (jede baut auf der vorherigen auf):
+
+1. **Ohne zusätzliche Infrastruktur:** strukturierte JSON-Logs (Phase L) + `lnav` auf dem Server
+   (SQL-Abfragen, Filter, Zeitachsen direkt auf Log-Dateien) bzw. `jq`. Dazu der Ereignis-Verlauf
+   pro Buchung im Admin-Bereich. Deckt vermutlich die meisten Support-Fälle ab.
+2. **Zentrale Log-Suche mit UI:** VictoriaLogs (ein Binary, sehr geringer Speicherbedarf, eigene
+   Web-UI, Grafana-Plugin) oder Grafana Loki + Grafana (Industriestandard, aber mehr RAM).
+   Auf dem 512-MB-VPS knapp → Optionen: VPS vergrößern, Stack nur bei Bedarf lokal betreiben
+   (Logs per `rsync` holen), oder gehosteter Free-Tier (Datenschutz prüfen, nur pseudonyme Logs).
+3. **Verfügbarkeit und Alarme:** externer Uptime-Check (z. B. Uptime Kuma, selbst gehostet, oder
+   ein externer Dienst) + Benachrichtigung bei Ausfall/Deploy-Fehler. Geringer Aufwand, hoher Nutzen
+   rund um das Festival.
+4. **Metriken/Dashboards (Grafana + Prometheus/VictoriaMetrics):** für diese Last vermutlich
+   Overkill; erst sinnvoll, wenn konkrete Fragen (Antwortzeiten, Fehlerraten) offen sind.
+
+Nicht empfohlen: Splunk/ELK (Betrieb und RAM-Bedarf weit über dem VPS), Sentry selbst gehostet
+(viele Dienste). Vorschlag: mit Stufe 1 + 3 starten, Stufe 2 nach dem nächsten Festival bewerten.
+
 ---
 
 ## Phase 1 – Backend-Fundament
@@ -262,6 +305,9 @@ Erfordert Datenmigration mit Backup → erst nach Phase 0/1 und mit Testabdeckun
 - [ ] **F5 – Offline/PWA-Sync bewerten.**
   `syncService.ts`, `utils/indexedDB.ts`, `SyncQueueManager` > 800 Zeilen. Nutzen prüfen, sonst entfernen.
 
+- [ ] **F7 – Google Fonts selbst hosten (Datenschutz).** Heute lädt jeder Seitenaufruf Schriften
+  von Google (IP-Übertragung, LG München 2022: DSGVO-Verstoß). Schriften als WOFF2 ins Bundle
+  (z. B. `@fontsource/*`), `index.html` bereinigen, danach CSP `style-src`/`font-src` auf `'self'`.
 - [ ] **F6 – Signature-Pads konsolidieren** (`SignaturePad.tsx` und `customSignaturePad.tsx`).
 
 ---
