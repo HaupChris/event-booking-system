@@ -14,15 +14,15 @@ import sqlite3
 import uuid
 
 # Determine database path
-IN_DOCKER = os.environ.get('IN_DOCKER', 'False').lower() == 'true'
+IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 
 if IN_DOCKER:
-    DB_FILE_PATH = '/app/user_data/bookings.db'
+    DB_FILE_PATH = "/app/user_data/bookings.db"
 else:
     # Local development path
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    DB_DIR = os.path.join(script_dir, '../../db')
-    DB_FILE_PATH = os.path.join(DB_DIR, 'bookings.db')
+    DB_DIR = os.path.join(script_dir, "../../db")
+    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
 
 
 def migrate():
@@ -83,10 +83,13 @@ def migrate():
         for booking in bookings:
             profile_uuid = str(uuid.uuid4())
             # Append profile_uuid to the row data
-            cursor.execute(f"""
-                INSERT INTO Bookings_new ({', '.join(columns)}, profile_uuid)
-                VALUES ({', '.join(['?'] * len(columns))}, ?)
-            """, (*booking, profile_uuid))
+            cursor.execute(
+                f"""
+                INSERT INTO Bookings_new ({", ".join(columns)}, profile_uuid)
+                VALUES ({", ".join(["?"] * len(columns))}, ?)
+            """,
+                (*booking, profile_uuid),
+            )
 
         # Drop old table and rename
         cursor.execute("DROP TABLE Bookings")
@@ -198,10 +201,13 @@ def migrate():
 
         for booking in artist_bookings:
             profile_uuid = str(uuid.uuid4())
-            cursor.execute(f"""
-                INSERT INTO ArtistBookings_new ({', '.join(artist_columns)}, profile_uuid)
-                VALUES ({', '.join(['?'] * len(artist_columns))}, ?)
-            """, (*booking, profile_uuid))
+            cursor.execute(
+                f"""
+                INSERT INTO ArtistBookings_new ({", ".join(artist_columns)}, profile_uuid)
+                VALUES ({", ".join(["?"] * len(artist_columns))}, ?)
+            """,
+                (*booking, profile_uuid),
+            )
 
         # Drop old table and rename
         cursor.execute("DROP TABLE ArtistBookings")
@@ -244,7 +250,9 @@ def migrate():
             cursor.execute("INSERT INTO ArtistBookingProfessions VALUES (?, ?, ?)", row)
 
         # Create index on profile_uuid
-        cursor.execute("CREATE INDEX idx_artist_bookings_profile_uuid ON ArtistBookings(profile_uuid)")
+        cursor.execute(
+            "CREATE INDEX idx_artist_bookings_profile_uuid ON ArtistBookings(profile_uuid)"
+        )
 
         print(f"   ✓ Migrated {artist_count} artist bookings with generated UUIDs")
 
@@ -257,7 +265,7 @@ def migrate():
         cursor.execute("PRAGMA table_info(ShiftAssignments)")
         existing_columns = [column[1] for column in cursor.fetchall()]
 
-        if 'status' not in existing_columns:
+        if "status" not in existing_columns:
             # Need to recreate table to add columns
             cursor.execute("SELECT * FROM ShiftAssignments")
             shift_assignments = cursor.fetchall()
@@ -283,11 +291,14 @@ def migrate():
 
             # Restore data
             for row in shift_assignments:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO ShiftAssignments
                     (id, booking_id, timeslot_id, is_confirmed, assignment_date, admin_notes, status)
                     VALUES (?, ?, ?, ?, ?, ?, 'pending')
-                """, row)
+                """,
+                    row,
+                )
 
             print("   ✓ Extended ShiftAssignments with acceptance workflow columns")
         else:
@@ -368,11 +379,12 @@ def migrate():
         conn.rollback()
         print(f"\n❌ Migration failed: {e}")
         import traceback
+
         traceback.print_exc()
         raise
     finally:
         conn.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     migrate()

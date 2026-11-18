@@ -131,9 +131,9 @@ def _build_custom_mail_context(
     }
 
 
-def _load_booking_mail_sources() -> (
-    tuple[dict[int, object], dict[int, object], dict, dict, str, str]
-):
+def _load_booking_mail_sources() -> tuple[
+    dict[int, object], dict[int, object], dict, dict, str, str
+]:
     regular_bookings = {booking.id: booking for booking in get_all_bookings()}
     artist_bookings = {booking.id: booking for booking in get_all_artist_bookings()}
     regular_form_content = get_up_to_date_form_content()

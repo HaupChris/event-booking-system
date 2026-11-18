@@ -77,7 +77,12 @@ def run_migration() -> bool:
         cursor.execute("PRAGMA table_info(ShiftAssignments)")
         columns = [col[1] for col in cursor.fetchall()]
 
-        required_columns = ["status", "rejection_reason", "alternative_preferences", "response_date"]
+        required_columns = [
+            "status",
+            "rejection_reason",
+            "alternative_preferences",
+            "response_date",
+        ]
         missing = [col for col in required_columns if col not in columns]
 
         if missing:
