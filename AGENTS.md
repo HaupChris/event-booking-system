@@ -114,6 +114,8 @@ Rules in `docs/LOGGING.md`. In short:
 - Use the attribute names listed in `docs/LOGGING.md` (`booking_ref`, `reason`, `error_type`, …).
 - Only values with bounded size: never request bodies, headers, free text from users or signatures.
 - No personal data or secrets: use `booking_ref`/`email_ref` pseudonyms; IPs only in the security log.
+- Business events of a booking: `record_booking_event(...)` / `record_profile_event(...)`
+  (stored for the admin history and logged with `booking_ref`), see `docs/LOGGING.md`.
 - Unexpected errors in `except` blocks: `logger.exception("…_failed", …)` (ruff `G201`), logged once where handled.
 
 

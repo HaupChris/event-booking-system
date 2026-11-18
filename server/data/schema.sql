@@ -354,3 +354,16 @@ CREATE TABLE IF NOT EXISTS AppSettings (
     value TEXT NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Business events per booking, shown in the admin booking view (docs/LOGGING.md).
+-- No personal data in `details`; rows are deleted together with the booking.
+CREATE TABLE IF NOT EXISTS BookingEvents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    booking_type TEXT NOT NULL CHECK (booking_type IN ('regular', 'artist')),
+    booking_id INTEGER NOT NULL,
+    event TEXT NOT NULL,
+    details TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_booking_events_booking ON BookingEvents (booking_type, booking_id);

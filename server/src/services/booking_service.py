@@ -6,6 +6,11 @@ from contextlib import closing
 from src.models.datatypes import Booking, BookingWithTimestamp
 from src.models.schema import init_db
 from src.services.app_settings_service import get_form_step_descriptions, get_payment_link
+from src.services.booking_events_service import (
+    delete_booking_events,
+    payment_details,
+    record_booking_event,
+)
 from src.services.formcontent_service import (
     get_form_content_obj,
     update_form_content_with_db_counts,
@@ -199,6 +204,8 @@ def insert_booking(booking: Booking) -> tuple[bool, str | None]:
             booking_id = _insert_booking_row(cursor, user_id, booking, profile_uuid)
             _insert_materials(cursor, booking_id, booking.material_ids)
             _insert_professions(cursor, booking_id, booking.profession_ids)
+            details = {"ticket_id": booking.ticket_id, "amount_shifts": booking.amount_shifts}
+            record_booking_event("regular", booking_id, "booking_created", details, cursor=cursor)
             conn.commit()
         except Exception:
             conn.rollback()
@@ -207,7 +214,6 @@ def insert_booking(booking: Booking) -> tuple[bool, str | None]:
             )
             raise
 
-    logger.info(f"Booking {booking_id} created (UUID: {profile_uuid[:8]}...) for user {user_id}")
     return True, profile_uuid
 
 
@@ -323,22 +329,6 @@ def get_all_bookings() -> list[BookingWithTimestamp]:
         return []
 
 
-def check_email_exists(email: str) -> bool:
-    """
-    Returns True if there's already a user with the specified email.
-    """
-    try:
-        logger.debug(f"Checking if email exists: {email}")
-        with closing(_connect_db()) as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM Users WHERE email=?", (email,))
-            return cursor.fetchone() is not None
-
-    except sqlite3.Error as e:
-        logger.exception(f"Database error checking email existence: {e}")
-        return True
-
-
 def get_up_to_date_form_content() -> dict:
     """Returns form content with updated booking counts and logging."""
     start_time = time.time()
@@ -448,9 +438,10 @@ def update_booking_db(booking_id: int, booking_data: dict) -> bool:
                             (booking_id, material_id),
                         )
 
-                # Commit transaction
+                record_booking_event(
+                    "regular", booking_id, "booking_updated_by_admin", cursor=cursor
+                )
                 conn.commit()
-                logger.info(f"Booking {booking_id} updated successfully")
                 return True
 
             except Exception as e:
@@ -501,8 +492,11 @@ def update_booking_payment(booking_id: int, payment_data: dict) -> bool:
                     ),
                 )
 
+                details = payment_details(payment_data)
+                record_booking_event(
+                    "regular", booking_id, "payment_updated", details, cursor=cursor
+                )
                 conn.commit()
-                logger.info(f"Payment status updated for booking {booking_id}")
                 return True
             except Exception as e:
                 print(f"Error updating payment: {e}")
@@ -542,6 +536,7 @@ def delete_booking(booking_id: int) -> bool:
                 user_id = result[0]
 
                 # Delete the booking
+                delete_booking_events(cursor, "regular", booking_id)
                 cursor.execute("DELETE FROM Bookings WHERE id = ?", (booking_id,))
 
                 # Check if user has other bookings, if not, delete the user

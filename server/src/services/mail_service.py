@@ -169,7 +169,7 @@ def get_booking_details(booking: Booking, form_content: dict) -> str:  # noqa: C
 
 def send_confirmation_mail(
     booking: Booking, form_content: dict, profile_uuid: str | None = None
-) -> None:
+) -> bool:
     """
     Sends a confirmation email to the user based on the booking details.
 
@@ -346,13 +346,12 @@ def send_confirmation_mail(
 
     msg.attach(MIMEText(html, "html"))
 
-    if _send_message(msg, booking.email):
-        logger.info("Email erfolgreich versendet!")
+    return _send_message(msg, booking.email)
 
 
 def send_artist_confirmation_mail(
     booking: ArtistBooking, form_content: dict, profile_uuid: str | None = None
-) -> None:
+) -> bool:
     """
     Sends a confirmation email to the artist based on the booking details.
 
@@ -550,8 +549,7 @@ def send_artist_confirmation_mail(
 
     msg.attach(MIMEText(html, "html"))
 
-    if _send_message(msg, booking.email):
-        logger.info("Artist email sent successfully!")
+    return _send_message(msg, booking.email)
 
 
 def get_artist_booking_details(booking: ArtistBooking, form_content: dict) -> str:

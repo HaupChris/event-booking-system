@@ -13,7 +13,7 @@ from src.services.booking_service import (
     update_booking_db,
     update_booking_payment,
 )
-from src.services.mail_service import send_confirmation_mail
+from src.services.confirmation_mail_service import send_confirmation
 from src.services.option_service import ticket_requires_workshift
 from src.services.orga_team_service import is_valid_active_orga_team_member
 from src.services.pricing_service import (
@@ -124,18 +124,7 @@ def submit_form():
 
         if success:
             resolved_profile_uuid = profile_uuid or ""
-            # Send email
-            try:
-                send_confirmation_mail(booking, form_content_dict, resolved_profile_uuid)
-                logger.info(
-                    f"Booking and confirmation email successful for {booking.first_name} {booking.last_name}"
-                )
-            except Exception as email_error:
-                logger.exception(
-                    "Booking successful but email failed for "
-                    f"{booking.first_name} {booking.last_name}: {str(email_error)}",
-                )
-                # Still return success since booking was created
+            send_confirmation(booking, form_content_dict, resolved_profile_uuid)
 
             duration = time.time() - start_time
             logger.info(

@@ -26,6 +26,7 @@ import { alpha } from '@mui/material/styles';
 import { adminPalette } from '../theme/adminPalette';
 import type { ArtistFormContent } from '../../artistArea/interface';
 import BookingDetailFormFields from './BookingDetailFormFields';
+import BookingEventHistory from './BookingEventHistory';
 
 interface BookingDetailModalProps {
   open: boolean;
@@ -176,6 +177,14 @@ const BookingDetailModal: React.FC<BookingDetailModalProps> = ({
             artistFormContent={artistFormContent}
             onInputChange={handleInputChange}
           />
+
+          {!editMode && (
+            <BookingEventHistory
+              bookingType={editedBooking.bookingType}
+              bookingId={editedBooking.id}
+              token={token}
+            />
+          )}
         </Box>
       </Modal>
       <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
