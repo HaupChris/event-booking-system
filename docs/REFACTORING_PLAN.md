@@ -77,12 +77,15 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
   Maßnahme: eigene nginx-Zonen für `/api/profile/` und schreibende Endpunkte; IP nur aus
   `request.remote_addr` nach `ProxyFix`.
 
-- [ ] **S5 – Sensible Dateien im Git.**
-  ~~`data/bookings.db`~~ (war in der gesamten History leer; aus dem Index entfernt, `*.db` ignoriert), `frontend/build/`, `.github/artifacts/vulverability-report.csv` sind eingecheckt.
-  Außerdem stand in `test/test_api.py` ein Klartext-Passwort (Datei inzwischen entfernt, in der
-  History aber noch vorhanden).
-  Maßnahme: prüfen, ob echte Personendaten enthalten sind und ob das Passwort noch irgendwo
-  verwendet wird → ggf. mit `git filter-repo` aus der History entfernen; `.gitignore` ergänzen.
+- [ ] **S5 – Sensible Dateien im Git (Repository ist öffentlich).**
+  - [x] `data/bookings.db`: war in der gesamten History leer; aus dem Index entfernt, `*.db` ignoriert
+  - [x] `frontend/build/` (CRA-Reste) und `.github/artifacts/vulverability-report.csv` aus dem Index
+    entfernt, `.github/artifacts/` ignoriert
+  - [ ] Klartext-Passwort aus dem früheren `test/test_api.py` steht öffentlich in der History →
+    Rollen-Passwörter rotieren (auch wenn es kürzer als 12 Zeichen ist: ein vor der Mindestlänge
+    gesetzter Hash bleibt gültig); History-Bereinigung ist danach optional
+  - [ ] `dependabot-alert-export.yml` lädt die Alert-Liste als Workflow-Artefakt hoch; bei einem
+    öffentlichen Repo für angemeldete GitHub-Nutzer abrufbar → Workflow entfernen oder Repo privat
 
 - [ ] **S6 – Keine CSP; JWT und Formularentwürfe (inkl. Unterschrift) in `localStorage`.**
   Orte: `deployment/nginx/wiesenwahn.conf`, `frontend/src/App.tsx`, `frontend/src/hooks/useFormManagement.tsx`.

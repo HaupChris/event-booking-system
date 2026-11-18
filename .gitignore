@@ -36,3 +36,6 @@ htmlcov/
 
 # Local databases (may contain personal data)
 *.db
+
+# Generated reports (never commit vulnerability reports to a public repository)
+.github/artifacts/
