@@ -90,10 +90,18 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
     Workflow-Artefakt hoch; Alerts sind im Security-Tab sichtbar). Secret `GH_TOKEN` in den
     Repo-Settings löschen, falls es sonst nicht gebraucht wird.
 
-- [ ] **S6 – Keine CSP; JWT und Formularentwürfe (inkl. Unterschrift) in `localStorage`.**
-  Orte: `deployment/nginx/wiesenwahn.conf`, `frontend/src/App.tsx`, `frontend/src/hooks/useFormManagement.tsx`.
-  Maßnahme: `Content-Security-Policy` setzen, veralteten `X-XSS-Protection`-Header entfernen,
-  Unterschrift nicht im Entwurf persistieren.
+- [x] **S6 – CSP und Formular-Entwürfe.**
+  - [x] `Content-Security-Policy` im Host-nginx (Skripte nur `'self'`; `style-src 'unsafe-inline'`
+    wegen MUI/Emotion), `X-Frame-Options: DENY`, veraltetes `X-XSS-Protection` entfernt
+  - [x] Unterschrift wird nicht mehr im `localStorage`-Entwurf gespeichert (auch aus alten Entwürfen
+    entfernt); nach einem Reload geht es höchstens bis zum Unterschrift-Schritt weiter
+  - [x] Service Worker fasst fremde Origins nicht mehr an, Cache-Versionen erhöht
+  - [x] Frontend: 403 (Token einer anderen Rolle) führt zum Login statt „Server nicht erreichbar“
+  - Geprüft im lokalen Gesamt-Stack hinter nginx mit Headless-Chromium: alle Formularschritte
+    (User + Artist), Admin-Login/Dashboard-Startseite, Profilseite → 0 CSP-Verletzungen.
+    Admin-Unterseiten nicht einzeln durchgeklickt.
+  - [ ] **Datenschutz:** Google Fonts werden von Google geladen (IP-Übertragung an Google; LG München
+    2022 als DSGVO-Verstoß gewertet) → Schriften selbst hosten, danach CSP auf `'self'` verschärfen
 
 - [ ] **S7 – Personendaten in Logs.** Bewusste Entscheidung für den Support (Nutzerprobleme
   nachvollziehen). Wird nicht einfach entfernt, sondern durch das Logging- und Support-Konzept

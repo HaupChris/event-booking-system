@@ -220,6 +220,7 @@ export function ArtistRegistrationFormContainer() {
           storageKey: 'artistBooking',
           versionKey: 'artistFormVersion',
           currentVersion: '1.3',
+          transientKeys: ['signature'],
         },
 
         // Validation and form configuration

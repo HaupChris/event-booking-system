@@ -203,6 +203,7 @@ export function UserRegistrationFormContainer() {
           storageKey: 'booking',
           versionKey: 'formVersion',
           currentVersion: '1.5',
+          transientKeys: ['signature'],
         },
 
         // Validation and form configuration

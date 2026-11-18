@@ -1,9 +1,9 @@
 /* eslint-disable no-restricted-globals */
 
 // Service Worker for Wiesenwahn PWA
-const CACHE_NAME = 'wiesenwahn-v3';
-const API_CACHE = 'wiesenwahn-api-v3';
-const PROFILE_CACHE = 'wiesenwahn-profile-v3';
+const CACHE_NAME = 'wiesenwahn-v4';
+const API_CACHE = 'wiesenwahn-api-v4';
+const PROFILE_CACHE = 'wiesenwahn-profile-v4';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache on install
@@ -56,6 +56,11 @@ self.addEventListener('fetch', (event) => {
 
   // Skip non-GET requests
   if (request.method !== 'GET') {
+    return;
+  }
+
+  // Leave cross-origin requests (e.g. fonts) to the browser and the page's CSP
+  if (url.origin !== self.location.origin) {
     return;
   }
 

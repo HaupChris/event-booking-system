@@ -28,6 +28,27 @@ interface FormManagementOptions<T> {
   currentVersion?: string;
   /** Initial step value */
   initialStep?: number;
+  /** Fields that are never written to localStorage (e.g. the signature) */
+  transientKeys?: (keyof T)[];
+  /** Required fields per step; used to resume before the first step needing a transient field */
+  requiredFieldsByStep?: Record<number, (keyof T)[]>;
+}
+
+function withoutKeys<T extends object>(state: T, keys: readonly (keyof T)[]): Partial<T> {
+  const copy: Partial<T> = { ...state };
+  keys.forEach((key) => delete copy[key]);
+  return copy;
+}
+
+/** First step that requires one of the given fields, as these are lost on reload. */
+function firstStepRequiring<T>(
+  requiredFieldsByStep: Record<number, (keyof T)[]>,
+  keys: readonly (keyof T)[]
+): number {
+  const steps = Object.entries(requiredFieldsByStep)
+    .filter(([, fields]) => fields.some((field) => keys.includes(field)))
+    .map(([step]) => Number(step));
+  return steps.length > 0 ? Math.min(...steps) : Number.POSITIVE_INFINITY;
 }
 
 /**
@@ -52,10 +73,15 @@ export function useFormManagement<T extends object>({
   versionKey,
   currentVersion = '1.0',
   initialStep = 0,
+  transientKeys = [],
+  requiredFieldsByStep = {},
 }: FormManagementOptions<T>): FormManagementReturn<T> {
   // Use ref for validationRules to keep updateField stable
   const validationRulesRef = useRef(validationRules);
   validationRulesRef.current = validationRules;
+  // Refs keep the storage effects independent of new array/object identities per render
+  const storageOptionsRef = useRef({ initialState, transientKeys, requiredFieldsByStep });
+  storageOptionsRef.current = { initialState, transientKeys, requiredFieldsByStep };
 
   // Add a flag to prevent overriding loaded data
   const [isInitialized, setIsInitialized] = useState(false);
@@ -89,12 +115,17 @@ export function useFormManagement<T extends object>({
       if (storedData) {
         try {
           const parsedData = JSON.parse(storedData);
-          setFormState(parsedData);
+          const { initialState: emptyState, transientKeys: transient } = storageOptionsRef.current;
+          setFormState({ ...emptyState, ...withoutKeys<T>(parsedData, transient) });
 
-          // Load step
+          // Load step, but never beyond the first step that needs a transient (not stored) field
           const storedStep = localStorage.getItem(`${storageKey}_step`);
           if (storedStep) {
-            setActiveStep(parseInt(storedStep, 10));
+            const resumeLimit = firstStepRequiring(
+              storageOptionsRef.current.requiredFieldsByStep,
+              transient
+            );
+            setActiveStep(Math.min(parseInt(storedStep, 10), resumeLimit));
           }
 
           setIsInitialized(true); // Mark as initialized with stored data
@@ -111,7 +142,8 @@ export function useFormManagement<T extends object>({
   useEffect(() => {
     if (storageKey && isInitialized) {
       // Only save after initialization
-      localStorage.setItem(storageKey, JSON.stringify(formState));
+      const persisted = withoutKeys(formState, storageOptionsRef.current.transientKeys);
+      localStorage.setItem(storageKey, JSON.stringify(persisted));
     }
   }, [formState, storageKey, isInitialized]);
 

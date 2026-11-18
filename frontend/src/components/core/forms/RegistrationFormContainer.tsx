@@ -13,25 +13,17 @@ import taenzerinImage from '../../../img/taenzerin.png';
 import { useBrandingPack } from '../../../branding/useBrandingPack';
 
 const getErrorResponseDetail = (error: unknown): string | undefined => {
-  if (!axios.isAxiosError(error) || !error.response?.data || typeof error.response.data !== 'object') {
+  if (
+    !axios.isAxiosError(error) ||
+    !error.response?.data ||
+    typeof error.response.data !== 'object'
+  ) {
     return undefined;
   }
 
   const data = error.response.data as { error?: unknown; message?: unknown; msg?: unknown };
-
-  if (typeof data.error === 'string') {
-    return data.error;
-  }
-
-  if (typeof data.message === 'string') {
-    return data.message;
-  }
-
-  if (typeof data.msg === 'string') {
-    return data.msg;
-  }
-
-  return undefined;
+  const detail = [data.error, data.message, data.msg].find((value) => typeof value === 'string');
+  return detail as string | undefined;
 };
 
 const getFormContentErrorMessage = (error: unknown): string => {
@@ -105,6 +97,8 @@ export interface RegistrationFormConfig<
     storageKey: string;
     versionKey: string;
     currentVersion: string;
+    /** Fields never stored in the local draft (personal data such as the signature) */
+    transientKeys?: (keyof TBooking)[];
   };
 
   // Validation and form configuration
@@ -175,6 +169,8 @@ export function RegistrationFormContainer<
     storageKey: config.storageConfig.storageKey,
     versionKey: config.storageConfig.versionKey,
     currentVersion: config.storageConfig.currentVersion,
+    transientKeys: config.storageConfig.transientKeys,
+    requiredFieldsByStep: config.requiredFields,
   });
 
   const [formContent, setFormContent] = useState<TFormContent>(config.getDummyFormContent());
@@ -199,7 +195,8 @@ export function RegistrationFormContainer<
       })
       .catch((error) => {
         const status = axios.isAxiosError(error) ? error.response?.status : undefined;
-        if (status === 401) {
+        if (status === 401 || status === 403) {
+          // 403: token of another role (e.g. user token on the artist form) -> log in again
           setAuth(false);
           setToken('');
           return;
@@ -304,7 +301,8 @@ export function RegistrationFormContainer<
       .catch((error) => {
         const status = axios.isAxiosError(error) ? error.response?.status : undefined;
 
-        if (status === 401) {
+        if (status === 401 || status === 403) {
+          // 403: token of another role (e.g. user token on the artist form) -> log in again
           setToken('');
           setAuth(false);
         } else {
