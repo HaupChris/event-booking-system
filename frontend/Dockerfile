@@ -3,6 +3,9 @@ FROM node:24-alpine AS build
 WORKDIR /app
 COPY . .
 RUN npm ci
+# Reported with browser errors (/api/client-errors); the deploy passes the commit SHA.
+ARG APP_VERSION=dev
+ENV VITE_APP_VERSION=$APP_VERSION
 RUN npm run build
 
 # Serve frontend with nginx (without SSL)

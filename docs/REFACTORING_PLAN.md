@@ -201,6 +201,11 @@ Client-Error-Endpunkt; (4) Klardaten entfernen und Log-Aufrufe auf Attribute ums
   transaktionaler Einfügeweg) und `check_email_exists`
   - [ ] Alte Log-Dateien auf dem Server (`access.log*`, `errors.log*`, `debug.log*`) einmalig löschen
   - [ ] lnav-Format auf dem Server ausprobieren und ggf. korrigieren
+- [x] **PR 3:** Fehlercode („Fehlercode: a1b2c3d4“ aus `X-Request-ID`) in den Fehlermeldungen von
+  Anmeldung, Profilseite und Mitfahrbörse; `POST /api/client-errors` (öffentlich, feste Felder,
+  UUIDs/E-Mails maskiert, max. 8 KB, nginx-Zone 10/min) gespeist von Error-Boundary,
+  `window.onerror`, `unhandledrejection` und Axios-Interceptor (5xx/keine Antwort);
+  App-Version = Commit-SHA im Frontend-Build
 
 Gefundene Mängel im Ist-Zustand: Herkunftsangabe zeigt den Logger-Wrapper statt der aufrufenden
 Stelle; Request-ID wird nicht an Clients zurückgegeben; doppelte Einträge (Zugriffszeilen in
@@ -211,7 +216,7 @@ Größenbegrenzung; ~100 Zeilen ungenutzter „Security-Monitoring“-Code.
 **Grundidee:** Logs enthalten keine Klardaten, sind aber über Pseudonyme und Fehlercodes gezielt
 einer Buchung zuordenbar, und zwar nur für Admins, die die Buchung ohnehin sehen dürfen.
 
-- [ ] **Fehlercode für Nutzer.** Jede Antwort bekommt `X-Request-ID` (existiert schon als
+- [x] **Fehlercode für Nutzer.** Jede Antwort bekommt `X-Request-ID` (existiert schon als
   `g.request_id`, wird aber nicht zurückgegeben). Das Frontend zeigt bei Fehlern
   „Fehlercode: a1b2c3d4“. Nutzer schicken den Code mit → genau ein Log-Eintrag statt Suche nach Namen.
 - [ ] **Pseudonyme statt Klardaten.** Statt Name/E-Mail/UUID wird `booking_id` bzw. ein kurzer
@@ -221,7 +226,7 @@ einer Buchung zuordenbar, und zwar nur für Admins, die die Buchung ohnehin sehe
   „Buchung angelegt“, „Bestätigungsmail versendet/fehlgeschlagen“, „Schicht abgelehnt“,
   „Zahlung erfasst“, „Recovery-Mail angefordert“ landen in einer Tabelle und sind in der
   Admin-Buchungsansicht sichtbar. Löst die meisten Support-Fälle ohne Logs. Wird mit der Buchung gelöscht.
-- [ ] **Frontend-Fehler erfassen.** Error-Boundary + `window.onerror`/`unhandledrejection` +
+- [x] **Frontend-Fehler erfassen.** Error-Boundary + `window.onerror`/`unhandledrejection` +
   zentraler Axios-Fehler-Handler (F1) senden an `POST /api/client-errors`: Fehlertyp, Meldung,
   Stacktrace, Route **ohne** UUID, App-Version, Request-ID, Browser grob. Keine Formulardaten.
   Rate-limitiert, Größe begrenzt, ohne Auth nutzbar. Selbst gebaut statt Sentry/GlitchTip

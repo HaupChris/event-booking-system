@@ -42,6 +42,8 @@ dann hier ergänzen.
 | `error_type` | Klassenname einer Exception | `OperationalError` |
 | `count` | Anzahl | `3` |
 | `*_id` | technische IDs (`ticket_id`, `timeslot_id`, `assignment_id`) | `17` |
+| `failed_request_id` | Request-ID eines fehlgeschlagenen API-Aufrufs, gemeldet vom Browser | `a1b2c3d4` |
+| `client_route` | Seite im Browser, UUIDs maskiert, ohne Query | `/profile/<uuid>` |
 
 ### 3. Level
 
@@ -111,6 +113,36 @@ record_profile_event(profile_uuid, "shift_accepted", {"assignment_id": 17})  # n
 Heute erfasst: Buchung angelegt, Bestätigungsmail versendet/fehlgeschlagen, von Admin bearbeitet,
 Zahlung aktualisiert, Schicht angenommen/abgelehnt, Profil-Link angefordert/versendet/fehlgeschlagen,
 Custom-Mail versendet/fehlgeschlagen.
+
+## Fehler im Browser
+
+Das Frontend meldet unerwartete Fehler an `POST /api/client-errors`; sie landen als
+`client_error` (Level `warning`, Logger `src.api.client_errors`) im `app.log`.
+
+| Quelle | `kind` |
+|---|---|
+| Error-Boundary um die App (Renderfehler, zeigt „Neu laden“ statt weißer Seite) | `render_error` |
+| `window.onerror` | `window_error` |
+| nicht behandelte Promise-Fehler | `unhandled_rejection` |
+| API-Aufrufe mit 5xx oder ohne Antwort (Axios-Interceptor, global und `apiClient`) | `api_error` |
+
+- Gesendet werden nur: `kind`, Fehlermeldung, Stacktrace, Seite (`client_route`), Request-ID des
+  fehlgeschlagenen Aufrufs, Status, App-Version (Commit-SHA). Der Server leitet daraus den
+  Browser grob ab (`chrome-mobile`). Keine Formulardaten, keine Antworten, keine Eingaben
+- UUIDs und E-Mail-Adressen werden im Browser und auf dem Server maskiert; unbekannte Felder
+  werden verworfen, Werte gekürzt (Meldung 200, Stacktrace 2000 Zeichen), Body höchstens 8 KB
+- Pro Seitenaufruf höchstens 10 Meldungen, jede nur einmal; nginx begrenzt auf 10 pro Minute und IP
+- 4xx-Antworten werden nicht gemeldet, sie sind erwartbar
+- Fehlermeldungen für Nutzende enthalten den Fehlercode (`withErrorCode` in
+  `frontend/src/utils/errorReporting.ts`), z. B. „… (Fehlercode: a1b2c3d4)“. Heute auf der
+  Profilseite, in der Mitfahrbörse und bei der Anmeldung
+
+```sql
+-- Browser-Fehler der letzten 7 Tage nach Art und Seite
+SELECT kind, client_route, message, count(*) AS n FROM wiesenwahn_log
+ WHERE event = 'client_error' AND log_time > datetime('now', '-7 day')
+ GROUP BY kind, client_route, message ORDER BY n DESC;
+```
 
 ## Durchsetzung
 

@@ -9,9 +9,10 @@ import re
 import pytest
 from main import app
 
-# Routes without JWT: login, health, public settings and the profile area (authorized by UUID).
+# Routes without JWT: login, health, public settings, browser error reports and the profile
+# area (authorized by UUID).
 PUBLIC_ENDPOINT_PREFIXES = ("auth.", "health.", "profile.", "static")
-PUBLIC_ENDPOINTS = {"settings.get_frontend_settings"}
+PUBLIC_ENDPOINTS = {"settings.get_frontend_settings", "client_errors.report_client_error"}
 
 # Routes for registration flows; every other JWT route is admin-only.
 ROLE_ENDPOINTS = {
