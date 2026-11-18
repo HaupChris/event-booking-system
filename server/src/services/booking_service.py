@@ -1,4 +1,3 @@
-import os
 import sqlite3
 import time
 import uuid
@@ -15,6 +14,7 @@ from src.services.option_service import ensure_option_schema
 from src.services.orga_team_service import get_active_orga_team_members
 from src.services.workshift_service import ensure_workshift_schema
 from src.utils.logger import get_logger
+from src.utils.paths import get_data_dir, get_db_file_path
 from src.utils.signature import (
     MAX_SIGNATURE_BYTES,
     decode_signature_to_blob,
@@ -23,21 +23,8 @@ from src.utils.signature import (
 
 logger = get_logger(__name__)
 
-IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
-
-if IN_DOCKER:
-    # Docker paths
-    DB_DIR = "/app/user_data"
-    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")  # noqa: PTH118  # lint-baseline
-    DATA_DIR = "/app/data"
-    REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, "schema.sql")  # noqa: PTH118  # lint-baseline
-
-else:
-    # Local development paths
-    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")  # noqa: PTH118, PTH120  # lint-baseline
-    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")  # noqa: PTH118  # lint-baseline
-    DATA_DIR = os.path.join(os.path.dirname(__file__), "../../data")  # noqa: PTH118, PTH120  # lint-baseline
-    REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, "schema.sql")  # noqa: PTH118  # lint-baseline
+DB_FILE_PATH = get_db_file_path()
+REGULAR_SCHEMA_PATH = str(get_data_dir() / "schema.sql")
 
 
 def _connect_db() -> sqlite3.Connection:

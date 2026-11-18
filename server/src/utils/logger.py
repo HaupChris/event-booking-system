@@ -11,13 +11,15 @@ from datetime import datetime, timedelta
 
 from flask import Flask, g, request
 
+from src.utils.paths import in_docker
+
 
 def setup_logging(app: Flask) -> None:
     """
     Configure structured logging with separate files for different purposes.
     """
     # Create logs directory if it doesn't exist
-    log_dir = "/app/logs" if os.environ.get("IN_DOCKER") else "logs"
+    log_dir = "/app/logs" if in_docker() else "logs"
     if not os.path.exists(log_dir):  # noqa: PTH110  # lint-baseline
         os.makedirs(log_dir)  # noqa: PTH103  # lint-baseline
 

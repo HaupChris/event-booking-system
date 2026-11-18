@@ -1,23 +1,16 @@
 """Orga Team service for inviter list management."""
 
-import os
 import sqlite3
 from contextlib import closing
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from src.utils.logger import get_logger
+from src.utils.paths import get_db_file_path
 
 logger = get_logger(__name__)
 
-IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
-
-if IN_DOCKER:
-    DB_FILE_PATH = "/app/user_data/bookings.db"
-else:
-    DB_DIR = (Path(__file__).resolve().parent / "../../db").resolve()
-    DB_FILE_PATH = str(DB_DIR / "bookings.db")
+DB_FILE_PATH = get_db_file_path()
 
 ALLOWED_SCHEMA_TABLES = {"OrgaTeamInviters", "Bookings", "ArtistBookings"}
 

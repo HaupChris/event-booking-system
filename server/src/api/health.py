@@ -4,6 +4,7 @@ import time
 from flask import Blueprint, jsonify
 
 from src.utils.logger import get_logger
+from src.utils.paths import in_docker
 from src.utils.rate_limit import limiter
 
 # Initialize logger
@@ -49,7 +50,7 @@ def health_check():  # noqa: PLR0915  # lint-baseline
 
         # Check log directory
         try:
-            log_dir = "/app/logs" if os.environ.get("IN_DOCKER") else "logs"
+            log_dir = "/app/logs" if in_docker() else "logs"
             if os.path.exists(log_dir) and os.access(log_dir, os.W_OK):  # noqa: PTH110  # lint-baseline
                 health_status["checks"]["logging"] = {
                     "status": "healthy",

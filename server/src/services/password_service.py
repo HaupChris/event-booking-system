@@ -13,16 +13,11 @@ from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from src.utils.logger import get_logger
+from src.utils.paths import get_db_file_path
 
 logger = get_logger(__name__)
 
-IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
-
-if IN_DOCKER:
-    DB_FILE_PATH = "/app/user_data/bookings.db"
-else:
-    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")  # noqa: PTH118, PTH120  # lint-baseline
-    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")  # noqa: PTH118  # lint-baseline
+DB_FILE_PATH = get_db_file_path()
 
 VALID_ROLES = {"admin", "user", "artist"}
 MIN_PASSWORD_LENGTH = 12

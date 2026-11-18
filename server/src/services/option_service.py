@@ -1,7 +1,6 @@
 """Ticket, beverage, and food option service for admin CRUD operations."""
 
 import json
-import os
 import sqlite3
 from contextlib import closing
 from pathlib import Path
@@ -13,19 +12,13 @@ from src.services.app_settings_service import (
     get_form_step_description,
     set_form_step_description,
 )
+from src.utils.paths import get_data_dir, get_db_file_path
 
 OptionScope = Literal["regular", "artist"]
 OptionType = Literal["ticket", "beverage", "food", "material"]
 
-IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
-
-if IN_DOCKER:
-    DB_FILE_PATH = "/app/user_data/bookings.db"
-    DATA_DIR = Path("/app/data")
-else:
-    DB_DIR = (Path(__file__).resolve().parent / "../../db").resolve()
-    DB_FILE_PATH = str(DB_DIR / "bookings.db")
-    DATA_DIR = (Path(__file__).resolve().parent / "../../data").resolve()
+DB_FILE_PATH = get_db_file_path()
+DATA_DIR = get_data_dir()
 
 REGULAR_FORM_CONTENT_PATH = DATA_DIR / "form_content.json"
 ARTIST_FORM_CONTENT_PATH = DATA_DIR / "artist_form_content.json"
