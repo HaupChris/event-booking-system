@@ -45,8 +45,10 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
 - [ ] Mit B1 `sqlite3` per Ruff `TID251` (banned-api) außerhalb von `src/db.py` verbieten.
 - [ ] Service-zu-Service-Imports reduzieren (z. B. `admin_booking_mail_service` hängt an vier
   Services); ggf. später als import-linter-Vertrag absichern.
-- [ ] Frontend-Linting angleichen: aktuell 1 ESLint-Warnung und 8 nicht Prettier-formatierte
-  Dateien, ESLint 8 mit CRA-Konfiguration; danach `npm run quality` in CI aufnehmen.
+- [x] Frontend: alle Dateien Prettier-formatiert, `npm run quality` + Vitest laufen blockierend in CI.
+- [ ] Frontend-Baseline: 1 ESLint-Ausnahme (`FAQManagementPage`, Funktion > 300 Zeilen,
+  `// eslint-disable-next-line ... -- lint-baseline`) → beim Aufteilen der Seite entfernen.
+- [ ] ESLint 8 mit CRA-Konfiguration (`react-app`) → auf ESLint 9 Flat Config umstellen.
 
 ---
 
