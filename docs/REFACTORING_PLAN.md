@@ -180,6 +180,20 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
 **Zielkonflikt:** Datensparsam sein und trotzdem Nutzerprobleme schnell finden und reproduzieren.
 Heute werden dafür Namen, E-Mails und UUIDs geloggt; im Frontend gibt es gar kein Logging.
 
+**Entscheidungen (2026-11-18):** structlog (JSON in Produktion, lesbare Konsole lokal);
+Aufbewahrung 30 Tage Anwendungs-Logs, 90 Tage Security-Log; Regeln in `docs/LOGGING.md`
+(Ereignisse mit Attributen statt f-Strings, nur Werte begrenzter Größe, keine Klardaten).
+Umsetzung in vier PRs: (1) structlog, JSON-Logs, Request-ID im Header, eine Rotation, Altcode raus;
+(2) Pseudonyme, Ereignis-Verlauf pro Buchung, Admin-Anzeige; (3) Fehlercode im Frontend und
+Client-Error-Endpunkt; (4) Klardaten entfernen und Log-Aufrufe auf Attribute umstellen
+(S7, Ruff-`G004`-Baseline auf null).
+
+Gefundene Mängel im Ist-Zustand: Herkunftsangabe zeigt den Logger-Wrapper statt der aufrufenden
+Stelle; Request-ID wird nicht an Clients zurückgegeben; doppelte Einträge (Zugriffszeilen in
+`access.log` und `app.log`); drei konkurrierende Rotationsmechanismen (Python, Aufräumskript,
+Host-logrotate – logrotate benennt Dateien um, während Python weiterschreibt); Docker-Logs ohne
+Größenbegrenzung; ~100 Zeilen ungenutzter „Security-Monitoring“-Code.
+
 **Grundidee:** Logs enthalten keine Klardaten, sind aber über Pseudonyme und Fehlercodes gezielt
 einer Buchung zuordenbar, und zwar nur für Admins, die die Buchung ohnehin sehen dürfen.
 
