@@ -86,8 +86,9 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
     gesetzter Hash bleibt gültig). Über *Admin → Settings → Password*: neue GitHub-Secrets allein
     reichen nicht, Env-Werte werden nur übernommen, wenn für eine Rolle noch kein Hash existiert.
     Dabei auch `JWT_SECRET_KEY` und das Gmail-App-Passwort erneuern. History-Bereinigung danach optional.
-  - [ ] `dependabot-alert-export.yml` lädt die Alert-Liste als Workflow-Artefakt hoch; bei einem
-    öffentlichen Repo für angemeldete GitHub-Nutzer abrufbar → Workflow entfernen oder Repo privat
+  - [x] `dependabot-alert-export.yml` entfernt (lud die Alert-Liste als öffentlich abrufbares
+    Workflow-Artefakt hoch; Alerts sind im Security-Tab sichtbar). Secret `GH_TOKEN` in den
+    Repo-Settings löschen, falls es sonst nicht gebraucht wird.
 
 - [ ] **S6 – Keine CSP; JWT und Formularentwürfe (inkl. Unterschrift) in `localStorage`.**
   Orte: `deployment/nginx/wiesenwahn.conf`, `frontend/src/App.tsx`, `frontend/src/hooks/useFormManagement.tsx`.
