@@ -100,8 +100,8 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
 
 ### Voraussetzung: Charakterisierungstests
 
-- [ ] Testinfrastruktur: pytest-Fixtures mit Flask-Test-Client, temporärer DB aus `schema.sql`,
-  Tokens je Rolle, gemocktem Mailversand. Danach pytest als Job in `ci.yml` aufnehmen.
+- [x] Testinfrastruktur (`server/test/conftest.py`): Flask-Test-Client, isolierte DB pro Test
+  (über `DB_FILE_PATH`), Tokens je Rolle, abgefangener Mailversand; pytest läuft in `ci.yml`.
 - [ ] Jeder Fix in Phase 0 bekommt zuerst einen Test, der die Lücke nachweist.
 - [ ] Vor Phase 1: Tests für Buchung (user + artist), Auth, Admin-Zugriffsschutz
   (parametrisiert über alle Routen), Profil-Endpunkte, Admin-CRUD.
@@ -110,7 +110,7 @@ Stand beim Einführen der Regeln. Darf nur sinken; wer eine betroffene Stelle an
 
 ## Phase 1 – Backend-Fundament
 
-- [ ] **B1 – Zentrale DB-Schicht.**
+- [ ] **B1 – Zentrale DB-Schicht.** (Teil erledigt: Pfadauflösung zentral in `src/utils/paths.py`)
   Pfad-Logik (`IN_DOCKER` → `DB_FILE_PATH`) und `_connect_db()` existieren in 11 Services + 4 Migrationen.
   → `src/db.py` mit `get_connection()` als Context Manager (row_factory, `foreign_keys=ON`, WAL,
   Commit/Rollback), Pfad aus der Config.
@@ -188,7 +188,9 @@ Erfordert Datenmigration mit Backup → erst nach Phase 0/1 und mit Testabdeckun
 ## Phase 4 – Betrieb und CI
 
 - [x] **Lint-Gate vor Deploy** (`ci.yml`, von `deploy.yml` aufgerufen).
-- [ ] **Test-Gate vor Deploy:** pytest-Job ergänzen, sobald die Testinfrastruktur steht.
+- [x] **Test-Gate vor Deploy:** pytest-Job in `ci.yml`.
+- [ ] Actions in `deploy.yml` auf aktuelle Major-Versionen heben (Node-20-Deprecation;
+  `ci.yml` ist bereits umgestellt). Erst nach einem Testlauf auf einem Branch.
 - [ ] **Rollback-fähige Images.** Zusätzlich zum `:latest` mit Commit-SHA taggen.
 - [ ] **nginx entdoppeln.** `frontend/nginx/default.conf` dupliziert Rate-Limit-Zonen und Auth-Routen des
   Host-nginx → Rate-Limiting nur im Host-nginx, Container-nginx liefert nur statische Dateien.
