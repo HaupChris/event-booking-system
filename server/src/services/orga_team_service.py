@@ -172,7 +172,7 @@ def update_orga_team_member(
         values.append(member_id)
 
         cursor.execute(
-            f"UPDATE OrgaTeamInviters SET {', '.join(updates)} WHERE id = ?",
+            f"UPDATE OrgaTeamInviters SET {', '.join(updates)} WHERE id = ?",  # noqa: S608  # lint-baseline
             tuple(values),
         )
         conn.commit()

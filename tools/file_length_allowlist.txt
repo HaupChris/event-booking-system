@@ -1,0 +1,32 @@
+# Files exceeding the code line limit (see tools/check_file_length.py).
+# Format: <path> <max allowed code lines>. Entries may only shrink or be removed.
+frontend/src/components/profile/NewsFeed.tsx 326
+frontend/src/components/profile/ProfileOverviewSections.tsx 347
+frontend/src/components/profile/ProfileTopNavigation.tsx 351
+frontend/src/components/profile/RideSharingCards.tsx 435
+frontend/src/form/adminArea/BookingsPage.tsx 303
+frontend/src/form/adminArea/FAQManagementPage.tsx 339
+frontend/src/form/adminArea/NewsManagementPage.tsx 345
+frontend/src/form/adminArea/PaymentConfirmationsPage.tsx 454
+frontend/src/form/adminArea/SettingsPage.tsx 317
+frontend/src/form/adminArea/ShiftAssignments/CurrentShiftPlanTab.tsx 313
+frontend/src/form/adminArea/ShiftAssignments/components/UserItem.tsx 337
+frontend/src/form/adminArea/components/BookingDetailFormFields.tsx 354
+frontend/src/form/constants/texts.ts 348
+frontend/src/form/userArea/WorkshiftsForm.tsx 314
+server/src/api/admin_faq.py 366
+server/src/api/admin_news.py 330
+server/src/api/artist_bookings.py 371
+server/src/api/profile.py 443
+server/src/scripts/generate_mock_data.py 362
+server/src/services/artist_service.py 536
+server/src/services/booking_service.py 581
+server/src/services/faq_service.py 384
+server/src/services/formcontent_service.py 709
+server/src/services/mail_service.py 643
+server/src/services/news_service.py 562
+server/src/services/option_service.py 570
+server/src/services/profile_service.py 629
+server/src/services/rideshare_service.py 784
+server/src/services/shift_assignment_service.py 380
+server/src/services/workshift_service.py 362

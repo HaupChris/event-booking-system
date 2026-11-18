@@ -28,16 +28,16 @@ IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 if IN_DOCKER:
     # Docker paths
     DB_DIR = "/app/user_data"
-    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
+    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")  # noqa: PTH118  # lint-baseline
     DATA_DIR = "/app/data"
-    REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, "schema.sql")
+    REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, "schema.sql")  # noqa: PTH118  # lint-baseline
 
 else:
     # Local development paths
-    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")
-    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
-    DATA_DIR = os.path.join(os.path.dirname(__file__), "../../data")
-    REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, "schema.sql")
+    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")  # noqa: PTH118, PTH120  # lint-baseline
+    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")  # noqa: PTH118  # lint-baseline
+    DATA_DIR = os.path.join(os.path.dirname(__file__), "../../data")  # noqa: PTH118, PTH120  # lint-baseline
+    REGULAR_SCHEMA_PATH = os.path.join(DATA_DIR, "schema.sql")  # noqa: PTH118  # lint-baseline
 
 
 def _connect_db() -> sqlite3.Connection:
@@ -72,13 +72,13 @@ def ensure_profile_uuid_schema(conn: sqlite3.Connection) -> None:
             cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN profile_uuid TEXT")
 
         cursor.execute(
-            f"SELECT id FROM {table_name} WHERE profile_uuid IS NULL OR profile_uuid = ''"
+            f"SELECT id FROM {table_name} WHERE profile_uuid IS NULL OR profile_uuid = ''"  # noqa: S608  # lint-baseline
         )
         missing_ids = [row[0] for row in cursor.fetchall()]
 
         for row_id in missing_ids:
             cursor.execute(
-                f"UPDATE {table_name} SET profile_uuid = ? WHERE id = ?",
+                f"UPDATE {table_name} SET profile_uuid = ? WHERE id = ?",  # noqa: S608  # lint-baseline
                 (str(uuid.uuid4()), row_id),
             )
 
@@ -421,7 +421,7 @@ def get_all_bookings() -> list[BookingWithTimestamp]:
                     total_price=row[15],
                     timestamp=row[16],
                     signature="",
-                    is_paid=True if row[18] == 1 else False,
+                    is_paid=True if row[18] == 1 else False,  # noqa: SIM210  # lint-baseline
                     paid_amount=row[19],
                     payment_notes=row[20],
                     payment_date=row[21],

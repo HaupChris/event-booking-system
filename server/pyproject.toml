@@ -19,9 +19,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "ruff>=0.8.0",
-    "black>=26.3.1",
     "mypy>=1.13.0",
     "pre-commit>=4.0.0",
+    "import-linter>=2.1",
     "pytest-cov>=6.0.0",
     "types-requests>=2.32.0",
     "types-Flask>=1.1.6",
@@ -77,26 +77,30 @@ select = [
     "S",
     # Performance
     "PERF",
+    # McCabe complexity (max-complexity below is only enforced with C90 selected)
+    "C90",
+    # flake8-tidy-imports (banned APIs, relative imports)
+    "TID",
 ]
 
 ignore = [
     "E501",     # line-too-long (handled by formatter)
     "S101",     # assert (used in tests)
-    "S608",     # SQL injection (we use parameterized queries)
     "PLR2004",  # magic values (common in config)
     "T201",     # print (allow for now, can be stricter later)
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]  # Allow unused imports
-"migrations/*.py" = ["ALL"]        # Ignore migrations
+"src/migrations/*.py" = ["ALL"]    # Legacy one-off migrations, replaced in B2
 "test/*.py" = ["S101", "ARG", "PLR2004"]  # Allow asserts and magic values in tests
+"src/scripts/generate_mock_data.py" = ["S311"]  # Mock data does not need cryptographic randomness
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
 [tool.ruff.lint.pylint]
-max-args = 6
+max-args = 5
 max-branches = 12
 max-returns = 6
 max-statements = 50
@@ -104,34 +108,11 @@ max-statements = 50
 [tool.ruff.lint.pycodestyle]
 max-line-length = 120  # Allow some wiggle room
 
-# File length enforcement (custom via Ruff's upcoming features)
-# For now, we'll enforce this manually
-
-# ============================================================================
-# BLACK - Code Formatter
-# ============================================================================
-[tool.black]
-line-length = 100
-target-version = ['py312']
-skip-string-normalization = false
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  | migrations
-)/
-'''
+# File length (max. 300 code lines) is enforced by tools/check_file_length.py.
+#
+# Lint baseline: violations that existed when the rules were tightened (2026-11-18)
+# are suppressed inline with "# noqa: <CODE>  # lint-baseline". These must be
+# removed step by step; never add new "lint-baseline" comments.
 
 # ============================================================================
 # MYPY - Static Type Checker
@@ -194,4 +175,36 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
     "@abstractmethod",
+]
+
+# ============================================================================
+# IMPORT-LINTER - Architecture contracts (run: lint-imports)
+# ============================================================================
+# Layering: api -> services -> models -> utils. src/scripts and src/migrations are
+# standalone scripts (no packages) and are not covered.
+# ignore_imports entries below are pre-existing violations (2026-11-18) that must be
+# removed step by step (see docs/REFACTORING_PLAN.md). Do not add new ones.
+[tool.importlinter]
+root_package = "src"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Layered architecture"
+type = "layers"
+layers = [
+    "src.api",
+    "src.services",
+    "src.models",
+    "src.utils",
+]
+
+[[tool.importlinter.contracts]]
+name = "Services are independent of the web framework"
+type = "forbidden"
+source_modules = ["src.services", "src.models"]
+forbidden_modules = ["flask", "flask_jwt_extended", "flask_limiter", "flask_cors"]
+# Only direct imports: src.utils.logger is infrastructure and may use the request context.
+allow_indirect_imports = true
+ignore_imports = [
+    "src.services.app_settings_service -> flask",
 ]

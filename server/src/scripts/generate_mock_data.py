@@ -247,7 +247,7 @@ def generate_mock_artists_data(num_artists, form_content):
             is_paid=random.choice([True, False]),
             paid_amount=total_price if random.random() > 0.3 else 0,
             payment_notes="",
-            payment_date=datetime.now().strftime("%Y-%m-%d") if random.random() > 0.3 else "",
+            payment_date=datetime.now().strftime("%Y-%m-%d") if random.random() > 0.3 else "",  # noqa: DTZ005  # lint-baseline
             equipment=f"Mock equipment needs for {first_name} {last_name}",
             special_requests=(
                 f"Mock special requests for {first_name} {last_name}"
@@ -281,7 +281,7 @@ def generate_mock_bookings_data(num_bookings, form_content):
     all_timeslots = []
     for shift in work_shifts:
         for timeslot in shift.time_slots:
-            all_timeslots.append(timeslot.id)
+            all_timeslots.append(timeslot.id)  # noqa: PERF401  # lint-baseline
 
     for _ in range(num_bookings):
         first_name, last_name = generate_mock_name()
@@ -355,7 +355,7 @@ def generate_mock_bookings_data(num_bookings, form_content):
             is_paid=random.choice([True, False]),
             paid_amount=total_price if random.random() > 0.3 else 0,
             payment_notes="",
-            payment_date=datetime.now().strftime("%Y-%m-%d") if random.random() > 0.3 else "",
+            payment_date=datetime.now().strftime("%Y-%m-%d") if random.random() > 0.3 else "",  # noqa: DTZ005  # lint-baseline
             artist_material_ids=[],  # Not used for regular bookings
         )
 

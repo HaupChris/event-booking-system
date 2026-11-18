@@ -21,8 +21,8 @@ IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 if IN_DOCKER:
     DB_FILE_PATH = "/app/user_data/bookings.db"
 else:
-    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")
-    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
+    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")  # noqa: PTH118, PTH120  # lint-baseline
+    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")  # noqa: PTH118  # lint-baseline
 
 VALID_ROLES = {"admin", "user", "artist"}
 MIN_PASSWORD_LENGTH = 12
@@ -81,7 +81,7 @@ def update_password(role: str, new_password: str) -> bool:
         return False
 
     hashed = generate_password_hash(new_password, method="pbkdf2:sha256", salt_length=16)
-    now = datetime.now().isoformat()
+    now = datetime.now().isoformat()  # noqa: DTZ005  # lint-baseline
 
     try:
         with closing(_connect_db()) as conn:
@@ -134,7 +134,7 @@ def ensure_password_hashes() -> None:
                 missing_role_envs.append(env_key)
                 continue
 
-            now = datetime.now().isoformat()
+            now = datetime.now().isoformat()  # noqa: DTZ005  # lint-baseline
             hashed = generate_password_hash(raw_password, method="pbkdf2:sha256", salt_length=16)
             cursor.execute(
                 "INSERT INTO Passwords (role, password_hash, updated_at) VALUES (?, ?, ?)",

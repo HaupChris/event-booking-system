@@ -48,7 +48,7 @@ def decode_signature_to_blob(signature: str) -> bytes:
     return decoded
 
 
-def encode_signature_blob(signature_blob: bytes | str | None) -> str:
+def encode_signature_blob(signature_blob: bytes | str | None) -> str:  # noqa: PLR0911  # lint-baseline
     """
     Normalize DB signature values to a data URL string for compatibility.
 
@@ -86,7 +86,7 @@ def migrate_signatures_to_blob(conn: sqlite3.Connection) -> None:
     cursor = conn.cursor()
 
     for table_name in ("Bookings", "ArtistBookings"):
-        cursor.execute(f"SELECT id, signature FROM {table_name} WHERE signature IS NOT NULL")
+        cursor.execute(f"SELECT id, signature FROM {table_name} WHERE signature IS NOT NULL")  # noqa: S608  # lint-baseline
         rows = cursor.fetchall()
 
         for row_id, signature_value in rows:
@@ -106,7 +106,7 @@ def migrate_signatures_to_blob(conn: sqlite3.Connection) -> None:
                 continue
 
             cursor.execute(
-                f"UPDATE {table_name} SET signature = ? WHERE id = ?",
+                f"UPDATE {table_name} SET signature = ? WHERE id = ?",  # noqa: S608  # lint-baseline
                 (sqlite3.Binary(signature_blob), row_id),
             )
 

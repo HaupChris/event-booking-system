@@ -18,8 +18,8 @@ def setup_logging(app: Flask) -> None:
     """
     # Create logs directory if it doesn't exist
     log_dir = "/app/logs" if os.environ.get("IN_DOCKER") else "logs"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+    if not os.path.exists(log_dir):  # noqa: PTH110  # lint-baseline
+        os.makedirs(log_dir)  # noqa: PTH103  # lint-baseline
 
     # Remove default Flask handler to avoid duplicates
     app.logger.handlers.clear()
@@ -33,7 +33,7 @@ def setup_logging(app: Flask) -> None:
 
     # 1. Application Logger (INFO and above)
     app_handler = logging.handlers.TimedRotatingFileHandler(
-        filename=os.path.join(log_dir, "app.log"),
+        filename=os.path.join(log_dir, "app.log"),  # noqa: PTH118  # lint-baseline
         when="midnight",
         interval=1,
         backupCount=30,
@@ -45,7 +45,7 @@ def setup_logging(app: Flask) -> None:
 
     # 2. Error Logger (WARNING and above)
     error_handler = logging.handlers.TimedRotatingFileHandler(
-        filename=os.path.join(log_dir, "errors.log"),
+        filename=os.path.join(log_dir, "errors.log"),  # noqa: PTH118  # lint-baseline
         when="midnight",
         interval=1,
         backupCount=30,
@@ -61,7 +61,7 @@ def setup_logging(app: Flask) -> None:
     access_logger.handlers.clear()
 
     access_handler = logging.handlers.TimedRotatingFileHandler(
-        filename=os.path.join(log_dir, "access.log"),
+        filename=os.path.join(log_dir, "access.log"),  # noqa: PTH118  # lint-baseline
         when="midnight",
         interval=1,
         backupCount=30,
@@ -75,7 +75,7 @@ def setup_logging(app: Flask) -> None:
     # 4. Debug Logger (only in development)
     if app.debug or os.environ.get("FLASK_ENV") == "development":
         debug_handler = logging.handlers.TimedRotatingFileHandler(
-            filename=os.path.join(log_dir, "debug.log"),
+            filename=os.path.join(log_dir, "debug.log"),  # noqa: PTH118  # lint-baseline
             when="midnight",
             interval=1,
             backupCount=7,  # Keep debug logs for only 7 days
@@ -121,18 +121,18 @@ def cleanup_old_logs(log_dir: str, retention_days: int = 30) -> None:
     """
     Remove log files older than retention_days.
     """
-    cutoff_date = datetime.now() - timedelta(days=retention_days)
+    cutoff_date = datetime.now() - timedelta(days=retention_days)  # noqa: DTZ005  # lint-baseline
 
     # Pattern to match rotated log files
     patterns = ["app.log.*", "errors.log.*", "access.log.*", "debug.log.*"]
 
     removed_count = 0
     for pattern in patterns:
-        for log_file in glob.glob(os.path.join(log_dir, pattern)):
+        for log_file in glob.glob(os.path.join(log_dir, pattern)):  # noqa: PTH118, PTH207  # lint-baseline
             try:
-                file_time = datetime.fromtimestamp(os.path.getctime(log_file))
+                file_time = datetime.fromtimestamp(os.path.getctime(log_file))  # noqa: DTZ006, PTH205  # lint-baseline
                 if file_time < cutoff_date:
-                    os.remove(log_file)
+                    os.remove(log_file)  # noqa: PTH107  # lint-baseline
                     removed_count += 1
             except OSError:
                 pass  # File might have been deleted already
@@ -190,7 +190,7 @@ def get_logger(name: str) -> logging.Logger:
 
         def _format_with_request_id(self, msg):
             try:
-                from flask import g, has_request_context
+                from flask import g, has_request_context  # noqa: PLC0415  # lint-baseline
 
                 if has_request_context() and hasattr(g, "request_id"):
                     return f"[{g.request_id}] {msg}"
@@ -224,7 +224,7 @@ def log_security_event(event_type: str, details: dict, severity: str = "WARNING"
 
     # Format security event consistently
     event_data = {
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now().isoformat(),  # noqa: DTZ005  # lint-baseline
         "request_id": getattr(g, "request_id", "unknown"),
         "event_type": event_type,
         "client_ip": request.remote_addr if hasattr(request, "remote_addr") else "unknown",
@@ -289,7 +289,7 @@ def detect_suspicious_patterns(request_data: str) -> list:
 
 def track_failed_authentication(client_ip: str, endpoint: str):
     """Track and alert on repeated authentication failures."""
-    now = datetime.now()
+    now = datetime.now()  # noqa: DTZ005  # lint-baseline
 
     # Clean old attempts (older than 1 hour)
     failed_attempts[client_ip] = [
@@ -314,7 +314,7 @@ def track_failed_authentication(client_ip: str, endpoint: str):
         )
 
 
-def enhanced_log_request():
+def enhanced_log_request():  # noqa: C901  # lint-baseline
     """Enhanced request logging with security monitoring."""
     # Generate unique request ID
     g.request_id = str(uuid.uuid4())[:8]
@@ -386,7 +386,7 @@ def enhanced_log_request():
         logging.getLogger(__name__).warning(f"Security analysis failed: {e}")
 
 
-def log_authentication_event(event_type: str, user_identity: str, success: bool):
+def log_authentication_event(event_type: str, user_identity: str, success: bool):  # noqa: ARG001  # lint-baseline
     """Log authentication events with context."""
     if success:
         log_security_event(

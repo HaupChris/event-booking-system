@@ -269,7 +269,7 @@ def _serialize_post(
     }
 
 
-def get_rideshare_board(profile_uuid: str) -> dict[str, Any]:  # noqa: PLR0915
+def get_rideshare_board(profile_uuid: str) -> dict[str, Any]:  # noqa: C901, PLR0915  # lint-baseline
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
         _ensure_rideshare_schema(cursor)

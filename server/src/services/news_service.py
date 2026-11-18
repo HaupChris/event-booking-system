@@ -269,7 +269,7 @@ def create_news(
         raise
 
 
-def update_news(
+def update_news(  # noqa: PLR0913  # lint-baseline
     news_id: int,
     title: str | None = None,
     content: str | None = None,
@@ -310,7 +310,7 @@ def update_news(
                 return False
 
             params.append(news_id)
-            query = f"UPDATE News SET {', '.join(updates)} WHERE id = ?"
+            query = f"UPDATE News SET {', '.join(updates)} WHERE id = ?"  # noqa: S608  # lint-baseline
 
             cursor.execute(query, params)
             conn.commit()
@@ -501,7 +501,7 @@ def update_news_category(
     with closing(_connect_db()) as conn:
         cursor = conn.cursor()
         _ensure_news_tables(cursor)
-        query = f"UPDATE NewsCategories SET {', '.join(updates)} WHERE id = ?"
+        query = f"UPDATE NewsCategories SET {', '.join(updates)} WHERE id = ?"  # noqa: S608  # lint-baseline
         cursor.execute(query, params)
         conn.commit()
         return cursor.rowcount > 0

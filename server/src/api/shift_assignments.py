@@ -55,7 +55,7 @@ def get_assignments():
 @shift_assignments_bp.route("/shifts/assignments", methods=["POST"])
 @limiter_assignments.limit("100/minute")
 @jwt_required()
-def create_shift_assignment():
+def create_shift_assignment():  # noqa: PLR0911  # lint-baseline
     # Check if user has admin permissions
     identity = get_jwt_identity()
     if identity != "admin":

@@ -15,7 +15,7 @@ limiter_health = limiter
 
 @health_bp.route("/health", methods=["GET"])
 @limiter_health.limit("60/minute")
-def health_check():
+def health_check():  # noqa: PLR0915  # lint-baseline
     """Comprehensive health check with logging."""
     start_time = time.time()
 
@@ -26,7 +26,7 @@ def health_check():
 
         # Check database connectivity
         try:
-            from src.services.booking_service import _connect_db
+            from src.services.booking_service import _connect_db  # noqa: PLC0415  # lint-baseline
 
             with _connect_db() as conn:
                 cursor = conn.cursor()
@@ -50,7 +50,7 @@ def health_check():
         # Check log directory
         try:
             log_dir = "/app/logs" if os.environ.get("IN_DOCKER") else "logs"
-            if os.path.exists(log_dir) and os.access(log_dir, os.W_OK):
+            if os.path.exists(log_dir) and os.access(log_dir, os.W_OK):  # noqa: PTH110  # lint-baseline
                 health_status["checks"]["logging"] = {
                     "status": "healthy",
                     "message": "Log directory accessible",
@@ -78,7 +78,7 @@ def health_check():
 
         for var in required_env_vars:
             if not os.environ.get(var):
-                missing_vars.append(var)
+                missing_vars.append(var)  # noqa: PERF401  # lint-baseline
 
         if missing_vars:
             health_status["status"] = "degraded"

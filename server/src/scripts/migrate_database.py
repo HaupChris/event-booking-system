@@ -36,7 +36,7 @@ MIGRATION_FILE = (
 )
 
 
-def run_migration() -> bool:
+def run_migration() -> bool:  # noqa: PLR0911, PLR0915  # lint-baseline
     """Execute the migration SQL file and verify success."""
 
     # Validate migration file exists
@@ -64,7 +64,7 @@ def run_migration() -> bool:
         cursor = conn.cursor()
 
         # Read and execute migration SQL
-        with open(MIGRATION_FILE, "r") as f:
+        with open(MIGRATION_FILE) as f:  # noqa: PTH123  # lint-baseline
             migration_sql = f.read()
 
         print("\n📝 Executing migration SQL...")
@@ -125,15 +125,15 @@ def run_migration() -> bool:
         return True
 
     except sqlite3.Error as e:
-        print(f"\n❌ ERROR: Database error during migration")
+        print("\n❌ ERROR: Database error during migration")
         print(f"   {e}")
         return False
     except FileNotFoundError as e:
-        print(f"\n❌ ERROR: File not found")
+        print("\n❌ ERROR: File not found")
         print(f"   {e}")
         return False
     except Exception as e:
-        print(f"\n❌ ERROR: Unexpected error during migration")
+        print("\n❌ ERROR: Unexpected error during migration")
         print(f"   {e}")
         return False
 

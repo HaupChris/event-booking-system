@@ -10,7 +10,7 @@ from pathlib import Path
 
 IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 
-if IN_DOCKER:
+if IN_DOCKER:  # noqa: SIM108  # lint-baseline
     DB_PATH = "/app/user_data/bookings.db"
 else:
     DB_PATH = Path(__file__).parent.parent.parent / "db" / "bookings.db"

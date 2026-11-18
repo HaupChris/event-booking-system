@@ -23,3 +23,13 @@ server/.env
 /frontend/build/
 
 db_backup
+
+# Python build and test artifacts
+__pycache__/
+*.pyc
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.import_linter_cache/

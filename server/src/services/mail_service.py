@@ -67,7 +67,7 @@ def send_email(recipient: str, subject: str, body: str, html_body: str | None = 
     return _send_message(msg, recipient)
 
 
-def get_booking_details(booking: Booking, form_content: dict) -> str:
+def get_booking_details(booking: Booking, form_content: dict) -> str:  # noqa: C901  # lint-baseline
     """
     Returns a human-readable textual summary of the booking in German.
     """

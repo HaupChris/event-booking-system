@@ -230,7 +230,7 @@ def update_workshift(
 
         values.append(workshift_id)
         cursor.execute(
-            f"UPDATE WorkShifts SET {', '.join(updates)} WHERE id = ?",
+            f"UPDATE WorkShifts SET {', '.join(updates)} WHERE id = ?",  # noqa: S608  # lint-baseline
             tuple(values),
         )
         conn.commit()
@@ -278,7 +278,7 @@ def delete_workshift(workshift_id: int) -> tuple[bool, str]:
         return True, "Workshift deleted"
 
 
-def create_timeslot(
+def create_timeslot(  # noqa: PLR0913  # lint-baseline
     workshift_id: int,
     title: str,
     start_time: str,
@@ -315,7 +315,7 @@ def create_timeslot(
         return row_id if row_id is not None else -1
 
 
-def update_timeslot(
+def update_timeslot(  # noqa: PLR0913  # lint-baseline
     timeslot_id: int,
     title: str | None = None,
     start_time: str | None = None,
@@ -355,7 +355,7 @@ def update_timeslot(
 
         values.append(timeslot_id)
         cursor.execute(
-            f"UPDATE TimeSlots SET {', '.join(updates)} WHERE id = ?",
+            f"UPDATE TimeSlots SET {', '.join(updates)} WHERE id = ?",  # noqa: S608  # lint-baseline
             tuple(values),
         )
         conn.commit()
@@ -379,7 +379,7 @@ def delete_timeslot(timeslot_id: int) -> tuple[bool, str]:
         return True, "Timeslot deleted"
 
 
-def validate_booking_timeslot_selection(timeslot_ids: list[int]) -> tuple[bool, str]:
+def validate_booking_timeslot_selection(timeslot_ids: list[int]) -> tuple[bool, str]:  # noqa: PLR0911  # lint-baseline
     if len(timeslot_ids) == 0:
         return False, "No timeslot priorities provided"
 
@@ -407,7 +407,7 @@ def validate_booking_timeslot_selection(timeslot_ids: list[int]) -> tuple[bool, 
             FROM TimeSlots ts
             JOIN WorkShifts ws ON ts.workshift_id = ws.id
             WHERE ts.id IN ({placeholders})
-            """,
+            """,  # noqa: S608  # lint-baseline
             tuple(normalized_ids),
         )
         rows = cursor.fetchall()

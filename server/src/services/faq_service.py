@@ -23,8 +23,8 @@ IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 if IN_DOCKER:
     DB_FILE_PATH = "/app/user_data/bookings.db"
 else:
-    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")
-    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
+    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")  # noqa: PTH118, PTH120  # lint-baseline
+    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")  # noqa: PTH118  # lint-baseline
 
 
 def _connect_db() -> sqlite3.Connection:
@@ -137,7 +137,7 @@ def create_faq(question: str, answer: str, category_id: int, display_order: int 
         with closing(_connect_db()) as conn:
             cursor = conn.cursor()
 
-            now = datetime.now().isoformat()
+            now = datetime.now().isoformat()  # noqa: DTZ005  # lint-baseline
 
             cursor.execute(
                 """
@@ -158,7 +158,7 @@ def create_faq(question: str, answer: str, category_id: int, display_order: int 
         raise
 
 
-def update_faq(
+def update_faq(  # noqa: PLR0913  # lint-baseline
     faq_id: int,
     question: str = None,
     answer: str = None,
@@ -199,10 +199,10 @@ def update_faq(
 
             # Always update updated_date
             updates.append("updated_date = ?")
-            params.append(datetime.now().isoformat())
+            params.append(datetime.now().isoformat())  # noqa: DTZ005  # lint-baseline
 
             params.append(faq_id)
-            query = f"UPDATE FAQs SET {', '.join(updates)} WHERE id = ?"
+            query = f"UPDATE FAQs SET {', '.join(updates)} WHERE id = ?"  # noqa: S608  # lint-baseline
 
             cursor.execute(query, params)
             conn.commit()
@@ -331,7 +331,7 @@ def create_faq_category(name: str, display_order: int = 0) -> int:
                 INSERT INTO FAQCategories (name, display_order, is_active, created_date)
                 VALUES (?, ?, 1, ?)
             """,
-                (name, display_order, datetime.now().isoformat()),
+                (name, display_order, datetime.now().isoformat()),  # noqa: DTZ005  # lint-baseline
             )
 
             conn.commit()
@@ -377,7 +377,7 @@ def update_faq_category(
                 return False
 
             params.append(category_id)
-            query = f"UPDATE FAQCategories SET {', '.join(updates)} WHERE id = ?"
+            query = f"UPDATE FAQCategories SET {', '.join(updates)} WHERE id = ?"  # noqa: S608  # lint-baseline
 
             cursor.execute(query, params)
             conn.commit()

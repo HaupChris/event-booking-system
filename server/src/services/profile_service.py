@@ -25,8 +25,8 @@ IN_DOCKER = os.environ.get("IN_DOCKER", "False").lower() == "true"
 if IN_DOCKER:
     DB_FILE_PATH = "/app/user_data/bookings.db"
 else:
-    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")
-    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")
+    DB_DIR = os.path.join(os.path.dirname(__file__), "../../db")  # noqa: PTH118, PTH120  # lint-baseline
+    DB_FILE_PATH = os.path.join(DB_DIR, "bookings.db")  # noqa: PTH118  # lint-baseline
 
 
 def _connect_db() -> sqlite3.Connection:
@@ -40,7 +40,7 @@ def _connect_db() -> sqlite3.Connection:
         raise
 
 
-def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:
+def get_profile_by_uuid(profile_uuid: str) -> dict[str, Any] | None:  # noqa: C901, PLR0912  # lint-baseline
     """
     Get complete profile data by profile UUID.
 
@@ -389,7 +389,7 @@ def get_assigned_shifts(booking_id: int) -> list[dict[str, Any]]:
 
             shifts = []
             for row in cursor.fetchall():
-                shifts.append(
+                shifts.append(  # noqa: PERF401  # lint-baseline
                     {
                         "assignment_id": row["assignment_id"],
                         "status": row["status"] or "pending",
@@ -455,7 +455,7 @@ def accept_shift(profile_uuid: str, assignment_id: int) -> bool:
                     response_date = ?
                 WHERE id = ?
             """,
-                (datetime.now().isoformat(), assignment_id),
+                (datetime.now().isoformat(), assignment_id),  # noqa: DTZ005  # lint-baseline
             )
 
             conn.commit()
@@ -479,7 +479,7 @@ def decline_shift(
         logger.debug(f"Declining shift assignment {assignment_id} for profile {profile_uuid}")
 
         # Validate rejection reason (required, minimum 20 characters)
-        MIN_REASON_LENGTH = 20
+        MIN_REASON_LENGTH = 20  # noqa: N806  # lint-baseline
         if not rejection_reason or len(rejection_reason.strip()) < MIN_REASON_LENGTH:
             raise ValueError(
                 f"Rejection reason is required and must be at least {MIN_REASON_LENGTH} characters. "
@@ -517,7 +517,7 @@ def decline_shift(
                 WHERE id = ?
             """,
                 (
-                    datetime.now().isoformat(),
+                    datetime.now().isoformat(),  # noqa: DTZ005  # lint-baseline
                     rejection_reason,
                     alternative_preferences,
                     assignment_id,
@@ -560,7 +560,7 @@ def get_profile_uuids_by_email(email: str) -> list[dict[str, str]]:
             )
 
             for row in cursor.fetchall():
-                profiles.append(
+                profiles.append(  # noqa: PERF401  # lint-baseline
                     {
                         "profile_uuid": row["profile_uuid"],
                         "name": f"{row['first_name']} {row['last_name']}",
@@ -582,7 +582,7 @@ def get_profile_uuids_by_email(email: str) -> list[dict[str, str]]:
             )
 
             for row in cursor.fetchall():
-                profiles.append(
+                profiles.append(  # noqa: PERF401  # lint-baseline
                     {
                         "profile_uuid": row["profile_uuid"],
                         "name": f"{row['first_name']} {row['last_name']}",
@@ -631,7 +631,7 @@ def get_profile_stats() -> list[dict[str, Any]]:
             """)
 
             for row in cursor.fetchall():
-                profiles.append(
+                profiles.append(  # noqa: PERF401  # lint-baseline
                     {
                         "booking_id": row["booking_id"],
                         "booking_type": row["booking_type"],
@@ -664,7 +664,7 @@ def get_profile_stats() -> list[dict[str, Any]]:
             """)
 
             for row in cursor.fetchall():
-                profiles.append(
+                profiles.append(  # noqa: PERF401  # lint-baseline
                     {
                         "booking_id": row["booking_id"],
                         "booking_type": row["booking_type"],

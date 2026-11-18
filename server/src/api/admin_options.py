@@ -149,7 +149,7 @@ def create_option_endpoint(scope: str, option_type: str):  # noqa: PLR0911
 )
 @limiter_admin_options.limit("60/minute")
 @jwt_required()
-def update_option_endpoint(scope: str, option_type: str, option_id: int):  # noqa: PLR0911, PLR0912
+def update_option_endpoint(scope: str, option_type: str, option_id: int):  # noqa: C901, PLR0911, PLR0912  # lint-baseline
     unauthorized = _ensure_admin()
     if unauthorized:
         return jsonify(unauthorized[0]), unauthorized[1]

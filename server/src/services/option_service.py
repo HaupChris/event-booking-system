@@ -141,7 +141,7 @@ def _seed_ticket_table_if_empty(
     cursor: sqlite3.Cursor, table_name: str, options: list[dict[str, Any]]
 ) -> None:
     table_name = _assert_allowed_table_name(table_name)
-    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")  # noqa: S608  # lint-baseline
     if int(cursor.fetchone()[0]) > 0:
         return
 
@@ -154,7 +154,7 @@ def _seed_ticket_table_if_empty(
             f"""
             INSERT INTO {table_name} (id, title, working_title, price, amount, requires_workshift)
             VALUES (?, ?, ?, ?, ?, ?)
-            """,
+            """,  # noqa: S608  # lint-baseline
             (
                 idx,
                 title,
@@ -170,7 +170,7 @@ def _seed_described_option_table_if_empty(
     cursor: sqlite3.Cursor, table_name: str, options: list[dict[str, Any]]
 ) -> None:
     table_name = _assert_allowed_table_name(table_name)
-    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")  # noqa: S608  # lint-baseline
     if int(cursor.fetchone()[0]) > 0:
         return
 
@@ -183,7 +183,7 @@ def _seed_described_option_table_if_empty(
             f"""
             INSERT INTO {table_name} (id, title, working_title, description, price)
             VALUES (?, ?, ?, ?, ?)
-            """,
+            """,  # noqa: S608  # lint-baseline
             (
                 idx,
                 title,
@@ -198,7 +198,7 @@ def _seed_material_table_if_empty(
     cursor: sqlite3.Cursor, table_name: str, materials: list[dict[str, Any]]
 ) -> None:
     table_name = _assert_allowed_table_name(table_name)
-    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")  # noqa: S608  # lint-baseline
     if int(cursor.fetchone()[0]) > 0:
         return
 
@@ -211,7 +211,7 @@ def _seed_material_table_if_empty(
             f"""
             INSERT INTO {table_name} (id, title, working_title, num_needed)
             VALUES (?, ?, ?, ?)
-            """,
+            """,  # noqa: S608  # lint-baseline
             (
                 idx,
                 title,
@@ -333,7 +333,7 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
             UPDATE {table_name}
             SET working_title = title
             WHERE working_title IS NULL OR TRIM(working_title) = ''
-            """
+            """  # noqa: S608  # lint-baseline
         )
 
     for ticket_table in ["TicketOptions", "ArtistTicketOptions"]:
@@ -346,7 +346,7 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
             UPDATE {ticket_table}
             SET requires_workshift = 1
             WHERE requires_workshift IS NULL
-            """
+            """  # noqa: S608  # lint-baseline
         )
 
     regular_ticket_seed = _load_option_seed(REGULAR_FORM_CONTENT_PATH, "ticket_options")
@@ -399,7 +399,7 @@ def get_options(scope: OptionScope, option_type: OptionType) -> list[dict[str, A
                     requires_workshift
                 FROM {table_name}
                 ORDER BY id ASC
-                """
+                """  # noqa: S608  # lint-baseline
             )
             rows = cursor.fetchall()
             return [
@@ -424,7 +424,7 @@ def get_options(scope: OptionScope, option_type: OptionType) -> list[dict[str, A
                     num_needed
                 FROM {table_name}
                 ORDER BY id ASC
-                """
+                """  # noqa: S608  # lint-baseline
             )
             rows = cursor.fetchall()
             return [
@@ -447,7 +447,7 @@ def get_options(scope: OptionScope, option_type: OptionType) -> list[dict[str, A
                 price
             FROM {table_name}
             ORDER BY id ASC
-            """
+            """  # noqa: S608  # lint-baseline
         )
         rows = cursor.fetchall()
         return [
@@ -486,7 +486,7 @@ def create_option(  # noqa: PLR0913
                 f"""
                 INSERT INTO {table_name} (title, working_title, price, amount, requires_workshift)
                 VALUES (?, ?, ?, ?, ?)
-                """,
+                """,  # noqa: S608  # lint-baseline
                 (
                     clean_title,
                     clean_working_title,
@@ -500,7 +500,7 @@ def create_option(  # noqa: PLR0913
                 f"""
                 INSERT INTO {table_name} (title, working_title, num_needed)
                 VALUES (?, ?, ?)
-                """,
+                """,  # noqa: S608  # lint-baseline
                 (
                     clean_title,
                     clean_working_title,
@@ -512,7 +512,7 @@ def create_option(  # noqa: PLR0913
                 f"""
                 INSERT INTO {table_name} (title, working_title, description, price)
                 VALUES (?, ?, ?, ?)
-                """,
+                """,  # noqa: S608  # lint-baseline
                 (
                     clean_title,
                     clean_working_title,
@@ -580,7 +580,7 @@ def update_option(  # noqa: PLR0913
 
         values.append(option_id)
         cursor.execute(
-            f"UPDATE {table_name} SET {', '.join(updates)} WHERE id = ?",
+            f"UPDATE {table_name} SET {', '.join(updates)} WHERE id = ?",  # noqa: S608  # lint-baseline
             tuple(values),
         )
         conn.commit()
@@ -594,7 +594,7 @@ def delete_option(scope: OptionScope, option_type: OptionType, option_id: int) -
         _ensure_schema(conn)
         cursor = conn.cursor()
 
-        cursor.execute(f"SELECT id FROM {table_name} WHERE id = ?", (option_id,))
+        cursor.execute(f"SELECT id FROM {table_name} WHERE id = ?", (option_id,))  # noqa: S608  # lint-baseline
         if not cursor.fetchone():
             return False, "Option not found"
 
@@ -602,28 +602,28 @@ def delete_option(scope: OptionScope, option_type: OptionType, option_id: int) -
             usage_table = _assert_allowed_table_name(MATERIAL_USAGE_TABLE_MAP[scope])
             usage_column = MATERIAL_USAGE_COLUMN_MAP[scope]
             cursor.execute(
-                f"SELECT COUNT(*) FROM {usage_table} WHERE {usage_column} = ?",
+                f"SELECT COUNT(*) FROM {usage_table} WHERE {usage_column} = ?",  # noqa: S608  # lint-baseline
                 (option_id,),
             )
             usage_count = int(cursor.fetchone()[0])
             if usage_count > 0:
                 return False, "Option is in use and cannot be deleted"
 
-            cursor.execute(f"DELETE FROM {table_name} WHERE id = ?", (option_id,))
+            cursor.execute(f"DELETE FROM {table_name} WHERE id = ?", (option_id,))  # noqa: S608  # lint-baseline
             conn.commit()
             return True, "Option deleted"
 
         usage_table = _assert_allowed_table_name(BOOKING_TABLE_MAP[scope])
         usage_column = BOOKING_COLUMN_MAP[option_type]
         cursor.execute(
-            f"SELECT COUNT(*) FROM {usage_table} WHERE {usage_column} = ?",
+            f"SELECT COUNT(*) FROM {usage_table} WHERE {usage_column} = ?",  # noqa: S608  # lint-baseline
             (option_id,),
         )
         usage_count = int(cursor.fetchone()[0])
         if usage_count > 0:
             return False, "Option is in use and cannot be deleted"
 
-        cursor.execute(f"DELETE FROM {table_name} WHERE id = ?", (option_id,))
+        cursor.execute(f"DELETE FROM {table_name} WHERE id = ?", (option_id,))  # noqa: S608  # lint-baseline
         conn.commit()
         return True, "Option deleted"
 
@@ -639,7 +639,7 @@ def ticket_requires_workshift(ticket_id: int, scope: OptionScope = "regular") ->
             SELECT requires_workshift
             FROM {table_name}
             WHERE id = ?
-            """,
+            """,  # noqa: S608  # lint-baseline
             (ticket_id,),
         )
         row = cursor.fetchone()

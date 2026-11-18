@@ -81,7 +81,7 @@ def _create_artist_booking_payload(source: dict, total_price: float) -> dict:
 @artist_bp.route("/artist/submitForm", methods=["POST"])
 @limiter_artist.limit("90/minute")
 @jwt_required()
-def submit_artist_form():  # noqa: PLR0911, PLR0912, PLR0915
+def submit_artist_form():  # noqa: C901, PLR0911, PLR0912, PLR0915  # lint-baseline
     """Submit artist booking form with comprehensive logging."""
     start_time = time.time()
     client_ip = request.remote_addr

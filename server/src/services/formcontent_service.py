@@ -23,11 +23,11 @@ from src.models.datatypes import (
 # Initialize logger
 logger = logging.getLogger(__name__)
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "../../data")
-FORM_CONTENT_PATH = os.path.join(DATA_DIR, "form_content.json")
+DATA_DIR = os.path.join(os.path.dirname(__file__), "../../data")  # noqa: PTH118, PTH120  # lint-baseline
+FORM_CONTENT_PATH = os.path.join(DATA_DIR, "form_content.json")  # noqa: PTH118  # lint-baseline
 
 
-def get_form_content_obj() -> FormContent:
+def get_form_content_obj() -> FormContent:  # noqa: PLR0915  # lint-baseline
     """
     Loads and returns a FormContent object from JSON (without DB-based booked counts).
     """
@@ -36,11 +36,11 @@ def get_form_content_obj() -> FormContent:
     try:
         logger.debug(f"Loading form content from {FORM_CONTENT_PATH}")
 
-        if not os.path.exists(FORM_CONTENT_PATH):
+        if not os.path.exists(FORM_CONTENT_PATH):  # noqa: PTH110  # lint-baseline
             logger.error(f"Form content file not found: {FORM_CONTENT_PATH}")
             raise FileNotFoundError(f"Form content file not found: {FORM_CONTENT_PATH}")
 
-        with open(FORM_CONTENT_PATH, encoding="utf-8") as f:
+        with open(FORM_CONTENT_PATH, encoding="utf-8") as f:  # noqa: PTH123  # lint-baseline
             data = json.load(f)
 
         logger.debug("Form content JSON loaded successfully")
@@ -155,18 +155,18 @@ def get_artist_form_content_obj() -> ArtistFormContent:
     Loads and returns an ArtistFormContent object from JSON.
     """
     start_time = time.time()
-    ARTIST_FORM_CONTENT_PATH = os.path.join(DATA_DIR, "artist_form_content.json")
+    ARTIST_FORM_CONTENT_PATH = os.path.join(DATA_DIR, "artist_form_content.json")  # noqa: N806, PTH118  # lint-baseline
 
     try:
         logger.debug(f"Loading artist form content from {ARTIST_FORM_CONTENT_PATH}")
 
-        if not os.path.exists(ARTIST_FORM_CONTENT_PATH):
+        if not os.path.exists(ARTIST_FORM_CONTENT_PATH):  # noqa: PTH110  # lint-baseline
             logger.error(f"Artist form content file not found: {ARTIST_FORM_CONTENT_PATH}")
             raise FileNotFoundError(
                 f"Artist form content file not found: {ARTIST_FORM_CONTENT_PATH}"
             )
 
-        with open(ARTIST_FORM_CONTENT_PATH, encoding="utf-8") as f:
+        with open(ARTIST_FORM_CONTENT_PATH, encoding="utf-8") as f:  # noqa: PTH123  # lint-baseline
             data = json.load(f)
 
         logger.debug("Artist form content JSON loaded successfully")
@@ -494,7 +494,7 @@ def _load_artist_materials_from_db(cursor: sqlite3.Cursor) -> list[ArtistMateria
     ]
 
 
-def update_form_content_with_db_counts(
+def update_form_content_with_db_counts(  # noqa: C901, PLR0912, PLR0915  # lint-baseline
     form_content_obj: FormContent, db_connect_func: Callable[[], sqlite3.Connection]
 ) -> dict:
     """
@@ -746,7 +746,7 @@ def update_form_content_with_db_counts(
 #         # Continue with original IDs if update fails
 
 
-def update_artist_form_content_with_db_counts(
+def update_artist_form_content_with_db_counts(  # noqa: C901, PLR0912, PLR0915  # lint-baseline
     form_content_obj: FormContent, db_connect_func: Callable[[], sqlite3.Connection]
 ) -> dict:
     """
